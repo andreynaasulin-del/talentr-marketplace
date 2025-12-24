@@ -35,19 +35,19 @@ export default function VendorCard({ vendor, index = 0 }: VendorCardProps) {
         >
             <Link href={`/vendor/${vendor.id}`} className="block group">
                 <motion.article
-                    className="card-interactive bg-white rounded-2xl overflow-hidden shadow-card"
+                    className="card-interactive bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-card dark:shadow-slate-900/50 border border-gray-100 dark:border-slate-700"
                     whileHover={{
-                        y: -5,
-                        boxShadow: "0 20px 40px rgba(0,0,0,0.12)"
+                        y: -8,
+                        boxShadow: "0 25px 50px rgba(0,0,0,0.15)"
                     }}
-                    whileTap={{ scale: 0.98 }}
+                    whileTap={{ scale: 0.97 }}
                     transition={{
                         duration: 0.3,
                         ease: [0.21, 0.47, 0.32, 0.98]
                     }}
                 >
                     {/* Image Container */}
-                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100">
+                    <div className="relative aspect-[4/3] overflow-hidden bg-gray-100 dark:bg-slate-700">
                         <motion.div
                             className="w-full h-full"
                             whileHover={{ scale: 1.05 }}
@@ -137,33 +137,33 @@ export default function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                     <div className="p-5">
                         {/* Header Row */}
                         <div className="flex items-start justify-between gap-2 mb-2">
-                            <h3 className="font-bold text-gray-900 text-lg leading-tight line-clamp-1 group-hover:text-blue-600 transition-colors">
+                            <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight line-clamp-1 group-hover:text-blue-600 transition-colors">
                                 {vendor.name}
                             </h3>
 
                             {/* Rating */}
                             <div className="flex items-center gap-1 flex-shrink-0">
                                 <Star className="w-4 h-4 fill-amber-400 text-amber-400" />
-                                <span className="font-bold text-gray-900">{vendor.rating.toFixed(1)}</span>
+                                <span className="font-bold text-gray-900 dark:text-white">{vendor.rating.toFixed(1)}</span>
                             </div>
                         </div>
 
                         {/* Location */}
-                        <div className="flex items-center gap-1.5 text-gray-500 text-sm mb-4">
+                        <div className="flex items-center gap-1.5 text-gray-500 dark:text-gray-400 text-sm mb-4">
                             <MapPin className="w-3.5 h-3.5" />
                             <span>{t(vendor.city)}</span>
-                            <span className="text-gray-300">•</span>
+                            <span className="text-gray-300 dark:text-slate-600">•</span>
                             <span>{vendor.reviewsCount} {t('reviews')}</span>
                         </div>
 
                         {/* Footer Row */}
-                        <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                        <div className="flex items-center justify-between pt-3 border-t border-gray-100 dark:border-slate-700">
                             {/* Tags */}
                             <div className="flex gap-1.5 overflow-hidden">
                                 {vendor.tags.slice(0, 2).map((tag) => (
                                     <span
                                         key={tag}
-                                        className="text-xs bg-gray-100 text-gray-600 px-2 py-1 rounded-md whitespace-nowrap"
+                                        className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-2 py-1 rounded-md whitespace-nowrap"
                                     >
                                         {t(tag)}
                                     </span>

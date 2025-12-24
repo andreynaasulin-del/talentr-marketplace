@@ -1,11 +1,14 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, User, LogOut, Globe, ChevronDown } from 'lucide-react';
+import { Search, User, LogOut, Globe, ChevronDown, Calendar } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
 
 export default function Navbar() {
     const router = useRouter();
@@ -26,7 +29,6 @@ export default function Navbar() {
         };
         checkAuth();
 
-        // Scroll listener for navbar effect
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
@@ -38,6 +40,7 @@ export default function Navbar() {
         localStorage.removeItem('test_mode');
         localStorage.removeItem('test_user');
         await supabase.auth.signOut();
+        toast.success(language === 'ru' ? 'Вы вышли из аккаунта' : language === 'he' ? 'התנתקת בהצלחה' : 'Signed out successfully');
         router.push('/');
     };
 
@@ -50,108 +53,165 @@ export default function Navbar() {
     const currentLang = languages.find((l) => l.code === language) || languages[0];
 
     return (
-        <nav className={`
-            sticky top-0 z-50 transition-all duration-300
-            ${isScrolled
-                ? 'navbar-glass shadow-md'
-                : 'bg-white/80 backdrop-blur-sm border-b border-gray-100/50'
-            }
-        `}>
+        <motion.nav
+            className={cn(
+                "sticky top-0 z-50 transition-all duration-300",
+                isScrolled
+                    ? 'navbar-glass shadow-md'
+                    : 'bg-white/80 dark:bg-slate-900/80 backdrop-blur-sm border-b border-gray-100/50 dark:border-slate-800/50'
+            )}
+            initial={{ y: -100 }}
+            animate={{ y: 0 }}
+            transition={{ duration: 0.5, ease: [0.21, 0.47, 0.32, 0.98] }}
+        >
             <div className="max-w-7xl mx-auto px-4 md:px-6 py-3 md:py-4">
                 <div className="flex items-center justify-between gap-4 md:gap-8">
-                    {/* Logo - force LTR to prevent reversal */}
-                    <Link
-                        href="/"
-                        dir="ltr"
-                        className="text-xl md:text-2xl font-bold hover:opacity-80 transition-all duration-300 flex items-center gap-0"
-                    >
-                        <span className="text-gray-900">talent</span>
-                        <span className="text-gradient">r</span>
-                    </Link>
+                    {/* Logo */}
+                    <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                        <Link
+                            href="/"
+                            dir="ltr"
+                            className="text-xl md:text-2xl font-bold hover:opacity-80 transition-all duration-300 flex items-center gap-0"
+                        >
+                            <span className="text-gray-900 dark:text-white">talent</span>
+                            <span className="text-gradient">r</span>
+                        </Link>
+                    </motion.div>
 
-                    {/* Search Bar - Hidden on mobile */}
+                    {/* Search Bar */}
                     <div className="hidden md:block flex-1 max-w-xl">
-                        <div className="relative group">
+                        <motion.div
+                            className="relative group"
+                            whileHover={{ scale: 1.01 }}
+                        >
                             <Search className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400 group-focus-within:text-blue-500 transition-colors" />
                             <input
                                 type="text"
                                 placeholder={t('searchPlaceholder')}
-                                className="search-input w-full rounded-full ps-12 pe-4 py-3 text-gray-900 placeholder-gray-400 focus:outline-none"
+                                className={cn(
+                                    "search-input w-full rounded-full ps-12 pe-4 py-3",
+                                    "text-gray-900 dark:text-white placeholder-gray-400 focus:outline-none",
+                                    "bg-gray-50 dark:bg-slate-800 border border-gray-100 dark:border-slate-700"
+                                )}
                             />
-                        </div>
+                        </motion.div>
                     </div>
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-2 md:gap-4">
                         {/* Language Switcher */}
                         <div className="relative">
-                            <button
+                            <motion.button
                                 onClick={() => setShowLangDropdown(!showLangDropdown)}
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-bold text-gray-700 hover:bg-gray-100 rounded-xl transition-all duration-200"
+                                className={cn(
+                                    "flex items-center gap-2 px-3 py-2 text-sm font-bold rounded-xl transition-all duration-200",
+                                    "text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800"
+                                )}
+                                whileHover={{ scale: 1.02 }}
+                                whileTap={{ scale: 0.98 }}
                             >
                                 <span className="text-xl leading-none">{currentLang.flag}</span>
                                 <span className="hidden lg:inline">{currentLang.label}</span>
-                                <ChevronDown className={`w-4 h-4 transition-transform duration-300 ${showLangDropdown ? 'rotate-180' : ''}`} />
-                            </button>
+                                <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", showLangDropdown && 'rotate-180')} />
+                            </motion.button>
 
-                            {showLangDropdown && (
-                                <>
-                                    <div
-                                        className="fixed inset-0 z-40"
-                                        onClick={() => setShowLangDropdown(false)}
-                                    />
-                                    <div className="absolute end-0 mt-3 w-48 bg-white/95 backdrop-blur-xl rounded-2xl shadow-xl border border-gray-100 py-2 z-50 animate-scale-in">
-                                        {languages.map((lang) => (
-                                            <button
-                                                key={lang.code}
-                                                onClick={() => {
-                                                    setLanguage(lang.code);
-                                                    setShowLangDropdown(false);
-                                                }}
-                                                className={`
-                                                    w-full px-4 py-3 text-start hover:bg-blue-50 transition-colors flex items-center justify-between
-                                                    ${language === lang.code ? 'text-blue-600' : 'text-gray-700'}
-                                                `}
-                                            >
-                                                <div className="flex items-center gap-3">
-                                                    <span className="text-xl leading-none">{lang.flag}</span>
-                                                    <span className="font-bold">{lang.label}</span>
-                                                </div>
-                                                {language === lang.code && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
+                            <AnimatePresence>
+                                {showLangDropdown && (
+                                    <>
+                                        <div
+                                            className="fixed inset-0 z-40"
+                                            onClick={() => setShowLangDropdown(false)}
+                                        />
+                                        <motion.div
+                                            className={cn(
+                                                "absolute end-0 mt-3 w-48 py-2 z-50",
+                                                "bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-2xl shadow-xl",
+                                                "border border-gray-100 dark:border-slate-700"
+                                            )}
+                                            initial={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            animate={{ opacity: 1, y: 0, scale: 1 }}
+                                            exit={{ opacity: 0, y: -10, scale: 0.95 }}
+                                            transition={{ duration: 0.2 }}
+                                        >
+                                            {languages.map((lang) => (
+                                                <motion.button
+                                                    key={lang.code}
+                                                    onClick={() => {
+                                                        setLanguage(lang.code);
+                                                        setShowLangDropdown(false);
+                                                        toast.success(`Language: ${lang.label}`);
+                                                    }}
+                                                    className={cn(
+                                                        "w-full px-4 py-3 text-start flex items-center justify-between transition-colors",
+                                                        "hover:bg-blue-50 dark:hover:bg-blue-900/20",
+                                                        language === lang.code ? 'text-blue-600' : 'text-gray-700 dark:text-gray-300'
+                                                    )}
+                                                    whileHover={{ x: 4 }}
+                                                >
+                                                    <div className="flex items-center gap-3">
+                                                        <span className="text-xl leading-none">{lang.flag}</span>
+                                                        <span className="font-bold">{lang.label}</span>
+                                                    </div>
+                                                    {language === lang.code && <div className="w-1.5 h-1.5 rounded-full bg-blue-600" />}
+                                                </motion.button>
+                                            ))}
+                                        </motion.div>
+                                    </>
+                                )}
+                            </AnimatePresence>
                         </div>
 
                         {/* Auth Button / User Profile */}
                         {isAuthenticated ? (
                             <div className="flex items-center gap-3">
-                                <button
+                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                    <Link
+                                        href="/bookings"
+                                        className={cn(
+                                            "hidden md:flex items-center gap-2 px-4 py-2 text-sm font-bold rounded-xl transition-all",
+                                            "text-gray-600 dark:text-gray-300 hover:text-blue-600 hover:bg-blue-50 dark:hover:bg-blue-900/20"
+                                        )}
+                                    >
+                                        <Calendar className="w-4 h-4" />
+                                        {language === 'ru' ? 'Заказы' : language === 'he' ? 'הזמנות' : 'Bookings'}
+                                    </Link>
+                                </motion.div>
+                                <motion.button
                                     onClick={handleSignOut}
-                                    className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 rounded-xl transition-all"
+                                    className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                                     title={t('signOut')}
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.9 }}
                                 >
                                     <LogOut className="w-5 h-5" />
-                                </button>
-                                <div className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center p-0.5 shadow-md">
-                                    <div className="w-full h-full rounded-full bg-white flex items-center justify-center">
-                                        <User className="w-5 h-5 text-gray-900" />
+                                </motion.button>
+                                <motion.div
+                                    className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center p-0.5 shadow-md"
+                                    whileHover={{ scale: 1.1 }}
+                                    whileTap={{ scale: 0.95 }}
+                                >
+                                    <div className="w-full h-full rounded-full bg-white dark:bg-slate-800 flex items-center justify-center">
+                                        <User className="w-5 h-5 text-gray-900 dark:text-white" />
                                     </div>
-                                </div>
+                                </motion.div>
                             </div>
                         ) : (
-                            <Link
-                                href="/signin"
-                                className="px-6 py-2.5 bg-gray-900 text-white rounded-xl font-bold hover:bg-gray-800 transition-all duration-300 shadow-lg shadow-gray-900/10 hover:shadow-gray-900/20 active:scale-95"
-                            >
-                                {t('Sign In')}
-                            </Link>
+                            <motion.div whileHover={{ scale: 1.05 }} whileTap={{ scale: 0.95 }}>
+                                <Link
+                                    href="/signin"
+                                    className={cn(
+                                        "px-6 py-2.5 rounded-xl font-bold transition-all duration-300",
+                                        "bg-gray-900 dark:bg-white text-white dark:text-gray-900",
+                                        "shadow-lg shadow-gray-900/10 hover:shadow-gray-900/20"
+                                    )}
+                                >
+                                    {t('Sign In')}
+                                </Link>
+                            </motion.div>
                         )}
                     </div>
                 </div>
             </div>
-        </nav>
+        </motion.nav>
     );
 }

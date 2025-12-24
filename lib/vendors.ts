@@ -94,7 +94,7 @@ export async function getVendorsByCity(city: City): Promise<Vendor[]> {
 }
 
 /**
- * Get single vendor by ID
+ * Get single vendor by ID - falls back to mock data
  */
 export async function getVendorById(id: string): Promise<Vendor | null> {
     const { data, error } = await supabase
@@ -103,16 +103,16 @@ export async function getVendorById(id: string): Promise<Vendor | null> {
         .eq('id', id)
         .single();
 
-    if (error) {
-        console.error('Error fetching vendor:', error);
-        return null;
+    if (error || !data) {
+        console.log('Using fallback vendor data for ID:', id);
+        return getMockVendorById(id);
     }
 
-    return data ? toVendor(data) : null;
+    return toVendor(data);
 }
 
 /**
- * Get featured vendors (for homepage)
+ * Get featured vendors (for homepage) - falls back to mock data
  */
 export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
     const { data, error } = await supabase
@@ -123,12 +123,30 @@ export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
         .order('rating', { ascending: false })
         .limit(limit);
 
-    if (error) {
-        console.error('Error fetching featured vendors:', error);
-        return [];
+    if (error || !data || data.length === 0) {
+        console.log('Using fallback vendor data');
+        return getMockFeaturedVendors(limit);
     }
 
-    return (data || []).map(toVendor);
+    return data.map(toVendor);
+}
+
+// Mock data for when Supabase is unavailable
+const mockVendorsList: Vendor[] = [
+    { id: 'mock-1', name: 'David Cohen Photography', category: 'Photographer', city: 'Tel Aviv', rating: 4.9, reviewsCount: 127, priceFrom: 2500, imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Bar Mitzvah', 'Corporate'], description: 'Professional wedding and event photographer with 10+ years experience.', phone: '+972501234567', isVerified: true, isFeatured: true },
+    { id: 'mock-2', name: 'DJ Noam - Electronic Vibes', category: 'DJ', city: 'Tel Aviv', rating: 4.8, reviewsCount: 94, priceFrom: 3000, imageUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Birthday', 'Club Night'], description: 'High-energy DJ specializing in EDM and Top 40 hits.', phone: '+972551234567', isVerified: true, isFeatured: true },
+    { id: 'mock-3', name: 'Yael Levi - Master of Ceremonies', category: 'MC', city: 'Haifa', rating: 5.0, reviewsCount: 156, priceFrom: 1800, imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Bar Mitzvah', 'Corporate'], description: 'Charismatic host making your event unforgettable.', phone: '+972521234567', isVerified: true, isFeatured: true },
+    { id: 'mock-4', name: 'Magic Mike - Illusions Show', category: 'Magician', city: 'Jerusalem', rating: 4.9, reviewsCount: 89, priceFrom: 2000, imageUrl: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=800&q=80', tags: ['Kids Party', 'Bar Mitzvah', 'Corporate'], description: 'Award-winning magician bringing wonder to every event.', phone: '+972541234567', isVerified: true, isFeatured: true },
+    { id: 'mock-5', name: 'Dream Decorations', category: 'Event Decor', city: 'Tel Aviv', rating: 5.0, reviewsCount: 234, priceFrom: 3000, imageUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Bar Mitzvah', 'Corporate'], description: 'Transforming venues into magical spaces.', phone: '+972531234567', isVerified: true, isFeatured: true },
+    { id: 'mock-6', name: 'Sarah Gold - Wedding Singer', category: 'Singer', city: 'Tel Aviv', rating: 4.7, reviewsCount: 203, priceFrom: 3500, imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Corporate', 'Private Party'], description: 'Soul and pop singer with 15 years experience.', phone: '+972561234567', isVerified: true, isFeatured: true },
+];
+
+function getMockFeaturedVendors(limit: number): Vendor[] {
+    return mockVendorsList.slice(0, limit);
+}
+
+function getMockVendorById(id: string): Vendor | null {
+    return mockVendorsList.find(v => v.id === id) || mockVendorsList[0];
 }
 
 /**
