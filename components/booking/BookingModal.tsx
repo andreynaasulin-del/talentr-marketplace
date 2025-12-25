@@ -5,6 +5,8 @@ import { useRouter } from 'next/navigation';
 import { X, Calendar, MessageSquare, Briefcase, Loader2, CheckCircle } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
+import { toast } from 'sonner';
+import confetti from 'canvas-confetti';
 
 interface BookingModalProps {
     vendorId: string;
@@ -62,26 +64,70 @@ export default function BookingModal({ vendorId, vendorName, onClose }: BookingM
         setError(null);
 
         try {
-            const { error: bookingError } = await supabase.from('bookings').insert([
-                {
-                    client_id: userId,
-                    vendor_id: vendorId,
-                    event_date: formData.eventDate,
-                    event_type: formData.eventType,
-                    details: formData.details,
-                    status: 'pending',
-                },
-            ]);
+            // Check if in test mode - simulate booking without Supabase
+            const isTestMode = localStorage.getItem('test_mode') === 'true';
 
-            if (bookingError) throw bookingError;
+            if (isTestMode) {
+                // Simulate network delay for realism
+                await new Promise(resolve => setTimeout(resolve, 1000));
+                console.log('🧪 Test Mode: Booking simulated', {
+                    vendorId,
+                    eventDate: formData.eventDate,
+                    eventType: formData.eventType,
+                });
+            } else {
+                // Real Supabase booking
+                const { error: bookingError } = await supabase.from('bookings').insert([
+                    {
+                        client_id: userId,
+                        vendor_id: vendorId,
+                        event_date: formData.eventDate,
+                        event_type: formData.eventType,
+                        details: formData.details,
+                        status: 'pending',
+                    },
+                ]);
 
+                if (bookingError) throw bookingError;
+            }
+
+            // 🎉 Celebration!
             setSuccess(true);
+
+            // Fire confetti
+            confetti({
+                particleCount: 100,
+                spread: 70,
+                origin: { y: 0.6 },
+                colors: ['#3b82f6', '#8b5cf6', '#10b981', '#f59e0b']
+            });
+
+            // Show toast
+            toast.success(
+                language === 'ru' ? 'Заявка отправлена!' : language === 'he' ? 'הבקשה נשלחה!' : 'Booking Request Sent!',
+                {
+                    description: language === 'ru'
+                        ? 'Специалист свяжется с вами в ближайшее время'
+                        : language === 'he'
+                            ? 'איש המקצוע יצור איתך קשר בקרוב'
+                            : 'The professional will contact you soon',
+                }
+            );
+
             setTimeout(() => {
                 onClose();
             }, 3000);
         } catch (err: any) {
             console.error('Booking error:', err);
             setError(err.message || 'Failed to send booking request');
+
+            // Show error toast
+            toast.error(
+                language === 'ru' ? 'Ошибка' : language === 'he' ? 'שגיאה' : 'Error',
+                {
+                    description: err.message || 'Failed to send booking request',
+                }
+            );
         } finally {
             setLoading(false);
         }
