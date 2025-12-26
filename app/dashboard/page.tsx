@@ -64,20 +64,6 @@ export default function DashboardPage() {
 
     useEffect(() => {
         const checkUser = async () => {
-            // Проверяем тестовый режим
-            const testMode = localStorage.getItem('test_mode');
-            const testUserData = localStorage.getItem('test_user');
-
-            if (testMode === 'true' && testUserData) {
-                // Используем тестового пользователя
-                const testUser = JSON.parse(testUserData);
-                setUser(testUser as any);
-                setVendorId('00000000-0000-0000-0000-000000000001'); // Test vendor ID
-                setLoading(false);
-                return;
-            }
-
-            // Обычная проверка через Supabase
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
@@ -158,18 +144,6 @@ export default function DashboardPage() {
         <>
             <Navbar />
             <div className="max-w-7xl mx-auto px-6 py-8">
-                {/* Test Mode Banner */}
-                {typeof window !== 'undefined' && localStorage.getItem('test_mode') === 'true' && (
-                    <div className="mb-6 bg-blue-500 text-white rounded-2xl p-6 shadow-lg">
-                        <div className="flex items-center gap-3">
-                            <span className="text-3xl">🚀</span>
-                            <div>
-                                <h3 className="font-bold text-lg">Test Mode Active</h3>
-                                <p className="text-sm opacity-90">You're using a temporary test account. No real authentication required.</p>
-                            </div>
-                        </div>
-                    </div>
-                )}
 
                 {/* Header */}
                 <div className="mb-8">

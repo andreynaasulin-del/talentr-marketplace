@@ -71,15 +71,6 @@ export default function BookingModal({
     // Check authentication
     useEffect(() => {
         const checkUser = async () => {
-            const testMode = localStorage.getItem('test_mode');
-            const testUserData = localStorage.getItem('test_user');
-
-            if (testMode === 'true' && testUserData) {
-                const testUser = JSON.parse(testUserData);
-                setUserId(testUser.id || 'test-user-id');
-                return;
-            }
-
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 toast.error(t('loginRequired'), {
@@ -146,26 +137,21 @@ export default function BookingModal({
         setError(null);
 
         try {
-            const isTestMode = localStorage.getItem('test_mode') === 'true';
+            // Save booking to Supabase
+            const { error: bookingError } = await supabase.from('bookings').insert([{
+                client_id: userId,
+                vendor_id: vendorId,
+                event_date: formData.eventDate,
+                event_type: formData.eventType,
+                details: JSON.stringify({
+                    time: formData.eventTime,
+                    guests: formData.guestCount,
+                    message: formData.details,
+                }),
+                status: 'pending',
+            }]);
 
-            if (isTestMode) {
-                await new Promise(resolve => setTimeout(resolve, 1200));
-            } else {
-                const { error: bookingError } = await supabase.from('bookings').insert([{
-                    client_id: userId,
-                    vendor_id: vendorId,
-                    event_date: formData.eventDate,
-                    event_type: formData.eventType,
-                    details: JSON.stringify({
-                        time: formData.eventTime,
-                        guests: formData.guestCount,
-                        message: formData.details,
-                    }),
-                    status: 'pending',
-                }]);
-
-                if (bookingError) throw bookingError;
-            }
+            if (bookingError) throw bookingError;
 
             // 🎉 Success!
             setSuccess(true);

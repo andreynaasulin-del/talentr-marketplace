@@ -63,19 +63,7 @@ export default function SignInPage() {
         }
     };
 
-    const handleTestMode = () => {
-        const testUser = {
-            id: 'test-user-' + Date.now(),
-            email: 'test@talentr.com',
-            user_metadata: {
-                full_name: 'Test User',
-                role: 'vendor',
-            },
-        };
-        localStorage.setItem('test_mode', 'true');
-        localStorage.setItem('test_user', JSON.stringify(testUser));
-        router.push('/dashboard');
-    };
+
 
     const handleChange = (e: React.ChangeEvent<HTMLInputElement>) => {
         setFormData({
@@ -268,14 +256,7 @@ export default function SignInPage() {
                             {t('googleBtn')}
                         </button>
 
-                        <button
-                            type="button"
-                            onClick={handleTestMode}
-                            className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-white font-bold rounded-xl transition-colors flex items-center justify-center gap-2"
-                        >
-                            <Zap className="w-5 h-5" />
-                            {t('testModeBtn')}
-                        </button>
+
                     </div>
 
                     {/* Divider */}

@@ -46,12 +46,9 @@ export async function middleware(request: NextRequest) {
     );
 
     // Get current session (this also validates the JWT)
-    const { data: { session }, error } = await supabase.auth.getSession();
+    const { data: { session } } = await supabase.auth.getSession();
 
-    // Check for test mode (demo purposes)
-    const testMode = request.cookies.get('test_mode')?.value === 'true';
-
-    const isAuthenticated = !!session || testMode;
+    const isAuthenticated = !!session;
     const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
     const isPublicRoute = publicRoutes.includes(pathname);
 

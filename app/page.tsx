@@ -36,11 +36,6 @@ export default function Home() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const testMode = localStorage.getItem('test_mode');
-            if (testMode === 'true') {
-                setIsAuthenticated(true);
-                return;
-            }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 setIsAuthenticated(true);

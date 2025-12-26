@@ -21,11 +21,6 @@ export default function Navbar() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const testMode = localStorage.getItem('test_mode');
-            if (testMode === 'true') {
-                setIsAuthenticated(true);
-                return;
-            }
             const { data: { user } } = await supabase.auth.getUser();
             setIsAuthenticated(!!user);
         };
@@ -39,8 +34,6 @@ export default function Navbar() {
     }, []);
 
     const handleSignOut = async () => {
-        localStorage.removeItem('test_mode');
-        localStorage.removeItem('test_user');
         await supabase.auth.signOut();
         toast.success(language === 'ru' ? 'Вы вышли из аккаунта' : language === 'he' ? 'התנתקת בהצלחה' : 'Signed out successfully');
         router.push('/');

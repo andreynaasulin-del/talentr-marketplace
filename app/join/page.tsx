@@ -47,7 +47,7 @@ export default function JoinPage() {
         setError('');
 
         try {
-            // Try Supabase first
+            // Register user with Supabase
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
@@ -62,7 +62,7 @@ export default function JoinPage() {
             if (authError) throw new Error(authError.message);
             if (!authData.user) throw new Error('Failed to create user account');
 
-            // Try to insert vendor profile
+            // Insert vendor profile
             const { error: vendorError } = await supabase.from('vendors').insert([
                 {
                     id: authData.user.id,
@@ -81,60 +81,25 @@ export default function JoinPage() {
             ]);
 
             if (vendorError) {
-                console.error('Vendor creation error, using local fallback:', vendorError);
-                // FALLBACK: Save to localStorage for demo
-                const vendorProfile = {
-                    id: authData.user.id,
-                    full_name: formData.fullName,
-                    email: formData.email,
-                    category: formData.category,
-                    city: formData.city,
-                    phone: formData.phone.startsWith('972') ? formData.phone : `972${formData.phone.replace(/^0/, '')}`,
-                    avatar_url: formData.portfolio || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-                    price_from: 1000,
-                    rating: 5.0,
-                    reviews_count: 0,
-                };
-                localStorage.setItem('vendor_profile', JSON.stringify(vendorProfile));
-                localStorage.setItem('test_mode', 'true');
-                localStorage.setItem('test_user', JSON.stringify({
-                    id: authData.user.id,
-                    email: formData.email,
-                    name: formData.fullName,
-                    role: 'vendor'
-                }));
+                console.error('Vendor creation error:', vendorError);
+                setError(language === 'ru'
+                    ? 'Ошибка создания профиля. Попробуйте позже.'
+                    : language === 'he'
+                        ? 'שגיאה ביצירת פרופיל. נסה שוב מאוחר יותר.'
+                        : 'Error creating profile. Please try again later.');
+                setLoading(false);
+                return;
             }
 
             router.push('/dashboard');
         } catch (err: any) {
             console.error('Registration error:', err);
-
-            // COMPLETE FALLBACK: If Supabase totally fails, use localStorage only
-            // console.log('Using complete localStorage fallback for demo');
-            const mockId = `vendor-${Date.now()}`;
-            const vendorProfile = {
-                id: mockId,
-                full_name: formData.fullName,
-                email: formData.email,
-                category: formData.category,
-                city: formData.city,
-                phone: formData.phone.startsWith('972') ? formData.phone : `972${formData.phone.replace(/^0/, '')}`,
-                avatar_url: formData.portfolio || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-                price_from: 1000,
-                rating: 5.0,
-                reviews_count: 0,
-            };
-            localStorage.setItem('vendor_profile', JSON.stringify(vendorProfile));
-            localStorage.setItem('test_mode', 'true');
-            localStorage.setItem('test_user', JSON.stringify({
-                id: mockId,
-                email: formData.email,
-                name: formData.fullName,
-                role: 'vendor'
-            }));
-
-            router.push('/dashboard');
-            return;
+            setError(err.message || (language === 'ru'
+                ? 'Ошибка регистрации'
+                : language === 'he'
+                    ? 'שגיאה בהרשמה'
+                    : 'Registration error'));
+            setLoading(false);
         }
     };
 

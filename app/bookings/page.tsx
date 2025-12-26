@@ -28,23 +28,13 @@ export default function BookingsPage() {
 
     useEffect(() => {
         const checkAuthAndFetchBookings = async () => {
-            const testMode = localStorage.getItem('test_mode');
-            const testUserData = localStorage.getItem('test_user');
-            let currentUserId: string | null = null;
-
-            if (testMode === 'true' && testUserData) {
-                const testUser = JSON.parse(testUserData);
-                currentUserId = testUser.id || 'test-user-id';
-            } else {
-                const { data: { user } } = await supabase.auth.getUser();
-                if (!user) { router.push('/signin'); return; }
-                currentUserId = user.id;
-            }
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) { router.push('/signin'); return; }
 
             const { data, error } = await supabase
                 .from('bookings')
                 .select(`id, event_date, event_type, details, status, created_at, vendor:vendors(id, name, category, city, image_url)`)
-                .eq('client_id', currentUserId)
+                .eq('client_id', user.id)
                 .order('created_at', { ascending: false });
 
             if (!error && data) {

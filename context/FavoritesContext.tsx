@@ -24,20 +24,10 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     // Load favorites on mount
     useEffect(() => {
         const loadFavorites = async () => {
-            // Check for test mode
-            const testMode = localStorage.getItem('test_mode');
-            if (testMode === 'true') {
-                const stored = localStorage.getItem('favorites');
-                setFavorites(stored ? JSON.parse(stored) : []);
-                setUserId('test-user');
-                setIsLoading(false);
-                return;
-            }
-
             // Check real auth
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
-                // No auth - use localStorage
+                // No auth - use localStorage only
                 const stored = localStorage.getItem('favorites');
                 setFavorites(stored ? JSON.parse(stored) : []);
                 setIsLoading(false);
@@ -105,7 +95,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         }
 
         // Sync to Supabase if authenticated
-        if (userId && userId !== 'test-user') {
+        if (userId) {
             try {
                 if (isCurrentlyFavorite) {
                     await supabase
