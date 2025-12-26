@@ -28,7 +28,8 @@ const Footer = dynamic(() => import('@/components/Footer'));
 export default function Home() {
     const router = useRouter();
     const { language } = useLanguage();
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
+    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
+    const [isLoading, setIsLoading] = useState(true);
     const [initialSearchQuery, setInitialSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
     const smartFeedSectionRef = useRef<HTMLDivElement>(null);
@@ -36,22 +37,31 @@ export default function Home() {
 
     useEffect(() => {
         const checkAuth = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            if (user) {
-                setIsAuthenticated(true);
-            } else {
-                router.push('/signin');
+            try {
+                const { data: { user } } = await supabase.auth.getUser();
+                setIsAuthenticated(!!user);
+            } catch (error) {
+                console.error('Auth check failed:', error);
+                setIsAuthenticated(false);
+            } finally {
+                setIsLoading(false);
             }
         };
-        checkAuth();
-    }, [router]);
+
+        // Timeout fallback - if auth check takes too long, just show the page
+        const timeout = setTimeout(() => {
+            setIsLoading(false);
+        }, 3000);
+
+        checkAuth().finally(() => clearTimeout(timeout));
+    }, []);
 
     const handleSearch = (query: string) => {
         setInitialSearchQuery(query);
         smartFeedSectionRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
     };
 
-    if (isAuthenticated === null) {
+    if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
                 <div className="text-center">
