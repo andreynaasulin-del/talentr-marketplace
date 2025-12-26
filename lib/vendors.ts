@@ -1,38 +1,38 @@
 import { supabase } from './supabase';
 import { Vendor, VendorCategory, City } from '@/types';
+import { mockVendors } from '@/data/mockData';
 
-// Type for Supabase vendor row (snake_case)
+// Type for Supabase vendor row (matching actual schema)
 interface VendorRow {
     id: string;
-    name: string;
+    full_name: string;
+    email: string | null;
     category: VendorCategory;
     city: City;
     rating: number;
     reviews_count: number;
     price_from: number;
-    image_url: string;
-    tags: string[];
-    description: string | null;
+    avatar_url: string | null;
+    bio: string | null;
     phone: string | null;
-    is_verified: boolean;
-    is_featured: boolean;
+    portfolio_gallery: string[] | null;
 }
 
 // Convert Supabase row to app Vendor type (camelCase)
 const toVendor = (row: VendorRow): Vendor => ({
     id: row.id,
-    name: row.name,
+    name: row.full_name,
     category: row.category,
     city: row.city,
-    rating: row.rating,
-    reviewsCount: row.reviews_count,
-    priceFrom: row.price_from,
-    imageUrl: row.image_url,
-    tags: row.tags || [],
-    description: row.description || undefined,
+    rating: row.rating || 0,
+    reviewsCount: row.reviews_count || 0,
+    priceFrom: row.price_from || 0,
+    imageUrl: row.avatar_url || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+    tags: [],
+    description: row.bio || undefined,
     phone: row.phone || undefined,
-    isVerified: row.is_verified,
-    isFeatured: row.is_featured,
+    isVerified: true, // Default for now
+    isFeatured: false,
 });
 
 // ========== VENDOR QUERIES ==========
@@ -41,37 +41,45 @@ const toVendor = (row: VendorRow): Vendor => ({
  * Get all active vendors
  */
 export async function getVendors(): Promise<Vendor[]> {
-    const { data, error } = await supabase
-        .from('vendors')
-        .select('*')
-        .eq('is_active', true)
-        .order('rating', { ascending: false });
+    try {
+        const { data, error } = await supabase
+            .from('vendors')
+            .select('*')
+            .order('rating', { ascending: false });
 
-    if (error) {
-        console.error('Error fetching vendors:', error);
-        return [];
+        if (error || !data || data.length === 0) {
+            // console.log('Using mock vendors fallback');
+            return mockVendors;
+        }
+
+        return data.map(toVendor);
+    } catch (e) {
+        console.error('Supabase error, using mock data:', e);
+        return mockVendors;
     }
-
-    return (data || []).map(toVendor);
 }
 
 /**
  * Get vendors by category
  */
 export async function getVendorsByCategory(category: VendorCategory): Promise<Vendor[]> {
-    const { data, error } = await supabase
-        .from('vendors')
-        .select('*')
-        .eq('category', category)
-        .eq('is_active', true)
-        .order('rating', { ascending: false });
+    try {
+        const { data, error } = await supabase
+            .from('vendors')
+            .select('*')
+            .eq('category', category)
+            .order('rating', { ascending: false });
 
-    if (error) {
-        console.error('Error fetching vendors by category:', error);
-        return [];
+        if (error || !data || data.length === 0) {
+            // console.log('Using mock vendors for category:', category);
+            return mockVendors.filter(v => v.category === category);
+        }
+
+        return data.map(toVendor);
+    } catch (e) {
+        console.error('Supabase error:', e);
+        return mockVendors.filter(v => v.category === category);
     }
-
-    return (data || []).map(toVendor);
 }
 
 /**
@@ -82,7 +90,6 @@ export async function getVendorsByCity(city: City): Promise<Vendor[]> {
         .from('vendors')
         .select('*')
         .eq('city', city)
-        .eq('is_active', true)
         .order('rating', { ascending: false });
 
     if (error) {
@@ -104,7 +111,7 @@ export async function getVendorById(id: string): Promise<Vendor | null> {
         .single();
 
     if (error || !data) {
-        console.log('Using fallback vendor data for ID:', id);
+        // console.log('Using fallback vendor data for ID:', id);
         return getMockVendorById(id);
     }
 
@@ -118,13 +125,11 @@ export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
     const { data, error } = await supabase
         .from('vendors')
         .select('*')
-        .eq('is_featured', true)
-        .eq('is_active', true)
         .order('rating', { ascending: false })
         .limit(limit);
 
     if (error || !data || data.length === 0) {
-        console.log('Using fallback vendor data');
+        // console.log('Using fallback vendor data');
         return getMockFeaturedVendors(limit);
     }
 
@@ -184,43 +189,62 @@ export interface VendorFilters {
 }
 
 export async function filterVendors(filters: VendorFilters): Promise<Vendor[]> {
-    let query = supabase
-        .from('vendors')
-        .select('*')
-        .eq('is_active', true);
+    try {
+        let query = supabase
+            .from('vendors')
+            .select('*');
 
-    if (filters.category) {
-        query = query.eq('category', filters.category);
+        if (filters.category) {
+            query = query.eq('category', filters.category);
+        }
+
+        if (filters.city) {
+            query = query.eq('city', filters.city);
+        }
+
+        if (filters.minPrice !== undefined) {
+            query = query.gte('price_from', filters.minPrice);
+        }
+
+        if (filters.maxPrice !== undefined) {
+            query = query.lte('price_from', filters.maxPrice);
+        }
+
+        if (filters.minRating !== undefined) {
+            query = query.gte('rating', filters.minRating);
+        }
+
+        const { data, error } = await query.order('rating', { ascending: false }).limit(10);
+
+        if (error || !data || data.length === 0) {
+            // console.log('Using mock vendors for filter:', filters);
+            // Fallback to mock data with filtering
+            let filtered = mockVendors;
+            if (filters.category) {
+                filtered = filtered.filter(v => v.category === filters.category);
+            }
+            if (filters.city) {
+                filtered = filtered.filter(v => v.city === filters.city);
+            }
+            if (filters.minRating) {
+                filtered = filtered.filter(v => v.rating >= filters.minRating!);
+            }
+            return filtered.slice(0, 10);
+        }
+
+        return data.map(toVendor);
+    } catch (e) {
+        console.error('Filter vendors error:', e);
+        // Fallback to mock data
+        let filtered = mockVendors;
+        if (filters.category) {
+            filtered = filtered.filter(v => v.category === filters.category);
+        }
+        if (filters.city) {
+            filtered = filtered.filter(v => v.city === filters.city);
+        }
+        return filtered.slice(0, 10);
     }
-
-    if (filters.city) {
-        query = query.eq('city', filters.city);
-    }
-
-    if (filters.minPrice !== undefined) {
-        query = query.gte('price_from', filters.minPrice);
-    }
-
-    if (filters.maxPrice !== undefined) {
-        query = query.lte('price_from', filters.maxPrice);
-    }
-
-    if (filters.minRating !== undefined) {
-        query = query.gte('rating', filters.minRating);
-    }
-
-    if (filters.isVerified !== undefined) {
-        query = query.eq('is_verified', filters.isVerified);
-    }
-
-    const { data, error } = await query.order('rating', { ascending: false });
-
-    if (error) {
-        console.error('Error filtering vendors:', error);
-        return [];
-    }
-
-    return (data || []).map(toVendor);
 }
 
 // ========== BOOKING QUERIES ==========

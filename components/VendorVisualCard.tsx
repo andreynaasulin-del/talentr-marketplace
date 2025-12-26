@@ -1,6 +1,6 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, memo } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { Star, MapPin, Heart, ChevronRight, Check, Zap } from 'lucide-react';
@@ -12,7 +12,7 @@ interface VendorVisualCardProps {
     context?: string;
 }
 
-export default function VendorVisualCard({ vendor, context }: VendorVisualCardProps) {
+function VendorVisualCard({ vendor, context }: VendorVisualCardProps) {
     const { convertPrice, t, language } = useLanguage();
     const [isLiked, setIsLiked] = useState(false);
 
@@ -42,6 +42,9 @@ export default function VendorVisualCard({ vendor, context }: VendorVisualCardPr
                         fill
                         className="object-cover group-hover:scale-110 transition-transform duration-700 ease-out"
                         sizes="(max-width: 768px) 100vw, 384px"
+                        loading="lazy"
+                        placeholder="blur"
+                        blurDataURL="data:image/jpeg;base64,/9j/4AAQSkZJRgABAQAAAQABAAD/2wBDAAMCAgMCAgMDAwMEAwMEBQgFBQQEBQoHBwYIDAoMCwsKCwsNDhIQDQ4RDgsLEBYQERMUFRUVDA8XGBYUGBIUFRT/2wBDAQMEBAUEBQkFBQkUDQsNFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBQUFBT/wAARCAAIAAoDASIAAhEBAxEB/8QAFgABAQEAAAAAAAAAAAAAAAAABgcI/8QAIhAAAgEDBAMBAAAAAAAAAAAAAQIDBAUGABESIQcxQVH/xAAVAQEBAAAAAAAAAAAAAAAAAAADBP/EABkRAAIDAQAAAAAAAAAAAAAAAAECAAMRIf/aAAwDAQACEQMRAD8Aqc14TxfO7Zcau03C4SRUEUU0yNTqpXkkKCWBJG5J7+anF+xaCaknx3JqWpS3Mhp1eCJkdWVCQQf0EH7pH0Njb//Z"
                     />
 
                     {/* Image Gradient Overlay */}
@@ -144,3 +147,5 @@ export default function VendorVisualCard({ vendor, context }: VendorVisualCardPr
         </div >
     );
 }
+
+export default memo(VendorVisualCard);

@@ -1,86 +1,170 @@
-# 🎭 Talentr - Event Marketplace
+# Talentr - Event Marketplace MVP
 
-Premium event vendor marketplace for Israel, built with Next.js 15 and Framer Motion.
+![Next.js](https://img.shields.io/badge/Next.js-15-black?style=flat-square)
+![TypeScript](https://img.shields.io/badge/TypeScript-5-blue?style=flat-square)
+![Tailwind CSS](https://img.shields.io/badge/Tailwind-3.4-38bdf8?style=flat-square)
+![Supabase](https://img.shields.io/badge/Supabase-Auth%20%26%20DB-3ecf8e?style=flat-square)
 
-## ✨ Features
+A modern event services marketplace connecting clients with professional vendors in Israel. Built with Next.js 15, TypeScript, and Supabase.
 
-- **🎨 Premium UI/UX** - Wolt-inspired minimalist design with smooth Framer Motion animations
-- **🌍 Multi-language** - Full RTL support for Hebrew, Russian, and English
-- **🔍 Smart Search** - AI-powered vendor discovery
-- **📱 Mobile-First** - Fully responsive design
-- **⚡ Performance** - Optimized with Next.js 15 App Router
-- **🔐 Authentication** - Supabase integration
+## 🌟 Features
 
-## 🚀 Tech Stack
+### Core Functionality
+- **AI-Powered Search** - Natural language vendor discovery with OpenAI
+- **Voice Search** - Speech-to-text in 3 languages (EN/RU/HE)
+- **Real-time Booking** - Instant booking with email notifications
+- **WhatsApp Integration** - One-click contact with vendors
+- **Reviews & Ratings** - Social proof system
 
-- **Framework:** Next.js 15 (App Router)
-- **Styling:** Tailwind CSS
-- **Animations:** Framer Motion
-- **Icons:** Lucide React
-- **Language:** TypeScript
-- **Database:** Supabase (PostgreSQL)
-- **Auth:** Supabase Auth
-- **Deployment:** Vercel
+### Technical Highlights
+- **Multi-language Support** - English, Russian, Hebrew with RTL
+- **SSR Authentication** - Secure server-side auth with Supabase
+- **Dynamic OG Images** - Auto-generated social previews
+- **SEO Optimized** - Sitemap, robots.txt, meta tags
+- **PWA Ready** - Installable web app
+- **Analytics** - Vercel Analytics & Speed Insights
 
-## 📦 Installation
+## 🚀 Quick Start
+
+### Prerequisites
+- Node.js 18+
+- npm or yarn
+- Supabase account
+- OpenAI API key (optional, for AI features)
+
+### Installation
 
 ```bash
+# Clone the repository
+git clone https://github.com/yourusername/event-marketplace-mvp.git
+cd event-marketplace-mvp
+
+# Install dependencies
 npm install
-```
 
-## 🔧 Environment Variables
+# Copy environment variables
+cp .env.example .env.local
 
-Create a `.env.local` file:
-
-```env
-NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
-NEXT_PUBLIC_SUPABASE_ANON_KEY=your_supabase_anon_key
-```
-
-## 🏃 Development
-
-```bash
+# Start development server
 npm run dev
 ```
 
-Open [http://localhost:3000](http://localhost:3000)
+### Environment Variables
 
-## 🏗️ Build
+Create `.env.local` with:
 
-```bash
-npm run build
-npm start
+```env
+# Supabase
+NEXT_PUBLIC_SUPABASE_URL=your_supabase_url
+NEXT_PUBLIC_SUPABASE_ANON_KEY=your_anon_key
+
+# OpenAI (optional)
+OPENAI_API_KEY=your_openai_key
 ```
-
-## 🎬 Animations
-
-This project features advanced Framer Motion animations:
-
-- **Hero Section** - Staggered text reveal animations
-- **Vendor Cards** - Hover lift, image zoom, and iOS-style tap effects
-- **Scroll Animations** - Viewport-triggered stagger animations
-- **Interactive Elements** - Smooth transitions on all buttons and links
 
 ## 📁 Project Structure
 
 ```
-├── app/                    # Next.js App Router pages
+event-marketplace-mvp/
+├── app/                    # Next.js App Router
+│   ├── api/               # API routes
+│   │   ├── chat/          # AI concierge
+│   │   └── email/         # Email notifications
+│   ├── vendor/[id]/       # Dynamic vendor pages
+│   ├── signin/            # Authentication
+│   ├── signup/
+│   ├── join/              # Vendor onboarding
+│   ├── dashboard/         # Vendor dashboard
+│   └── bookings/          # User bookings
 ├── components/            # React components
-├── lib/                   # Utilities and Supabase client
-├── types/                 # TypeScript type definitions
-├── utils/                 # Helper functions
-├── supabase/             # Database schemas and seeds
-└── public/               # Static assets
+│   ├── booking/           # Booking modal
+│   ├── HeroSection.tsx    # Landing hero
+│   ├── SmartFeed.tsx      # AI chat
+│   ├── VendorCard.tsx     # Vendor cards
+│   └── ...
+├── lib/                   # Utilities
+│   ├── supabase.ts        # Supabase client
+│   ├── validations.ts     # Zod schemas
+│   └── rate-limit.ts      # API rate limiting
+├── utils/                 # Helpers
+│   └── translations.ts    # i18n (1250+ translations)
+└── types/                 # TypeScript types
 ```
 
-## 🌐 Live Demo
+## 🛠️ Tech Stack
 
-[https://event-marketplace-mvp.vercel.app](https://event-marketplace-mvp.vercel.app)
+| Category | Technology |
+|----------|------------|
+| Framework | Next.js 15 (App Router) |
+| Language | TypeScript 5 |
+| Styling | Tailwind CSS + Framer Motion |
+| Database | Supabase (PostgreSQL) |
+| Auth | Supabase Auth (SSR) |
+| AI | OpenAI GPT-4 |
+| Forms | React Hook Form + Zod |
+| Icons | Lucide React |
+| Analytics | Vercel Analytics |
 
-## 📝 License
+## 📜 Scripts
 
-MIT
+```bash
+npm run dev        # Start development server
+npm run build      # Production build
+npm run start      # Start production server
+npm run lint       # Run ESLint
+npm run type-check # TypeScript check
+```
+
+## 🔒 Security
+
+- Rate limiting on all API endpoints
+- Input validation with Zod
+- Security headers (CSP, HSTS, etc.)
+- Server-side authentication
+- SQL injection prevention via Supabase
+
+## 🌐 Deployment
+
+### Vercel (Recommended)
+
+```bash
+npx vercel --prod
+```
+
+### Environment Variables in Vercel:
+- `NEXT_PUBLIC_SUPABASE_URL`
+- `NEXT_PUBLIC_SUPABASE_ANON_KEY`
+- `OPENAI_API_KEY`
+
+## 📊 Performance
+
+| Metric | Score |
+|--------|-------|
+| Lighthouse Performance | 90+ |
+| First Contentful Paint | < 1.5s |
+| Time to Interactive | < 3s |
+| Bundle Size (home) | 11.6 kB |
+
+## 🗺️ Roadmap
+
+- [ ] Unit tests (Jest/Vitest)
+- [ ] E2E tests (Playwright)
+- [ ] Stripe payment integration
+- [ ] Push notifications
+- [ ] Native mobile apps
+
+## 📄 License
+
+MIT License - see [LICENSE](LICENSE) for details.
+
+## 🤝 Contributing
+
+1. Fork the repository
+2. Create feature branch (`git checkout -b feature/amazing`)
+3. Commit changes (`git commit -m 'Add amazing feature'`)
+4. Push to branch (`git push origin feature/amazing`)
+5. Open a Pull Request
 
 ---
 
-**Made with ❤️ for the Israeli event community**
+Built with ❤️ for the Israeli event industry

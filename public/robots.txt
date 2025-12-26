@@ -1,0 +1,17 @@
+# Robots.txt for Talentr Event Marketplace
+
+User-agent: *
+Allow: /
+
+# Sitemap
+Sitemap: https://event-marketplace-mvp.vercel.app/sitemap.xml
+
+# Disallow admin areas
+Disallow: /api/
+Disallow: /auth/
+
+# Allow search engines to access all public pages
+Allow: /vendor/
+Allow: /join
+Allow: /signin
+Allow: /signup

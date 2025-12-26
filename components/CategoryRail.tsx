@@ -53,9 +53,18 @@ const categories: CategoryItem[] = [
     { id: 'Chef', label: 'Chefs/Catering', icon: ChefHat },
 ];
 
-export default function CategoryRail() {
+interface CategoryRailProps {
+    onCategoryChange?: (category: Category) => void;
+}
+
+export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     const [activeCategory, setActiveCategory] = useState<Category>('All');
     const { t, language } = useLanguage();
+
+    const handleCategoryClick = (categoryId: Category) => {
+        setActiveCategory(categoryId);
+        onCategoryChange?.(categoryId);
+    };
 
     // Mock counts for categories
     const counts: Record<string, number> = {
@@ -87,7 +96,7 @@ export default function CategoryRail() {
                     return (
                         <button
                             key={category.id}
-                            onClick={() => setActiveCategory(category.id)}
+                            onClick={() => handleCategoryClick(category.id)}
                             className={`
                                 group relative flex items-center gap-3 px-6 py-3.5 rounded-2xl
                                 flex-shrink-0 font-bold text-sm transition-all duration-300

@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { getVendorBookings, updateBookingStatus } from '@/lib/vendors';
 import { useRouter } from 'next/navigation';
-import Link from 'next/link';
 import Navbar from '@/components/Navbar';
 import { User } from '@supabase/supabase-js';
 import { DollarSign, Eye, Calendar, Check, X, TrendingUp, Clock, Loader2 } from 'lucide-react';

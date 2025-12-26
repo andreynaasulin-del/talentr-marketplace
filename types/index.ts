@@ -16,7 +16,18 @@ export type VendorCategory =
     | 'Piercing/Tattoo'
     | 'Chef';
 
-export type City = 'Tel Aviv' | 'Haifa' | 'Jerusalem' | 'Eilat' | 'Rishon LeZion' | 'Netanya' | 'Ashdod';
+export type City =
+    | 'Tel Aviv'
+    | 'Haifa'
+    | 'Jerusalem'
+    | 'Eilat'
+    | 'Rishon LeZion'
+    | 'Netanya'
+    | 'Ashdod'
+    | 'Beer Sheva'
+    | 'Petah Tikva'
+    | 'Herzliya'
+    | 'Ramat Gan';
 
 export interface Vendor {
     id: string;

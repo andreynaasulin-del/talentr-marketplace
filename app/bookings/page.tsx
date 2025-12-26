@@ -21,7 +21,7 @@ interface Booking {
 }
 
 export default function BookingsPage() {
-    const { t, language } = useLanguage();
+    const { language } = useLanguage();
     const router = useRouter();
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [loading, setLoading] = useState(true);
@@ -48,10 +48,10 @@ export default function BookingsPage() {
                 .order('created_at', { ascending: false });
 
             if (!error && data) {
-                const transformedBookings = data.map((booking: any) => ({
+                const transformedBookings = data.map((booking: { vendor: unknown[] | unknown } & Omit<Booking, 'vendor'>) => ({
                     ...booking,
                     vendor: Array.isArray(booking.vendor) ? booking.vendor[0] : booking.vendor
-                }));
+                })) as Booking[];
                 setBookings(transformedBookings);
             }
             setLoading(false);

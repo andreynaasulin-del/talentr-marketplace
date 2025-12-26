@@ -1,11 +1,12 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, User, LogOut, Globe, ChevronDown, Calendar } from 'lucide-react';
+import { Search, User, LogOut, Globe, ChevronDown, Calendar, Heart } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
+import { useFavorites } from '@/context/FavoritesContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -16,6 +17,7 @@ export default function Navbar() {
     const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const { language, setLanguage, t } = useLanguage();
+    const { favoritesCount } = useFavorites();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -139,7 +141,6 @@ export default function Navbar() {
                                                     onClick={() => {
                                                         setLanguage(lang.code);
                                                         setShowLangDropdown(false);
-                                                        toast.success(`Language: ${lang.label}`);
                                                     }}
                                                     className={cn(
                                                         "w-full px-4 py-3 text-start flex items-center justify-between transition-colors",
@@ -164,6 +165,23 @@ export default function Navbar() {
                         {/* Auth Button / User Profile */}
                         {isAuthenticated ? (
                             <div className="flex items-center gap-3">
+                                {/* Favorites Button */}
+                                <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
+                                    <Link
+                                        href="/favorites"
+                                        className="relative p-2.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                                        title={language === 'ru' ? 'Избранное' : language === 'he' ? 'מועדפים' : 'Favorites'}
+                                    >
+                                        <Heart className="w-5 h-5" />
+                                        {favoritesCount > 0 && (
+                                            <span className="absolute -top-1 -end-1 w-5 h-5 flex items-center justify-center text-xs font-bold text-white bg-red-500 rounded-full">
+                                                {favoritesCount > 9 ? '9+' : favoritesCount}
+                                            </span>
+                                        )}
+                                    </Link>
+                                </motion.div>
+
+                                {/* Bookings Button */}
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                                     <Link
                                         href="/bookings"

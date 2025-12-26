@@ -124,7 +124,7 @@ export default function Testimonials() {
 
                             <div className="flex items-center gap-4">
                                 <div className="relative w-12 h-12 rounded-full overflow-hidden ring-2 ring-blue-100 dark:ring-blue-900">
-                                    <Image src={testimonial.avatar} alt={testimonial.name} fill className="object-cover" />
+                                    <Image src={testimonial.avatar} alt={testimonial.name} fill sizes="48px" className="object-cover" />
                                 </div>
                                 <div>
                                     <p className="font-bold text-gray-900 dark:text-white">{testimonial.name}</p>

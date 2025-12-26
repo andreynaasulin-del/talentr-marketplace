@@ -2,40 +2,48 @@
 
 import { useState, useEffect, useRef } from 'react';
 import { useRouter } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import CategoryRail from '@/components/CategoryRail';
-import SmartFeed from '@/components/SmartFeed';
-import FeaturedVendors from '@/components/FeaturedVendors';
-import HowItWorks from '@/components/HowItWorks';
-import Testimonials from '@/components/Testimonials';
-import AppBanner from '@/components/AppBanner';
-import WhatsAppButton from '@/components/WhatsAppButton';
-import Footer from '@/components/Footer';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { Sparkles } from 'lucide-react';
 
+// Dynamic imports for below-fold components (lazy loading)
+const VendorGrid = dynamic(() => import('@/components/VendorGrid'), {
+    loading: () => <div className="h-96 animate-pulse bg-gray-100 rounded-3xl" />
+});
+const SmartFeed = dynamic(() => import('@/components/SmartFeed'), {
+    loading: () => <div className="h-[500px] animate-pulse bg-gray-100 rounded-[40px]" />
+});
+const FeaturedVendors = dynamic(() => import('@/components/FeaturedVendors'));
+const HowItWorks = dynamic(() => import('@/components/HowItWorks'));
+const Testimonials = dynamic(() => import('@/components/Testimonials'));
+const AppBanner = dynamic(() => import('@/components/AppBanner'));
+const WhatsAppButton = dynamic(() => import('@/components/WhatsAppButton'), { ssr: false });
+const EventSuggestions = dynamic(() => import('@/components/EventSuggestions'));
+const Footer = dynamic(() => import('@/components/Footer'));
+
 export default function Home() {
     const router = useRouter();
-    const { t, language } = useLanguage();
-    const [mounted, setMounted] = useState(false);
+    const { language } = useLanguage();
     const [isAuthenticated, setIsAuthenticated] = useState<boolean | null>(null);
     const [initialSearchQuery, setInitialSearchQuery] = useState('');
+    const [selectedCategory, setSelectedCategory] = useState('All');
     const smartFeedSectionRef = useRef<HTMLDivElement>(null);
+    const vendorGridRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
             const testMode = localStorage.getItem('test_mode');
             if (testMode === 'true') {
                 setIsAuthenticated(true);
-                setMounted(true);
                 return;
             }
             const { data: { user } } = await supabase.auth.getUser();
             if (user) {
                 setIsAuthenticated(true);
-                setMounted(true);
             } else {
                 router.push('/signin');
             }
@@ -66,8 +74,24 @@ export default function Home() {
             <HeroSection onSearch={handleSearch} />
 
             <div className="max-w-7xl mx-auto border-b border-gray-100 dark:border-slate-800">
-                <CategoryRail />
+                <CategoryRail onCategoryChange={(cat) => {
+                    setSelectedCategory(cat);
+                    vendorGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
+                }} />
             </div>
+
+            {/* Event Type Suggestions */}
+            {selectedCategory === 'All' && (
+                <div className="max-w-7xl mx-auto px-6">
+                    <EventSuggestions onSelect={(query) => handleSearch(query)} />
+                </div>
+            )}
+
+            {selectedCategory !== 'All' && (
+                <div ref={vendorGridRef} className="scroll-mt-20">
+                    <VendorGrid category={selectedCategory} />
+                </div>
+            )}
 
             <FeaturedVendors />
 

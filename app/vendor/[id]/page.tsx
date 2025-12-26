@@ -1,11 +1,13 @@
 'use client';
 
 import BookingModal from '@/components/booking/BookingModal';
+import ReviewsSection from '@/components/ReviewsSection';
+import SmartTips from '@/components/SmartTips';
 import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, MapPin, Check, Shield, Heart, Share2, ChevronLeft, Calendar, MessageCircle, Clock, Award, Sparkles, Phone } from 'lucide-react';
+import { Star, MapPin, Shield, Heart, Share2, ChevronLeft, Calendar, Clock, Award, Sparkles } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getVendorById } from '@/lib/vendors';
@@ -230,6 +232,7 @@ export default function VendorPage() {
                                     src={portfolioImages[activeImage]}
                                     alt={`Portfolio ${activeImage + 1}`}
                                     fill
+                                    sizes="(max-width: 768px) 100vw, 800px"
                                     className="object-cover transition-transform duration-700 group-hover:scale-105"
                                 />
                                 <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
@@ -245,64 +248,14 @@ export default function VendorPage() {
                                             ? 'ring-4 ring-blue-600 ring-offset-2 scale-95 shadow-xl'
                                             : 'opacity-40 hover:opacity-100 hover:scale-105 grayscale hover:grayscale-0'}`}
                                     >
-                                        <Image src={image} alt={`Thumbnail ${index + 1}`} fill className="object-cover" />
+                                        <Image src={image} alt={`Thumbnail ${index + 1}`} fill sizes="100px" className="object-cover" />
                                     </button>
                                 ))}
                             </div>
                         </div>
 
-                        {/* Social Proof (Reviews) */}
-                        <div className="bg-white rounded-[32px] shadow-card p-10 border border-gray-100">
-                            <div className="flex flex-col md:flex-row md:items-end justify-between gap-6 mb-10">
-                                <div>
-                                    <h2 className="text-3xl font-black text-gray-900 tracking-tight mb-2">{t('Reviews')}</h2>
-                                    <p className="text-gray-500 font-medium">{t('What clients say about workers')}</p>
-                                </div>
-                                <div className="flex items-center gap-4 bg-gray-50 px-6 py-4 rounded-[24px] border border-gray-100">
-                                    <div className="text-right">
-                                        <p className="text-2xl font-black text-gray-900 leading-none mb-1">{vendor.rating}</p>
-                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{vendor.reviewsCount} {t('ratings')}</p>
-                                    </div>
-                                    <div className="flex items-center gap-0.5">
-                                        {[1, 2, 3, 4, 5].map((s) => (
-                                            <Star key={s} className={`w-5 h-5 ${s <= Math.round(vendor.rating) ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />
-                                        ))}
-                                    </div>
-                                </div>
-                            </div>
-
-                            <div className="space-y-6">
-                                {reviews.map((review, index) => (
-                                    <div key={index} className="p-8 rounded-[24px] bg-gray-50/50 border border-gray-100 hover:bg-white hover:shadow-card transition-all group">
-                                        <div className="flex items-start gap-6">
-                                            <div className="w-16 h-16 rounded-2xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center text-white text-2xl font-black group-hover:rotate-6 transition-transform">
-                                                {review.avatar}
-                                            </div>
-                                            <div className="flex-1">
-                                                <div className="flex items-start justify-between mb-2">
-                                                    <div>
-                                                        <h4 className="text-lg font-black text-gray-900 leading-tight">{review.name}</h4>
-                                                        <p className="text-sm font-bold text-gray-400">{review.date}</p>
-                                                    </div>
-                                                    <div className="flex items-center gap-0.5">
-                                                        {Array.from({ length: 5 }).map((_, i) => (
-                                                            <Star key={i} className={`w-4 h-4 ${i < review.rating ? 'fill-amber-400 text-amber-400' : 'text-gray-200'}`} />
-                                                        ))}
-                                                    </div>
-                                                </div>
-                                                <p className="text-gray-600 text-lg font-medium leading-relaxed italic">
-                                                    "{t(review.text)}"
-                                                </p>
-                                            </div>
-                                        </div>
-                                    </div>
-                                ))}
-                            </div>
-
-                            <button className="w-full mt-10 py-5 bg-gray-50 text-gray-900 font-black text-sm uppercase tracking-widest rounded-2xl hover:bg-gray-100 transition-colors">
-                                {t('Read all reviews')}
-                            </button>
-                        </div>
+                        {/* Reviews Section */}
+                        <ReviewsSection vendorId={vendorId} vendorName={vendor.name} />
                     </div>
 
                     {/* RIGHT SIDEBAR (4/12) */}
@@ -378,6 +331,12 @@ export default function VendorPage() {
                                     ))}
                                 </div>
                             </div>
+
+                            {/* AI Smart Tips */}
+                            <SmartTips
+                                vendorName={vendor.name}
+                                vendorCategory={vendor.category}
+                            />
 
                             {/* Secondary Sidebar Content? */}
                             <div className="bg-white rounded-[32px] p-8 border border-gray-100 shadow-sm">

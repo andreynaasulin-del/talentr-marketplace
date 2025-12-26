@@ -12,6 +12,7 @@ interface Message {
     role: 'user' | 'assistant';
     content: string;
     vendors?: Vendor[];
+    suggestions?: string[];
     timestamp: Date;
 }
 
@@ -114,31 +115,30 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
         setActiveCardIndex(0);
 
         try {
+            // Build conversation history for context
+            const conversationHistory = messages.map(m => ({
+                role: m.role,
+                content: m.content
+            }));
+
             const response = await fetch('/api/chat', {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: text })
+                body: JSON.stringify({
+                    message: text,
+                    conversationHistory,
+                    language
+                })
             });
 
             const data = await response.json();
 
-            // Add some personality to the response
-            let enhancedResponse = data.response;
-            if (data.vendors && data.vendors.length > 0) {
-                const intros = language === 'ru'
-                    ? ['🎯 Отлично!', '✨ Нашёл!', '🔥 Вот что есть:', '💎 Топовые варианты:']
-                    : language === 'he'
-                        ? ['🎯 מעולה!', '✨ מצאתי!', '🔥 הנה מה שיש:', '💎 הכי טובים:']
-                        : ['🎯 Great choice!', '✨ Found them!', '🔥 Here we go:', '💎 Top picks:'];
-                const randomIntro = intros[Math.floor(Math.random() * intros.length)];
-                enhancedResponse = `${randomIntro} ${data.response}`;
-            }
-
             const assistantMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: enhancedResponse,
+                content: data.response,
                 vendors: data.vendors,
+                suggestions: data.suggestions,
                 timestamp: new Date()
             };
 
@@ -252,6 +252,7 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
                                         src={category.image}
                                         alt={category.label[language] || category.label.en}
                                         fill
+                                        sizes="(max-width: 768px) 50vw, 200px"
                                         className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-700 ease-out"
                                     />
                                     {/* Premium Gradient Overlay */}
@@ -309,6 +310,21 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
                                 >
                                     {message.content}
                                 </div>
+
+                                {/* AI Suggestion Chips */}
+                                {message.role === 'assistant' && message.suggestions && message.suggestions.length > 0 && (
+                                    <div className="flex flex-wrap gap-2 mt-3 ms-2">
+                                        {message.suggestions.map((suggestion, idx) => (
+                                            <button
+                                                key={idx}
+                                                onClick={() => sendMessage(suggestion)}
+                                                className="px-4 py-2 text-sm font-semibold text-blue-600 bg-blue-50 hover:bg-blue-100 rounded-full border border-blue-100 transition-all duration-200 hover:scale-105 active:scale-95"
+                                            >
+                                                {suggestion}
+                                            </button>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     ))}

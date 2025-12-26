@@ -1104,6 +1104,148 @@ export const translations: Translations = {
         ru: 'событие',
         he: 'אירוע',
     },
+
+    // ===== VENDOR CARD & PROFILE BADGES =====
+    'Verified Pro': {
+        en: 'Verified Pro',
+        ru: 'Проверен',
+        he: 'מאומת',
+    },
+    'Fast Reply': {
+        en: 'Fast Reply',
+        ru: 'Быстрый ответ',
+        he: 'תגובה מהירה',
+    },
+    '✓ Verified': {
+        en: '✓ Verified',
+        ru: '✓ Проверен',
+        he: '✓ מאומת',
+    },
+    'TOP': {
+        en: 'TOP',
+        ru: 'ТОП',
+        he: 'מוביל',
+    },
+
+    // ===== HERO SECTION STATS =====
+    'Verified Pros': {
+        en: 'Verified Pros',
+        ru: 'Проверенных специалистов',
+        he: 'בעלי מקצוע מאומתים',
+    },
+    'Happy Clients': {
+        en: 'Happy Clients',
+        ru: 'Довольных клиентов',
+        he: 'לקוחות מרוצים',
+    },
+    'Events Completed': {
+        en: 'Events Completed',
+        ru: 'Проведено мероприятий',
+        he: 'אירועים שהושלמו',
+    },
+
+    // ===== REVIEWS SECTION =====
+    'Client Reviews': {
+        en: 'Client Reviews',
+        ru: 'Отзывы клиентов',
+        he: 'ביקורות לקוחות',
+    },
+    'Write Review': {
+        en: 'Write Review',
+        ru: 'Написать отзыв',
+        he: 'כתוב ביקורת',
+    },
+    'Your Rating': {
+        en: 'Your Rating',
+        ru: 'Ваша оценка',
+        he: 'הדירוג שלך',
+    },
+    'Your Review': {
+        en: 'Your Review',
+        ru: 'Ваш отзыв',
+        he: 'הביקורת שלך',
+    },
+    'Submit Review': {
+        en: 'Submit Review',
+        ru: 'Отправить отзыв',
+        he: 'שלח ביקורת',
+    },
+    'Helpful': {
+        en: 'Helpful',
+        ru: 'Полезно',
+        he: 'שימושי',
+    },
+    'Show all reviews': {
+        en: 'Show all reviews',
+        ru: 'Показать все отзывы',
+        he: 'הצג את כל הביקורות',
+    },
+
+    // ===== SMARTFEED =====
+    'What can I help you find?': {
+        en: 'What can I help you find?',
+        ru: 'Чем могу помочь?',
+        he: 'במה אוכל לעזור?',
+    },
+    'Ask me anything...': {
+        en: 'Ask me anything...',
+        ru: 'Спросите меня о чем угодно...',
+        he: 'שאל אותי כל דבר...',
+    },
+
+    // ===== HOW IT WORKS =====
+    'How It Works': {
+        en: 'How It Works',
+        ru: 'Как это работает',
+        he: 'איך זה עובד',
+    },
+    'Simple steps to find your perfect professional': {
+        en: 'Simple steps to find your perfect professional',
+        ru: 'Простые шаги для поиска идеального специалиста',
+        he: 'צעדים פשוטים למציאת איש המקצוע המושלם',
+    },
+
+    // ===== FOOTER =====
+    'All rights reserved': {
+        en: 'All rights reserved',
+        ru: 'Все права защищены',
+        he: 'כל הזכויות שמורות',
+    },
+    'Privacy Policy': {
+        en: 'Privacy Policy',
+        ru: 'Политика конфиденциальности',
+        he: 'מדיניות פרטיות',
+    },
+    'Terms of Service': {
+        en: 'Terms of Service',
+        ru: 'Условия использования',
+        he: 'תנאי שימוש',
+    },
+    'Contact Us': {
+        en: 'Contact Us',
+        ru: 'Контакты',
+        he: 'צור קשר',
+    },
+    'Avg. Rating': {
+        en: 'Avg. Rating',
+        ru: 'Средний рейтинг',
+        he: 'דירוג ממוצע',
+    },
+    'Popular': {
+        en: 'Popular:',
+        ru: 'Популярное:',
+        he: 'פופולרי:',
+    },
+    'How it works': {
+        en: 'How it works',
+        ru: 'Как это работает',
+        he: 'איך זה עובד',
+    },
+    'Search': {
+        en: 'Search',
+        ru: 'Поиск',
+        he: 'חיפוש',
+    },
 };
 
 // Helper function to get translation

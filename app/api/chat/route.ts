@@ -1,9 +1,28 @@
 import { NextRequest, NextResponse } from 'next/server';
+import OpenAI from 'openai';
 import { filterVendors } from '@/lib/vendors';
 import { Vendor, VendorCategory, City } from '@/types';
+import { rateLimit, getClientIP, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
+import { chatMessageSchema } from '@/lib/validations';
 
-interface ChatRequest {
-    message: string;
+// ===== OPENAI INITIALIZATION =====
+let openai: OpenAI | null = null;
+function getOpenAI(): OpenAI | null {
+    if (!process.env.OPENAI_API_KEY) return null;
+    if (!openai) {
+        openai = new OpenAI({ apiKey: process.env.OPENAI_API_KEY });
+    }
+    return openai;
+}
+
+// ===== TYPES =====
+interface EventContext {
+    eventType?: string;
+    eventDate?: string;
+    guestCount?: number;
+    budget?: string;
+    city?: City;
+    selectedCategories?: VendorCategory[];
 }
 
 interface ChatResponse {
@@ -13,286 +32,493 @@ interface ChatResponse {
         category?: VendorCategory;
         city?: City;
         eventType?: string;
+        budget?: string;
+        guestCount?: number;
+        eventDate?: string;
     };
+    suggestions?: string[];
+    followUpQuestions?: string[];
 }
 
-// Category keywords mapping
+// ===== ENHANCED KEYWORD MAPPINGS =====
 const categoryKeywords: Record<string, VendorCategory> = {
     // English
-    'photographer': 'Photographer',
-    'photo': 'Photographer',
-    'photography': 'Photographer',
-    'videographer': 'Videographer',
-    'video': 'Videographer',
-    'film': 'Videographer',
-    'dj': 'DJ',
-    'disc jockey': 'DJ',
-    'mc': 'MC',
-    'host': 'MC',
-    'emcee': 'MC',
-    'magician': 'Magician',
-    'magic': 'Magician',
-    'singer': 'Singer',
-    'vocalist': 'Singer',
-    'musician': 'Musician',
-    'band': 'Musician',
-    'live music': 'Musician',
-    'comedian': 'Comedian',
-    'comedy': 'Comedian',
-    'dancer': 'Dancer',
-    'dance': 'Dancer',
-    'bartender': 'Bartender',
-    'bar': 'Bartender',
-    'cocktail': 'Bartender',
-    'bar show': 'Bar Show',
-    'flair': 'Bar Show',
-    'decor': 'Event Decor',
-    'decoration': 'Event Decor',
-    'flowers': 'Event Decor',
-    'kids': 'Kids Animator',
-    'children': 'Kids Animator',
-    'animator': 'Kids Animator',
-    'face paint': 'Face Painter',
-    'face painting': 'Face Painter',
-    'tattoo': 'Piercing/Tattoo',
-    'henna': 'Piercing/Tattoo',
-    'chef': 'Chef',
-    'catering': 'Chef',
-    'food': 'Chef',
-
-    // Russian
-    'фотограф': 'Photographer',
-    'фото': 'Photographer',
-    'видеограф': 'Videographer',
-    'видео': 'Videographer',
-    'диджей': 'DJ',
-    'ди-джей': 'DJ',
-    'ведущий': 'MC',
-    'тамада': 'MC',
-    'фокусник': 'Magician',
-    'иллюзионист': 'Magician',
-    'певец': 'Singer',
-    'певица': 'Singer',
-    'музыкант': 'Musician',
-    'группа': 'Musician',
-    'комик': 'Comedian',
-    'юморист': 'Comedian',
-    'танцор': 'Dancer',
-    'танцы': 'Dancer',
-    'бармен': 'Bartender',
-    'коктейли': 'Bartender',
-    'декор': 'Event Decor',
-    'оформление': 'Event Decor',
-    'аниматор': 'Kids Animator',
-    'детский': 'Kids Animator',
-    'аквагрим': 'Face Painter',
-    'тату': 'Piercing/Tattoo',
-    'хна': 'Piercing/Tattoo',
-    'повар': 'Chef',
-    'кейтеринг': 'Chef',
-
-    // Hebrew
-    'צלם': 'Photographer',
-    'צילום': 'Photographer',
-    'וידאו': 'Videographer',
-    'דיג\'יי': 'DJ',
-    'מנחה': 'MC',
-    'קוסם': 'Magician',
-    'זמר': 'Singer',
-    'זמרת': 'Singer',
-    'מוזיקאי': 'Musician',
-    'להקה': 'Musician',
-    'קומיקאי': 'Comedian',
-    'רקדן': 'Dancer',
-    'ברמן': 'Bartender',
-    'עיצוב': 'Event Decor',
-    'אנימטור': 'Kids Animator',
-    'ציור פנים': 'Face Painter',
-    'שף': 'Chef',
-    'קייטרינג': 'Chef',
+    'photographer': 'Photographer', 'photo': 'Photographer', 'photography': 'Photographer', 'photoshoot': 'Photographer',
+    'videographer': 'Videographer', 'video': 'Videographer', 'film': 'Videographer', 'filming': 'Videographer',
+    'dj': 'DJ', 'disc jockey': 'DJ', 'music': 'DJ',
+    'mc': 'MC', 'host': 'MC', 'emcee': 'MC', 'presenter': 'MC', 'master of ceremonies': 'MC',
+    'magician': 'Magician', 'magic': 'Magician', 'illusion': 'Magician', 'tricks': 'Magician',
+    'singer': 'Singer', 'vocalist': 'Singer', 'voice': 'Singer', 'singing': 'Singer',
+    'musician': 'Musician', 'band': 'Musician', 'live music': 'Musician', 'orchestra': 'Musician',
+    'comedian': 'Comedian', 'comedy': 'Comedian', 'standup': 'Comedian', 'funny': 'Comedian',
+    'dancer': 'Dancer', 'dance': 'Dancer', 'dancing': 'Dancer', 'choreography': 'Dancer',
+    'bartender': 'Bartender', 'bar': 'Bartender', 'cocktail': 'Bartender', 'drinks': 'Bartender',
+    'bar show': 'Bar Show', 'flair': 'Bar Show', 'bottle show': 'Bar Show',
+    'decor': 'Event Decor', 'decoration': 'Event Decor', 'flowers': 'Event Decor', 'balloons': 'Event Decor', 'design': 'Event Decor',
+    'kids': 'Kids Animator', 'children': 'Kids Animator', 'animator': 'Kids Animator', 'clown': 'Kids Animator',
+    'face paint': 'Face Painter', 'face painting': 'Face Painter', 'makeup artist': 'Face Painter',
+    'tattoo': 'Piercing/Tattoo', 'henna': 'Piercing/Tattoo', 'piercing': 'Piercing/Tattoo',
+    'chef': 'Chef', 'catering': 'Chef', 'food': 'Chef', 'cuisine': 'Chef', 'cooking': 'Chef',
+    // Russian (expanded)
+    'фотограф': 'Photographer', 'фото': 'Photographer', 'фотосессия': 'Photographer', 'съёмка': 'Photographer',
+    'видеограф': 'Videographer', 'видео': 'Videographer', 'видеосъёмка': 'Videographer', 'оператор': 'Videographer',
+    'диджей': 'DJ', 'ди-джей': 'DJ', 'дискотека': 'DJ',
+    'ведущий': 'MC', 'тамада': 'MC', 'шоумен': 'MC', 'конферансье': 'MC',
+    'фокусник': 'Magician', 'иллюзионист': 'Magician', 'маг': 'Magician',
+    'певец': 'Singer', 'певица': 'Singer', 'вокалист': 'Singer', 'вокал': 'Singer',
+    'музыкант': 'Musician', 'группа': 'Musician', 'оркестр': 'Musician', 'ансамбль': 'Musician',
+    'комик': 'Comedian', 'юморист': 'Comedian', 'стендап': 'Comedian',
+    'танцор': 'Dancer', 'танцы': 'Dancer', 'балет': 'Dancer', 'хореограф': 'Dancer',
+    'бармен': 'Bartender', 'коктейли': 'Bartender', 'напитки': 'Bartender',
+    'бар-шоу': 'Bar Show', 'флейринг': 'Bar Show',
+    'декор': 'Event Decor', 'оформление': 'Event Decor', 'цветы': 'Event Decor', 'шары': 'Event Decor',
+    'аниматор': 'Kids Animator', 'детский': 'Kids Animator', 'клоун': 'Kids Animator',
+    'аквагрим': 'Face Painter', 'визажист': 'Face Painter',
+    'тату': 'Piercing/Tattoo', 'хна': 'Piercing/Tattoo', 'мехенди': 'Piercing/Tattoo',
+    'повар': 'Chef', 'кейтеринг': 'Chef', 'еда': 'Chef', 'банкет': 'Chef',
+    // Hebrew (expanded)
+    'צלם': 'Photographer', 'צילום': 'Photographer', 'תמונות': 'Photographer',
+    'וידאו': 'Videographer', 'צלם וידאו': 'Videographer', 'סרטון': 'Videographer',
+    "דיג'יי": 'DJ', 'מוזיקה': 'DJ', 'דיסק': 'DJ',
+    'מנחה': 'MC', 'מארח': 'MC', 'תמרה': 'MC',
+    'קוסם': 'Magician', 'קסמים': 'Magician', 'אשליות': 'Magician',
+    'זמר': 'Singer', 'זמרת': 'Singer', 'שירה': 'Singer',
+    'מוזיקאי': 'Musician', 'להקה': 'Musician', 'תזמורת': 'Musician',
+    'קומיקאי': 'Comedian', 'סטנדאפ': 'Comedian', 'הומור': 'Comedian',
+    'רקדן': 'Dancer', 'רקדנית': 'Dancer', 'ריקוד': 'Dancer',
+    'ברמן': 'Bartender', 'קוקטיילים': 'Bartender', 'משקאות': 'Bartender',
+    'עיצוב': 'Event Decor', 'קישוט': 'Event Decor', 'פרחים': 'Event Decor', 'בלונים': 'Event Decor',
+    'אנימטור': 'Kids Animator', 'הפעלה לילדים': 'Kids Animator', 'ליצן': 'Kids Animator',
+    'ציור פנים': 'Face Painter', 'איפור': 'Face Painter',
+    'שף': 'Chef', 'קייטרינג': 'Chef', 'אוכל': 'Chef',
 };
 
-// City keywords mapping
 const cityKeywords: Record<string, City> = {
     // English
-    'tel aviv': 'Tel Aviv',
-    'telaviv': 'Tel Aviv',
-    'tlv': 'Tel Aviv',
-    'haifa': 'Haifa',
-    'jerusalem': 'Jerusalem',
-    'eilat': 'Eilat',
-    'rishon': 'Rishon LeZion',
-    'rishon lezion': 'Rishon LeZion',
-    'netanya': 'Netanya',
-    'ashdod': 'Ashdod',
-
+    'tel aviv': 'Tel Aviv', 'telaviv': 'Tel Aviv', 'tlv': 'Tel Aviv', 'tel-aviv': 'Tel Aviv',
+    'haifa': 'Haifa', 'jerusalem': 'Jerusalem', 'eilat': 'Eilat',
+    'rishon': 'Rishon LeZion', 'rishon lezion': 'Rishon LeZion', 'rishon le zion': 'Rishon LeZion',
+    'netanya': 'Netanya', 'ashdod': 'Ashdod', 'beer sheva': 'Beer Sheva', 'beersheva': 'Beer Sheva',
+    'petah tikva': 'Petah Tikva', 'herzliya': 'Herzliya', 'ramat gan': 'Ramat Gan',
     // Russian
-    'тель-авив': 'Tel Aviv',
-    'тель авив': 'Tel Aviv',
-    'хайфа': 'Haifa',
-    'иерусалим': 'Jerusalem',
-    'эйлат': 'Eilat',
-    'ришон': 'Rishon LeZion',
-    'нетания': 'Netanya',
-    'ашдод': 'Ashdod',
-
+    'тель-авив': 'Tel Aviv', 'тель авив': 'Tel Aviv', 'тельавив': 'Tel Aviv',
+    'хайфа': 'Haifa', 'иерусалим': 'Jerusalem', 'эйлат': 'Eilat',
+    'ришон': 'Rishon LeZion', 'ришон ле-цион': 'Rishon LeZion',
+    'нетания': 'Netanya', 'ашдод': 'Ashdod', 'беэр-шева': 'Beer Sheva',
+    'петах-тиква': 'Petah Tikva', 'герцлия': 'Herzliya', 'рамат-ган': 'Ramat Gan',
     // Hebrew
-    'תל אביב': 'Tel Aviv',
-    'חיפה': 'Haifa',
-    'ירושלים': 'Jerusalem',
-    'אילת': 'Eilat',
-    'ראשון לציון': 'Rishon LeZion',
-    'נתניה': 'Netanya',
-    'אשדוד': 'Ashdod',
+    'תל אביב': 'Tel Aviv', 'ת"א': 'Tel Aviv', 'חיפה': 'Haifa', 'ירושלים': 'Jerusalem',
+    'אילת': 'Eilat', 'ראשון לציון': 'Rishon LeZion', 'נתניה': 'Netanya', 'אשדוד': 'Ashdod',
+    'באר שבע': 'Beer Sheva', 'פתח תקווה': 'Petah Tikva', 'הרצליה': 'Herzliya', 'רמת גן': 'Ramat Gan',
 };
 
-// Event type keywords
 const eventKeywords: Record<string, string> = {
-    'wedding': 'Wedding',
-    'свадьба': 'Wedding',
-    'חתונה': 'Wedding',
-    'bar mitzvah': 'Bar Mitzvah',
-    'bat mitzvah': 'Bar Mitzvah',
-    'бар мицва': 'Bar Mitzvah',
-    'בר מצווה': 'Bar Mitzvah',
-    'בת מצווה': 'Bar Mitzvah',
-    'birthday': 'Birthday',
-    'день рождения': 'Birthday',
-    'יום הולדת': 'Birthday',
-    'corporate': 'Corporate',
-    'корпоратив': 'Corporate',
-    'אירוע עסקי': 'Corporate',
-    'party': 'Private Party',
-    'вечеринка': 'Private Party',
-    'מסיבה': 'Private Party',
+    'wedding': 'Wedding', 'свадьба': 'Wedding', 'חתונה': 'Wedding', 'marriage': 'Wedding', 'bride': 'Wedding',
+    'bar mitzvah': 'Bar Mitzvah', 'bat mitzvah': 'Bat Mitzvah', 'בר מצווה': 'Bar Mitzvah', 'בת מצווה': 'Bat Mitzvah',
+    'бар мицва': 'Bar Mitzvah', 'бат мицва': 'Bat Mitzvah',
+    'birthday': 'Birthday', 'день рождения': 'Birthday', 'יום הולדת': 'Birthday', 'bday': 'Birthday',
+    'corporate': 'Corporate', 'корпоратив': 'Corporate', 'אירוע עסקי': 'Corporate', 'company': 'Corporate', 'business': 'Corporate',
+    'party': 'Private Party', 'вечеринка': 'Private Party', 'מסיבה': 'Private Party',
+    'graduation': 'Graduation', 'выпускной': 'Graduation', 'סיום': 'Graduation',
+    'anniversary': 'Anniversary', 'годовщина': 'Anniversary', 'יום נישואין': 'Anniversary',
+    'engagement': 'Engagement', 'помолвка': 'Engagement', 'אירוסין': 'Engagement',
+    'baby shower': 'Baby Shower', 'беби шауэр': 'Baby Shower',
+    'new year': 'New Year Party', 'новый год': 'New Year Party',
+    'hanukkah': 'Hanukkah', 'חנוכה': 'Hanukkah', 'ханука': 'Hanukkah',
+    'purim': 'Purim', 'פורים': 'Purim', 'пурим': 'Purim',
 };
 
+// Budget extraction patterns
+const budgetPatterns = [
+    /(\d+[,.]?\d*)\s*(shekel|nis|₪|шекел|шек)/i,
+    /budget[:\s]+(\d+[,.]?\d*)/i,
+    /бюджет[:\s]+(\d+[,.]?\d*)/i,
+    /תקציב[:\s]+(\d+[,.]?\d*)/i,
+    /(\d+[,.]?\d*)[-–]\s*(\d+[,.]?\d*)\s*(shekel|nis|₪|шекел)?/i,
+];
+
+// Guest count patterns
+const guestPatterns = [
+    /(\d+)\s*(guests?|people|persons?|человек|гост|אורחים)/i,
+    /for\s+(\d+)/i,
+    /на\s+(\d+)/i,
+];
+
+// Date patterns
+const datePatterns = [
+    /(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/,
+    /(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}/i,
+    /(январ|феврал|март|апрел|ма[йя]|июн|июл|август|сентябр|октябр|ноябр|декабр)/i,
+];
+
+// ===== EXTRACTION FUNCTION =====
 function extractFromMessage(message: string): {
     category?: VendorCategory;
     city?: City;
-    eventType?: string
+    eventType?: string;
+    budget?: string;
+    guestCount?: number;
+    eventDate?: string;
 } {
     const lowerMessage = message.toLowerCase();
-
     let category: VendorCategory | undefined;
     let city: City | undefined;
     let eventType: string | undefined;
+    let budget: string | undefined;
+    let guestCount: number | undefined;
+    let eventDate: string | undefined;
 
-    // Find category
+    // Extract category
     for (const [keyword, cat] of Object.entries(categoryKeywords)) {
-        if (lowerMessage.includes(keyword)) {
-            category = cat;
-            break;
-        }
+        if (lowerMessage.includes(keyword)) { category = cat; break; }
     }
 
-    // Find city
+    // Extract city
     for (const [keyword, c] of Object.entries(cityKeywords)) {
-        if (lowerMessage.includes(keyword)) {
-            city = c;
-            break;
-        }
+        if (lowerMessage.includes(keyword)) { city = c; break; }
     }
 
-    // Find event type
+    // Extract event type
     for (const [keyword, event] of Object.entries(eventKeywords)) {
-        if (lowerMessage.includes(keyword)) {
-            eventType = event;
+        if (lowerMessage.includes(keyword)) { eventType = event; break; }
+    }
+
+    // Extract budget
+    for (const pattern of budgetPatterns) {
+        const match = message.match(pattern);
+        if (match) {
+            budget = match[1] + (match[2] ? ` ${match[2]}` : ' NIS');
             break;
         }
     }
 
-    return { category, city, eventType };
+    // Extract guest count
+    for (const pattern of guestPatterns) {
+        const match = message.match(pattern);
+        if (match) {
+            guestCount = parseInt(match[1]);
+            break;
+        }
+    }
+
+    // Extract date
+    for (const pattern of datePatterns) {
+        const match = message.match(pattern);
+        if (match) {
+            eventDate = match[0];
+            break;
+        }
+    }
+
+    return { category, city, eventType, budget, guestCount, eventDate };
 }
 
-async function findVendors(category?: VendorCategory, city?: City, eventType?: string): Promise<Vendor[]> {
+// ===== FIND VENDORS =====
+async function findVendors(
+    category?: VendorCategory,
+    city?: City,
+    eventType?: string,
+    limit: number = 6
+): Promise<Vendor[]> {
     try {
-        // Use Supabase filterVendors
         let results = await filterVendors({
             category,
             city,
+            minRating: 4.0,
         });
 
-        // Filter by event type (tag matching) if provided
-        if (eventType && results.length > 0) {
-            const eventResults = results.filter(v =>
-                v.tags.some(tag => tag.toLowerCase().includes(eventType.toLowerCase()))
-            );
-            if (eventResults.length > 0) {
-                results = eventResults;
-            }
+        if (results.length === 0 && category) {
+            results = await filterVendors({ category });
         }
 
-        // Return top 3
-        return results.slice(0, 3);
+        if (results.length === 0 && city) {
+            results = await filterVendors({ city });
+        }
+
+        return results.slice(0, limit);
     } catch (error) {
         console.error('Error finding vendors:', error);
         return [];
     }
 }
 
-function generateResponse(
-    extracted: { category?: VendorCategory; city?: City; eventType?: string },
-    vendors: Vendor[]
+// ===== ENHANCED AI SYSTEM PROMPT =====
+const SYSTEM_PROMPT = `You are Talentr AI Concierge - an expert event planner assistant helping people find the perfect entertainment and service professionals for their events in Israel.
+
+## Your Personality
+- Warm, enthusiastic, and genuinely helpful
+- Expert knowledge about Israeli events and traditions
+- Speaks naturally with personality, not robotic
+- Uses 1-2 relevant emojis per message (not excessive)
+- Matches the user's energy and language style
+
+## Your Expertise
+You help find professionals for:
+- 📸 Photographers & Videographers
+- 🎵 DJs, Musicians, Singers
+- 🎤 MCs, Hosts, Comedians
+- 🎩 Magicians, Kids Animators
+- 💐 Event Decorators, Florists
+- 🍸 Bartenders, Bar Shows
+- 👨‍🍳 Chefs, Catering
+- 💄 Makeup Artists, Face Painters
+
+## Event Types You Know
+Weddings, Bar/Bat Mitzvahs, Birthdays, Corporate events, Private parties, 
+Graduations, Anniversaries, Engagements, Baby Showers, Jewish holidays
+
+## Cities You Cover
+Tel Aviv, Haifa, Jerusalem, Eilat, Rishon LeZion, Netanya, Ashdod, 
+Beer Sheva, Petah Tikva, Herzliya, Ramat Gan
+
+## Response Guidelines
+
+### When user specifies what they need:
+1. Acknowledge their request enthusiastically
+2. If vendors found: "I found some amazing [category]s for you! ✨"
+3. Suggest 1-2 related services they might need
+
+### When request is vague:
+Ask ONE clarifying question. Examples:
+- "What kind of event are you planning?"
+- "Which city will the event be in?"
+- "What's the vibe you're going for?"
+
+### Smart follow-ups based on event type:
+- Wedding → Suggest photographer, videographer, DJ, flowers
+- Bar Mitzvah → Suggest DJ, photographer, animator, decor
+- Birthday → Suggest photographer, entertainment, decor
+- Corporate → Suggest photographer, MC, catering
+
+### Pricing questions:
+"Prices vary based on experience and packages. I'd recommend checking a few profiles to compare. Most pros on Talentr offer free consultations! 💬"
+
+## Language Rules
+- ALWAYS respond in the same language the user writes in
+- English → English
+- Russian (Русский) → Russian 
+- Hebrew (עברית) → Hebrew (RTL)
+
+## Important Rules
+1. Keep responses SHORT (2-4 sentences max)
+2. Never invent vendor names or specific prices
+3. Be positive and solution-oriented
+4. Guide toward booking action
+5. If no vendors found, suggest alternatives
+
+## Current Context
+[VENDOR_CONTEXT]`;
+
+// ===== GENERATE FOLLOW-UP SUGGESTIONS =====
+function generateSuggestions(
+    extracted: { category?: VendorCategory; eventType?: string; city?: City },
+    language: string
+): string[] {
+    const suggestions: Record<string, string[]> = {
+        en: [],
+        ru: [],
+        he: [],
+    };
+
+    if (extracted.eventType === 'Wedding') {
+        suggestions.en = ['Find a photographer', 'Find a DJ', 'Find a videographer', 'Find decorators'];
+        suggestions.ru = ['Найти фотографа', 'Найти диджея', 'Найти видеографа', 'Найти декоратора'];
+        suggestions.he = ['מצא צלם', "מצא דיג'יי", 'מצא צלם וידאו', 'מצא מעצב'];
+    } else if (extracted.eventType === 'Bar Mitzvah' || extracted.eventType === 'Bat Mitzvah') {
+        suggestions.en = ['Find a DJ', 'Find an animator', 'Find a photographer', 'Find a magician'];
+        suggestions.ru = ['Найти диджея', 'Найти аниматора', 'Найти фотографа', 'Найти фокусника'];
+        suggestions.he = ["מצא דיג'יי", 'מצא אנימטור', 'מצא צלם', 'מצא קוסם'];
+    } else if (extracted.eventType === 'Birthday') {
+        suggestions.en = ['Find an animator', 'Find a photographer', 'Find decorations', 'Find a magician'];
+        suggestions.ru = ['Найти аниматора', 'Найти фотографа', 'Найти декор', 'Найти фокусника'];
+        suggestions.he = ['מצא אנימטור', 'מצא צלם', 'מצא קישוטים', 'מצא קוסם'];
+    } else if (!extracted.category) {
+        suggestions.en = ['I need a photographer', 'I need a DJ', 'I need a singer', 'Planning a wedding'];
+        suggestions.ru = ['Нужен фотограф', 'Нужен диджей', 'Нужен певец', 'Планирую свадьбу'];
+        suggestions.he = ['אני צריך צלם', "אני צריך דיג'יי", 'אני צריך זמר', 'מתכנן חתונה'];
+    }
+
+    return suggestions[language] || suggestions.en;
+}
+
+// ===== AI RESPONSE GENERATION =====
+async function generateAIResponse(
+    message: string,
+    conversationHistory: { role: 'user' | 'assistant'; content: string }[],
+    extracted: ReturnType<typeof extractFromMessage>,
+    vendors: Vendor[],
+    language: string
+): Promise<string> {
+    const client = getOpenAI();
+    if (!client) {
+        return generateFallbackResponse(extracted, vendors, language);
+    }
+
+    try {
+        // Build vendor context
+        let vendorContext = '';
+        if (vendors.length > 0) {
+            vendorContext = `\n[SYSTEM INFO: Found ${vendors.length} excellent ${extracted.category || 'professional'}s. Cards will display automatically. Be enthusiastic!]`;
+        } else if (extracted.category || extracted.city) {
+            vendorContext = `\n[SYSTEM INFO: No vendors found for this specific search. Suggest broadening criteria or trying nearby cities.]`;
+        }
+
+        const systemPrompt = SYSTEM_PROMPT.replace('[VENDOR_CONTEXT]', vendorContext);
+
+        const messages: { role: 'system' | 'user' | 'assistant'; content: string }[] = [
+            { role: 'system', content: systemPrompt },
+            ...conversationHistory.slice(-8).map(msg => ({
+                role: msg.role as 'user' | 'assistant',
+                content: msg.content
+            })),
+            { role: 'user', content: message }
+        ];
+
+        const completion = await client.chat.completions.create({
+            model: 'gpt-4o-mini',
+            messages,
+            max_tokens: 250,
+            temperature: 0.8,
+            presence_penalty: 0.1,
+            frequency_penalty: 0.1,
+        });
+
+        return completion.choices[0]?.message?.content || generateFallbackResponse(extracted, vendors, language);
+    } catch (error) {
+        console.error('OpenAI API error:', error);
+        return generateFallbackResponse(extracted, vendors, language);
+    }
+}
+
+// ===== FALLBACK RESPONSES =====
+function generateFallbackResponse(
+    extracted: ReturnType<typeof extractFromMessage>,
+    vendors: Vendor[],
+    language: string = 'en'
 ): string {
     const { category, city, eventType } = extracted;
 
-    if (vendors.length === 0) {
-        if (category && city) {
-            return `I couldn't find any ${category}s in ${city} at the moment. Would you like me to search in nearby cities?`;
-        }
-        if (category) {
-            return `I couldn't find ${category}s matching your criteria. Try specifying a city or different requirements.`;
-        }
-        return `I'd love to help! Tell me what kind of professional you're looking for and where. For example: "I need a DJ for a wedding in Tel Aviv"`;
+    const responses = {
+        en: {
+            found: (count: number, cat: string, loc?: string) =>
+                `Great news! I found ${count} amazing ${cat}s${loc ? ` in ${loc}` : ''} for you! ✨ Take a look at these top-rated professionals.`,
+            notFound: () =>
+                `I couldn't find exact matches, but let me help you! Which city are you looking in?`,
+            askEvent: () =>
+                `I'd love to help! What kind of event are you planning? 🎉`,
+            askCategory: () =>
+                `What kind of professional are you looking for? Photographer, DJ, singer, or something else?`,
+        },
+        ru: {
+            found: (count: number, cat: string, loc?: string) =>
+                `Отлично! Нашёл ${count} потрясающих специалистов${loc ? ` в ${loc}` : ''}! ✨ Посмотрите на этих профессионалов.`,
+            notFound: () =>
+                `Не нашёл точных совпадений. В каком городе вы ищете?`,
+            askEvent: () =>
+                `С удовольствием помогу! Какое мероприятие вы планируете? 🎉`,
+            askCategory: () =>
+                `Какого специалиста вы ищете? Фотографа, диджея, певца или кого-то ещё?`,
+        },
+        he: {
+            found: (count: number, cat: string, loc?: string) =>
+                `מצאתי ${count} מקצוענים מעולים${loc ? ` ב${loc}` : ''}! ✨ הנה הטובים ביותר.`,
+            notFound: () =>
+                `לא מצאתי התאמות מדויקות. באיזה עיר אתה מחפש?`,
+            askEvent: () =>
+                `אשמח לעזור! איזה סוג אירוע אתה מתכנן? 🎉`,
+            askCategory: () =>
+                `איזה איש מקצוע אתה מחפש? צלם, דיג'יי, זמר או משהו אחר?`,
+        },
+    };
+
+    const r = responses[language as keyof typeof responses] || responses.en;
+
+    if (vendors.length > 0) {
+        return r.found(vendors.length, category || 'professional', city);
     }
 
-    let response = '';
-
-    if (vendors.length === 1) {
-        response = `Great choice! Here's the perfect ${category || 'professional'}`;
-    } else {
-        response = `Excellent! Here are the top ${vendors.length} ${category || 'professional'}s`;
+    if (category && !city) {
+        return r.notFound();
     }
 
-    if (city) {
-        response += ` in ${city}`;
+    if (!category && eventType) {
+        return r.askCategory();
     }
 
-    if (eventType) {
-        response += ` for your ${eventType}`;
-    }
-
-    response += ':';
-
-    return response;
+    return r.askEvent();
 }
 
+// ===== MAIN API HANDLER =====
 export async function POST(request: NextRequest) {
     try {
-        const body: ChatRequest = await request.json();
-        const { message } = body;
+        // Rate limiting
+        const clientIP = getClientIP(request);
+        const rateLimitResult = rateLimit(clientIP, RATE_LIMITS.chat);
 
-        if (!message || typeof message !== 'string') {
+        if (!rateLimitResult.success) {
             return NextResponse.json(
-                { error: 'Message is required' },
+                { error: 'Too many requests. Please try again later.' },
+                { status: 429, headers: rateLimitHeaders(rateLimitResult) }
+            );
+        }
+
+        const body = await request.json();
+
+        // Validate input
+        const validation = chatMessageSchema.safeParse({
+            message: body.message,
+            language: body.language || 'en'
+        });
+
+        if (!validation.success) {
+            return NextResponse.json(
+                { error: validation.error.issues[0]?.message || 'Invalid input' },
                 { status: 400 }
             );
         }
 
+        const { message, language } = validation.data;
+        const conversationHistory = body.conversationHistory || [];
+        const existingContext = body.context || {};
+
         // Extract entities from message
         const extracted = extractFromMessage(message);
 
-        // Find matching vendors from Supabase
-        const vendors = await findVendors(extracted.category, extracted.city, extracted.eventType);
+        // Merge with existing context
+        const mergedExtracted = {
+            ...existingContext,
+            ...extracted,
+            // Only override if new value exists
+            category: extracted.category || existingContext.selectedCategories?.[0],
+            city: extracted.city || existingContext.city,
+            eventType: extracted.eventType || existingContext.eventType,
+        };
 
-        // Generate response
-        const response = generateResponse(extracted, vendors);
+        // Find matching vendors
+        const vendors = await findVendors(
+            mergedExtracted.category,
+            mergedExtracted.city,
+            mergedExtracted.eventType,
+            6
+        );
+
+        // Generate AI response
+        const response = await generateAIResponse(
+            message,
+            conversationHistory,
+            mergedExtracted,
+            vendors,
+            language
+        );
+
+        // Generate follow-up suggestions
+        const suggestions = generateSuggestions(mergedExtracted, language);
 
         const result: ChatResponse = {
             response,
             vendors,
-            extracted
+            extracted: mergedExtracted,
+            suggestions: suggestions.slice(0, 4),
         };
 
         return NextResponse.json(result);
@@ -305,4 +531,3 @@ export async function POST(request: NextRequest) {
         );
     }
 }
-
