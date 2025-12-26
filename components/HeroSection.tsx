@@ -315,7 +315,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                                 )}
                                 whileHover={{ scale: 1.01 }}
                             >
-                                <div className="absolute left-5 top-1/2 -translate-y-1/2">
+                                <div className="absolute start-5 top-1/2 -translate-y-1/2">
                                     <motion.div
                                         animate={isSearchFocused ? { scale: [1, 1.2, 1] } : {}}
                                         transition={{ duration: 0.3 }}
@@ -333,14 +333,14 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                                     onFocus={() => setIsSearchFocused(true)}
                                     onBlur={() => setIsSearchFocused(false)}
                                     placeholder={t('searchPlaceholder')}
-                                    className="flex-1 pl-14 pr-4 py-5 text-lg text-gray-900 placeholder-gray-400 bg-transparent rounded-l-2xl focus:outline-none"
+                                    className="flex-1 ps-14 pe-4 py-5 text-lg text-gray-900 placeholder-gray-400 bg-transparent rounded-s-2xl focus:outline-none"
                                 />
                                 <div className="flex-shrink-0 px-2">
                                     <VoiceSearch onTranscript={(text) => { setSearchQuery(text); onSearch?.(text); }} />
                                 </div>
                                 <motion.button
                                     type="submit"
-                                    className="flex-shrink-0 px-6 py-3 mr-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/30"
+                                    className="flex-shrink-0 px-6 py-3 me-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/30"
                                     whileHover={{ scale: 1.02 }}
                                     whileTap={{ scale: 0.98 }}
                                 >
