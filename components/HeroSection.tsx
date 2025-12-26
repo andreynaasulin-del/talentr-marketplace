@@ -3,7 +3,7 @@
 import { useState, useEffect, useCallback } from 'react';
 import { Search, Sparkles, ArrowRight, Play, Star, Users, Calendar, TrendingUp } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import VoiceSearch from './VoiceSearch';
 import Image from 'next/image';
@@ -63,6 +63,8 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
     const [displayText, setDisplayText] = useState('');
     const [wordIndex, setWordIndex] = useState(0);
     const [isDeleting, setIsDeleting] = useState(false);
+    const [isAISearching, setIsAISearching] = useState(false);
+    const [aiSummary, setAiSummary] = useState('');
 
     // Animated stats
     const vendorCount = useAnimatedNumber(500, 2500);
@@ -112,9 +114,39 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
         return () => clearTimeout(timer);
     }, [displayText, isDeleting, wordIndex, words]);
 
+    // AI-powered search
+    const handleAISearch = async (query: string) => {
+        if (!query.trim()) return;
+
+        setIsAISearching(true);
+        setAiSummary('');
+
+        try {
+            const response = await fetch('/api/ai-search', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ query, language }),
+            });
+
+            const data = await response.json();
+
+            if (data.success && data.summary) {
+                setAiSummary(data.summary);
+            }
+
+            // Still trigger the regular search for filtering
+            onSearch?.(query);
+        } catch (error) {
+            console.error('AI Search error:', error);
+            onSearch?.(query);
+        } finally {
+            setIsAISearching(false);
+        }
+    };
+
     const handleSearch = (e: React.FormEvent) => {
         e.preventDefault();
-        if (searchQuery.trim()) onSearch?.(searchQuery);
+        if (searchQuery.trim()) handleAISearch(searchQuery);
     };
 
     const popularSearches = [
@@ -336,18 +368,51 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                                     className="flex-1 ps-14 pe-4 py-5 text-lg text-gray-900 placeholder-gray-400 bg-transparent rounded-s-2xl focus:outline-none"
                                 />
                                 <div className="flex-shrink-0 px-2">
-                                    <VoiceSearch onTranscript={(text) => { setSearchQuery(text); onSearch?.(text); }} />
+                                    <VoiceSearch onTranscript={(text) => { setSearchQuery(text); handleAISearch(text); }} />
                                 </div>
                                 <motion.button
                                     type="submit"
-                                    className="flex-shrink-0 px-6 py-3 me-2 bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-blue-500/30"
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
+                                    className={cn(
+                                        "flex-shrink-0 px-6 py-3 me-2 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg",
+                                        isAISearching
+                                            ? "bg-gray-400 cursor-not-allowed"
+                                            : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-500/30"
+                                    )}
+                                    whileHover={!isAISearching ? { scale: 1.02 } : {}}
+                                    whileTap={!isAISearching ? { scale: 0.98 } : {}}
+                                    disabled={isAISearching}
                                 >
-                                    {t('Search')}
-                                    <ArrowRight className="w-4 h-4" />
+                                    {isAISearching ? (
+                                        <>
+                                            <div className="w-4 h-4 border-2 border-white border-t-transparent rounded-full animate-spin" />
+                                            AI...
+                                        </>
+                                    ) : (
+                                        <>
+                                            {t('Search')}
+                                            <ArrowRight className="w-4 h-4" />
+                                        </>
+                                    )}
                                 </motion.button>
                             </motion.div>
+
+                            {/* AI Summary */}
+                            <AnimatePresence>
+                                {aiSummary && (
+                                    <motion.div
+                                        initial={{ opacity: 0, y: -10 }}
+                                        animate={{ opacity: 1, y: 0 }}
+                                        exit={{ opacity: 0, y: -10 }}
+                                        className="mt-4 p-4 bg-gradient-to-r from-purple-50 to-blue-50 border border-purple-100 rounded-xl"
+                                    >
+                                        <div className="flex items-center gap-2">
+                                            <Sparkles className="w-5 h-5 text-purple-500" />
+                                            <span className="text-sm font-medium text-purple-700">AI:</span>
+                                            <span className="text-sm text-gray-700">{aiSummary}</span>
+                                        </div>
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
                         </motion.form>
 
                         {/* Popular Tags */}
@@ -356,7 +421,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                             {popularSearches.map((search) => (
                                 <motion.button
                                     key={search.query}
-                                    onClick={() => { setSearchQuery(search.query); onSearch?.(search.query); }}
+                                    onClick={() => { setSearchQuery(search.query); handleAISearch(search.query); }}
                                     className="inline-flex items-center gap-2 px-4 py-2 bg-white/80 hover:bg-white border border-gray-200/50 rounded-full text-sm font-medium text-gray-700 hover:text-blue-600 hover:border-blue-300 transition-all shadow-sm hover:shadow-md"
                                     whileHover={{ scale: 1.05, y: -2 }}
                                     whileTap={{ scale: 0.95 }}
