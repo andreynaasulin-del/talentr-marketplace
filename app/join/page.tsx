@@ -82,11 +82,9 @@ export default function JoinPage() {
 
             if (vendorError) {
                 console.error('Vendor creation error:', vendorError);
-                setError(language === 'ru'
-                    ? 'Ошибка создания профиля. Попробуйте позже.'
-                    : language === 'he'
-                        ? 'שגיאה ביצירת פרופיל. נסה שוב מאוחר יותר.'
-                        : 'Error creating profile. Please try again later.');
+                // Show actual error for debugging
+                const errorDetail = vendorError.message || vendorError.code || JSON.stringify(vendorError);
+                setError(`Error: ${errorDetail}`);
                 setLoading(false);
                 return;
             }

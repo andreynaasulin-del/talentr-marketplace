@@ -189,7 +189,10 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
             {mounted && (
                 <>
                     <motion.div
-                        className="absolute top-20 right-[15%] w-16 h-16 hidden lg:flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl"
+                        className={cn(
+                            "absolute top-20 w-16 h-16 hidden lg:flex items-center justify-center bg-white/80 backdrop-blur-sm rounded-2xl shadow-xl",
+                            language === 'he' ? 'left-[15%]' : 'right-[15%]'
+                        )}
                         animate={{ y: [0, -15, 0], rotate: [0, 5, 0] }}
                         transition={{ duration: 5, repeat: Infinity, ease: 'easeInOut' }}
                         style={{ x: moveX, y: moveY }}
@@ -197,14 +200,20 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         <span className="text-3xl">📸</span>
                     </motion.div>
                     <motion.div
-                        className="absolute top-40 right-[25%] w-14 h-14 hidden lg:flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-xl"
+                        className={cn(
+                            "absolute top-40 w-14 h-14 hidden lg:flex items-center justify-center bg-gradient-to-br from-purple-500 to-pink-500 rounded-xl shadow-xl",
+                            language === 'he' ? 'left-[25%]' : 'right-[25%]'
+                        )}
                         animate={{ y: [0, -20, 0], rotate: [0, -8, 0] }}
                         transition={{ duration: 6, repeat: Infinity, ease: 'easeInOut', delay: 1 }}
                     >
                         <span className="text-2xl">🎵</span>
                     </motion.div>
                     <motion.div
-                        className="absolute bottom-32 right-[20%] w-12 h-12 hidden lg:flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-xl"
+                        className={cn(
+                            "absolute bottom-32 w-12 h-12 hidden lg:flex items-center justify-center bg-gradient-to-br from-amber-400 to-orange-500 rounded-full shadow-xl",
+                            language === 'he' ? 'left-[20%]' : 'right-[20%]'
+                        )}
                         animate={{ y: [0, -12, 0], scale: [1, 1.1, 1] }}
                         transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut', delay: 2 }}
                     >
@@ -215,7 +224,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
 
             {/* Main Content */}
             <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 w-full">
-                <div className="grid lg:grid-cols-2 gap-16 items-center">
+                <div className="grid lg:grid-cols-2 gap-16 items-center" dir={language === 'he' ? 'rtl' : 'ltr'}>
                     {/* Left Side - Content */}
                     <motion.div
                         variants={containerVariants}

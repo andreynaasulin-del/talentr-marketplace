@@ -136,7 +136,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                             />
 
                             {/* Top Row - Premium Badges */}
-                            <div className="absolute top-3 left-3 flex items-center gap-2 z-20">
+                            <div className="absolute top-3 start-3 flex items-center gap-2 z-20">
                                 {isPremium && (
                                     <motion.div
                                         className="flex items-center gap-1.5 px-3 py-1.5 bg-gradient-to-r from-amber-500 to-orange-500 rounded-full shadow-lg"
@@ -173,7 +173,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                     toggleFavorite(vendor.id, vendor.name);
                                 }}
                                 className={cn(
-                                    "absolute top-3 right-3 z-20",
+                                    "absolute top-3 end-3 z-20",
                                     "w-10 h-10 rounded-full",
                                     "flex items-center justify-center",
                                     "backdrop-blur-xl transition-all duration-300",
@@ -192,7 +192,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                             {/* Fast Reply Badge */}
                             {vendor.reviewsCount > 50 && (
                                 <motion.div
-                                    className="absolute bottom-3 right-3 flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/90 backdrop-blur-md rounded-full shadow-lg z-20"
+                                    className="absolute bottom-3 end-3 flex items-center gap-1.5 px-3 py-1.5 bg-blue-500/90 backdrop-blur-md rounded-full shadow-lg z-20"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     transition={{ delay: 0.5 }}
@@ -203,7 +203,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                             )}
 
                             {/* Category - Glass Pill */}
-                            <div className="absolute bottom-3 left-3 z-20">
+                            <div className="absolute bottom-3 start-3 z-20">
                                 <motion.span
                                     className="inline-flex items-center px-4 py-2 bg-white/95 backdrop-blur-md rounded-full text-sm font-semibold text-gray-900 shadow-lg"
                                     initial={{ opacity: 0, y: 10 }}
