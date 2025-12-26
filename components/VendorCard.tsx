@@ -2,7 +2,7 @@
 
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, Heart, MapPin, MessageCircle, Zap, Shield, Crown } from 'lucide-react';
+import { Star, Heart, MapPin, Zap, Shield, Crown } from 'lucide-react';
 import { Vendor } from '@/types';
 import { useLanguage } from '@/context/LanguageContext';
 import { useFavorites } from '@/context/FavoritesContext';
@@ -187,33 +187,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                 <Heart className={cn("w-5 h-5 transition-transform", isLiked && 'fill-current scale-110')} />
                             </motion.button>
 
-                            {/* WhatsApp - appears on hover */}
-                            {vendor.phone && (
-                                <motion.div
-                                    role="button"
-                                    tabIndex={0}
-                                    onClick={(e) => {
-                                        e.preventDefault();
-                                        e.stopPropagation();
-                                        window.open(
-                                            `https://wa.me/${vendor.phone!.replace(/\D/g, '')}?text=${encodeURIComponent(`Hi! I found you on Talentr.`)}`,
-                                            '_blank'
-                                        );
-                                    }}
-                                    className={cn(
-                                        "absolute top-16 right-3 z-20",
-                                        "w-10 h-10 rounded-full",
-                                        "flex items-center justify-center",
-                                        "bg-green-500 text-white shadow-lg shadow-green-500/30",
-                                        "opacity-0 group-hover:opacity-100 translate-y-2 group-hover:translate-y-0",
-                                        "transition-all duration-300 cursor-pointer"
-                                    )}
-                                    whileHover={{ scale: 1.15 }}
-                                    whileTap={{ scale: 0.9 }}
-                                >
-                                    <MessageCircle className="w-5 h-5" />
-                                </motion.div>
-                            )}
+                            {/* WhatsApp removed - users must go to vendor page first */}
 
                             {/* Fast Reply Badge */}
                             {vendor.reviewsCount > 50 && (
