@@ -24,40 +24,11 @@ interface ReviewsSectionProps {
     initialReviews?: Review[];
 }
 
-// Mock reviews data
-const mockReviews: Review[] = [
-    {
-        id: '1',
-        author: 'Sarah M.',
-        rating: 5,
-        date: '2 weeks ago',
-        text: 'Absolutely amazing! Made our wedding day truly magical. Professional, punctual, and incredibly talented.',
-        helpful: 24,
-        eventType: 'Wedding'
-    },
-    {
-        id: '2',
-        author: 'David K.',
-        rating: 5,
-        date: '1 month ago',
-        text: 'Exceeded all expectations. The photos and videos captured every perfect moment. Highly recommend!',
-        helpful: 18,
-        eventType: 'Bar Mitzvah'
-    },
-    {
-        id: '3',
-        author: 'Anna L.',
-        rating: 4,
-        date: '2 months ago',
-        text: 'Great service and very creative approach. Would definitely book again for our next event.',
-        helpful: 12,
-        eventType: 'Corporate Event'
-    }
-];
+// Mock reviews removed - only real reviews from database are shown
 
 export default function ReviewsSection({ vendorId, vendorName, initialReviews }: ReviewsSectionProps) {
     const { t, language } = useLanguage();
-    const [reviews] = useState<Review[]>(initialReviews || mockReviews);
+    const [reviews] = useState<Review[]>(initialReviews || []);
     const [showForm, setShowForm] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [newReview, setNewReview] = useState({

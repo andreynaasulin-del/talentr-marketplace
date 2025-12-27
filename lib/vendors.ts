@@ -1,6 +1,7 @@
 import { supabase } from './supabase';
 import { Vendor, VendorCategory, City } from '@/types';
-import { mockVendors } from '@/data/mockData';
+
+// NOTE: Mock data removed - only real data from Supabase is used
 
 // Type for Supabase vendor row (matching actual schema)
 interface VendorRow {
@@ -48,14 +49,14 @@ export async function getVendors(): Promise<Vendor[]> {
             .order('rating', { ascending: false });
 
         if (error || !data || data.length === 0) {
-            // console.log('Using mock vendors fallback');
-            return mockVendors;
+            // No vendors found in database
+            return [];
         }
 
         return data.map(toVendor);
     } catch (e) {
-        console.error('Supabase error, using mock data:', e);
-        return mockVendors;
+        console.error('Supabase error:', e);
+        return [];
     }
 }
 
@@ -71,14 +72,13 @@ export async function getVendorsByCategory(category: VendorCategory): Promise<Ve
             .order('rating', { ascending: false });
 
         if (error || !data || data.length === 0) {
-            // console.log('Using mock vendors for category:', category);
-            return mockVendors.filter(v => v.category === category);
+            return [];
         }
 
         return data.map(toVendor);
     } catch (e) {
         console.error('Supabase error:', e);
-        return mockVendors.filter(v => v.category === category);
+        return [];
     }
 }
 
@@ -111,8 +111,7 @@ export async function getVendorById(id: string): Promise<Vendor | null> {
         .single();
 
     if (error || !data) {
-        // console.log('Using fallback vendor data for ID:', id);
-        return getMockVendorById(id);
+        return null;
     }
 
     return toVendor(data);
@@ -129,30 +128,13 @@ export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
         .limit(limit);
 
     if (error || !data || data.length === 0) {
-        // console.log('Using fallback vendor data');
-        return getMockFeaturedVendors(limit);
+        return [];
     }
 
     return data.map(toVendor);
 }
 
-// Mock data for when Supabase is unavailable
-const mockVendorsList: Vendor[] = [
-    { id: 'mock-1', name: 'David Cohen Photography', category: 'Photographer', city: 'Tel Aviv', rating: 4.9, reviewsCount: 127, priceFrom: 2500, imageUrl: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Bar Mitzvah', 'Corporate'], description: 'Professional wedding and event photographer with 10+ years experience.', phone: '+972501234567', isVerified: true, isFeatured: true },
-    { id: 'mock-2', name: 'DJ Noam - Electronic Vibes', category: 'DJ', city: 'Tel Aviv', rating: 4.8, reviewsCount: 94, priceFrom: 3000, imageUrl: 'https://images.unsplash.com/photo-1571330735066-03aaa9429d89?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Birthday', 'Club Night'], description: 'High-energy DJ specializing in EDM and Top 40 hits.', phone: '+972551234567', isVerified: true, isFeatured: true },
-    { id: 'mock-3', name: 'Yael Levi - Master of Ceremonies', category: 'MC', city: 'Haifa', rating: 5.0, reviewsCount: 156, priceFrom: 1800, imageUrl: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Bar Mitzvah', 'Corporate'], description: 'Charismatic host making your event unforgettable.', phone: '+972521234567', isVerified: true, isFeatured: true },
-    { id: 'mock-4', name: 'Magic Mike - Illusions Show', category: 'Magician', city: 'Jerusalem', rating: 4.9, reviewsCount: 89, priceFrom: 2000, imageUrl: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=800&q=80', tags: ['Kids Party', 'Bar Mitzvah', 'Corporate'], description: 'Award-winning magician bringing wonder to every event.', phone: '+972541234567', isVerified: true, isFeatured: true },
-    { id: 'mock-5', name: 'Dream Decorations', category: 'Event Decor', city: 'Tel Aviv', rating: 5.0, reviewsCount: 234, priceFrom: 3000, imageUrl: 'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Bar Mitzvah', 'Corporate'], description: 'Transforming venues into magical spaces.', phone: '+972531234567', isVerified: true, isFeatured: true },
-    { id: 'mock-6', name: 'Sarah Gold - Wedding Singer', category: 'Singer', city: 'Tel Aviv', rating: 4.7, reviewsCount: 203, priceFrom: 3500, imageUrl: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=800&q=80', tags: ['Wedding', 'Corporate', 'Private Party'], description: 'Soul and pop singer with 15 years experience.', phone: '+972561234567', isVerified: true, isFeatured: true },
-];
-
-function getMockFeaturedVendors(limit: number): Vendor[] {
-    return mockVendorsList.slice(0, limit);
-}
-
-function getMockVendorById(id: string): Vendor | null {
-    return mockVendorsList.find(v => v.id === id) || mockVendorsList[0];
-}
+// Mock data functions removed - only real data is used
 
 /**
  * Search vendors by query (name, description, tags)
@@ -217,33 +199,13 @@ export async function filterVendors(filters: VendorFilters): Promise<Vendor[]> {
         const { data, error } = await query.order('rating', { ascending: false }).limit(10);
 
         if (error || !data || data.length === 0) {
-            // console.log('Using mock vendors for filter:', filters);
-            // Fallback to mock data with filtering
-            let filtered = mockVendors;
-            if (filters.category) {
-                filtered = filtered.filter(v => v.category === filters.category);
-            }
-            if (filters.city) {
-                filtered = filtered.filter(v => v.city === filters.city);
-            }
-            if (filters.minRating) {
-                filtered = filtered.filter(v => v.rating >= filters.minRating!);
-            }
-            return filtered.slice(0, 10);
+            return [];
         }
 
         return data.map(toVendor);
     } catch (e) {
         console.error('Filter vendors error:', e);
-        // Fallback to mock data
-        let filtered = mockVendors;
-        if (filters.category) {
-            filtered = filtered.filter(v => v.category === filters.category);
-        }
-        if (filters.city) {
-            filtered = filtered.filter(v => v.city === filters.city);
-        }
-        return filtered.slice(0, 10);
+        return [];
     }
 }
 
