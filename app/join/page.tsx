@@ -89,7 +89,11 @@ export default function JoinPage() {
                 return;
             }
 
-            router.push('/dashboard');
+            // Wait for session to be fully established
+            await new Promise(resolve => setTimeout(resolve, 1000));
+
+            // Force redirect to dashboard
+            window.location.href = '/dashboard';
         } catch (err: any) {
             console.error('Registration error:', err);
             setError(err.message || (language === 'ru'
