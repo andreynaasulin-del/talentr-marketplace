@@ -81,11 +81,9 @@ export default function AISupportChat() {
     const lang = language as 'en' | 'ru' | 'he';
     const quickActions = QUICK_ACTIONS[lang] || QUICK_ACTIONS.en;
 
-    // Hide on auth pages to prevent covering Sign In/Sign Up buttons
+    // Check if on auth pages to prevent covering Sign In/Sign Up buttons
     const authRoutes = ['/signin', '/signup', '/join'];
-    if (authRoutes.includes(pathname)) {
-        return null;
-    }
+    const shouldHide = authRoutes.includes(pathname);
 
     const t = {
         title: lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Support',
@@ -265,6 +263,11 @@ export default function AISupportChat() {
             ))}
         </div>
     );
+
+    // Don't render on auth pages
+    if (shouldHide) {
+        return null;
+    }
 
     return (
         <>
