@@ -137,6 +137,29 @@ export default function BookingModal({
         setError(null);
 
         try {
+            // Fetch user data for email
+            const { data: { user } } = await supabase.auth.getUser();
+            const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Client';
+            const userEmail = user?.email;
+
+            // Fetch vendor email
+            const { data: vendorData } = await supabase
+                .from('vendors')
+                .select('user_id')
+                .eq('id', vendorId)
+                .single();
+
+            let vendorEmail: string | null = null;
+            if (vendorData?.user_id) {
+                // Get vendor's email from auth.users via their profile
+                const { data: vendorUser } = await supabase
+                    .from('vendors')
+                    .select('email')
+                    .eq('id', vendorId)
+                    .single();
+                vendorEmail = vendorUser?.email || null;
+            }
+
             // Save booking to Supabase
             const { error: bookingError } = await supabase.from('bookings').insert([{
                 client_id: userId,
@@ -157,20 +180,40 @@ export default function BookingModal({
             setSuccess(true);
             celebrateSuccess();
 
-            // Send notification email
-            fetch('/api/email', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({
-                    template: 'booking_confirmation',
-                    to: 'user@example.com',
-                    vendorName,
-                    clientName: 'Client',
-                    eventDate: formData.eventDate,
-                    eventType: formData.eventType,
-                    message: formData.details
-                })
-            }).catch(() => { });
+            // Send email notifications (fire and forget)
+            const emailPayload = {
+                vendorName,
+                clientName: userName,
+                eventDate: formData.eventDate,
+                eventType: formData.eventType,
+                message: formData.details
+            };
+
+            // Send confirmation to client
+            if (userEmail) {
+                fetch('/api/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        template: 'booking_confirmation',
+                        to: userEmail,
+                        ...emailPayload
+                    })
+                }).catch((err) => console.log('Email send failed:', err));
+            }
+
+            // Send notification to vendor
+            if (vendorEmail) {
+                fetch('/api/email', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        template: 'vendor_notification',
+                        to: vendorEmail,
+                        ...emailPayload
+                    })
+                }).catch((err) => console.log('Vendor email failed:', err));
+            }
 
             toast.success(
                 language === 'ru' ? '🎉 Заявка отправлена!'
