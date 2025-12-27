@@ -30,7 +30,7 @@ Respond ONLY with a JSON object, nothing else. Example:
 If something is not mentioned, use null for that field.`;
 
         const completion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',  // Premium model for better understanding
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: query }
@@ -82,7 +82,7 @@ If something is not mentioned, use null for that field.`;
                 : `Based on the request "${query}", write a short sentence (max 20 words) explaining what we found. No quotes.`;
 
         const summaryCompletion = await openai.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',  // Premium model for better summaries
             messages: [
                 { role: 'system', content: 'You help summarize search results in a friendly, concise way.' },
                 { role: 'user', content: recommendationPrompt }

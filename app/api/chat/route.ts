@@ -375,11 +375,11 @@ async function generateAIResponse(
         ];
 
         const completion = await client.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o',  // Premium model for best quality responses
             messages,
-            max_tokens: 250,
-            temperature: 0.8,
-            presence_penalty: 0.1,
+            max_tokens: 500,  // More detailed responses
+            temperature: 0.7, // Slightly lower for more focused answers
+            presence_penalty: 0.2,
             frequency_penalty: 0.1,
         });
 

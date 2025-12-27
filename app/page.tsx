@@ -21,7 +21,6 @@ const FeaturedVendors = dynamic(() => import('@/components/FeaturedVendors'));
 const HowItWorks = dynamic(() => import('@/components/HowItWorks'));
 const Testimonials = dynamic(() => import('@/components/Testimonials'));
 const AppBanner = dynamic(() => import('@/components/AppBanner'));
-const WhatsAppButton = dynamic(() => import('@/components/WhatsAppButton'), { ssr: false });
 const EventSuggestions = dynamic(() => import('@/components/EventSuggestions'));
 const Footer = dynamic(() => import('@/components/Footer'));
 
@@ -132,8 +131,6 @@ export default function Home() {
             <AppBanner />
 
             <Footer />
-
-            <WhatsAppButton />
         </main>
     );
 }

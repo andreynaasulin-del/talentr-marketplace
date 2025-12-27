@@ -1,104 +1,118 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
+import { usePathname } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Bot, X, Send, Sparkles, HelpCircle, MapPin, Calendar, Search, Users } from 'lucide-react';
+import { X, Send, Sparkles, HelpCircle, Calendar, Search, Users, Star, MapPin, ExternalLink } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
+import { toast } from 'sonner';
+import Image from 'next/image';
+import Link from 'next/link';
+import { Vendor } from '@/types';
 
 interface Message {
     id: string;
     role: 'user' | 'assistant';
     content: string;
     timestamp: Date;
+    vendors?: Vendor[];
+    suggestions?: string[];
+}
+
+interface ChatAPIResponse {
+    response: string;
+    vendors: Vendor[];
+    extracted: {
+        category?: string;
+        city?: string;
+        eventType?: string;
+    };
+    suggestions?: string[];
 }
 
 // Quick action buttons
 const QUICK_ACTIONS = {
     en: [
-        { icon: Search, label: 'Find vendors', query: 'How do I find a photographer?' },
+        { icon: Search, label: 'Find vendors', query: 'I need a photographer for my wedding' },
         { icon: Calendar, label: 'Book event', query: 'How do I book a vendor?' },
         { icon: Users, label: 'Categories', query: 'What categories are available?' },
         { icon: HelpCircle, label: 'How it works', query: 'How does Talentr work?' },
     ],
     ru: [
-        { icon: Search, label: 'Найти', query: 'Как найти фотографа?' },
-        { icon: Calendar, label: 'Бронировать', query: 'Как забронировать?' },
-        { icon: Users, label: 'Категории', query: 'Какие категории есть?' },
+        { icon: Search, label: 'Найти', query: 'Ищу фотографа на свадьбу' },
+        { icon: Calendar, label: 'Бронировать', query: 'Как забронировать специалиста?' },
+        { icon: Users, label: 'Категории', query: 'Какие категории специалистов есть?' },
         { icon: HelpCircle, label: 'Как работает', query: 'Как работает Talentr?' },
     ],
     he: [
-        { icon: Search, label: 'חיפוש', query: 'איך למצוא צלם?' },
-        { icon: Calendar, label: 'הזמנה', query: 'איך להזמין?' },
+        { icon: Search, label: 'חיפוש', query: 'אני מחפש צלם לחתונה' },
+        { icon: Calendar, label: 'הזמנה', query: 'איך להזמין איש מקצוע?' },
         { icon: Users, label: 'קטגוריות', query: 'אילו קטגוריות יש?' },
         { icon: HelpCircle, label: 'איך זה עובד', query: 'איך Talentr עובד?' },
     ],
 };
 
-// AI responses for common questions
-const AI_RESPONSES: Record<string, Record<string, string>> = {
-    en: {
-        greeting: "Hi! 👋 I'm Talentr AI, your 24/7 event planning assistant. How can I help you today?",
-        find: "To find vendors:\n\n1️⃣ Use the search bar at the top\n2️⃣ Browse categories (Photographers, DJs, etc.)\n3️⃣ Or just tell me what you need!\n\nWould you like me to help you find someone specific?",
-        book: "Booking is easy! 🎉\n\n1️⃣ Find a vendor you like\n2️⃣ Click 'Book Now' on their profile\n3️⃣ Fill in event details\n4️⃣ Submit your request\n\nThe vendor will respond within 24 hours!",
-        categories: "We have amazing vendors in:\n\n📸 Photographers\n🎵 DJs\n🎤 MCs & Hosts\n🎩 Magicians\n💃 Dancers\n🎂 Cake Designers\n💐 Florists\n...and more!\n\nWhich category interests you?",
-        how: "Talentr connects you with top event professionals! ✨\n\n1️⃣ Search or browse vendors\n2️⃣ View profiles & reviews\n3️⃣ Send a booking request\n4️⃣ Confirm & enjoy your event!\n\nAll vendors are verified for quality.",
-        default: "I'd be happy to help! You can:\n\n• Search for vendors by category\n• Browse featured professionals\n• Learn about our booking process\n\nWhat would you like to know more about?",
-    },
-    ru: {
-        greeting: "Привет! 👋 Я AI-ассистент Talentr, помогу вам 24/7. Чем могу помочь?",
-        find: "Чтобы найти специалиста:\n\n1️⃣ Используйте поиск вверху\n2️⃣ Выберите категорию\n3️⃣ Или просто напишите мне!\n\nКого ищете?",
-        book: "Бронирование — это просто! 🎉\n\n1️⃣ Найдите подходящего специалиста\n2️⃣ Нажмите 'Забронировать'\n3️⃣ Заполните детали события\n4️⃣ Отправьте запрос\n\nОтвет придёт в течение 24 часов!",
-        categories: "У нас есть:\n\n📸 Фотографы\n🎵 Диджеи\n🎤 Ведущие\n🎩 Фокусники\n💃 Танцоры\n🎂 Кондитеры\n💐 Флористы\n\nКакая категория интересует?",
-        how: "Talentr связывает вас с лучшими специалистами! ✨\n\n1️⃣ Ищите или выбирайте\n2️⃣ Смотрите профили и отзывы\n3️⃣ Отправляйте запрос\n4️⃣ Подтвердите и наслаждайтесь!\n\nВсе проверены на качество.",
-        default: "С радостью помогу! Вы можете:\n\n• Искать по категориям\n• Смотреть лучших специалистов\n• Узнать о бронировании\n\nЧто хотите узнать?",
-    },
-    he: {
-        greeting: "היי! 👋 אני העוזר AI של Talentr, זמין 24/7. איך אוכל לעזור?",
-        find: "למציאת אנשי מקצוע:\n\n1️⃣ השתמשו בחיפוש למעלה\n2️⃣ בחרו קטגוריה\n3️⃣ או פשוט ספרו לי!\n\nמה מחפשים?",
-        book: "הזמנה זה קל! 🎉\n\n1️⃣ מצאו איש מקצוע\n2️⃣ לחצו 'הזמן עכשיו'\n3️⃣ מלאו פרטי האירוע\n4️⃣ שלחו בקשה\n\nתקבלו תשובה תוך 24 שעות!",
-        categories: "יש לנו:\n\n📸 צלמים\n🎵 דיג'ייז\n🎤 מנחים\n🎩 קוסמים\n💃 רקדנים\n🎂 קונדיטורים\n💐 פרחים\n\nאיזו קטגוריה מעניינת?",
-        how: "Talentr מחבר אתכם עם הטובים ביותר! ✨\n\n1️⃣ חפשו או דפדפו\n2️⃣ צפו בפרופילים וביקורות\n3️⃣ שלחו בקשה\n4️⃣ אשרו ותיהנו!\n\nכולם מאומתים לאיכות.",
-        default: "אשמח לעזור! תוכלו:\n\n• לחפש לפי קטגוריה\n• לראות מומלצים\n• ללמוד על הזמנות\n\nמה תרצו לדעת?",
-    },
+// Greeting messages
+const GREETINGS = {
+    en: "Hi! 👋 I'm Talentr AI, your 24/7 event planning assistant. Tell me about your event and I'll find the perfect professionals for you!",
+    ru: "Привет! 👋 Я AI-ассистент Talentr, помогу найти лучших специалистов для вашего мероприятия 24/7. Расскажите, что вы планируете!",
+    he: "היי! 👋 אני העוזר AI של Talentr, זמין 24/7. ספרו לי על האירוע שלכם ואמצא לכם את אנשי המקצוע המושלמים!",
+};
+
+// Error messages
+const ERROR_MESSAGES = {
+    en: "Sorry, I'm having trouble connecting. Please try again in a moment.",
+    ru: "Извините, проблема с соединением. Попробуйте ещё раз через минуту.",
+    he: "סליחה, יש בעיה בחיבור. נסו שוב עוד רגע.",
 };
 
 export default function AISupportChat() {
+    const pathname = usePathname();
     const { language } = useLanguage();
     const [isOpen, setIsOpen] = useState(false);
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [conversationHistory, setConversationHistory] = useState<{ role: 'user' | 'assistant'; content: string }[]>([]);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const lang = language as 'en' | 'ru' | 'he';
     const quickActions = QUICK_ACTIONS[lang] || QUICK_ACTIONS.en;
-    const responses = AI_RESPONSES[lang] || AI_RESPONSES.en;
+
+    // Hide on auth pages to prevent covering Sign In/Sign Up buttons
+    const authRoutes = ['/signin', '/signup', '/join'];
+    if (authRoutes.includes(pathname)) {
+        return null;
+    }
 
     const t = {
         title: lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Support',
         online: lang === 'ru' ? 'Онлайн 24/7' : lang === 'he' ? 'מחובר 24/7' : 'Online 24/7',
         placeholder: lang === 'ru' ? 'Напишите вопрос...' : lang === 'he' ? 'כתבו שאלה...' : 'Ask a question...',
-        typing: lang === 'ru' ? 'Печатает...' : lang === 'he' ? 'מקלידה...' : 'Typing...',
+        typing: lang === 'ru' ? 'Думаю...' : lang === 'he' ? 'חושב...' : 'Thinking...',
+        viewProfile: lang === 'ru' ? 'Профиль' : lang === 'he' ? 'פרופיל' : 'View',
     };
 
     // Reset messages when language changes
     useEffect(() => {
         setMessages([]);
+        setConversationHistory([]);
     }, [language]);
 
     // Add greeting on first open or after language change
     useEffect(() => {
         if (isOpen && messages.length === 0) {
+            const greeting = GREETINGS[lang] || GREETINGS.en;
             setMessages([{
                 id: 'greeting',
                 role: 'assistant',
-                content: responses.greeting,
+                content: greeting,
                 timestamp: new Date(),
             }]);
         }
-    }, [isOpen, messages.length, responses.greeting]);
+    }, [isOpen, messages.length, lang]);
 
     // Scroll to bottom
     useEffect(() => {
@@ -111,25 +125,6 @@ export default function AISupportChat() {
             setTimeout(() => inputRef.current?.focus(), 100);
         }
     }, [isOpen]);
-
-    const getAIResponse = (query: string): string => {
-        const q = query.toLowerCase();
-
-        if (q.includes('find') || q.includes('найти') || q.includes('search') || q.includes('поиск') || q.includes('מצא') || q.includes('חיפוש')) {
-            return responses.find;
-        }
-        if (q.includes('book') || q.includes('брониров') || q.includes('заказ') || q.includes('הזמ')) {
-            return responses.book;
-        }
-        if (q.includes('categor') || q.includes('катего') || q.includes('קטגור')) {
-            return responses.categories;
-        }
-        if (q.includes('work') || q.includes('работ') || q.includes('עובד') || q.includes('how')) {
-            return responses.how;
-        }
-
-        return responses.default;
-    };
 
     const sendMessage = async (text?: string) => {
         const messageText = text || input.trim();
@@ -146,22 +141,130 @@ export default function AISupportChat() {
         setInput('');
         setIsTyping(true);
 
-        // Simulate AI typing delay
-        await new Promise(resolve => setTimeout(resolve, 800 + Math.random() * 500));
+        // Update conversation history
+        const newHistory = [...conversationHistory, { role: 'user' as const, content: messageText }];
 
-        // Get AI response
-        const response = getAIResponse(messageText);
+        try {
+            // Call the real API
+            const response = await fetch('/api/chat', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    message: messageText,
+                    language: lang,
+                    conversationHistory: newHistory.slice(-10), // Keep last 10 messages for context
+                }),
+            });
 
-        const assistantMessage: Message = {
-            id: (Date.now() + 1).toString(),
-            role: 'assistant',
-            content: response,
-            timestamp: new Date(),
-        };
+            if (!response.ok) {
+                throw new Error(`API error: ${response.status}`);
+            }
 
-        setMessages(prev => [...prev, assistantMessage]);
-        setIsTyping(false);
+            const data: ChatAPIResponse = await response.json();
+
+            // Create assistant message with vendors
+            const assistantMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: data.response,
+                timestamp: new Date(),
+                vendors: data.vendors,
+                suggestions: data.suggestions,
+            };
+
+            setMessages(prev => [...prev, assistantMessage]);
+            setConversationHistory([...newHistory, { role: 'assistant', content: data.response }]);
+
+            // Show toast if vendors found
+            if (data.vendors && data.vendors.length > 0) {
+                toast.success(
+                    lang === 'ru' ? `Найдено ${data.vendors.length} специалистов!` :
+                        lang === 'he' ? `נמצאו ${data.vendors.length} מקצוענים!` :
+                            `Found ${data.vendors.length} professionals!`,
+                    { duration: 2000 }
+                );
+            }
+
+        } catch (error) {
+            console.error('Chat API error:', error);
+
+            // Show error message
+            const errorMessage = ERROR_MESSAGES[lang] || ERROR_MESSAGES.en;
+            const assistantMessage: Message = {
+                id: (Date.now() + 1).toString(),
+                role: 'assistant',
+                content: errorMessage,
+                timestamp: new Date(),
+            };
+            setMessages(prev => [...prev, assistantMessage]);
+
+            toast.error(
+                lang === 'ru' ? 'Ошибка соединения' :
+                    lang === 'he' ? 'שגיאת חיבור' :
+                        'Connection error'
+            );
+        } finally {
+            setIsTyping(false);
+        }
     };
+
+    // Render vendor mini-cards
+    const renderVendorCards = (vendors: Vendor[]) => (
+        <div className="mt-3 space-y-2">
+            {vendors.slice(0, 3).map((vendor) => (
+                <Link
+                    key={vendor.id}
+                    href={`/vendor/${vendor.id}`}
+                    className="flex items-center gap-3 p-2 bg-gray-50 hover:bg-blue-50 rounded-xl transition-all group"
+                >
+                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                        <Image
+                            src={vendor.imageUrl || '/placeholder-vendor.jpg'}
+                            alt={vendor.name}
+                            fill
+                            className="object-cover"
+                        />
+                    </div>
+                    <div className="flex-1 min-w-0">
+                        <p className="font-medium text-gray-900 text-sm truncate group-hover:text-blue-600 transition-colors">
+                            {vendor.name}
+                        </p>
+                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                            <span className="flex items-center gap-0.5">
+                                <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                                {vendor.rating}
+                            </span>
+                            <span className="flex items-center gap-0.5">
+                                <MapPin className="w-3 h-3" />
+                                {vendor.city}
+                            </span>
+                        </div>
+                    </div>
+                    <ExternalLink className="w-4 h-4 text-gray-400 group-hover:text-blue-500 transition-colors" />
+                </Link>
+            ))}
+            {vendors.length > 3 && (
+                <p className="text-xs text-center text-gray-500 pt-1">
+                    +{vendors.length - 3} {lang === 'ru' ? 'ещё' : lang === 'he' ? 'עוד' : 'more'}
+                </p>
+            )}
+        </div>
+    );
+
+    // Render suggestion chips
+    const renderSuggestions = (suggestions: string[]) => (
+        <div className="flex flex-wrap gap-1.5 mt-3">
+            {suggestions.map((suggestion, i) => (
+                <button
+                    key={i}
+                    onClick={() => sendMessage(suggestion)}
+                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full text-xs font-medium transition-colors"
+                >
+                    {suggestion}
+                </button>
+            ))}
+        </div>
+    );
 
     return (
         <>
@@ -185,7 +288,7 @@ export default function AISupportChat() {
                 >
                     <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
                     <span className="text-sm font-semibold text-gray-800">
-                        {lang === 'ru' ? 'Talentr Поддержка' : lang === 'he' ? 'תמיכת Talentr' : 'Talentr Support'}
+                        {lang === 'ru' ? 'Talentr Ассистент' : lang === 'he' ? 'עוזר Talentr' : 'Talentr Assistant'}
                     </span>
                 </motion.div>
 
@@ -202,7 +305,7 @@ export default function AISupportChat() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    <Bot className="w-7 h-7 text-white" />
+                    <Sparkles className="w-7 h-7 text-white" />
 
                     {/* Online Indicator */}
                     <span className="absolute top-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
@@ -270,6 +373,10 @@ export default function AISupportChat() {
                                             : 'bg-white text-gray-800 shadow-sm rounded-bl-md'
                                     )}>
                                         {msg.content}
+                                        {/* Show vendor cards if present */}
+                                        {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
+                                        {/* Show suggestion chips if present */}
+                                        {msg.suggestions && msg.suggestions.length > 0 && renderSuggestions(msg.suggestions)}
                                     </div>
                                 </motion.div>
                             ))}

@@ -41,7 +41,7 @@ export default function SignUpPage() {
             if (error) throw error;
 
             if (data.user) {
-                router.push('/');
+                router.push('/profile');
             }
         } catch (err: any) {
             setError(err.message || 'Failed to create account');
