@@ -22,7 +22,6 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
     const cardRef = useRef<HTMLDivElement>(null);
 
     const isLiked = isFavorite(vendor.id);
-    const isTopRated = vendor.rating >= 4.9;
     const isVerified = vendor.reviewsCount > 100;
     const isPremium = vendor.rating >= 4.8 && vendor.reviewsCount > 50;
 

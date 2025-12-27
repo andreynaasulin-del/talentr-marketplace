@@ -43,6 +43,7 @@ export interface Vendor {
     phone?: string; // WhatsApp number format: 972XXXXXXXXX
     isVerified?: boolean;
     isFeatured?: boolean;
+    portfolioGallery?: string[]; // Array of image URLs
 }
 
 export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'completed';

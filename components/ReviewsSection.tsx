@@ -192,63 +192,99 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
 
             {/* Reviews List */}
             <div className="space-y-6">
-                {reviews.map((review, index) => (
+                {reviews.length === 0 ? (
+                    /* Empty State */
                     <motion.div
-                        key={review.id}
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ delay: index * 0.1 }}
-                        className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors"
+                        initial={{ opacity: 0, y: 10 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        className="text-center py-12 px-6"
                     >
-                        <div className="flex items-start gap-4">
-                            {/* Avatar */}
-                            <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0">
-                                {review.author.charAt(0)}
-                            </div>
-
-                            <div className="flex-1">
-                                {/* Header */}
-                                <div className="flex items-center justify-between mb-2">
-                                    <div>
-                                        <h4 className="font-bold text-gray-900">{review.author}</h4>
-                                        <div className="flex items-center gap-2 text-sm text-gray-500">
-                                            <span>{review.date}</span>
-                                            <span>•</span>
-                                            <span className="text-blue-600 font-medium">{t(review.eventType)}</span>
-                                        </div>
-                                    </div>
-                                    <div className="flex items-center gap-0.5">
-                                        {[1, 2, 3, 4, 5].map((star) => (
-                                            <Star
-                                                key={star}
-                                                className={cn(
-                                                    "w-4 h-4",
-                                                    star <= review.rating
-                                                        ? "fill-amber-400 text-amber-400"
-                                                        : "text-gray-200"
-                                                )}
-                                            />
-                                        ))}
-                                    </div>
+                        <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                            <Star className="w-10 h-10 text-blue-500" />
+                        </div>
+                        <h4 className="text-xl font-bold text-gray-900 mb-2">
+                            {language === 'ru'
+                                ? 'Пока нет отзывов'
+                                : language === 'he'
+                                    ? 'אין עדיין ביקורות'
+                                    : 'No reviews yet'}
+                        </h4>
+                        <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                            {language === 'ru'
+                                ? `Станьте первым, кто оставит отзыв о ${vendorName}!`
+                                : language === 'he'
+                                    ? `היו הראשונים לכתוב ביקורת על ${vendorName}!`
+                                    : `Be the first to review ${vendorName}!`}
+                        </p>
+                        <motion.button
+                            onClick={() => setShowForm(true)}
+                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl inline-flex items-center gap-2 shadow-lg shadow-blue-600/20"
+                            whileHover={{ scale: 1.02 }}
+                            whileTap={{ scale: 0.98 }}
+                        >
+                            <Star className="w-4 h-4" />
+                            {language === 'ru' ? 'Написать отзыв' : language === 'he' ? 'כתוב ביקורת' : 'Write a Review'}
+                        </motion.button>
+                    </motion.div>
+                ) : (
+                    reviews.map((review, index) => (
+                        <motion.div
+                            key={review.id}
+                            initial={{ opacity: 0, y: 20 }}
+                            whileInView={{ opacity: 1, y: 0 }}
+                            viewport={{ once: true }}
+                            transition={{ delay: index * 0.1 }}
+                            className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors"
+                        >
+                            <div className="flex items-start gap-4">
+                                {/* Avatar */}
+                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                                    {review.author.charAt(0)}
                                 </div>
 
-                                {/* Text */}
-                                <p className="text-gray-600 leading-relaxed mb-4">{review.text}</p>
+                                <div className="flex-1">
+                                    {/* Header */}
+                                    <div className="flex items-center justify-between mb-2">
+                                        <div>
+                                            <h4 className="font-bold text-gray-900">{review.author}</h4>
+                                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                                <span>{review.date}</span>
+                                                <span>•</span>
+                                                <span className="text-blue-600 font-medium">{t(review.eventType)}</span>
+                                            </div>
+                                        </div>
+                                        <div className="flex items-center gap-0.5">
+                                            {[1, 2, 3, 4, 5].map((star) => (
+                                                <Star
+                                                    key={star}
+                                                    className={cn(
+                                                        "w-4 h-4",
+                                                        star <= review.rating
+                                                            ? "fill-amber-400 text-amber-400"
+                                                            : "text-gray-200"
+                                                    )}
+                                                />
+                                            ))}
+                                        </div>
+                                    </div>
 
-                                {/* Helpful */}
-                                <motion.button
-                                    className="flex items-center gap-2 text-sm text-gray-400 hover:text-blue-600 transition-colors"
-                                    whileHover={{ scale: 1.02 }}
-                                    whileTap={{ scale: 0.98 }}
-                                >
-                                    <ThumbsUp className="w-4 h-4" />
-                                    <span>{t('Helpful')} ({review.helpful})</span>
-                                </motion.button>
+                                    {/* Text */}
+                                    <p className="text-gray-600 leading-relaxed mb-4">{review.text}</p>
+
+                                    {/* Helpful */}
+                                    <motion.button
+                                        className="flex items-center gap-2 text-sm text-gray-400 hover:text-blue-600 transition-colors"
+                                        whileHover={{ scale: 1.02 }}
+                                        whileTap={{ scale: 0.98 }}
+                                    >
+                                        <ThumbsUp className="w-4 h-4" />
+                                        <span>{t('Helpful')} ({review.helpful})</span>
+                                    </motion.button>
+                                </div>
                             </div>
-                        </div>
-                    </motion.div>
-                ))}
+                        </motion.div>
+                    ))
+                )}
             </div>
 
             {/* Show More */}

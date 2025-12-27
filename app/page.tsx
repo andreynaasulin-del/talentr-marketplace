@@ -1,7 +1,6 @@
 'use client';
 
 import { useState, useEffect, useRef } from 'react';
-import { useRouter } from 'next/navigation';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
@@ -25,9 +24,7 @@ const EventSuggestions = dynamic(() => import('@/components/EventSuggestions'));
 const Footer = dynamic(() => import('@/components/Footer'));
 
 export default function Home() {
-    const router = useRouter();
     const { language } = useLanguage();
-    const [isAuthenticated, setIsAuthenticated] = useState<boolean>(false);
     const [isLoading, setIsLoading] = useState(true);
     const [initialSearchQuery, setInitialSearchQuery] = useState('');
     const [selectedCategory, setSelectedCategory] = useState('All');
@@ -37,11 +34,9 @@ export default function Home() {
     useEffect(() => {
         const checkAuth = async () => {
             try {
-                const { data: { user } } = await supabase.auth.getUser();
-                setIsAuthenticated(!!user);
+                await supabase.auth.getUser();
             } catch (error) {
                 console.error('Auth check failed:', error);
-                setIsAuthenticated(false);
             } finally {
                 setIsLoading(false);
             }

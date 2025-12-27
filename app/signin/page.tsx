@@ -3,7 +3,6 @@
 import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
-import Image from 'next/image';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, Globe, ChevronDown, Sparkles, ArrowRight, Shield, Zap } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';

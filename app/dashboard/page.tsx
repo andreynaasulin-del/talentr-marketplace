@@ -27,16 +27,26 @@ export default function DashboardPage() {
     const [bookings, setBookings] = useState<Booking[]>([]);
     const [bookingsLoading, setBookingsLoading] = useState(false);
 
-    // Calculate stats from bookings
+    // Calculate real stats from bookings
+    const confirmedBookings = bookings.filter(b => b.status === 'confirmed').length;
+    const pendingBookings = bookings.filter(b => b.status === 'pending').length;
+    const estimatedEarnings = confirmedBookings * 2500; // Estimated avg per booking
+
     const stats = {
         earnings: {
-            value: `₪${bookings.filter(b => b.status === 'confirmed').length * 2500}`,
-            trend: '+12%',
+            value: `₪${estimatedEarnings.toLocaleString()}`,
+            trend: confirmedBookings > 0 ? `${confirmedBookings} bookings` : '',
             label: t('Total Earnings')
         },
-        views: { value: '1,204', trend: '+5%', label: t('Profile Views') },
+        // Views tracking not implemented yet - show honest message
+        views: {
+            value: '—',
+            trend: '',
+            label: t('Profile Views'),
+            comingSoon: true
+        },
         requests: {
-            value: String(bookings.filter(b => b.status === 'pending').length),
+            value: String(pendingBookings),
             trend: '',
             label: t('Active Requests')
         },
@@ -173,19 +183,18 @@ export default function DashboardPage() {
                         <p className="text-gray-500 text-sm">{stats.earnings.label}</p>
                     </div>
 
-                    {/* Profile Views */}
-                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100">
+                    {/* Profile Views - Coming Soon */}
+                    <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 relative overflow-hidden">
                         <div className="flex items-center justify-between mb-4">
-                            <div className="p-3 bg-blue-50 rounded-xl">
-                                <Eye className="w-6 h-6 text-blue-600" />
+                            <div className="p-3 bg-gray-100 rounded-xl">
+                                <Eye className="w-6 h-6 text-gray-400" />
                             </div>
-                            <span className="text-sm font-medium text-green-600 flex items-center gap-1">
-                                <TrendingUp className="w-4 h-4" />
-                                {stats.views.trend}
+                            <span className="text-xs font-semibold text-gray-400 bg-gray-100 px-2 py-1 rounded-full">
+                                {language === 'ru' ? 'Скоро' : language === 'he' ? 'בקרוב' : 'Coming soon'}
                             </span>
                         </div>
-                        <h3 className="text-3xl font-bold text-gray-900 mb-1">{stats.views.value}</h3>
-                        <p className="text-gray-500 text-sm">{stats.views.label}</p>
+                        <h3 className="text-3xl font-bold text-gray-300 mb-1">—</h3>
+                        <p className="text-gray-400 text-sm">{stats.views.label}</p>
                     </div>
 
                     {/* Active Requests */}

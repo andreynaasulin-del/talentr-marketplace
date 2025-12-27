@@ -1,8 +1,8 @@
 'use client';
 
-import { useState, useEffect } from 'react';
+import { useState } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Sparkles, Calendar, Users, Music, Camera, Cake, Heart, Briefcase, GraduationCap, PartyPopper } from 'lucide-react';
+import { Sparkles, Music, Cake, Heart, Briefcase, GraduationCap, PartyPopper } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
 

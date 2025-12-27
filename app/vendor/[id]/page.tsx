@@ -70,20 +70,12 @@ export default function VendorPage() {
         );
     }
 
-    const portfolioImages = [
-        'https://images.unsplash.com/photo-1511795409834-ef04bbd61622?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1492684223066-81342ee5ff30?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1464366400600-7168b8af9bc3?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1470229722913-7c0e2dbbafd3?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?auto=format&fit=crop&w=600&q=80',
-        'https://images.unsplash.com/photo-1478147427282-58a87a120781?auto=format&fit=crop&w=600&q=80',
-    ];
+    // Use vendor's gallery if available, otherwise show empty state
+    const portfolioImages = vendor.portfolioGallery && vendor.portfolioGallery.length > 0
+        ? vendor.portfolioGallery
+        : []; // Empty - will show "Portfolio coming soon" message
 
-    const reviews = [
-        { name: 'Sarah M.', rating: 5, text: 'Absolutely amazing experience! Professional and creative.', date: '2 weeks ago', avatar: 'S' },
-        { name: 'David K.', rating: 5, text: 'Best decision for our wedding. Highly recommended!', date: '1 month ago', avatar: 'D' },
-        { name: 'Rachel L.', rating: 4, text: 'Great service, very responsive and talented.', date: '2 months ago', avatar: 'R' },
-    ];
+    const hasPortfolio = portfolioImages.length > 0;
 
     const highlights = [
         { icon: Clock, label: 'Quick Response', value: '< 1 hour' },
@@ -221,37 +213,64 @@ export default function VendorPage() {
                         <div className="bg-white rounded-[32px] shadow-card p-10 border border-gray-100">
                             <div className="flex items-center justify-between mb-8">
                                 <h2 className="text-3xl font-black text-gray-900 tracking-tight">{t('Portfolio')}</h2>
-                                <span className="text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">
-                                    {portfolioImages.length} {t('Works')}
-                                </span>
+                                {hasPortfolio && (
+                                    <span className="text-sm font-bold text-blue-600 bg-blue-50 px-4 py-2 rounded-xl">
+                                        {portfolioImages.length} {t('Works')}
+                                    </span>
+                                )}
                             </div>
 
-                            {/* Main Active Visual */}
-                            <div className="relative aspect-[16/9] rounded-[24px] overflow-hidden mb-6 bg-gray-50 group">
-                                <Image
-                                    src={portfolioImages[activeImage]}
-                                    alt={`Portfolio ${activeImage + 1}`}
-                                    fill
-                                    sizes="(max-width: 768px) 100vw, 800px"
-                                    className="object-cover transition-transform duration-700 group-hover:scale-105"
-                                />
-                                <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
-                            </div>
+                            {hasPortfolio ? (
+                                <>
+                                    {/* Main Active Visual */}
+                                    <div className="relative aspect-[16/9] rounded-[24px] overflow-hidden mb-6 bg-gray-50 group">
+                                        <Image
+                                            src={portfolioImages[activeImage]}
+                                            alt={`Portfolio ${activeImage + 1}`}
+                                            fill
+                                            sizes="(max-width: 768px) 100vw, 800px"
+                                            className="object-cover transition-transform duration-700 group-hover:scale-105"
+                                        />
+                                        <div className="absolute inset-0 bg-gradient-to-t from-black/20 to-transparent pointer-events-none" />
+                                    </div>
 
-                            {/* Intuitive Thumbnails */}
-                            <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
-                                {portfolioImages.map((image, index) => (
-                                    <button
-                                        key={index}
-                                        onClick={() => setActiveImage(index)}
-                                        className={`relative aspect-square rounded-[18px] overflow-hidden transition-all duration-300 ${activeImage === index
-                                            ? 'ring-4 ring-blue-600 ring-offset-2 scale-95 shadow-xl'
-                                            : 'opacity-40 hover:opacity-100 hover:scale-105 grayscale hover:grayscale-0'}`}
-                                    >
-                                        <Image src={image} alt={`Thumbnail ${index + 1}`} fill sizes="100px" className="object-cover" />
-                                    </button>
-                                ))}
-                            </div>
+                                    {/* Intuitive Thumbnails */}
+                                    <div className="grid grid-cols-3 md:grid-cols-6 gap-3">
+                                        {portfolioImages.map((image: string, index: number) => (
+                                            <button
+                                                key={index}
+                                                onClick={() => setActiveImage(index)}
+                                                className={`relative aspect-square rounded-[18px] overflow-hidden transition-all duration-300 ${activeImage === index
+                                                    ? 'ring-4 ring-blue-600 ring-offset-2 scale-95 shadow-xl'
+                                                    : 'opacity-40 hover:opacity-100 hover:scale-105 grayscale hover:grayscale-0'}`}
+                                            >
+                                                <Image src={image} alt={`Thumbnail ${index + 1}`} fill sizes="100px" className="object-cover" />
+                                            </button>
+                                        ))}
+                                    </div>
+                                </>
+                            ) : (
+                                /* Empty State */
+                                <div className="text-center py-12 px-6">
+                                    <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-gray-100 to-gray-200 rounded-full flex items-center justify-center">
+                                        <Calendar className="w-10 h-10 text-gray-400" />
+                                    </div>
+                                    <h4 className="text-xl font-bold text-gray-900 mb-2">
+                                        {language === 'ru'
+                                            ? 'Портфолио скоро появится'
+                                            : language === 'he'
+                                                ? 'הפורטפוליו יגיע בקרוב'
+                                                : 'Portfolio coming soon'}
+                                    </h4>
+                                    <p className="text-gray-500 max-w-sm mx-auto">
+                                        {language === 'ru'
+                                            ? `${vendor.name} скоро добавит свои работы`
+                                            : language === 'he'
+                                                ? `${vendor.name} יוסיף את העבודות שלו בקרוב`
+                                                : `${vendor.name} will add their work samples soon`}
+                                    </p>
+                                </div>
+                            )}
                         </div>
 
                         {/* Reviews Section */}

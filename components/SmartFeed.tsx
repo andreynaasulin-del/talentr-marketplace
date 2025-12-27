@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Loader2, ChevronLeft, ChevronRight, Camera, Music, Mic2, Wand2, Palette, Users, UtensilsCrossed, PartyPopper, RefreshCw, ThumbsUp, Filter } from 'lucide-react';
+import { Send, Sparkles, Loader2, ChevronLeft, ChevronRight, Camera, Music, Mic2, Wand2, Palette, Users, RefreshCw, Filter } from 'lucide-react';
 import { Vendor } from '@/types';
 import VendorVisualCard from './VendorVisualCard';
 import { useLanguage } from '@/context/LanguageContext';

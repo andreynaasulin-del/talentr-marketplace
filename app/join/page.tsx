@@ -4,7 +4,7 @@ import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { useRouter } from 'next/navigation';
-import { Check, Loader2, Globe, ChevronDown, User, Mail, Lock, Phone, MapPin, Briefcase, Link as LinkIcon, ArrowRight, Star, DollarSign, Calendar } from 'lucide-react';
+import { Loader2, Globe, ChevronDown, User, Mail, Lock, Phone, MapPin, Briefcase, Link as LinkIcon, ArrowRight, Star, DollarSign, Calendar } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
 
