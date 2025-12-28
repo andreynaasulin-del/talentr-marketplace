@@ -9,8 +9,8 @@ import Navbar from '@/components/Navbar';
 import { User } from '@supabase/supabase-js';
 import {
     DollarSign, Eye, Calendar, Check, X, Clock, Loader2,
-    Pencil, Image, FileText, Tag, Share2, Copy, CheckCircle,
-    Sparkles, ArrowRight, Camera, User as UserIcon
+    Pencil, FileText, Tag, Share2, Copy, CheckCircle,
+    Sparkles, ArrowRight, Camera
 } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
@@ -200,7 +200,6 @@ export default function DashboardPage() {
         },
     ];
 
-    const completedActions = onboardingActions.filter(a => a.completed).length;
 
     if (loading) {
         return (

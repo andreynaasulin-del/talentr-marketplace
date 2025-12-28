@@ -16,7 +16,8 @@ function getOpenAI(): OpenAI | null {
 }
 
 // ===== TYPES =====
-interface EventContext {
+// Event context for future use
+interface _EventContext {
     eventType?: string;
     eventDate?: string;
     guestCount?: number;

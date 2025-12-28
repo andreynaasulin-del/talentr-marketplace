@@ -11,7 +11,6 @@ import { useFavorites } from '@/context/FavoritesContext';
 import { useLanguage } from '@/context/LanguageContext';
 import { getVendorById } from '@/lib/vendors';
 import { Vendor } from '@/types';
-import { cn } from '@/lib/utils';
 
 export default function FavoritesPage() {
     const { language } = useLanguage();

@@ -3,7 +3,7 @@
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { useLanguage } from '@/context/LanguageContext';
-import { FileText, Shield, Mail } from 'lucide-react';
+import { FileText, Mail } from 'lucide-react';
 
 export default function TermsPage() {
     const { language } = useLanguage();

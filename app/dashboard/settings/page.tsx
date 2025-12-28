@@ -14,7 +14,7 @@ import { toast } from 'sonner';
 import { motion } from 'framer-motion';
 import Link from 'next/link';
 import Image from 'next/image';
-import { cn } from '@/lib/utils';
+// cn utility available if needed
 
 interface VendorProfile {
     id: string;
@@ -40,7 +40,7 @@ const CITIES = ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat', 'Rishon LeZion', 'Net
 export default function SettingsPage() {
     const router = useRouter();
     const { t, language } = useLanguage();
-    const [user, setUser] = useState<User | null>(null);
+    const [, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [vendorId, setVendorId] = useState<string | null>(null);

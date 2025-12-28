@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function JoinPage() {
-    const router = useRouter();
+    useRouter(); // Keep hook for future use
     const { language, setLanguage, t } = useLanguage();
     const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [loading, setLoading] = useState(false);
