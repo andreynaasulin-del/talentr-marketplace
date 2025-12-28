@@ -255,7 +255,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
             )}
 
             {/* Main Content */}
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-16 w-full">
+            <div className="relative z-10 max-w-7xl mx-auto px-3 sm:px-4 md:px-6 py-6 md:py-16 w-full overflow-hidden">
                 <div className="grid lg:grid-cols-2 gap-16 items-center" dir={language === 'he' ? 'rtl' : 'ltr'}>
                     {/* Left Side - Content */}
                     <motion.div
@@ -282,7 +282,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         {/* Headline */}
                         <motion.h1
                             variants={itemVariants}
-                            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-900 leading-[1.1] md:leading-[1.05] mb-4 md:mb-6 tracking-tight"
+                            className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-extrabold text-gray-900 leading-[1.15] md:leading-[1.1] mb-3 md:mb-6 tracking-tight"
                         >
                             {language === 'he' ? 'מצא את ה' : language === 'ru' ? 'Найдите ' : 'Find the '}
                             <span className="relative inline-block">
@@ -323,7 +323,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         {/* Subtitle */}
                         <motion.p
                             variants={itemVariants}
-                            className="text-base md:text-xl text-gray-600 mb-6 md:mb-10 max-w-xl leading-relaxed"
+                            className="text-sm sm:text-base md:text-lg lg:text-xl text-gray-600 mb-5 md:mb-10 max-w-xl leading-relaxed"
                         >
                             {language === 'he'
                                 ? 'התחבר עם 500+ צלמים, DJ-ים ואמנים מאומתים. הזמן בביטחון.'
@@ -336,24 +336,24 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         <motion.form
                             variants={itemVariants}
                             onSubmit={handleSearch}
-                            className="relative max-w-xl mb-8"
+                            className="relative max-w-xl mb-6 md:mb-8"
                         >
                             <motion.div
                                 className={cn(
-                                    "relative flex items-center bg-white rounded-2xl transition-all duration-300",
+                                    "relative flex items-center bg-white rounded-xl md:rounded-2xl transition-all duration-300",
                                     isSearchFocused
                                         ? 'shadow-2xl shadow-blue-500/20 ring-2 ring-blue-500/30'
                                         : 'shadow-xl shadow-gray-200/50'
                                 )}
                                 whileHover={{ scale: 1.01 }}
                             >
-                                <div className="absolute start-5 top-1/2 -translate-y-1/2">
+                                <div className="absolute start-3 sm:start-5 top-1/2 -translate-y-1/2">
                                     <motion.div
                                         animate={isSearchFocused ? { scale: [1, 1.2, 1] } : {}}
                                         transition={{ duration: 0.3 }}
                                     >
                                         <Search className={cn(
-                                            "w-6 h-6 transition-colors",
+                                            "w-5 h-5 sm:w-6 sm:h-6 transition-colors",
                                             isSearchFocused ? 'text-blue-500' : 'text-gray-400'
                                         )} />
                                     </motion.div>
@@ -365,15 +365,15 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                                     onFocus={() => setIsSearchFocused(true)}
                                     onBlur={() => setIsSearchFocused(false)}
                                     placeholder={t('searchPlaceholder')}
-                                    className="flex-1 ps-14 pe-4 py-5 text-lg text-gray-900 placeholder-gray-400 bg-transparent rounded-s-2xl focus:outline-none"
+                                    className="flex-1 min-w-0 ps-10 sm:ps-14 pe-2 py-3.5 sm:py-5 text-sm sm:text-base md:text-lg text-gray-900 placeholder-gray-400 bg-transparent rounded-s-xl md:rounded-s-2xl focus:outline-none"
                                 />
-                                <div className="flex-shrink-0 px-2">
+                                <div className="flex-shrink-0 px-1 sm:px-2">
                                     <VoiceSearch onTranscript={(text) => { setSearchQuery(text); handleAISearch(text); }} />
                                 </div>
                                 <motion.button
                                     type="submit"
                                     className={cn(
-                                        "flex-shrink-0 px-6 py-3 me-2 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg",
+                                        "flex-shrink-0 px-3 sm:px-6 py-2.5 sm:py-3 me-1.5 sm:me-2 text-white font-bold rounded-lg sm:rounded-xl flex items-center gap-1 sm:gap-2 shadow-lg text-sm sm:text-base",
                                         isAISearching
                                             ? "bg-gray-400 cursor-not-allowed"
                                             : "bg-gradient-to-r from-blue-600 to-indigo-600 hover:from-blue-500 hover:to-indigo-500 shadow-blue-500/30"
@@ -389,7 +389,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                                         </>
                                     ) : (
                                         <>
-                                            {t('Search')}
+                                            <span className="hidden sm:inline">{t('Search')}</span>
                                             <ArrowRight className="w-4 h-4" />
                                         </>
                                     )}

@@ -274,17 +274,17 @@ export default function AISupportChat() {
             {/* Floating Button with Label */}
             <motion.div
                 className={cn(
-                    "fixed bottom-20 md:bottom-[100px] right-3 md:right-5 z-40",
-                    "flex items-center gap-2 md:gap-3",
+                    "fixed bottom-6 sm:bottom-20 lg:bottom-[100px] right-3 lg:right-5 z-40",
+                    "flex items-center gap-2 lg:gap-3",
                     isOpen && "scale-0 opacity-0 pointer-events-none"
                 )}
                 initial={{ scale: 0, x: 20 }}
                 animate={{ scale: isOpen ? 0 : 1, x: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             >
-                {/* Permanent Label - hidden on mobile */}
+                {/* Permanent Label - hidden on tablet and below */}
                 <motion.div
-                    className="hidden md:flex bg-white px-4 py-2.5 rounded-2xl shadow-lg border border-gray-100 items-center gap-2"
+                    className="hidden lg:flex bg-white px-4 py-2.5 rounded-2xl shadow-lg border border-gray-100 items-center gap-2"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
@@ -299,7 +299,7 @@ export default function AISupportChat() {
                 <motion.button
                     onClick={() => setIsOpen(true)}
                     className={cn(
-                        "w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg shadow-blue-500/30",
+                        "w-10 h-10 sm:w-12 sm:h-12 lg:w-14 lg:h-14 rounded-full shadow-lg shadow-blue-500/30",
                         "bg-gradient-to-br from-blue-600 to-indigo-600",
                         "hover:from-blue-500 hover:to-indigo-500",
                         "flex items-center justify-center",
@@ -308,10 +308,10 @@ export default function AISupportChat() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-white" />
+                    <Sparkles className="w-5 h-5 sm:w-6 sm:h-6 lg:w-7 lg:h-7 text-white" />
 
                     {/* Online Indicator */}
-                    <span className="absolute top-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
+                    <span className="absolute -top-0.5 -right-0.5 sm:top-0 sm:right-0 w-3 h-3 sm:w-4 sm:h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
                 </motion.button>
             </motion.div>
 
@@ -320,10 +320,11 @@ export default function AISupportChat() {
                 {isOpen && (
                     <motion.div
                         className={cn(
-                            "fixed bottom-20 md:bottom-[100px] right-3 md:right-5 z-50",
-                            "w-[340px] md:w-[380px] max-w-[calc(100vw-24px)]",
-                            "bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden",
-                            "border border-gray-100"
+                            "fixed bottom-4 sm:bottom-20 lg:bottom-[100px] right-2 sm:right-3 lg:right-5 z-50",
+                            "w-[calc(100vw-16px)] sm:w-[340px] lg:w-[380px]",
+                            "bg-white rounded-2xl lg:rounded-3xl shadow-2xl overflow-hidden",
+                            "border border-gray-100",
+                            "max-h-[80vh]"
                         )}
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
