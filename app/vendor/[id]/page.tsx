@@ -88,7 +88,7 @@ export default function VendorPage() {
             <Navbar />
 
             {/* Hero Section - Full Width Premium */}
-            <div className="relative h-[60vh] md:h-[70vh] overflow-hidden">
+            <div className="relative h-[50vh] md:h-[70vh] overflow-hidden">
                 <Image
                     src={vendor.imageUrl}
                     alt={vendor.name}
@@ -101,7 +101,7 @@ export default function VendorPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/60 via-transparent to-transparent opacity-60" />
 
                 {/* Navigation Buttons Overlays */}
-                <div className="absolute top-8 inset-x-8 flex items-center justify-between z-20">
+                <div className="absolute top-4 md:top-8 inset-x-4 md:inset-x-8 flex items-center justify-between z-20">
                     <Link
                         href="/"
                         className="p-3 bg-white/10 backdrop-blur-xl hover:bg-white/20 border border-white/20 rounded-2xl transition-all active:scale-95 group"
@@ -109,7 +109,7 @@ export default function VendorPage() {
                         <ChevronLeft className="w-6 h-6 text-white group-hover:-translate-x-1 transition-transform" />
                     </Link>
 
-                    <div className="flex items-center gap-4">
+                    <div className="flex items-center gap-2 md:gap-4">
                         <button
                             onClick={() => setIsLiked(!isLiked)}
                             className={`p-3 backdrop-blur-xl rounded-2xl border transition-all active:scale-95 ${isLiked
@@ -125,7 +125,7 @@ export default function VendorPage() {
                 </div>
 
                 {/* Vendor Info Center-Bottom */}
-                <div className="absolute bottom-0 inset-x-0 p-8 pb-16 md:pb-24">
+                <div className="absolute bottom-0 inset-x-0 p-4 md:p-8 pb-12 md:pb-24">
                     <div className="max-w-7xl mx-auto">
                         <div className="flex flex-col gap-6 animate-slide-up">
                             {/* Brand Badges */}
@@ -149,7 +149,7 @@ export default function VendorPage() {
 
                             {/* Headline */}
                             <div className="max-w-3xl">
-                                <h1 className="text-5xl md:text-7xl font-black text-white mb-6 tracking-tight drop-shadow-2xl">
+                                <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-7xl font-black text-white mb-4 md:mb-6 tracking-tight drop-shadow-2xl">
                                     {vendor.name}
                                 </h1>
 
@@ -180,24 +180,26 @@ export default function VendorPage() {
                     <div className="lg:col-span-8 space-y-8">
 
                         {/* Highlights Grid */}
-                        <div className="bg-white rounded-[32px] shadow-card p-8 border border-gray-100">
-                            <div className="grid grid-cols-3 gap-4">
+                        <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-card p-4 md:p-8 border border-gray-100">
+                            <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
                                 {highlights.map((item, index) => (
-                                    <div key={index} className="flex flex-col items-center text-center p-4 rounded-2xl bg-gray-50/50 group hover:bg-blue-50/50 transition-colors">
-                                        <div className="w-12 h-12 rounded-2xl bg-white shadow-sm flex items-center justify-center mb-4 group-hover:scale-110 transition-transform">
-                                            <item.icon className="w-6 h-6 text-blue-600" />
+                                    <div key={index} className="flex flex-row sm:flex-col items-center sm:text-center p-3 md:p-4 rounded-2xl bg-gray-50/50 group hover:bg-blue-50/50 transition-colors gap-3 sm:gap-0">
+                                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white shadow-sm flex items-center justify-center sm:mb-4 group-hover:scale-110 transition-transform flex-shrink-0">
+                                            <item.icon className="w-5 h-5 md:w-6 md:h-6 text-blue-600" />
                                         </div>
-                                        <p className="text-xl font-black text-gray-900 mb-1">{item.value}</p>
-                                        <p className="text-xs font-bold text-gray-400 uppercase tracking-widest">{t(item.label)}</p>
+                                        <div className="sm:text-center">
+                                            <p className="text-lg md:text-xl font-black text-gray-900 mb-0.5 md:mb-1">{item.value}</p>
+                                            <p className="text-[10px] md:text-xs font-bold text-gray-400 uppercase tracking-widest">{t(item.label)}</p>
+                                        </div>
                                     </div>
                                 ))}
                             </div>
                         </div>
 
                         {/* Story Card */}
-                        <div className="bg-white rounded-[32px] shadow-card p-10 border border-gray-100">
-                            <h2 className="text-3xl font-black text-gray-900 mb-6 tracking-tight">{t('About')}</h2>
-                            <p className="text-xl text-gray-600 leading-relaxed font-medium mb-8">
+                        <div className="bg-white rounded-[24px] md:rounded-[32px] shadow-card p-6 md:p-10 border border-gray-100">
+                            <h2 className="text-2xl md:text-3xl font-black text-gray-900 mb-4 md:mb-6 tracking-tight">{t('About')}</h2>
+                            <p className="text-base md:text-xl text-gray-600 leading-relaxed font-medium mb-6 md:mb-8">
                                 {t(vendor.description || `${vendor.name} is a highly experienced ${vendor.category.toLowerCase()} based in ${vendor.city}. With a passion for creating unforgettable moments, they bring creativity, professionalism, and attention to detail to every event.`)}
                             </p>
                             <div className="flex flex-wrap gap-3">
@@ -378,15 +380,15 @@ export default function VendorPage() {
             </div>
 
             {/* Mobile Sticky CTA Glassmorphism Footer */}
-            <div className="fixed bottom-0 inset-x-0 lg:hidden p-4 z-50 bg-white/80 backdrop-blur-2xl border-t border-gray-100 safe-area-bottom shadow-2xl">
-                <div className="max-w-xl mx-auto flex items-center justify-between gap-6">
-                    <div>
-                        <p className="text-[10px] font-black text-gray-400 uppercase tracking-widest mb-1">{t('Starting from')}</p>
-                        <p className="text-3xl font-black text-gray-900 leading-none">{convertPrice(vendor.priceFrom)}</p>
+            <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 md:p-4 z-50 bg-white/90 backdrop-blur-2xl border-t border-gray-100 safe-area-bottom shadow-2xl">
+                <div className="max-w-xl mx-auto flex items-center justify-between gap-3 md:gap-6">
+                    <div className="flex-shrink-0">
+                        <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{t('Starting from')}</p>
+                        <p className="text-xl md:text-3xl font-black text-gray-900 leading-none">{convertPrice(vendor.priceFrom)}</p>
                     </div>
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex-1 h-16 bg-blue-600 hover:bg-blue-700 text-white font-black text-lg rounded-[20px] transition-all shadow-xl shadow-blue-600/20 active:scale-95"
+                        className="flex-1 h-12 md:h-16 bg-blue-600 hover:bg-blue-700 text-white font-black text-base md:text-lg rounded-xl md:rounded-[20px] transition-all shadow-xl shadow-blue-600/20 active:scale-95"
                     >
                         {t('Book Now')}
                     </button>

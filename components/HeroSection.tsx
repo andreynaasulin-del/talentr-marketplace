@@ -255,7 +255,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
             )}
 
             {/* Main Content */}
-            <div className="relative z-10 max-w-7xl mx-auto px-6 py-16 w-full">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-6 py-8 md:py-16 w-full">
                 <div className="grid lg:grid-cols-2 gap-16 items-center" dir={language === 'he' ? 'rtl' : 'ltr'}>
                     {/* Left Side - Content */}
                     <motion.div
@@ -282,7 +282,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         {/* Headline */}
                         <motion.h1
                             variants={itemVariants}
-                            className="text-5xl md:text-6xl lg:text-7xl font-extrabold text-gray-900 leading-[1.05] mb-6 tracking-tight"
+                            className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-extrabold text-gray-900 leading-[1.1] md:leading-[1.05] mb-4 md:mb-6 tracking-tight"
                         >
                             {language === 'he' ? 'מצא את ה' : language === 'ru' ? 'Найдите ' : 'Find the '}
                             <span className="relative inline-block">
@@ -323,7 +323,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         {/* Subtitle */}
                         <motion.p
                             variants={itemVariants}
-                            className="text-xl text-gray-600 mb-10 max-w-xl leading-relaxed"
+                            className="text-base md:text-xl text-gray-600 mb-6 md:mb-10 max-w-xl leading-relaxed"
                         >
                             {language === 'he'
                                 ? 'התחבר עם 500+ צלמים, DJ-ים ואמנים מאומתים. הזמן בביטחון.'
@@ -433,7 +433,7 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                         </motion.div>
 
                         {/* Animated Stats */}
-                        <motion.div variants={itemVariants} className="flex items-center gap-6 lg:gap-10">
+                        <motion.div variants={itemVariants} className="flex flex-wrap items-center gap-4 md:gap-6 lg:gap-10">
                             {[
                                 { value: `${vendorCount}+`, label: language === 'ru' ? 'Специалистов' : language === 'he' ? 'בעלי מקצוע' : 'Verified Pros', icon: Users },
                                 { value: `${eventCount}K+`, label: language === 'ru' ? 'Событий' : language === 'he' ? 'אירועים' : 'Events', icon: Calendar },
@@ -444,12 +444,12 @@ export default function HeroSection({ onSearch }: HeroSectionProps) {
                                     className="flex items-center gap-3"
                                     whileHover={{ scale: 1.05 }}
                                 >
-                                    <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center">
-                                        <stat.icon className="w-5 h-5 text-blue-600" />
+                                    <div className="w-8 h-8 md:w-10 md:h-10 rounded-xl bg-gradient-to-br from-blue-50 to-indigo-100 flex items-center justify-center flex-shrink-0">
+                                        <stat.icon className="w-4 h-4 md:w-5 md:h-5 text-blue-600" />
                                     </div>
                                     <div>
-                                        <p className="text-2xl font-bold text-gray-900">{stat.value}</p>
-                                        <p className="text-xs text-gray-500">{stat.label}</p>
+                                        <p className="text-lg md:text-2xl font-bold text-gray-900">{stat.value}</p>
+                                        <p className="text-[10px] md:text-xs text-gray-500">{stat.label}</p>
                                     </div>
                                 </motion.div>
                             ))}

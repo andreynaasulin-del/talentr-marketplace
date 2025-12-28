@@ -82,8 +82,8 @@ export default function AISupportChat() {
     const quickActions = QUICK_ACTIONS[lang] || QUICK_ACTIONS.en;
 
     // Check if on auth pages to prevent covering Sign In/Sign Up buttons
-    const authRoutes = ['/signin', '/signup', '/join'];
-    const shouldHide = authRoutes.includes(pathname);
+    const authRoutes = ['/signin', '/signup', '/join', '/dashboard'];
+    const shouldHide = authRoutes.includes(pathname) || pathname.startsWith('/vendor/');
 
     const t = {
         title: lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Support',
@@ -274,17 +274,17 @@ export default function AISupportChat() {
             {/* Floating Button with Label */}
             <motion.div
                 className={cn(
-                    "fixed bottom-[100px] right-5 z-40",
-                    "flex items-center gap-3",
+                    "fixed bottom-20 md:bottom-[100px] right-3 md:right-5 z-40",
+                    "flex items-center gap-2 md:gap-3",
                     isOpen && "scale-0 opacity-0 pointer-events-none"
                 )}
                 initial={{ scale: 0, x: 20 }}
                 animate={{ scale: isOpen ? 0 : 1, x: 0 }}
                 transition={{ type: 'spring', stiffness: 300, damping: 25 }}
             >
-                {/* Permanent Label */}
+                {/* Permanent Label - hidden on mobile */}
                 <motion.div
-                    className="bg-white px-4 py-2.5 rounded-2xl shadow-lg border border-gray-100 flex items-center gap-2"
+                    className="hidden md:flex bg-white px-4 py-2.5 rounded-2xl shadow-lg border border-gray-100 items-center gap-2"
                     initial={{ opacity: 0, x: 20 }}
                     animate={{ opacity: 1, x: 0 }}
                     transition={{ delay: 0.3 }}
@@ -299,7 +299,7 @@ export default function AISupportChat() {
                 <motion.button
                     onClick={() => setIsOpen(true)}
                     className={cn(
-                        "w-14 h-14 rounded-full shadow-lg shadow-blue-500/30",
+                        "w-12 h-12 md:w-14 md:h-14 rounded-full shadow-lg shadow-blue-500/30",
                         "bg-gradient-to-br from-blue-600 to-indigo-600",
                         "hover:from-blue-500 hover:to-indigo-500",
                         "flex items-center justify-center",
@@ -308,7 +308,7 @@ export default function AISupportChat() {
                     whileHover={{ scale: 1.1 }}
                     whileTap={{ scale: 0.95 }}
                 >
-                    <Sparkles className="w-7 h-7 text-white" />
+                    <Sparkles className="w-6 h-6 md:w-7 md:h-7 text-white" />
 
                     {/* Online Indicator */}
                     <span className="absolute top-0 right-0 w-4 h-4 bg-green-500 rounded-full border-2 border-white animate-pulse" />
@@ -320,9 +320,9 @@ export default function AISupportChat() {
                 {isOpen && (
                     <motion.div
                         className={cn(
-                            "fixed bottom-[100px] right-5 z-50",
-                            "w-[380px] max-w-[calc(100vw-40px)]",
-                            "bg-white rounded-3xl shadow-2xl overflow-hidden",
+                            "fixed bottom-20 md:bottom-[100px] right-3 md:right-5 z-50",
+                            "w-[340px] md:w-[380px] max-w-[calc(100vw-24px)]",
+                            "bg-white rounded-2xl md:rounded-3xl shadow-2xl overflow-hidden",
                             "border border-gray-100"
                         )}
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}

@@ -93,7 +93,7 @@ export default function Navbar() {
                     </div>
 
                     {/* Right Actions */}
-                    <div className="flex items-center gap-2 md:gap-4">
+                    <div className="flex items-center gap-1 md:gap-4">
                         {/* Language Switcher */}
                         <div className="relative">
                             <motion.button
@@ -105,9 +105,9 @@ export default function Navbar() {
                                 whileHover={{ scale: 1.02 }}
                                 whileTap={{ scale: 0.98 }}
                             >
-                                <span className="text-xl leading-none">{currentLang.flag}</span>
+                                <span className="text-lg md:text-xl leading-none">{currentLang.flag}</span>
                                 <span className="hidden lg:inline">{currentLang.label}</span>
-                                <ChevronDown className={cn("w-4 h-4 transition-transform duration-300", showLangDropdown && 'rotate-180')} />
+                                <ChevronDown className={cn("w-3 h-3 md:w-4 md:h-4 hidden sm:block transition-transform duration-300", showLangDropdown && 'rotate-180')} />
                             </motion.button>
 
                             <AnimatePresence>
@@ -157,7 +157,7 @@ export default function Navbar() {
 
                         {/* Auth Button / User Profile */}
                         {isAuthenticated ? (
-                            <div className="flex items-center gap-3">
+                            <div className="flex items-center gap-1 md:gap-3">
                                 {/* Favorites Button */}
                                 <motion.div whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }}>
                                     <Link
@@ -189,7 +189,7 @@ export default function Navbar() {
                                 </motion.div>
                                 <motion.button
                                     onClick={handleSignOut}
-                                    className="p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
+                                    className="hidden sm:block p-2.5 text-gray-400 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
                                     title={t('signOut')}
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.9 }}
@@ -197,7 +197,7 @@ export default function Navbar() {
                                     <LogOut className="w-5 h-5" />
                                 </motion.button>
                                 <motion.div
-                                    className="w-10 h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center p-0.5 shadow-md"
+                                    className="w-8 h-8 md:w-10 md:h-10 rounded-full bg-gradient-to-tr from-blue-500 to-purple-500 flex items-center justify-center p-0.5 shadow-md"
                                     whileHover={{ scale: 1.1 }}
                                     whileTap={{ scale: 0.95 }}
                                 >
