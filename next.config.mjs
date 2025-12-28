@@ -19,7 +19,7 @@ const nextConfig = {
 
     // Experimental optimizations
     experimental: {
-        optimizePackageImports: ['lucide-react', 'framer-motion', 'date-fns'],
+        optimizePackageImports: ['lucide-react', 'framer-motion'],
     },
 
     // Compiler options for production
