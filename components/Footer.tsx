@@ -35,10 +35,10 @@ export default function Footer() {
         {
             title: { en: 'Support', ru: 'Поддержка', he: 'תמיכה' },
             links: [
-                { label: { en: 'Contact Support', ru: 'Связаться с поддержкой', he: 'צור קשר' }, href: '#' },
-                { label: { en: 'Help Center', ru: 'Центр помощи', he: 'מרכז עזרה' }, href: '#' },
-                { label: { en: 'Terms of Service', ru: 'Условия использования', he: 'תנאי שימוש' }, href: '#' },
-                { label: { en: 'Privacy Policy', ru: 'Политика конфиденциальности', he: 'מדיניות פרטיות' }, href: '#' },
+                { label: { en: 'Contact Support', ru: 'Связаться с поддержкой', he: 'צור קשר' }, href: 'mailto:support@talentr.app' },
+                { label: { en: 'Join as Vendor', ru: 'Стать исполнителем', he: 'הצטרף כספק' }, href: '/join' },
+                { label: { en: 'Terms of Service', ru: 'Условия использования', he: 'תנאי שימוש' }, href: '/terms' },
+                { label: { en: 'Privacy Policy', ru: 'Политика конфиденциальности', he: 'מדיניות פרטיות' }, href: '/privacy' },
             ]
         },
         {
