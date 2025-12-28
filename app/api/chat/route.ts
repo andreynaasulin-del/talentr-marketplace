@@ -375,18 +375,34 @@ async function generateAIResponse(
             { role: 'user', content: message }
         ];
 
-        const completion = await client.chat.completions.create({
-            model: 'gpt-4o',  // Premium model for best quality responses
-            messages,
-            max_tokens: 500,  // More detailed responses
-            temperature: 0.7, // Slightly lower for more focused answers
-            presence_penalty: 0.2,
-            frequency_penalty: 0.1,
-        });
+        // Create an AbortController for timeout
+        const controller = new AbortController();
+        const timeoutId = setTimeout(() => controller.abort(), 10000); // 10 second timeout
 
-        return completion.choices[0]?.message?.content || generateFallbackResponse(extracted, vendors, language);
-    } catch (error) {
-        console.error('OpenAI API error:', error);
+        try {
+            const completion = await client.chat.completions.create({
+                model: 'gpt-4o-mini',  // Cost-effective model (15x cheaper than gpt-4o)
+                messages,
+                max_tokens: 300,  // Shorter responses = faster + cheaper
+                temperature: 0.7,
+                presence_penalty: 0.2,
+                frequency_penalty: 0.1,
+            }, { signal: controller.signal });
+
+            clearTimeout(timeoutId);
+            return completion.choices[0]?.message?.content || generateFallbackResponse(extracted, vendors, language);
+        } catch (apiError) {
+            clearTimeout(timeoutId);
+            throw apiError;
+        }
+    } catch (error: unknown) {
+        // Log error details for debugging (but not sensitive info)
+        const errorMessage = error instanceof Error ? error.message : 'Unknown error';
+        if (errorMessage.includes('aborted')) {
+            console.error('OpenAI API timeout (10s exceeded)');
+        } else {
+            console.error('OpenAI API error:', errorMessage);
+        }
         return generateFallbackResponse(extracted, vendors, language);
     }
 }
