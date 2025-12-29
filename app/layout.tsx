@@ -6,7 +6,7 @@ import { FavoritesProvider } from '@/context/FavoritesContext';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
-import AISupportChat from '@/components/AISupportChat';
+
 
 // Optimize font loading
 const inter = Inter({
@@ -106,7 +106,7 @@ export default function RootLayout({
                 <LanguageProvider>
                     <FavoritesProvider>
                         {children}
-                        <AISupportChat />
+
                     </FavoritesProvider>
                 </LanguageProvider>
                 <Toaster
