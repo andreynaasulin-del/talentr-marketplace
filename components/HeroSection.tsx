@@ -111,14 +111,13 @@ export default function HeroSection() {
         ]
     };
 
+    // Reset greeting when language changes
     useEffect(() => {
-        if (messages.length === 0) {
-            setMessages([{
-                id: 'greeting',
-                role: 'assistant',
-                content: getGreeting(),
-            }]);
-        }
+        setMessages([{
+            id: 'greeting',
+            role: 'assistant',
+            content: getGreeting(),
+        }]);
     }, [lang]);
 
     useEffect(() => {
