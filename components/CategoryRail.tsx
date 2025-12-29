@@ -66,20 +66,9 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
         onCategoryChange?.(categoryId);
     };
 
-    // Mock counts for categories
-    const counts: Record<string, number> = {
-        'All': 542,
-        'Photographer': 124,
-        'Videographer': 86,
-        'DJ': 92,
-        'MC': 45,
-        'Singer': 67,
-        'Magician': 23,
-    };
-
     return (
         <div className="relative px-6 py-8">
-            {/* Header for categories (Optional, Wolt-like) */}
+            {/* Header */}
             <div className="flex items-center justify-between mb-4">
                 <h3 className="text-sm font-bold text-gray-400 uppercase tracking-widest px-2">
                     {language === 'he' ? 'קטגוריות' : language === 'ru' ? 'КАТЕГОРИИ' : 'CATEGORIES'}
@@ -87,54 +76,35 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
             </div>
 
             {/* Scrollable Container */}
-            <div className="flex gap-4 overflow-x-auto scrollbar-hide pb-4 -mx-2 px-2">
+            <div className="flex gap-3 overflow-x-auto scrollbar-hide pb-4 -mx-2 px-2">
                 {categories.map((category) => {
                     const Icon = category.icon;
                     const isActive = activeCategory === category.id;
-                    const count = counts[category.id] || Math.floor(Math.random() * 30) + 5;
 
                     return (
                         <button
                             key={category.id}
                             onClick={() => handleCategoryClick(category.id)}
                             className={`
-                                group relative flex items-center gap-3 px-6 py-3.5 rounded-2xl
-                                flex-shrink-0 font-bold text-sm transition-all duration-300
+                                group relative flex items-center gap-2.5 px-5 py-3 rounded-2xl
+                                flex-shrink-0 font-semibold text-sm transition-all duration-300
                                 ${isActive
-                                    ? 'bg-blue-500 text-white shadow-lg shadow-blue-500/30 scale-105'
-                                    : 'bg-white text-gray-600 border border-gray-100 hover:border-blue-200 hover:bg-blue-50/30'
+                                    ? 'bg-gray-900 text-white shadow-lg'
+                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200'
                                 }
                             `}
                         >
-                            <div className={`
-                                p-1.5 rounded-lg transition-colors
-                                ${isActive ? 'bg-white/20' : 'bg-gray-50 group-hover:bg-blue-100/50'}
-                            `}>
-                                <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-blue-500'}`} />
-                            </div>
-
+                            <Icon className={`w-4 h-4 ${isActive ? 'text-white' : 'text-gray-500'}`} />
                             <span className="whitespace-nowrap">{t(category.label)}</span>
-
-                            {/* Count Badge */}
-                            <span className={`
-                                text-[10px] px-2 py-0.5 rounded-full font-black
-                                ${isActive ? 'bg-white/20 text-white' : 'bg-gray-100 text-gray-400 group-hover:bg-blue-100 group-hover:text-blue-600'}
-                            `}>
-                                {count}
-                            </span>
-
-                            {/* Active Indicator Underline (roadmapping 5.5) */}
-                            {isActive && (
-                                <div className="absolute -bottom-1 left-1/2 -translate-x-1/2 w-8 h-1 bg-white rounded-full" />
-                            )}
                         </button>
                     );
                 })}
             </div>
 
             {/* Edge Fades */}
-            <div className="absolute left-0 top-0 bottom-0 w-20 bg-gradient-to-r from-white via-white/50 to-transparent z-10 pointer-events-none" />
-            <div className="absolute right-0 top-0 bottom-0 w-20 bg-gradient-to-l from-white via-white/50 to-transparent z-10 pointer-events-none" />
+            <div className="absolute left-0 top-0 bottom-0 w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none" />
+            <div className="absolute right-0 top-0 bottom-0 w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none" />
         </div>
     );
 }
+
