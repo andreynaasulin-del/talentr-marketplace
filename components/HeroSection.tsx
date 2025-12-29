@@ -209,24 +209,24 @@ export default function HeroSection() {
                     </p>
                 </motion.div>
 
-                {/* Chat Container - Clean White Card */}
+                {/* Chat Container - Compact */}
                 <motion.div
-                    className="bg-white rounded-2xl shadow-xl overflow-hidden"
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-lg mx-auto"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                    {/* Chat Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-4 py-3 text-white">
-                        <div className="flex items-center gap-3">
-                            <div className="w-9 h-9 rounded-xl bg-white/20 flex items-center justify-center">
-                                <Sparkles className="w-4 h-4" />
+                    {/* Chat Header - Compact */}
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2.5 text-white">
+                        <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                                <Sparkles className="w-3.5 h-3.5" />
                             </div>
                             <div>
-                                <h3 className="font-semibold text-sm">
+                                <h3 className="font-semibold text-sm leading-tight">
                                     {lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Assistant'}
                                 </h3>
-                                <p className="text-xs text-white/70 flex items-center gap-1">
+                                <p className="text-[10px] text-white/70 flex items-center gap-1">
                                     <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
                                     {lang === 'ru' ? 'Онлайн' : lang === 'he' ? 'מחובר' : 'Online'}
                                 </p>
@@ -234,8 +234,8 @@ export default function HeroSection() {
                         </div>
                     </div>
 
-                    {/* Messages */}
-                    <div className="h-[240px] sm:h-[280px] overflow-y-auto p-4 space-y-3 bg-gray-50">
+                    {/* Messages - Compact */}
+                    <div className="h-[180px] sm:h-[200px] overflow-y-auto p-3 space-y-2 bg-gray-50">
                         <AnimatePresence mode="popLayout">
                             {messages.map((msg) => (
                                 <motion.div
@@ -291,21 +291,21 @@ export default function HeroSection() {
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Quick Prompts */}
+                    {/* Quick Prompts - Compact */}
                     <AnimatePresence>
                         {messages.length <= 1 && (
                             <motion.div
-                                className="px-4 py-3 border-t border-gray-100 bg-white"
+                                className="px-3 py-2 border-t border-gray-100 bg-white"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
                             >
-                                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
+                                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
                                     {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => (
                                         <button
                                             key={i}
                                             onClick={() => sendMessage(prompt.text)}
-                                            className="px-4 py-2 bg-gray-100 hover:bg-gray-200 rounded-full text-sm font-medium text-gray-700 transition-colors flex-shrink-0"
+                                            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-xs font-medium text-gray-700 transition-colors flex-shrink-0"
                                         >
                                             {prompt.text}
                                         </button>
@@ -315,13 +315,13 @@ export default function HeroSection() {
                         )}
                     </AnimatePresence>
 
-                    {/* Input */}
+                    {/* Input - Compact */}
                     <form
                         onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                        className="p-4 border-t border-gray-100 bg-white"
+                        className="p-3 border-t border-gray-100 bg-white"
                     >
                         <div className={cn(
-                            "flex items-center gap-2 px-4 py-2 rounded-full border-2 transition-colors",
+                            "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors",
                             isFocused ? "border-blue-500 bg-blue-50/30" : "border-gray-200 bg-gray-50"
                         )}>
                             <input
@@ -332,20 +332,20 @@ export default function HeroSection() {
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
                                 placeholder={placeholders[lang] || placeholders.en}
-                                className="flex-1 py-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-base"
+                                className="flex-1 py-1.5 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-sm"
                                 style={{ fontSize: '16px' }}
                             />
                             <button
                                 type="submit"
                                 disabled={!input.trim()}
                                 className={cn(
-                                    "p-2 rounded-full transition-colors",
+                                    "p-1.5 rounded-full transition-colors",
                                     input.trim()
                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                         : 'bg-gray-200 text-gray-400'
                                 )}
                             >
-                                <Send className="w-4 h-4" />
+                                <Send className="w-3.5 h-3.5" />
                             </button>
                         </div>
                     </form>
