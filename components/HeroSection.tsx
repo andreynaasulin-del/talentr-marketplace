@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, ArrowRight } from 'lucide-react';
+import { Send, Sparkles, Star, ArrowRight, MapPin } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -29,10 +29,28 @@ export default function HeroSection() {
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const [userCity, setUserCity] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const lang = language as 'en' | 'ru' | 'he';
+
+    // Detect user city via IP geolocation
+    useEffect(() => {
+        const detectCity = async () => {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                if (data.city) {
+                    setUserCity(data.city);
+                }
+            } catch {
+                // Fallback to Tel Aviv for Israel users
+                setUserCity('Tel Aviv');
+            }
+        };
+        detectCity();
+    }, []);
 
     // Smart time-based greetings
     const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
@@ -351,26 +369,28 @@ export default function HeroSection() {
                     </form>
                 </motion.div>
 
-                {/* Trust Badge - Simple */}
+                {/* Popular Near You - Like Wolt */}
                 <motion.div
-                    className="mt-6 flex flex-col items-center gap-2"
+                    className="mt-5 flex justify-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
                 >
-                    <div className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-sm rounded-full">
-                        <div className="flex -space-x-1.5">
-                            {[1, 2, 3].map((i) => (
-                                <div key={i} className="w-6 h-6 rounded-full bg-white/30 border-2 border-white/20" />
-                            ))}
-                        </div>
-                        <span className="text-white text-sm font-medium">
-                            {lang === 'ru' ? '500+ специалистов' : lang === 'he' ? '500+ מקצוענים' : '500+ professionals'}
+                    <Link
+                        href="/vendors"
+                        className="group flex items-center gap-2 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all"
+                    >
+                        <MapPin className="w-4 h-4 text-blue-600" />
+                        <span className="text-gray-900 text-sm font-medium">
+                            {lang === 'ru'
+                                ? `Популярное рядом${userCity ? ` · ${userCity}` : ''}`
+                                : lang === 'he'
+                                    ? `פופולרי באזורך${userCity ? ` · ${userCity}` : ''}`
+                                    : `Popular around you${userCity ? ` · ${userCity}` : ''}`
+                            }
                         </span>
-                    </div>
-                    <p className="text-white/60 text-xs">
-                        ⚡ {lang === 'ru' ? 'Бесплатно' : lang === 'he' ? 'חינם' : 'Free'}
-                    </p>
+                        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                    </Link>
                 </motion.div>
             </div>
 
