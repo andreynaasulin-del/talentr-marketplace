@@ -45,22 +45,22 @@ export default function HeroSection() {
 
     const timeBasedGreetings = {
         en: {
-            morning: "Good morning! What event are you planning?",
-            afternoon: "Good afternoon! What event are you planning?",
-            evening: "Good evening! What event are you planning?",
-            night: "Still planning? I'm here 24/7!"
+            morning: "Hi! 👋 When is your event and what type of professional are you looking for?",
+            afternoon: "Hi! 👋 When is your event and what type of professional are you looking for?",
+            evening: "Hi! 👋 When is your event and what type of professional are you looking for?",
+            night: "Hi! 👋 When is your event and what type of professional are you looking for?"
         },
         ru: {
-            morning: "Доброе утро! Какое мероприятие планируете?",
-            afternoon: "Добрый день! Какое мероприятие планируете?",
-            evening: "Добрый вечер! Какое мероприятие планируете?",
-            night: "Планируете ночью? Я онлайн 24/7!"
+            morning: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?",
+            afternoon: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?",
+            evening: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?",
+            night: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?"
         },
         he: {
-            morning: "בוקר טוב! איזה אירוע אתם מתכננים?",
-            afternoon: "צהריים טובים! איזה אירוע מתכננים?",
-            evening: "ערב טוב! איזה אירוע מתכננים?",
-            night: "עדיין מתכננים? אני כאן 24/7!"
+            morning: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?",
+            afternoon: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?",
+            evening: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?",
+            night: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?"
         }
     };
 
@@ -77,19 +77,19 @@ export default function HeroSection() {
 
     const quickPrompts = {
         en: [
-            { text: "Photographer" },
-            { text: "DJ" },
-            { text: "Decor" },
+            { text: "Wedding photographer" },
+            { text: "DJ for birthday" },
+            { text: "Corporate event MC" },
         ],
         ru: [
-            { text: "Фотограф" },
-            { text: "DJ" },
-            { text: "Декор" },
+            { text: "Фотограф на свадьбу" },
+            { text: "DJ на день рождения" },
+            { text: "Ведущий корпоратива" },
         ],
         he: [
-            { text: "צלם" },
-            { text: "DJ" },
-            { text: "עיצוב" },
+            { text: "צלם לחתונה" },
+            { text: "DJ ליום הולדת" },
+            { text: "מנחה לאירוע עסקי" },
         ]
     };
 
