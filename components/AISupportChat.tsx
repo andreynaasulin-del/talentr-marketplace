@@ -99,6 +99,15 @@ export default function AISupportChat() {
         setConversationHistory([]);
     }, [language]);
 
+    // Listen for external open event (from Hero button)
+    useEffect(() => {
+        const handleOpenChat = () => {
+            setIsOpen(true);
+        };
+        window.addEventListener('openAIChat', handleOpenChat);
+        return () => window.removeEventListener('openAIChat', handleOpenChat);
+    }, []);
+
     // Add greeting on first open or after language change
     useEffect(() => {
         if (isOpen && messages.length === 0) {

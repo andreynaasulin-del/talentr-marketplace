@@ -12,8 +12,8 @@
   /* Surfaces */
   --surface: #FFFFFF;
   --surface-elevated: rgba(255, 255, 255, 0.85);
-  --background: #FAFBFC;
-  --background-subtle: #F1F5F9;
+  --background: #FFFFFF;
+  --background-subtle: #F8FAFC;
 
   /* Borders */
   --border-light: rgba(0, 0, 0, 0.06);
@@ -43,11 +43,23 @@
 }
 
 /* ===== BASE STYLES ===== */
+html {
+  /* Larger base font for mobile readability */
+  font-size: 17px;
+}
+
+@media (min-width: 640px) {
+  html {
+    font-size: 16px;
+  }
+}
+
 body {
   background: var(--background);
   color: var(--text-primary);
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
+  line-height: 1.6;
 }
 
 /* Prevent iOS Safari from zooming on input focus (requires 16px minimum) */
@@ -55,6 +67,15 @@ input,
 select,
 textarea {
   font-size: 16px !important;
+}
+
+@media (min-width: 640px) {
+
+  input,
+  select,
+  textarea {
+    font-size: inherit !important;
+  }
 }
 
 /* Safe Area for iPhone */
