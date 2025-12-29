@@ -66,7 +66,7 @@ export default function FeaturedVendors() {
     const t = content[lang] || content.en;
 
     return (
-        <section className="py-16 md:py-24 bg-white">
+        <section id="featured-vendors" className="py-16 md:py-24 bg-white">
             <div className="max-w-7xl mx-auto px-4 md:px-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 md:mb-12">

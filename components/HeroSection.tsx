@@ -375,8 +375,10 @@ export default function HeroSection() {
                     animate={{ opacity: 1 }}
                     transition={{ delay: 0.4 }}
                 >
-                    <Link
-                        href="/vendors"
+                    <button
+                        onClick={() => {
+                            document.getElementById('featured-vendors')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
                         className="group flex items-center gap-2 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all"
                     >
                         <MapPin className="w-4 h-4 text-blue-600" />
@@ -389,7 +391,7 @@ export default function HeroSection() {
                             }
                         </span>
                         <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
-                    </Link>
+                    </button>
                 </motion.div>
             </div>
 
