@@ -2,65 +2,132 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { Globe } from 'lucide-react';
+import { Globe, Heart, Sparkles } from 'lucide-react';
+import { motion } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function Footer() {
     const { language } = useLanguage();
-
     const currentYear = new Date().getFullYear();
+    const lang = language as 'en' | 'ru' | 'he';
+
+    const content = {
+        en: {
+            tagline: 'Find your perfect event professional',
+            terms: 'Terms',
+            privacy: 'Privacy',
+            partner: 'For Vendors',
+            about: 'About',
+            made: 'Made with',
+            in: 'in Israel'
+        },
+        ru: {
+            tagline: 'Найдите идеального специалиста',
+            terms: 'Условия',
+            privacy: 'Приватность',
+            partner: 'Для партнёров',
+            about: 'О нас',
+            made: 'Сделано с',
+            in: 'в Израиле'
+        },
+        he: {
+            tagline: 'מצא את איש המקצוע המושלם',
+            terms: 'תנאים',
+            privacy: 'פרטיות',
+            partner: 'לספקים',
+            about: 'אודות',
+            made: 'נוצר עם',
+            in: 'בישראל'
+        }
+    };
+
+    const t = content[lang] || content.en;
+
+    const footerLinks = [
+        { href: '/terms', label: t.terms },
+        { href: '/privacy', label: t.privacy },
+        { href: '/join', label: t.partner },
+    ];
 
     return (
-        <footer className="bg-gray-950 text-white py-12 md:py-16">
-            <div className="max-w-7xl mx-auto px-6">
+        <footer className="bg-gray-950 text-white">
+            {/* Main Footer Content */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 py-10 md:py-16">
                 {/* Top Section */}
-                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-8 mb-12">
-                    {/* Logo */}
-                    <div className="text-2xl font-black" dir="ltr">
-                        talent<span className="text-blue-500">r</span>
-                    </div>
+                <div className="flex flex-col md:flex-row justify-between items-start md:items-center gap-6 md:gap-8 mb-8 md:mb-12">
+                    {/* Logo & Tagline */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 10 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                    >
+                        <Link href="/" dir="ltr" className="inline-block mb-2">
+                            <span className="text-2xl md:text-3xl font-black">
+                                talent<span className="text-blue-500">r</span>
+                            </span>
+                        </Link>
+                        <p className="text-gray-400 text-sm md:text-base max-w-xs">
+                            {t.tagline}
+                        </p>
+                    </motion.div>
 
-                    {/* Language Selector */}
-                    <div className="flex items-center gap-2 text-gray-400 hover:text-white transition-colors cursor-pointer">
-                        <Globe className="w-5 h-5" />
+                    {/* Language Display */}
+                    <motion.div
+                        className="flex items-center gap-2 text-gray-400"
+                        initial={{ opacity: 0 }}
+                        whileInView={{ opacity: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        <Globe className="w-4 h-4 md:w-5 md:h-5" />
                         <span className="text-sm font-medium">
-                            {language === 'en' ? 'English' : language === 'ru' ? 'Русский' : 'עברית'}
+                            {lang === 'en' ? 'English' : lang === 'ru' ? 'Русский' : 'עברית'}
                         </span>
-                    </div>
+                    </motion.div>
                 </div>
 
                 {/* Divider */}
-                <div className="h-px bg-gray-800 mb-8" />
+                <div className="h-px bg-gray-800 mb-6 md:mb-8" />
 
-                {/* Bottom Section */}
-                <div className="flex flex-col md:flex-row justify-between items-center gap-6">
-                    {/* Copyright */}
-                    <p className="text-sm text-gray-500">
-                        © Talentr {currentYear}
-                    </p>
+                {/* Bottom Section - Mobile Optimized */}
+                <div className="flex flex-col-reverse md:flex-row justify-between items-center gap-4 md:gap-6">
+                    {/* Copyright & Made With */}
+                    <div className="flex flex-col sm:flex-row items-center gap-2 sm:gap-4 text-center sm:text-left">
+                        <p className="text-xs md:text-sm text-gray-500">
+                            © {currentYear} Talentr
+                        </p>
+                        <span className="hidden sm:inline text-gray-700">•</span>
+                        <p className="text-xs md:text-sm text-gray-500 flex items-center gap-1">
+                            {t.made} <Heart className="w-3 h-3 text-red-500 fill-red-500" /> {t.in}
+                        </p>
+                    </div>
 
-                    {/* Links */}
-                    <nav className="flex flex-wrap items-center justify-center gap-x-6 gap-y-2">
-                        <Link
-                            href="/terms"
-                            className="text-sm text-gray-400 hover:text-white transition-colors"
-                        >
-                            {language === 'ru' ? 'Условия' : language === 'he' ? 'תנאים' : 'Terms'}
-                        </Link>
-                        <Link
-                            href="/privacy"
-                            className="text-sm text-gray-400 hover:text-white transition-colors"
-                        >
-                            {language === 'ru' ? 'Конфиденциальность' : language === 'he' ? 'פרטיות' : 'Privacy'}
-                        </Link>
-                        <Link
-                            href="/join"
-                            className="text-sm text-gray-400 hover:text-white transition-colors"
-                        >
-                            {language === 'ru' ? 'Стать партнёром' : language === 'he' ? 'הצטרף אלינו' : 'Become a Partner'}
-                        </Link>
+                    {/* Links - Mobile Horizontal Scroll */}
+                    <nav className="flex items-center gap-4 md:gap-6 overflow-x-auto scrollbar-hide w-full md:w-auto justify-center md:justify-end pb-1 md:pb-0">
+                        {footerLinks.map((link, index) => (
+                            <motion.div
+                                key={link.href}
+                                initial={{ opacity: 0, y: 5 }}
+                                whileInView={{ opacity: 1, y: 0 }}
+                                viewport={{ once: true }}
+                                transition={{ delay: index * 0.1 }}
+                            >
+                                <Link
+                                    href={link.href}
+                                    className={cn(
+                                        "text-sm text-gray-400 hover:text-white transition-colors whitespace-nowrap",
+                                        "py-1 border-b border-transparent hover:border-gray-600"
+                                    )}
+                                >
+                                    {link.label}
+                                </Link>
+                            </motion.div>
+                        ))}
                     </nav>
                 </div>
             </div>
+
+            {/* Bottom Accent Line */}
+            <div className="h-1 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600" />
         </footer>
     );
 }

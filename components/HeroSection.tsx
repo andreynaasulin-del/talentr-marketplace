@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, Calendar, Users } from 'lucide-react';
+import { Send, Sparkles, Star, ArrowRight, MapPin } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -28,49 +28,96 @@ export default function HeroSection() {
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
+    const [isFocused, setIsFocused] = useState(false);
+    const [userCity, setUserCity] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const lang = language as 'en' | 'ru' | 'he';
 
-    const greetings = {
-        en: "👋 Hi! I'm your AI event assistant. Tell me what you're planning and I'll help you find the perfect professionals!",
-        ru: "👋 Привет! Я AI-помощник для мероприятий. Расскажите, что планируете, и я помогу найти идеальных специалистов!",
-        he: "👋 שלום! אני עוזר AI לאירועים. ספרו לי מה אתם מתכננים ואעזור למצוא את אנשי המקצוע המושלמים!"
+    // Detect user city via IP geolocation
+    useEffect(() => {
+        const detectCity = async () => {
+            try {
+                const res = await fetch('https://ipapi.co/json/');
+                const data = await res.json();
+                if (data.city) {
+                    setUserCity(data.city);
+                }
+            } catch {
+                // Fallback to Tel Aviv for Israel users
+                setUserCity('Tel Aviv');
+            }
+        };
+        detectCity();
+    }, []);
+
+    // Smart time-based greetings
+    const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
+        const hour = new Date().getHours();
+        if (hour >= 6 && hour < 12) return 'morning';
+        if (hour >= 12 && hour < 18) return 'afternoon';
+        if (hour >= 18 && hour < 22) return 'evening';
+        return 'night';
+    };
+
+    const timeBasedGreetings = {
+        en: {
+            morning: "Hi! 👋 When is your event and what type of professional are you looking for?",
+            afternoon: "Hi! 👋 When is your event and what type of professional are you looking for?",
+            evening: "Hi! 👋 When is your event and what type of professional are you looking for?",
+            night: "Hi! 👋 When is your event and what type of professional are you looking for?"
+        },
+        ru: {
+            morning: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?",
+            afternoon: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?",
+            evening: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?",
+            night: "Привет! 👋 Когда ваше мероприятие и какой специалист нужен?"
+        },
+        he: {
+            morning: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?",
+            afternoon: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?",
+            evening: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?",
+            night: "היי! 👋 מתי האירוע שלכם ואיזה איש מקצוע אתם מחפשים?"
+        }
+    };
+
+    const getGreeting = () => {
+        const timeOfDay = getTimeOfDay();
+        return timeBasedGreetings[lang]?.[timeOfDay] || timeBasedGreetings.en[timeOfDay];
     };
 
     const placeholders = {
-        en: "e.g., I need a photographer for my wedding in Tel Aviv...",
-        ru: "напр.: Ищу фотографа на свадьбу в Тель-Авиве...",
-        he: "למשל: אני מחפש צלם לחתונה בתל אביב..."
+        en: "What do you need?",
+        ru: "Что вам нужно?",
+        he: "מה אתם מחפשים?"
     };
 
     const quickPrompts = {
         en: [
-            "Find a wedding photographer",
-            "I need a DJ for birthday party",
-            "Looking for event decor",
+            { text: "Wedding photographer" },
+            { text: "DJ for birthday" },
+            { text: "Corporate event MC" },
         ],
         ru: [
-            "Найти свадебного фотографа",
-            "Нужен диджей на день рождения",
-            "Ищу декор для мероприятия",
+            { text: "Фотограф на свадьбу" },
+            { text: "DJ на день рождения" },
+            { text: "Ведущий корпоратива" },
         ],
         he: [
-            "מצא צלם לחתונה",
-            "אני צריך DJ למסיבת יום הולדת",
-            "מחפש עיצוב אירועים",
+            { text: "צלם לחתונה" },
+            { text: "DJ ליום הולדת" },
+            { text: "מנחה לאירוע עסקי" },
         ]
     };
 
+    // Reset greeting when language changes
     useEffect(() => {
-        if (messages.length === 0) {
-            setMessages([{
-                id: 'greeting',
-                role: 'assistant',
-                content: greetings[lang] || greetings.en,
-            }]);
-        }
+        setMessages([{
+            id: 'greeting',
+            role: 'assistant',
+            content: getGreeting(),
+        }]);
     }, [lang]);
 
     useEffect(() => {
@@ -113,7 +160,7 @@ export default function HeroSection() {
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: lang === 'ru' ? 'Извините, ошибка соединения.' : lang === 'he' ? 'סליחה, שגיאת חיבור.' : 'Sorry, connection error.',
+                content: lang === 'ru' ? 'Извините, ошибка.' : lang === 'he' ? 'סליחה, שגיאה.' : 'Sorry, error.',
             }]);
         } finally {
             setIsTyping(false);
@@ -122,13 +169,13 @@ export default function HeroSection() {
 
     const renderVendorCards = (vendors: Vendor[]) => (
         <div className="mt-3 space-y-2">
-            {vendors.slice(0, 3).map((vendor) => (
+            {vendors.slice(0, 2).map((vendor) => (
                 <Link
                     key={vendor.id}
                     href={`/vendor/${vendor.id}`}
-                    className="flex items-center gap-3 p-2 bg-gray-50 hover:bg-blue-50 rounded-xl transition-all group"
+                    className="flex items-center gap-3 p-2.5 bg-gray-50 hover:bg-gray-100 rounded-xl transition-colors"
                 >
-                    <div className="relative w-12 h-12 rounded-lg overflow-hidden flex-shrink-0">
+                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0">
                         <Image
                             src={vendor.imageUrl || '/placeholder-vendor.jpg'}
                             alt={vendor.name}
@@ -137,206 +184,221 @@ export default function HeroSection() {
                         />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 text-sm truncate group-hover:text-blue-600">
+                        <p className="font-medium text-gray-900 text-sm truncate">
                             {vendor.name}
                         </p>
-                        <div className="flex items-center gap-2 text-xs text-gray-500">
+                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
                             <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
-                            {vendor.rating} • {vendor.city}
+                            {vendor.rating} · {vendor.city}
                         </div>
                     </div>
+                    <ArrowRight className="w-4 h-4 text-gray-400" />
                 </Link>
             ))}
         </div>
     );
 
     return (
-        <section className="relative min-h-[85vh] flex items-center justify-center overflow-hidden bg-gradient-to-b from-sky-400 via-sky-500 to-blue-500">
-            {/* Background Pattern */}
-            <div className="absolute inset-0 opacity-10">
-                <div
-                    className="absolute inset-0"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                        backgroundSize: '32px 32px'
-                    }}
-                />
-            </div>
-
+        <section className="relative min-h-[85vh] md:min-h-[88vh] flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600">
             {/* Content */}
-            <div className="relative z-10 max-w-3xl mx-auto px-4 py-12 w-full">
-                {/* Headline */}
+            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-8 md:py-12">
+                {/* Headline - Clean & Simple */}
                 <motion.div
-                    className="text-center mb-8"
+                    className="text-center mb-6 md:mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.5 }}
                 >
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-3 tracking-tight">
-                        {lang === 'ru' ? 'Найдите идеального специалиста' : lang === 'he' ? 'מצא את הטאלנט המושלם' : 'Find the perfect talent'}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
+                        {lang === 'ru' ? 'Найдите' : lang === 'he' ? 'מצא את' : 'Find the'}
+                        <br />
+                        <span className="text-white/90">
+                            {lang === 'ru' ? 'идеального специалиста' : lang === 'he' ? 'הטאלנט המושלם' : 'perfect talent'}
+                        </span>
                     </h1>
-                    <p className="text-lg sm:text-xl text-white/90 font-medium">
-                        {lang === 'ru' ? 'Спросите AI-помощника' : lang === 'he' ? 'שאל את עוזר AI' : 'Ask our AI assistant'}
+                    <p className="text-base md:text-lg text-white/80">
+                        {lang === 'ru'
+                            ? 'Опишите, что нужно — AI найдёт лучших'
+                            : lang === 'he'
+                                ? 'תארו מה אתם צריכים — AI ימצא'
+                                : 'Describe what you need — AI finds the best'
+                        }
                     </p>
                 </motion.div>
 
-                {/* Embedded Chat */}
+                {/* Chat Container - Compact */}
                 <motion.div
-                    className="bg-white rounded-3xl shadow-2xl overflow-hidden"
-                    initial={{ opacity: 0, y: 30 }}
+                    className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-lg mx-auto"
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, delay: 0.2 }}
+                    transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                    {/* Chat Header */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 p-4 text-white">
-                        <div className="flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
-                                <Sparkles className="w-5 h-5" />
+                    {/* Chat Header - Compact */}
+                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2.5 text-white">
+                        <div className="flex items-center gap-2">
+                            <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                                <Sparkles className="w-3.5 h-3.5" />
                             </div>
                             <div>
-                                <h3 className="font-bold">
+                                <h3 className="font-semibold text-sm leading-tight">
                                     {lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Assistant'}
                                 </h3>
-                                <p className="text-xs text-white/80 flex items-center gap-1">
-                                    <span className="w-2 h-2 bg-green-400 rounded-full" />
-                                    {lang === 'ru' ? 'Онлайн 24/7' : lang === 'he' ? 'מחובר 24/7' : 'Online 24/7'}
+                                <p className="text-[10px] text-white/70 flex items-center gap-1">
+                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                                    {lang === 'ru' ? 'Онлайн' : lang === 'he' ? 'מחובר' : 'Online'}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Messages */}
-                    <div className="h-[300px] sm:h-[350px] overflow-y-auto p-4 space-y-3 bg-gray-50">
-                        {messages.map((msg) => (
-                            <motion.div
-                                key={msg.id}
-                                className={cn(
-                                    "max-w-[85%]",
-                                    msg.role === 'user' ? 'ms-auto' : 'me-auto'
-                                )}
-                                initial={{ opacity: 0, y: 10 }}
-                                animate={{ opacity: 1, y: 0 }}
-                            >
-                                <div className={cn(
-                                    "rounded-2xl px-4 py-3 whitespace-pre-line text-sm",
-                                    msg.role === 'user'
-                                        ? 'bg-blue-600 text-white rounded-br-md'
-                                        : 'bg-white text-gray-800 shadow-sm rounded-bl-md'
-                                )}>
-                                    {msg.content}
-                                    {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
-                                    {msg.suggestions && msg.suggestions.length > 0 && (
-                                        <div className="flex flex-wrap gap-1.5 mt-3">
-                                            {msg.suggestions.map((s, i) => (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => sendMessage(s)}
-                                                    className="px-3 py-1.5 bg-blue-50 hover:bg-blue-100 text-blue-700 rounded-full text-xs font-medium"
-                                                >
-                                                    {s}
-                                                </button>
-                                            ))}
-                                        </div>
+                    {/* Messages - Compact */}
+                    <div className="h-[180px] sm:h-[200px] overflow-y-auto p-3 space-y-2 bg-gray-50">
+                        <AnimatePresence mode="popLayout">
+                            {messages.map((msg) => (
+                                <motion.div
+                                    key={msg.id}
+                                    className={cn(
+                                        "max-w-[85%]",
+                                        msg.role === 'user' ? 'ms-auto' : 'me-auto'
                                     )}
-                                </div>
-                            </motion.div>
-                        ))}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    layout
+                                >
+                                    <div className={cn(
+                                        "rounded-2xl px-4 py-3 text-sm",
+                                        msg.role === 'user'
+                                            ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white'
+                                            : 'bg-white text-gray-800 shadow-sm'
+                                    )}>
+                                        {msg.content}
+                                        {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
+                                        {msg.suggestions && msg.suggestions.length > 0 && (
+                                            <div className="flex flex-wrap gap-1.5 mt-3">
+                                                {msg.suggestions.slice(0, 3).map((s, i) => (
+                                                    <button
+                                                        key={i}
+                                                        onClick={() => sendMessage(s)}
+                                                        className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 text-gray-700 rounded-full text-xs font-medium transition-colors"
+                                                    >
+                                                        {s}
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        )}
+                                    </div>
+                                </motion.div>
+                            ))}
+                        </AnimatePresence>
 
                         {isTyping && (
-                            <motion.div
-                                className="flex items-center gap-2 text-gray-500"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                            >
+                            <div className="flex items-center gap-2 bg-white rounded-2xl px-4 py-3 shadow-sm w-fit">
                                 <div className="flex gap-1">
-                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" />
-                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                    <span className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                    {[0, 1, 2].map((i) => (
+                                        <span
+                                            key={i}
+                                            className="w-2 h-2 bg-gray-400 rounded-full animate-bounce"
+                                            style={{ animationDelay: `${i * 150}ms` }}
+                                        />
+                                    ))}
                                 </div>
-                            </motion.div>
+                            </div>
                         )}
 
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Quick Prompts - only show initially */}
-                    {messages.length <= 1 && (
-                        <div className="px-4 py-3 border-t border-gray-200 bg-white">
-                            <div className="flex flex-wrap gap-2 justify-center">
-                                {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => (
-                                    <button
-                                        key={i}
-                                        onClick={() => sendMessage(prompt)}
-                                        className="px-3 py-2 bg-gray-100 hover:bg-blue-50 hover:text-blue-600 rounded-xl text-xs font-medium transition-colors"
-                                    >
-                                        {prompt}
-                                    </button>
-                                ))}
-                            </div>
-                        </div>
-                    )}
+                    {/* Quick Prompts - Compact */}
+                    <AnimatePresence>
+                        {messages.length <= 1 && (
+                            <motion.div
+                                className="px-3 py-2 border-t border-gray-100 bg-white"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
+                            >
+                                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+                                    {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => (
+                                        <button
+                                            key={i}
+                                            onClick={() => sendMessage(prompt.text)}
+                                            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-xs font-medium text-gray-700 transition-colors flex-shrink-0"
+                                        >
+                                            {prompt.text}
+                                        </button>
+                                    ))}
+                                </div>
+                            </motion.div>
+                        )}
+                    </AnimatePresence>
 
-                    {/* Input */}
+                    {/* Input - Compact */}
                     <form
                         onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                        className="p-4 border-t border-gray-200 bg-white"
+                        className="p-3 border-t border-gray-100 bg-white"
                     >
-                        <div className="flex items-center gap-2">
+                        <div className={cn(
+                            "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors",
+                            isFocused ? "border-blue-500 bg-blue-50/30" : "border-gray-200 bg-gray-50"
+                        )}>
                             <input
                                 ref={inputRef}
                                 type="text"
                                 value={input}
                                 onChange={(e) => setInput(e.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
                                 placeholder={placeholders[lang] || placeholders.en}
-                                className="flex-1 px-4 py-3 bg-gray-100 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:ring-2 focus:ring-blue-500 text-sm"
+                                className="flex-1 py-1.5 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-sm"
+                                style={{ fontSize: '16px' }}
                             />
-                            <motion.button
+                            <button
                                 type="submit"
                                 disabled={!input.trim()}
                                 className={cn(
-                                    "p-3 rounded-xl transition-all",
+                                    "p-1.5 rounded-full transition-colors",
                                     input.trim()
                                         ? 'bg-blue-600 text-white hover:bg-blue-700'
                                         : 'bg-gray-200 text-gray-400'
                                 )}
-                                whileHover={{ scale: 1.05 }}
-                                whileTap={{ scale: 0.95 }}
                             >
-                                <Send className="w-5 h-5" />
-                            </motion.button>
+                                <Send className="w-3.5 h-3.5" />
+                            </button>
                         </div>
                     </form>
                 </motion.div>
 
-                {/* Trust Badge */}
-                <motion.p
-                    className="mt-6 text-center text-white/80 text-sm font-medium"
+                {/* Popular Near You - Like Wolt */}
+                <motion.div
+                    className="mt-5 flex justify-center"
                     initial={{ opacity: 0 }}
                     animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
+                    transition={{ delay: 0.4 }}
                 >
-                    {lang === 'ru'
-                        ? '500+ проверенных специалистов • Бесплатно'
-                        : lang === 'he'
-                            ? '500+ בעלי מקצוע מאומתים • חינם'
-                            : '500+ verified professionals • Free'
-                    }
-                </motion.p>
+                    <button
+                        onClick={() => {
+                            document.getElementById('featured-vendors')?.scrollIntoView({ behavior: 'smooth' });
+                        }}
+                        className="group flex items-center gap-2 px-4 py-2.5 bg-white/95 backdrop-blur-sm rounded-full shadow-lg hover:shadow-xl transition-all"
+                    >
+                        <MapPin className="w-4 h-4 text-blue-600" />
+                        <span className="text-gray-900 text-sm font-medium">
+                            {lang === 'ru'
+                                ? `Популярное рядом${userCity ? ` · ${userCity}` : ''}`
+                                : lang === 'he'
+                                    ? `פופולרי באזורך${userCity ? ` · ${userCity}` : ''}`
+                                    : `Popular around you${userCity ? ` · ${userCity}` : ''}`
+                            }
+                        </span>
+                        <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-0.5 transition-all" />
+                    </button>
+                </motion.div>
             </div>
 
-            {/* Bottom Wave */}
+            {/* Simple Wave */}
             <div className="absolute bottom-0 left-0 right-0">
-                <svg
-                    viewBox="0 0 1440 120"
-                    fill="none"
-                    xmlns="http://www.w3.org/2000/svg"
-                    className="w-full h-auto"
-                    preserveAspectRatio="none"
-                >
-                    <path
-                        d="M0 120L60 110C120 100 240 80 360 70C480 60 600 60 720 65C840 70 960 80 1080 85C1200 90 1320 90 1380 90L1440 90V120H1380C1320 120 1200 120 1080 120C960 120 840 120 720 120C600 120 480 120 360 120C240 120 120 120 60 120H0Z"
-                        fill="white"
-                    />
+                <svg viewBox="0 0 1440 60" fill="none" className="w-full" preserveAspectRatio="none">
+                    <path d="M0 60L1440 60V30C1200 45 960 55 720 50C480 45 240 35 0 40V60Z" fill="white" />
                 </svg>
             </div>
         </section>
