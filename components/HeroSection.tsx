@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, ArrowRight, Shield, CheckCircle2, Zap } from 'lucide-react';
+import { Send, Sparkles, Star, ArrowRight, Shield, CheckCircle2, Zap, Bot, Camera, Music, Mic } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -93,19 +93,19 @@ export default function HeroSection() {
 
     const quickPrompts = {
         en: [
-            "Wedding photographer",
-            "DJ for party",
-            "Event MC",
+            { text: "Wedding photographer", icon: Camera },
+            { text: "DJ for party", icon: Music },
+            { text: "Event MC", icon: Mic },
         ],
         ru: [
-            "Фотограф на свадьбу",
-            "DJ на праздник",
-            "Ведущий мероприятия",
+            { text: "Фотограф на свадьбу", icon: Camera },
+            { text: "DJ на праздник", icon: Music },
+            { text: "Ведущий мероприятия", icon: Mic },
         ],
         he: [
-            "צלם לחתונה",
-            "DJ למסיבה",
-            "מנחה לאירוע",
+            { text: "צלם לחתונה", icon: Camera },
+            { text: "DJ למסיבה", icon: Music },
+            { text: "מנחה לאירוע", icon: Mic },
         ]
     };
 
@@ -242,151 +242,202 @@ export default function HeroSection() {
                     </p>
                 </motion.div>
 
-                {/* Premium Chat Container */}
+                {/* Premium AI Chat */}
                 <motion.div
                     className="max-w-2xl mx-auto"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
+                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
+                    animate={{ opacity: 1, y: 0, scale: 1 }}
+                    transition={{ duration: 0.5, delay: 0.1, type: "spring", stiffness: 100 }}
                 >
+                    {/* Floating Glow Effect */}
+                    <div className="absolute -inset-4 bg-gradient-to-r from-blue-400/20 via-indigo-400/20 to-purple-400/20 rounded-[40px] blur-2xl opacity-60 animate-pulse" />
+
                     {/* Main Chat Card */}
-                    <div className="bg-white dark:bg-slate-800 rounded-3xl shadow-2xl overflow-hidden border border-gray-100 dark:border-slate-700">
-                        {/* Header with gradient */}
-                        <div className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 px-6 py-5">
-                            <div className="flex items-center justify-between">
-                                <div className="flex items-center gap-4">
-                                    <div className="relative">
-                                        <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-sm flex items-center justify-center shadow-lg">
-                                            <Sparkles className="w-7 h-7 text-white" />
+                    <div className="relative bg-white/95 dark:bg-slate-800/95 backdrop-blur-xl rounded-3xl shadow-[0_20px_60px_-15px_rgba(0,0,0,0.3)] overflow-hidden border border-white/50 dark:border-slate-600/50">
+                        {/* Header */}
+                        <div className="relative overflow-hidden">
+                            <div className="absolute inset-0 bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600" />
+                            <div className="absolute inset-0 bg-[url('data:image/svg+xml;base64,PHN2ZyB3aWR0aD0iNjAiIGhlaWdodD0iNjAiIHZpZXdCb3g9IjAgMCA2MCA2MCIgeG1sbnM9Imh0dHA6Ly93d3cudzMub3JnLzIwMDAvc3ZnIj48ZyBmaWxsPSJub25lIiBmaWxsLXJ1bGU9ImV2ZW5vZGQiPjxnIGZpbGw9IiNmZmZmZmYiIGZpbGwtb3BhY2l0eT0iMC4wNSI+PGNpcmNsZSBjeD0iMzAiIGN5PSIzMCIgcj0iMiIvPjwvZz48L2c+PC9zdmc+')] opacity-30" />
+
+                            <div className="relative px-6 py-5">
+                                <div className="flex items-center justify-between">
+                                    <div className="flex items-center gap-4">
+                                        {/* Animated Avatar */}
+                                        <motion.div
+                                            className="relative"
+                                            animate={{
+                                                boxShadow: ['0 0 20px rgba(99,102,241,0.5)', '0 0 40px rgba(99,102,241,0.8)', '0 0 20px rgba(99,102,241,0.5)']
+                                            }}
+                                            transition={{ duration: 2, repeat: Infinity }}
+                                        >
+                                            <div className="w-14 h-14 rounded-2xl bg-white/20 backdrop-blur-md flex items-center justify-center border border-white/30">
+                                                <Bot className="w-7 h-7 text-white" />
+                                            </div>
+                                            <motion.span
+                                                className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white"
+                                                animate={{ scale: [1, 1.2, 1] }}
+                                                transition={{ duration: 1.5, repeat: Infinity }}
+                                            />
+                                        </motion.div>
+                                        <div>
+                                            <h3 className="font-bold text-xl text-white flex items-center gap-2">
+                                                {lang === 'ru' ? 'ИИ-Ассистент' : lang === 'he' ? 'עוזר AI' : 'AI Assistant'}
+                                                <span className="px-2 py-0.5 bg-white/20 rounded-full text-xs font-medium">
+                                                    {lang === 'ru' ? 'Онлайн' : lang === 'he' ? 'מחובר' : 'Online'}
+                                                </span>
+                                            </h3>
+                                            <p className="text-sm text-white/80 flex items-center gap-2">
+                                                <Sparkles className="w-4 h-4" />
+                                                {lang === 'ru' ? 'Подберу идеального специалиста' : lang === 'he' ? 'אמצא את המקצוען המושלם' : 'Find your perfect pro'}
+                                            </p>
                                         </div>
-                                        <span className="absolute -bottom-1 -right-1 w-4 h-4 bg-green-400 rounded-full border-2 border-white animate-pulse" />
                                     </div>
-                                    <div>
-                                        <h3 className="font-bold text-xl text-white">
-                                            {lang === 'ru' ? 'Умный поиск' : lang === 'he' ? 'חיפוש חכם' : 'Smart Search'}
-                                        </h3>
-                                        <p className="text-sm text-white/80 flex items-center gap-2">
-                                            <CheckCircle2 className="w-4 h-4" />
-                                            {lang === 'ru' ? 'Подберу за 30 секунд' : lang === 'he' ? 'אמצא תוך 30 שניות' : 'Find in 30 seconds'}
-                                        </p>
+                                    <div className="hidden sm:flex items-center gap-2 bg-white/10 backdrop-blur-sm px-4 py-2 rounded-full border border-white/20">
+                                        <Zap className="w-4 h-4 text-yellow-300" />
+                                        <span className="text-sm text-white font-semibold">AI</span>
                                     </div>
-                                </div>
-                                <div className="hidden sm:flex items-center gap-2 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full">
-                                    <Zap className="w-4 h-4 text-yellow-300" />
-                                    <span className="text-sm text-white font-medium">AI</span>
                                 </div>
                             </div>
                         </div>
 
                         {/* Messages Area */}
-                        <div className="h-[200px] overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-gray-50 to-white dark:from-slate-900 dark:to-slate-800">
+                        <div className="h-[180px] overflow-y-auto p-5 space-y-4 bg-gradient-to-b from-slate-50 via-white to-slate-50 dark:from-slate-900 dark:via-slate-800 dark:to-slate-900">
                             <AnimatePresence mode="popLayout">
-                                {messages.map((msg) => (
+                                {messages.map((msg, index) => (
                                     <motion.div
                                         key={msg.id}
                                         className={cn(
-                                            "max-w-[90%]",
+                                            "max-w-[88%]",
                                             msg.role === 'user' ? 'ms-auto' : 'me-auto'
                                         )}
-                                        initial={{ opacity: 0, y: 10, scale: 0.95 }}
-                                        animate={{ opacity: 1, y: 0, scale: 1 }}
+                                        initial={{ opacity: 0, y: 20, x: msg.role === 'user' ? 20 : -20 }}
+                                        animate={{ opacity: 1, y: 0, x: 0 }}
+                                        transition={{ duration: 0.4, delay: index * 0.1, type: "spring", stiffness: 120 }}
                                         layout
                                     >
                                         {msg.role === 'assistant' && (
                                             <div className="flex items-start gap-3">
-                                                <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                                                    <Sparkles className="w-4 h-4 text-white" />
-                                                </div>
+                                                <motion.div
+                                                    className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-lg"
+                                                    whileHover={{ scale: 1.1, rotate: 5 }}
+                                                >
+                                                    <Bot className="w-5 h-5 text-white" />
+                                                </motion.div>
                                                 <div className="flex-1">
-                                                    <div className="bg-white dark:bg-slate-800 rounded-2xl rounded-tl-md px-4 py-3 shadow-md border border-gray-100 dark:border-slate-700">
+                                                    <motion.div
+                                                        className="bg-white dark:bg-slate-800 rounded-2xl rounded-tl-sm px-4 py-3 shadow-lg border border-gray-100 dark:border-slate-700"
+                                                        whileHover={{ scale: 1.01 }}
+                                                    >
                                                         <p className="text-gray-800 dark:text-gray-100 text-[15px] leading-relaxed">{msg.content}</p>
                                                         {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
                                                         {msg.suggestions && msg.suggestions.length > 0 && (
                                                             <div className="flex flex-wrap gap-2 mt-3">
                                                                 {msg.suggestions.slice(0, 3).map((s, i) => (
-                                                                    <button
+                                                                    <motion.button
                                                                         key={i}
                                                                         onClick={() => sendMessage(s)}
-                                                                        className="px-3 py-1.5 bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium transition-colors"
+                                                                        className="px-3 py-1.5 bg-gradient-to-r from-blue-50 to-indigo-50 dark:from-slate-700 dark:to-slate-600 hover:from-blue-100 hover:to-indigo-100 text-blue-700 dark:text-blue-300 rounded-full text-sm font-medium transition-all border border-blue-200 dark:border-slate-600"
+                                                                        whileHover={{ scale: 1.05 }}
+                                                                        whileTap={{ scale: 0.95 }}
                                                                     >
                                                                         {s}
-                                                                    </button>
+                                                                    </motion.button>
                                                                 ))}
                                                             </div>
                                                         )}
-                                                    </div>
+                                                    </motion.div>
                                                 </div>
                                             </div>
                                         )}
                                         {msg.role === 'user' && (
-                                            <div className="bg-gradient-to-r from-blue-600 to-blue-500 text-white rounded-2xl rounded-br-md px-4 py-3 shadow-md">
+                                            <motion.div
+                                                className="bg-gradient-to-r from-blue-600 via-blue-500 to-indigo-600 text-white rounded-2xl rounded-br-sm px-4 py-3 shadow-lg"
+                                                whileHover={{ scale: 1.01 }}
+                                            >
                                                 <p className="text-[15px]">{msg.content}</p>
-                                            </div>
+                                            </motion.div>
                                         )}
                                     </motion.div>
                                 ))}
                             </AnimatePresence>
 
                             {isTyping && (
-                                <div className="flex items-start gap-3">
-                                    <div className="w-8 h-8 rounded-xl bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0 shadow-md">
-                                        <Sparkles className="w-4 h-4 text-white" />
+                                <motion.div
+                                    className="flex items-start gap-3"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                >
+                                    <div className="w-9 h-9 rounded-xl bg-gradient-to-br from-blue-500 via-indigo-500 to-violet-600 flex items-center justify-center flex-shrink-0 shadow-lg">
+                                        <Bot className="w-5 h-5 text-white" />
                                     </div>
-                                    <div className="bg-white dark:bg-slate-800 rounded-2xl px-4 py-3 shadow-md border border-gray-100 dark:border-slate-700">
+                                    <div className="bg-white dark:bg-slate-800 rounded-2xl px-5 py-4 shadow-lg border border-gray-100 dark:border-slate-700">
                                         <div className="flex gap-1.5">
                                             {[0, 1, 2].map((i) => (
-                                                <span
+                                                <motion.span
                                                     key={i}
-                                                    className="w-2.5 h-2.5 bg-blue-500 rounded-full animate-bounce"
-                                                    style={{ animationDelay: `${i * 150}ms` }}
+                                                    className="w-2.5 h-2.5 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
+                                                    animate={{ y: [0, -8, 0] }}
+                                                    transition={{ duration: 0.6, delay: i * 0.15, repeat: Infinity }}
                                                 />
                                             ))}
                                         </div>
                                     </div>
-                                </div>
+                                </motion.div>
                             )}
 
                             <div ref={messagesEndRef} />
                         </div>
 
-                        {/* Quick Actions */}
+                        {/* Quick Actions with Icons */}
                         <AnimatePresence>
                             {messages.length <= 1 && (
                                 <motion.div
-                                    className="px-5 py-4 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700"
-                                    initial={{ opacity: 0 }}
-                                    animate={{ opacity: 1 }}
-                                    exit={{ opacity: 0 }}
+                                    className="px-5 py-4 bg-gradient-to-r from-slate-50 to-white dark:from-slate-800 dark:to-slate-800 border-t border-gray-100 dark:border-slate-700"
+                                    initial={{ opacity: 0, height: 0 }}
+                                    animate={{ opacity: 1, height: 'auto' }}
+                                    exit={{ opacity: 0, height: 0 }}
                                 >
-                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 font-medium uppercase tracking-wide">
-                                        {lang === 'ru' ? 'Быстрый выбор' : lang === 'he' ? 'בחירה מהירה' : 'Quick pick'}
+                                    <p className="text-xs text-gray-500 dark:text-gray-400 mb-3 font-semibold uppercase tracking-wider">
+                                        {lang === 'ru' ? 'Популярные запросы' : lang === 'he' ? 'חיפושים פופולריים' : 'Popular searches'}
                                     </p>
                                     <div className="flex gap-2 flex-wrap">
-                                        {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => (
-                                            <button
-                                                key={i}
-                                                onClick={() => sendMessage(prompt)}
-                                                className="px-4 py-2.5 bg-gradient-to-r from-gray-50 to-gray-100 dark:from-slate-700 dark:to-slate-600 hover:from-blue-50 hover:to-blue-100 dark:hover:from-blue-900/30 dark:hover:to-blue-800/30 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 transition-all shadow-sm hover:shadow-md border border-gray-200 dark:border-slate-600"
-                                            >
-                                                {prompt}
-                                            </button>
-                                        ))}
+                                        {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => {
+                                            const IconComponent = prompt.icon;
+                                            return (
+                                                <motion.button
+                                                    key={i}
+                                                    onClick={() => sendMessage(prompt.text)}
+                                                    className="flex items-center gap-2 px-4 py-2.5 bg-white dark:bg-slate-700 hover:bg-gradient-to-r hover:from-blue-50 hover:to-indigo-50 dark:hover:from-blue-900/30 dark:hover:to-indigo-900/30 rounded-xl text-sm font-semibold text-gray-700 dark:text-gray-200 transition-all shadow-md hover:shadow-lg border border-gray-200 dark:border-slate-600"
+                                                    whileHover={{ scale: 1.03, y: -2 }}
+                                                    whileTap={{ scale: 0.97 }}
+                                                    initial={{ opacity: 0, y: 10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    transition={{ delay: i * 0.1 }}
+                                                >
+                                                    <IconComponent className="w-4 h-4 text-blue-500" />
+                                                    {prompt.text}
+                                                </motion.button>
+                                            );
+                                        })}
                                     </div>
                                 </motion.div>
                             )}
                         </AnimatePresence>
 
-                        {/* Premium Input Area */}
+                        {/* Premium Input */}
                         <form
                             onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                            className="p-5 bg-gray-50 dark:bg-slate-900 border-t border-gray-100 dark:border-slate-700"
+                            className="p-5 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700"
                         >
-                            <div className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all bg-white dark:bg-slate-800 shadow-sm",
-                                isFocused
-                                    ? "border-blue-500 shadow-lg shadow-blue-500/20"
-                                    : "border-gray-200 dark:border-slate-600"
-                            )}>
+                            <motion.div
+                                className={cn(
+                                    "flex items-center gap-3 px-4 py-3 rounded-2xl border-2 transition-all bg-gray-50 dark:bg-slate-900",
+                                    isFocused
+                                        ? "border-blue-500 shadow-[0_0_20px_rgba(59,130,246,0.3)] bg-white dark:bg-slate-800"
+                                        : "border-gray-200 dark:border-slate-600"
+                                )}
+                                animate={isFocused ? { scale: 1.01 } : { scale: 1 }}
+                            >
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -398,47 +449,45 @@ export default function HeroSection() {
                                     className="flex-1 py-1 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none text-base"
                                     style={{ fontSize: '16px' }}
                                 />
-                                <button
+                                <motion.button
                                     type="submit"
                                     disabled={!input.trim()}
                                     className={cn(
                                         "p-3 rounded-xl transition-all",
                                         input.trim()
-                                            ? 'bg-gradient-to-r from-blue-600 to-blue-500 text-white hover:shadow-lg hover:shadow-blue-500/30 hover:scale-105'
-                                            : 'bg-gray-100 dark:bg-slate-700 text-gray-400'
+                                            ? 'bg-gradient-to-r from-blue-600 via-indigo-600 to-violet-600 text-white shadow-lg'
+                                            : 'bg-gray-200 dark:bg-slate-700 text-gray-400'
                                     )}
+                                    whileHover={input.trim() ? { scale: 1.1, rotate: 5 } : {}}
+                                    whileTap={input.trim() ? { scale: 0.9 } : {}}
                                 >
                                     <Send className="w-5 h-5" />
-                                </button>
-                            </div>
+                                </motion.button>
+                            </motion.div>
                         </form>
                     </div>
 
-                    {/* Trust Badges Below Chat */}
+                    {/* Trust Badges */}
                     <motion.div
-                        className="flex items-center justify-center gap-6 mt-6 flex-wrap"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.3 }}
+                        className="flex items-center justify-center gap-4 sm:gap-8 mt-6 flex-wrap"
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.4 }}
                     >
-                        <div className="flex items-center gap-2 text-white/80">
-                            <Shield className="w-4 h-4" />
-                            <span className="text-sm font-medium">
-                                {lang === 'ru' ? 'Безопасно' : lang === 'he' ? 'מאובטח' : 'Secure'}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/80">
-                            <CheckCircle2 className="w-4 h-4" />
-                            <span className="text-sm font-medium">
-                                {lang === 'ru' ? 'Проверенные профи' : lang === 'he' ? 'מקצוענים מאומתים' : 'Verified pros'}
-                            </span>
-                        </div>
-                        <div className="flex items-center gap-2 text-white/80">
-                            <Zap className="w-4 h-4" />
-                            <span className="text-sm font-medium">
-                                {lang === 'ru' ? 'Мгновенный ответ' : lang === 'he' ? 'תגובה מיידית' : 'Instant reply'}
-                            </span>
-                        </div>
+                        {[
+                            { icon: Shield, text: { en: 'Secure', ru: 'Безопасно', he: 'מאובטח' } },
+                            { icon: CheckCircle2, text: { en: 'Verified pros', ru: 'Проверенные профи', he: 'מקצוענים מאומתים' } },
+                            { icon: Zap, text: { en: 'Instant reply', ru: 'Мгновенный ответ', he: 'תגובה מיידית' } },
+                        ].map((badge, i) => (
+                            <motion.div
+                                key={i}
+                                className="flex items-center gap-2 text-white/90 bg-white/10 backdrop-blur-sm px-3 py-1.5 rounded-full"
+                                whileHover={{ scale: 1.05, backgroundColor: 'rgba(255,255,255,0.2)' }}
+                            >
+                                <badge.icon className="w-4 h-4" />
+                                <span className="text-sm font-medium">{badge.text[lang]}</span>
+                            </motion.div>
+                        ))}
                     </motion.div>
                 </motion.div>
             </div>
