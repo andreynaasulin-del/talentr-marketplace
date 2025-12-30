@@ -81,23 +81,17 @@ export default function SignInPage() {
 
     return (
         <div className="min-h-screen flex" dir={language === 'he' ? 'rtl' : 'ltr'}>
-            {/* Left Side - Dark Background */}
+            {/* Left Side - Blue Background */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-                {/* Solid Dark Background */}
-                <div className="absolute inset-0 bg-gray-900" />
+                {/* Solid Blue Background */}
+                <div className="absolute inset-0 bg-blue-600" />
 
-                {/* Overlay Pattern */}
-                <div
-                    className="absolute inset-0 opacity-10"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                        backgroundSize: '32px 32px'
-                    }}
-                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/50 to-blue-700/50" />
 
                 {/* Subtle Pattern */}
-                <div className="absolute top-20 left-20 w-72 h-72 bg-blue-500/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-32 right-20 w-96 h-96 bg-blue-500/5 rounded-full blur-3xl" />
+                <div className="absolute top-20 left-20 w-72 h-72 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-32 right-20 w-96 h-96 bg-white/5 rounded-full blur-3xl" />
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
@@ -118,20 +112,20 @@ export default function SignInPage() {
                         {/* Features */}
                         <div className="space-y-4">
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                    <Shield className="w-5 h-5 text-blue-400" />
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <Shield className="w-5 h-5 text-white" />
                                 </div>
                                 <span className="text-white/90">Secure & Protected Transactions</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                    <Zap className="w-5 h-5 text-blue-400" />
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <Zap className="w-5 h-5 text-white" />
                                 </div>
                                 <span className="text-white/90">Instant Booking Confirmation</span>
                             </div>
                             <div className="flex items-center gap-3">
-                                <div className="w-10 h-10 rounded-full bg-blue-500/20 flex items-center justify-center">
-                                    <Sparkles className="w-5 h-5 text-blue-400" />
+                                <div className="w-10 h-10 rounded-full bg-white/20 flex items-center justify-center">
+                                    <Sparkles className="w-5 h-5 text-white" />
                                 </div>
                                 <span className="text-white/90">500+ Verified Professionals</span>
                             </div>

@@ -96,20 +96,14 @@ export default function SignUpPage() {
             {/* Left Side - Benefits */}
             <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
                 {/* Background */}
-                <div className="absolute inset-0 bg-gray-900" />
+                <div className="absolute inset-0 bg-blue-600" />
 
-                {/* Pattern */}
-                <div
-                    className="absolute inset-0 opacity-10"
-                    style={{
-                        backgroundImage: `radial-gradient(circle at 2px 2px, white 1px, transparent 0)`,
-                        backgroundSize: '32px 32px'
-                    }}
-                />
+                {/* Gradient Overlay */}
+                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/50 to-blue-700/50" />
 
                 {/* Subtle Orbs */}
-                <div className="absolute top-32 right-20 w-80 h-80 bg-blue-500/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-20 left-20 w-64 h-64 bg-blue-500/5 rounded-full blur-3xl" />
+                <div className="absolute top-32 right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
+                <div className="absolute bottom-20 left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
 
                 {/* Content */}
                 <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
@@ -136,8 +130,8 @@ export default function SignUpPage() {
                         <div className="space-y-4">
                             {benefits.map((benefit, index) => (
                                 <div key={index} className="flex items-center gap-3">
-                                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center flex-shrink-0">
-                                        <Check className="w-4 h-4 text-blue-400" />
+                                    <div className="w-6 h-6 rounded-full bg-white/20 flex items-center justify-center flex-shrink-0">
+                                        <Check className="w-4 h-4 text-white" />
                                     </div>
                                     <span className="text-white/90">{benefit}</span>
                                 </div>
