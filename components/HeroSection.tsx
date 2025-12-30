@@ -204,9 +204,9 @@ export default function HeroSection() {
     );
 
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center bg-slate-900 dark:bg-slate-950">
+        <section className="relative min-h-[90vh] flex items-center justify-center bg-blue-600 dark:bg-slate-900">
             {/* Subtle gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-800/50 to-slate-900" />
+            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/30 to-blue-700/50 dark:from-slate-800/50 dark:to-slate-900" />
 
             {/* Content */}
             <div className="relative z-10 w-full max-w-3xl mx-auto px-4 py-10 md:py-16">

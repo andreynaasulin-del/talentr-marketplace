@@ -1,33 +1,22 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
 import { motion, AnimatePresence } from 'framer-motion';
-import { Send, Sparkles, Check, ArrowRight, Loader2, Globe, ChevronDown } from 'lucide-react';
+import { Check, ArrowRight, ArrowLeft, Loader2, Globe, ChevronDown, User, Mail, Lock, Phone, MapPin, Briefcase, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
 import { useLanguage } from '@/context/LanguageContext';
 import { cn } from '@/lib/utils';
 
-type Step = 'name' | 'email' | 'password' | 'category' | 'city' | 'phone' | 'complete';
-
-interface Message {
-    id: string;
-    type: 'bot' | 'user';
-    content: string;
-    options?: string[];
-}
+type Step = 0 | 1 | 2 | 3 | 4 | 5;
 
 export default function JoinPage() {
     const { language, setLanguage } = useLanguage();
     const [showLangDropdown, setShowLangDropdown] = useState(false);
-    const [currentStep, setCurrentStep] = useState<Step>('name');
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
+    const [currentStep, setCurrentStep] = useState<Step>(0);
     const [loading, setLoading] = useState(false);
-    const messagesEndRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
+    const [error, setError] = useState('');
 
     const languages = [
         { code: 'en' as const, label: 'English', flag: '🇺🇸' },
@@ -46,203 +35,168 @@ export default function JoinPage() {
         phone: '',
     });
 
-    const steps: Step[] = ['name', 'email', 'password', 'category', 'city', 'phone', 'complete'];
-    const currentStepIndex = steps.indexOf(currentStep);
-    const progress = (currentStepIndex / (steps.length - 1)) * 100;
-
     const categories = [
-        'Photographer', 'Videographer', 'DJ', 'MC', 'Magician', 'Singer',
-        'Musician', 'Bartender', 'Event Decor', 'Kids Animator',
+        { id: 'Photographer', icon: '📸', label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' } },
+        { id: 'Videographer', icon: '🎬', label: { en: 'Videographer', ru: 'Видеограф', he: 'צלם וידאו' } },
+        { id: 'DJ', icon: '🎧', label: { en: 'DJ', ru: 'DJ', he: 'DJ' } },
+        { id: 'MC', icon: '🎤', label: { en: 'MC / Host', ru: 'Ведущий', he: 'מנחה' } },
+        { id: 'Magician', icon: '🎩', label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' } },
+        { id: 'Singer', icon: '🎵', label: { en: 'Singer', ru: 'Певец', he: 'זמר' } },
+        { id: 'Musician', icon: '🎸', label: { en: 'Musician', ru: 'Музыкант', he: 'מוזיקאי' } },
+        { id: 'Bartender', icon: '🍸', label: { en: 'Bartender', ru: 'Бармен', he: 'ברמן' } },
+        { id: 'Event Decor', icon: '🎨', label: { en: 'Event Decor', ru: 'Декоратор', he: 'עיצוב אירועים' } },
+        { id: 'Kids Animator', icon: '🎈', label: { en: 'Kids Animator', ru: 'Аниматор', he: 'אנימטור' } },
+        { id: 'Chef', icon: '👨‍🍳', label: { en: 'Chef', ru: 'Повар', he: 'שף' } },
+        { id: 'Dancer', icon: '💃', label: { en: 'Dancer', ru: 'Танцор', he: 'רקדן' } },
     ];
 
-    const cities = ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat', 'Rishon LeZion', 'Netanya', 'Ashdod'];
+    const cities = [
+        { id: 'Tel Aviv', label: { en: 'Tel Aviv', ru: 'Тель-Авив', he: 'תל אביב' } },
+        { id: 'Jerusalem', label: { en: 'Jerusalem', ru: 'Иерусалим', he: 'ירושלים' } },
+        { id: 'Haifa', label: { en: 'Haifa', ru: 'Хайфа', he: 'חיפה' } },
+        { id: 'Eilat', label: { en: 'Eilat', ru: 'Эйлат', he: 'אילת' } },
+        { id: 'Rishon LeZion', label: { en: 'Rishon LeZion', ru: 'Ришон ле-Цион', he: 'ראשון לציון' } },
+        { id: 'Netanya', label: { en: 'Netanya', ru: 'Нетания', he: 'נתניה' } },
+        { id: 'Ashdod', label: { en: 'Ashdod', ru: 'Ашдод', he: 'אשדוד' } },
+        { id: 'Beer Sheva', label: { en: 'Beer Sheva', ru: 'Беэр-Шева', he: 'באר שבע' } },
+    ];
 
     const content = {
         en: {
-            greeting: "Hey! 👋 I'm here to help you join Talentr. Let's make it quick and fun!",
-            askName: "First things first - what's your name?",
-            askEmail: "Nice to meet you, {name}! 🎉 What's your email address?",
-            askPassword: "Great! Now let's secure your account. Create a password (min 6 characters):",
-            askCategory: "Awesome! What type of professional are you? Pick one:",
-            askCity: "Where are you based? Select your city:",
-            askPhone: "Almost done! What's your phone number? (We'll only use it for bookings)",
-            complete: "Perfect! 🎊 You're all set, {name}! Creating your account...",
-            success: "Welcome to Talentr! 🚀 Redirecting to your dashboard...",
-            placeholder: "Type your answer...",
+            steps: [
+                { title: "What's your name?", subtitle: "Let's start with the basics" },
+                { title: "What's your email?", subtitle: "We'll use this for your account" },
+                { title: "Create a password", subtitle: "Keep your account secure" },
+                { title: "What do you do?", subtitle: "Select your specialty" },
+                { title: "Where are you based?", subtitle: "Select your city" },
+                { title: "Your phone number", subtitle: "For booking notifications" },
+            ],
             namePlaceholder: "Your full name",
             emailPlaceholder: "your@email.com",
-            passwordPlaceholder: "Min 6 characters",
+            passwordPlaceholder: "Minimum 6 characters",
             phonePlaceholder: "50-123-4567",
+            next: "Continue",
+            back: "Back",
+            finish: "Create Account",
+            creating: "Creating...",
+            progress: "Step",
+            of: "of",
         },
         ru: {
-            greeting: "Привет! 👋 Я помогу тебе присоединиться к Talentr. Давай быстро и весело!",
-            askName: "Начнём с главного - как тебя зовут?",
-            askEmail: "Приятно познакомиться, {name}! 🎉 Какой твой email?",
-            askPassword: "Отлично! Теперь защитим аккаунт. Придумай пароль (мин. 6 символов):",
-            askCategory: "Круто! Кем ты работаешь? Выбери специальность:",
-            askCity: "Где ты базируешься? Выбери город:",
-            askPhone: "Почти готово! Твой номер телефона? (Только для бронирований)",
-            complete: "Супер! 🎊 Всё готово, {name}! Создаю твой аккаунт...",
-            success: "Добро пожаловать в Talentr! 🚀 Переходим в личный кабинет...",
-            placeholder: "Напиши ответ...",
+            steps: [
+                { title: "Как тебя зовут?", subtitle: "Начнём со знакомства" },
+                { title: "Твой email?", subtitle: "Для входа в аккаунт" },
+                { title: "Придумай пароль", subtitle: "Защити свой аккаунт" },
+                { title: "Чем занимаешься?", subtitle: "Выбери специализацию" },
+                { title: "Где работаешь?", subtitle: "Выбери город" },
+                { title: "Номер телефона", subtitle: "Для уведомлений о заказах" },
+            ],
             namePlaceholder: "Твоё полное имя",
             emailPlaceholder: "твой@email.com",
-            passwordPlaceholder: "Мин. 6 символов",
+            passwordPlaceholder: "Минимум 6 символов",
             phonePlaceholder: "50-123-4567",
+            next: "Далее",
+            back: "Назад",
+            finish: "Создать аккаунт",
+            creating: "Создаём...",
+            progress: "Шаг",
+            of: "из",
         },
         he: {
-            greeting: "היי! 👋 אני כאן לעזור לך להצטרף ל-Talentr. בוא נעשה את זה מהר וכיף!",
-            askName: "קודם כל - מה השם שלך?",
-            askEmail: "נעים להכיר, {name}! 🎉 מה כתובת האימייל שלך?",
-            askPassword: "מעולה! עכשיו נאבטח את החשבון. צור סיסמה (מינימום 6 תווים):",
-            askCategory: "אחלה! מה סוג המקצוע שלך? בחר אחד:",
-            askCity: "איפה אתה מבוסס? בחר את העיר שלך:",
-            askPhone: "כמעט סיימנו! מה מספר הטלפון שלך? (רק להזמנות)",
-            complete: "מושלם! 🎊 הכל מוכן, {name}! יוצר את החשבון שלך...",
-            success: "ברוך הבא ל-Talentr! 🚀 מעביר ללוח הבקרה...",
-            placeholder: "הקלד את התשובה שלך...",
+            steps: [
+                { title: "מה השם שלך?", subtitle: "בוא נתחיל עם הבסיס" },
+                { title: "מה האימייל שלך?", subtitle: "נשתמש בו לחשבון שלך" },
+                { title: "צור סיסמה", subtitle: "שמור על החשבון שלך" },
+                { title: "מה אתה עושה?", subtitle: "בחר את ההתמחות שלך" },
+                { title: "איפה אתה נמצא?", subtitle: "בחר את העיר שלך" },
+                { title: "מספר הטלפון שלך", subtitle: "להתראות על הזמנות" },
+            ],
             namePlaceholder: "השם המלא שלך",
             emailPlaceholder: "your@email.com",
             passwordPlaceholder: "מינימום 6 תווים",
             phonePlaceholder: "50-123-4567",
+            next: "המשך",
+            back: "חזור",
+            finish: "צור חשבון",
+            creating: "יוצר...",
+            progress: "שלב",
+            of: "מתוך",
         }
     };
 
     const t = content[language] || content.en;
+    const totalSteps = 6;
+    const progress = ((currentStep + 1) / totalSteps) * 100;
 
-    // Initialize with greeting
-    useEffect(() => {
-        const timer = setTimeout(() => {
-            addBotMessage(t.greeting);
-            setTimeout(() => addBotMessage(t.askName), 1000);
-        }, 500);
-        return () => clearTimeout(timer);
-    }, []);
-
-    // Reset messages when language changes
-    useEffect(() => {
-        if (messages.length > 0) {
-            setMessages([]);
-            setCurrentStep('name');
-            setFormData({ fullName: '', email: '', password: '', category: '', city: '', phone: '' });
-            setTimeout(() => {
-                addBotMessage(t.greeting);
-                setTimeout(() => addBotMessage(t.askName), 1000);
-            }, 300);
-        }
-    }, [language]);
-
-    useEffect(() => {
-        messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' });
-    }, [messages]);
-
-    useEffect(() => {
-        inputRef.current?.focus();
-    }, [currentStep]);
-
-    const addBotMessage = (text: string, options?: string[]) => {
-        setIsTyping(true);
-        setTimeout(() => {
-            setMessages(prev => [...prev, {
-                id: Date.now().toString(),
-                type: 'bot',
-                content: text,
-                options
-            }]);
-            setIsTyping(false);
-        }, 600);
-    };
-
-    const addUserMessage = (text: string) => {
-        setMessages(prev => [...prev, {
-            id: Date.now().toString(),
-            type: 'user',
-            content: text
-        }]);
-    };
-
-    const handleSubmit = async (value?: string) => {
-        const answer = value || input.trim();
-        if (!answer && currentStep !== 'complete') return;
-
-        addUserMessage(answer);
-        setInput('');
-
-        // Process based on current step
+    const validateStep = (): boolean => {
+        setError('');
         switch (currentStep) {
-            case 'name':
-                setFormData(prev => ({ ...prev, fullName: answer }));
-                setTimeout(() => {
-                    addBotMessage(t.askEmail.replace('{name}', answer));
-                    setCurrentStep('email');
-                }, 800);
-                break;
-
-            case 'email':
-                if (!answer.includes('@')) {
-                    setTimeout(() => addBotMessage(language === 'ru' ? 'Хм, это не похоже на email. Попробуй ещё раз!' : language === 'he' ? 'הממ, זה לא נראה כמו אימייל. נסה שוב!' : "Hmm, that doesn't look like an email. Try again!"), 500);
-                    return;
+            case 0:
+                if (!formData.fullName.trim()) {
+                    setError(language === 'ru' ? 'Введи имя' : language === 'he' ? 'הכנס שם' : 'Enter your name');
+                    return false;
                 }
-                setFormData(prev => ({ ...prev, email: answer }));
-                setTimeout(() => {
-                    addBotMessage(t.askPassword);
-                    setCurrentStep('password');
-                }, 800);
                 break;
-
-            case 'password':
-                if (answer.length < 6) {
-                    setTimeout(() => addBotMessage(language === 'ru' ? 'Пароль слишком короткий! Минимум 6 символов 🔐' : language === 'he' ? 'הסיסמה קצרה מדי! מינימום 6 תווים 🔐' : "Password too short! Need at least 6 characters 🔐"), 500);
-                    return;
+            case 1:
+                if (!formData.email.includes('@')) {
+                    setError(language === 'ru' ? 'Неверный email' : language === 'he' ? 'אימייל לא תקין' : 'Invalid email');
+                    return false;
                 }
-                setFormData(prev => ({ ...prev, password: answer }));
-                setTimeout(() => {
-                    addBotMessage(t.askCategory, categories);
-                    setCurrentStep('category');
-                }, 800);
                 break;
-
-            case 'category':
-                setFormData(prev => ({ ...prev, category: answer }));
-                setTimeout(() => {
-                    addBotMessage(t.askCity, cities);
-                    setCurrentStep('city');
-                }, 800);
+            case 2:
+                if (formData.password.length < 6) {
+                    setError(language === 'ru' ? 'Минимум 6 символов' : language === 'he' ? 'מינימום 6 תווים' : 'Minimum 6 characters');
+                    return false;
+                }
                 break;
-
-            case 'city':
-                setFormData(prev => ({ ...prev, city: answer }));
-                setTimeout(() => {
-                    addBotMessage(t.askPhone);
-                    setCurrentStep('phone');
-                }, 800);
+            case 3:
+                if (!formData.category) {
+                    setError(language === 'ru' ? 'Выбери специальность' : language === 'he' ? 'בחר התמחות' : 'Select a specialty');
+                    return false;
+                }
                 break;
-
-            case 'phone':
-                setFormData(prev => ({ ...prev, phone: answer }));
-                setTimeout(async () => {
-                    addBotMessage(t.complete.replace('{name}', formData.fullName));
-                    setCurrentStep('complete');
-
-                    // Actually register
-                    await handleRegister({
-                        ...formData,
-                        phone: answer
-                    });
-                }, 800);
+            case 4:
+                if (!formData.city) {
+                    setError(language === 'ru' ? 'Выбери город' : language === 'he' ? 'בחר עיר' : 'Select a city');
+                    return false;
+                }
                 break;
+            case 5:
+                if (!formData.phone.trim()) {
+                    setError(language === 'ru' ? 'Введи телефон' : language === 'he' ? 'הכנס טלפון' : 'Enter phone number');
+                    return false;
+                }
+                break;
+        }
+        return true;
+    };
+
+    const nextStep = () => {
+        if (!validateStep()) return;
+        if (currentStep < 5) {
+            setCurrentStep((currentStep + 1) as Step);
+        } else {
+            handleRegister();
         }
     };
 
-    const handleRegister = async (data: typeof formData) => {
+    const prevStep = () => {
+        if (currentStep > 0) {
+            setCurrentStep((currentStep - 1) as Step);
+            setError('');
+        }
+    };
+
+    const handleRegister = async () => {
         setLoading(true);
+        setError('');
         try {
             const { data: authData, error: authError } = await supabase.auth.signUp({
-                email: data.email,
-                password: data.password,
+                email: formData.email,
+                password: formData.password,
                 options: {
                     data: {
-                        full_name: data.fullName,
+                        full_name: formData.fullName,
                         role: 'vendor',
                     },
                 },
@@ -253,11 +207,11 @@ export default function JoinPage() {
 
             const { error: vendorError } = await supabase.from('vendors').insert([{
                 id: authData.user.id,
-                full_name: data.fullName,
-                email: data.email,
-                category: data.category,
-                city: data.city,
-                phone: data.phone.startsWith('972') ? data.phone : `972${data.phone.replace(/^0/, '')}`,
+                full_name: formData.fullName,
+                email: formData.email,
+                category: formData.category,
+                city: formData.city,
+                phone: formData.phone.startsWith('972') ? formData.phone : `972${formData.phone.replace(/^0/, '')}`,
                 avatar_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
                 price_from: 1000,
                 rating: 0,
@@ -268,46 +222,179 @@ export default function JoinPage() {
 
             if (vendorError) throw vendorError;
 
-            setTimeout(() => {
-                addBotMessage(t.success);
-                setTimeout(() => {
-                    window.location.href = '/dashboard';
-                }, 2000);
-            }, 1000);
+            window.location.href = '/dashboard';
 
-        } catch (err: any) {
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Registration error';
             console.error('Registration error:', err);
-            addBotMessage(language === 'ru'
-                ? `Упс! Ошибка: ${err.message}. Попробуй ещё раз!`
-                : language === 'he'
-                    ? `אופס! שגיאה: ${err.message}. נסה שוב!`
-                    : `Oops! Error: ${err.message}. Try again!`);
-            setCurrentStep('name');
+            setError(errorMessage);
             setLoading(false);
         }
     };
 
-    const handleOptionClick = (option: string) => {
-        handleSubmit(option);
-    };
+    const renderStepContent = () => {
+        const stepInfo = t.steps[currentStep];
 
-    const getPlaceholder = () => {
-        switch (currentStep) {
-            case 'name': return t.namePlaceholder;
-            case 'email': return t.emailPlaceholder;
-            case 'password': return t.passwordPlaceholder;
-            case 'phone': return t.phonePlaceholder;
-            default: return t.placeholder;
-        }
-    };
+        return (
+            <motion.div
+                key={currentStep}
+                initial={{ opacity: 0, x: 20 }}
+                animate={{ opacity: 1, x: 0 }}
+                exit={{ opacity: 0, x: -20 }}
+                transition={{ duration: 0.3 }}
+                className="space-y-6"
+            >
+                {/* Question */}
+                <div className="text-center">
+                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
+                        {stepInfo.title}
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400">
+                        {stepInfo.subtitle}
+                    </p>
+                </div>
 
-    const getInputType = () => {
-        switch (currentStep) {
-            case 'email': return 'email';
-            case 'password': return 'password';
-            case 'phone': return 'tel';
-            default: return 'text';
-        }
+                {/* Input based on step */}
+                <div className="max-w-md mx-auto">
+                    {currentStep === 0 && (
+                        <div className="relative">
+                            <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="text"
+                                value={formData.fullName}
+                                onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
+                                placeholder={t.namePlaceholder}
+                                className="w-full h-14 pl-12 pr-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-500 transition-all text-lg"
+                                autoFocus
+                            />
+                        </div>
+                    )}
+
+                    {currentStep === 1 && (
+                        <div className="relative">
+                            <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="email"
+                                value={formData.email}
+                                onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                placeholder={t.emailPlaceholder}
+                                className="w-full h-14 pl-12 pr-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-500 transition-all text-lg"
+                                autoFocus
+                            />
+                        </div>
+                    )}
+
+                    {currentStep === 2 && (
+                        <div className="relative">
+                            <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <input
+                                type="password"
+                                value={formData.password}
+                                onChange={(e) => setFormData({ ...formData, password: e.target.value })}
+                                placeholder={t.passwordPlaceholder}
+                                className="w-full h-14 pl-12 pr-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-500 transition-all text-lg"
+                                autoFocus
+                            />
+                        </div>
+                    )}
+
+                    {currentStep === 3 && (
+                        <div className="grid grid-cols-3 sm:grid-cols-4 gap-3">
+                            {categories.map((cat) => (
+                                <button
+                                    key={cat.id}
+                                    onClick={() => setFormData({ ...formData, category: cat.id })}
+                                    className={cn(
+                                        "flex flex-col items-center gap-2 p-4 rounded-2xl border-2 transition-all",
+                                        formData.category === cat.id
+                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                            : "border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-gray-300 dark:hover:border-slate-500"
+                                    )}
+                                >
+                                    <span className="text-2xl">{cat.icon}</span>
+                                    <span className={cn(
+                                        "text-xs font-medium text-center",
+                                        formData.category === cat.id
+                                            ? "text-blue-600 dark:text-blue-400"
+                                            : "text-gray-600 dark:text-gray-300"
+                                    )}>
+                                        {cat.label[language] || cat.label.en}
+                                    </span>
+                                    {formData.category === cat.id && (
+                                        <motion.div
+                                            initial={{ scale: 0 }}
+                                            animate={{ scale: 1 }}
+                                            className="absolute top-2 right-2 w-5 h-5 bg-blue-500 rounded-full flex items-center justify-center"
+                                        >
+                                            <Check className="w-3 h-3 text-white" />
+                                        </motion.div>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {currentStep === 4 && (
+                        <div className="grid grid-cols-2 gap-3">
+                            {cities.map((city) => (
+                                <button
+                                    key={city.id}
+                                    onClick={() => setFormData({ ...formData, city: city.id })}
+                                    className={cn(
+                                        "flex items-center gap-3 p-4 rounded-2xl border-2 transition-all",
+                                        formData.city === city.id
+                                            ? "border-blue-500 bg-blue-50 dark:bg-blue-900/30"
+                                            : "border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-gray-300 dark:hover:border-slate-500"
+                                    )}
+                                >
+                                    <MapPin className={cn(
+                                        "w-5 h-5",
+                                        formData.city === city.id ? "text-blue-500" : "text-gray-400"
+                                    )} />
+                                    <span className={cn(
+                                        "font-medium",
+                                        formData.city === city.id
+                                            ? "text-blue-600 dark:text-blue-400"
+                                            : "text-gray-700 dark:text-gray-300"
+                                    )}>
+                                        {city.label[language] || city.label.en}
+                                    </span>
+                                    {formData.city === city.id && (
+                                        <Check className="w-5 h-5 text-blue-500 ml-auto" />
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    )}
+
+                    {currentStep === 5 && (
+                        <div className="relative">
+                            <Phone className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <span className="absolute left-12 top-1/2 -translate-y-1/2 text-gray-500 font-medium">+972</span>
+                            <input
+                                type="tel"
+                                value={formData.phone}
+                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                placeholder={t.phonePlaceholder}
+                                className="w-full h-14 pl-24 pr-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-blue-500 transition-all text-lg"
+                                autoFocus
+                            />
+                        </div>
+                    )}
+
+                    {/* Error */}
+                    {error && (
+                        <motion.p
+                            initial={{ opacity: 0, y: -10 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            className="text-red-500 text-sm text-center mt-3"
+                        >
+                            {error}
+                        </motion.p>
+                    )}
+                </div>
+            </motion.div>
+        );
     };
 
     return (
@@ -332,81 +419,30 @@ export default function JoinPage() {
                         <h2 className="text-5xl font-bold leading-tight mb-6">
                             {language === 'ru' ? 'Развивай свой бизнес' : language === 'he' ? 'צמיח את העסק שלך' : 'Grow your business'}
                         </h2>
-                        <p className="text-xl text-white/80 mb-6">
+                        <p className="text-xl text-white/80">
                             {language === 'ru' ? 'Присоединяйся к 500+ профессионалам на Talentr' : language === 'he' ? 'הצטרף ל-500+ מקצוענים ב-Talentr' : 'Join 500+ professionals on Talentr'}
                         </p>
-
-                        {/* Progress indicator */}
-                        <div className="space-y-3">
-                            <div className="flex items-center justify-between text-sm">
-                                <span className="text-white/70">
-                                    {language === 'ru' ? 'Прогресс' : language === 'he' ? 'התקדמות' : 'Progress'}
-                                </span>
-                                <span className="font-semibold">{Math.round(progress)}%</span>
-                            </div>
-                            <div className="h-2 bg-white/20 rounded-full overflow-hidden">
-                                <motion.div
-                                    className="h-full bg-white rounded-full"
-                                    initial={{ width: 0 }}
-                                    animate={{ width: `${progress}%` }}
-                                    transition={{ duration: 0.5, ease: 'easeOut' }}
-                                />
-                            </div>
-                            <div className="flex justify-between">
-                                {steps.slice(0, -1).map((step, index) => (
-                                    <div
-                                        key={step}
-                                        className={cn(
-                                            "w-8 h-8 rounded-full flex items-center justify-center text-xs font-bold transition-all",
-                                            index < currentStepIndex
-                                                ? "bg-green-500 text-white"
-                                                : index === currentStepIndex
-                                                    ? "bg-white text-gray-900"
-                                                    : "bg-white/20 text-white/50"
-                                        )}
-                                    >
-                                        {index < currentStepIndex ? <Check className="w-4 h-4" /> : index + 1}
-                                    </div>
-                                ))}
-                            </div>
-                        </div>
                     </div>
 
                     <p className="text-white/60 text-sm">© 2024 Talentr. All rights reserved.</p>
                 </div>
             </div>
 
-            {/* Right Side - Chat */}
-            <div className="w-full lg:w-1/2 flex flex-col bg-gray-50 dark:bg-slate-900">
+            {/* Right Side - Quiz Form */}
+            <div className="w-full lg:w-1/2 flex flex-col bg-blue-600 dark:bg-slate-900">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
+                <div className="flex items-center justify-between p-4 bg-blue-700/50 dark:bg-slate-800">
                     <div className="flex items-center gap-3">
-                        <div className="lg:hidden">
-                            <Link href="/" className="text-xl font-bold text-gray-900 dark:text-white">
-                                talent<span className="text-blue-600">r</span>
-                            </Link>
-                        </div>
-                        <div className="hidden lg:flex items-center gap-3">
-                            <div className="w-10 h-10 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center">
-                                <Sparkles className="w-5 h-5 text-white" />
-                            </div>
-                            <div>
-                                <p className="font-semibold text-gray-900 dark:text-white">
-                                    {language === 'ru' ? 'Talentr Бот' : language === 'he' ? 'בוט Talentr' : 'Talentr Bot'}
-                                </p>
-                                <p className="text-sm text-green-500 flex items-center gap-1">
-                                    <span className="w-2 h-2 bg-green-500 rounded-full animate-pulse" />
-                                    {language === 'ru' ? 'Онлайн' : language === 'he' ? 'מחובר' : 'Online'}
-                                </p>
-                            </div>
-                        </div>
+                        <Link href="/" className="text-xl font-bold text-white">
+                            talent<span className="text-white/80">r</span>
+                        </Link>
                     </div>
 
                     {/* Language Switcher */}
                     <div className="relative">
                         <button
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
-                            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-600 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-700 rounded-full transition-colors"
+                            className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-white/90 hover:bg-white/10 rounded-full transition-colors"
                         >
                             <span>{currentLang.flag}</span>
                             <span className="hidden sm:inline">{currentLang.label}</span>
@@ -446,140 +482,93 @@ export default function JoinPage() {
                     </div>
                 </div>
 
-                {/* Mobile Progress */}
-                <div className="lg:hidden p-4 bg-white dark:bg-slate-800 border-b border-gray-100 dark:border-slate-700">
-                    <div className="flex items-center justify-between text-sm mb-2">
-                        <span className="text-gray-500 dark:text-gray-400">
-                            {language === 'ru' ? 'Шаг' : language === 'he' ? 'שלב' : 'Step'} {currentStepIndex + 1}/6
+                {/* Progress Bar */}
+                <div className="px-6 py-4">
+                    <div className="flex items-center justify-between text-sm mb-3">
+                        <span className="text-white/80 font-medium">
+                            {t.progress} {currentStep + 1} {t.of} {totalSteps}
                         </span>
-                        <span className="font-semibold text-gray-900 dark:text-white">{Math.round(progress)}%</span>
+                        <span className="text-white font-bold">{Math.round(progress)}%</span>
                     </div>
-                    <div className="h-2 bg-gray-200 dark:bg-slate-700 rounded-full overflow-hidden">
+                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
                         <motion.div
-                            className="h-full bg-blue-500 rounded-full"
+                            className="h-full bg-white rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
-                            transition={{ duration: 0.5 }}
+                            transition={{ duration: 0.4, ease: 'easeOut' }}
                         />
+                    </div>
+                    {/* Step indicators */}
+                    <div className="flex justify-between mt-4">
+                        {[0, 1, 2, 3, 4, 5].map((step) => (
+                            <div
+                                key={step}
+                                className={cn(
+                                    "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all",
+                                    step < currentStep
+                                        ? "bg-green-500 text-white"
+                                        : step === currentStep
+                                            ? "bg-white text-blue-600"
+                                            : "bg-white/20 text-white/50"
+                                )}
+                            >
+                                {step < currentStep ? <Check className="w-4 h-4" /> : step + 1}
+                            </div>
+                        ))}
                     </div>
                 </div>
 
-                {/* Messages */}
-                <div className="flex-1 overflow-y-auto p-4 space-y-4">
-                    <AnimatePresence mode="popLayout">
-                        {messages.map((msg) => (
-                            <motion.div
-                                key={msg.id}
-                                initial={{ opacity: 0, y: 20, scale: 0.95 }}
-                                animate={{ opacity: 1, y: 0, scale: 1 }}
-                                exit={{ opacity: 0 }}
-                                className={cn(
-                                    "flex",
-                                    msg.type === 'user' ? 'justify-end' : 'justify-start'
-                                )}
-                            >
-                                <div className={cn(
-                                    "max-w-[85%] rounded-2xl px-4 py-3",
-                                    msg.type === 'user'
-                                        ? 'bg-blue-600 text-white rounded-br-md'
-                                        : 'bg-white dark:bg-slate-800 text-gray-900 dark:text-white shadow-sm rounded-bl-md'
-                                )}>
-                                    <p className="text-base">{msg.content}</p>
+                {/* Main Content Card */}
+                <div className="flex-1 flex items-center justify-center p-6">
+                    <div className="w-full max-w-lg bg-gray-50 dark:bg-slate-800 rounded-3xl p-6 md:p-8 shadow-2xl">
+                        <AnimatePresence mode="wait">
+                            {renderStepContent()}
+                        </AnimatePresence>
 
-                                    {/* Options */}
-                                    {msg.options && (
-                                        <div className="flex flex-wrap gap-2 mt-3">
-                                            {msg.options.map((option) => (
-                                                <button
-                                                    key={option}
-                                                    onClick={() => handleOptionClick(option)}
-                                                    className="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900/50 text-gray-700 dark:text-gray-200 rounded-full text-sm font-medium transition-colors"
-                                                >
-                                                    {option}
-                                                </button>
-                                            ))}
-                                        </div>
-                                    )}
-                                </div>
-                            </motion.div>
-                        ))}
-                    </AnimatePresence>
-
-                    {/* Typing indicator */}
-                    {isTyping && (
-                        <motion.div
-                            initial={{ opacity: 0 }}
-                            animate={{ opacity: 1 }}
-                            className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-2xl px-4 py-3 shadow-sm w-fit"
-                        >
-                            <div className="flex gap-1">
-                                {[0, 1, 2].map((i) => (
-                                    <span
-                                        key={i}
-                                        className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
-                                        style={{ animationDelay: `${i * 150}ms` }}
-                                    />
-                                ))}
-                            </div>
-                        </motion.div>
-                    )}
-
-                    <div ref={messagesEndRef} />
-                </div>
-
-                {/* Input */}
-                {currentStep !== 'complete' && !['category', 'city'].includes(currentStep) && (
-                    <motion.form
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        onSubmit={(e) => { e.preventDefault(); handleSubmit(); }}
-                        className="p-4 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700"
-                    >
-                        <div className="flex items-center gap-3 px-4 py-3 rounded-xl bg-gray-100 dark:bg-slate-900 focus-within:ring-2 focus-within:ring-blue-500 transition-all">
-                            <input
-                                ref={inputRef}
-                                type={getInputType()}
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                placeholder={getPlaceholder()}
-                                disabled={loading}
-                                className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none text-base"
-                                autoComplete={currentStep === 'password' ? 'new-password' : 'off'}
-                            />
+                        {/* Navigation Buttons */}
+                        <div className="flex gap-3 mt-8 max-w-md mx-auto">
+                            {currentStep > 0 && (
+                                <button
+                                    onClick={prevStep}
+                                    className="flex items-center justify-center gap-2 px-6 py-4 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-semibold rounded-2xl hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
+                                >
+                                    <ArrowLeft className="w-5 h-5" />
+                                    {t.back}
+                                </button>
+                            )}
                             <button
-                                type="submit"
-                                disabled={!input.trim() || loading}
+                                onClick={nextStep}
+                                disabled={loading}
                                 className={cn(
-                                    "p-2.5 rounded-xl transition-colors",
-                                    input.trim() && !loading
-                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                        : 'bg-gray-200 dark:bg-slate-700 text-gray-400'
+                                    "flex-1 flex items-center justify-center gap-2 px-6 py-4 bg-blue-600 text-white font-semibold rounded-2xl hover:bg-blue-700 transition-colors",
+                                    loading && "opacity-70 cursor-not-allowed"
                                 )}
                             >
                                 {loading ? (
-                                    <Loader2 className="w-5 h-5 animate-spin" />
+                                    <>
+                                        <Loader2 className="w-5 h-5 animate-spin" />
+                                        {t.creating}
+                                    </>
+                                ) : currentStep === 5 ? (
+                                    <>
+                                        {t.finish}
+                                        <Sparkles className="w-5 h-5" />
+                                    </>
                                 ) : (
-                                    <Send className="w-5 h-5" />
+                                    <>
+                                        {t.next}
+                                        <ArrowRight className="w-5 h-5" />
+                                    </>
                                 )}
                             </button>
                         </div>
-                    </motion.form>
-                )}
-
-                {/* Loading state for complete */}
-                {currentStep === 'complete' && loading && (
-                    <div className="p-4 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700">
-                        <div className="flex items-center justify-center gap-3 text-gray-600 dark:text-gray-300">
-                            <Loader2 className="w-5 h-5 animate-spin" />
-                            <span>{language === 'ru' ? 'Создаём аккаунт...' : language === 'he' ? 'יוצר חשבון...' : 'Creating account...'}</span>
-                        </div>
                     </div>
-                )}
+                </div>
 
-                {/* Footer link */}
-                <div className="p-4 text-center text-sm text-gray-500 dark:text-gray-400 bg-white dark:bg-slate-800 border-t border-gray-100 dark:border-slate-700">
+                {/* Footer */}
+                <div className="p-4 text-center text-sm text-white/70">
                     {language === 'ru' ? 'Уже с нами?' : language === 'he' ? 'כבר שותף?' : 'Already a partner?'}{' '}
-                    <Link href="/signin" className="text-blue-600 font-semibold hover:underline">
+                    <Link href="/signin" className="text-white font-semibold hover:underline">
                         {language === 'ru' ? 'Войти' : language === 'he' ? 'התחבר' : 'Sign in'}
                     </Link>
                 </div>
