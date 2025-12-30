@@ -1,9 +1,7 @@
 import type { Metadata, Viewport } from 'next';
 import { Inter } from 'next/font/google';
 import './globals.css';
-import { LanguageProvider } from '@/context/LanguageContext';
-import { FavoritesProvider } from '@/context/FavoritesContext';
-import { ThemeProvider } from '@/context/ThemeContext';
+import { Providers } from '@/components/Providers';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -104,12 +102,8 @@ export default function RootLayout({
                 <link rel="dns-prefetch" href="https://images.unsplash.com" />
             </head>
             <body className={`${inter.className} antialiased`}>
-                <ThemeProvider>
-                    <LanguageProvider>
-                        <FavoritesProvider>
-                            {children}
-                        </FavoritesProvider>
-                    </LanguageProvider>
+                <Providers>
+                    {children}
                     <Toaster
                         position="top-center"
                         richColors
@@ -124,7 +118,7 @@ export default function RootLayout({
                     />
                     <Analytics />
                     <SpeedInsights />
-                </ThemeProvider>
+                </Providers>
             </body>
         </html>
     );
