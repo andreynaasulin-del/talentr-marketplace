@@ -11,7 +11,7 @@ import { supabase } from '@/lib/supabase';
 const VendorGrid = dynamic(() => import('@/components/VendorGrid'), {
     loading: () => <div className="h-96 animate-pulse bg-gray-100 dark:bg-slate-800 rounded-3xl" />
 });
-const FeaturedVendors = dynamic(() => import('@/components/FeaturedVendors'));
+// FeaturedVendors temporarily hidden until we have vendors
 const HowItWorks = dynamic(() => import('@/components/HowItWorks'));
 const Footer = dynamic(() => import('@/components/Footer'));
 
@@ -71,8 +71,7 @@ export default function Home() {
                 </section>
             )}
 
-            {/* Featured Vendors */}
-            <FeaturedVendors />
+            {/* Featured Vendors - hidden until we have vendors */}
 
             {/* How It Works */}
             <HowItWorks />
