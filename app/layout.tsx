@@ -3,6 +3,7 @@ import { Inter } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { FavoritesProvider } from '@/context/FavoritesContext';
+import { ThemeProvider } from '@/context/ThemeContext';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
@@ -103,12 +104,13 @@ export default function RootLayout({
                 <link rel="dns-prefetch" href="https://images.unsplash.com" />
             </head>
             <body className={`${inter.className} antialiased`}>
-                <LanguageProvider>
-                    <FavoritesProvider>
-                        {children}
-
-                    </FavoritesProvider>
-                </LanguageProvider>
+                <ThemeProvider>
+                    <LanguageProvider>
+                        <FavoritesProvider>
+                            {children}
+                        </FavoritesProvider>
+                    </LanguageProvider>
+                </ThemeProvider>
                 <Toaster
                     position="top-center"
                     richColors

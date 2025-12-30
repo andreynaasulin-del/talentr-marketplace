@@ -1,7 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { Search, MessageSquare, CalendarCheck } from 'lucide-react';
+import { Search, MessageSquare, CalendarCheck, ArrowRight } from 'lucide-react';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
 
@@ -29,89 +29,138 @@ export default function HowItWorks() {
     const steps = [
         {
             icon: Search,
-            number: '1',
+            number: '01',
             title: { en: 'Search', ru: 'Поиск', he: 'חיפוש' },
             desc: {
                 en: 'Describe what you need or browse categories',
                 ru: 'Опишите, что нужно, или выберите категорию',
                 he: 'תארו מה אתם צריכים או חפשו קטגוריות'
             },
-            color: 'bg-blue-50 text-blue-600'
+            gradient: 'from-blue-500 to-cyan-400',
+            bgGlow: 'bg-blue-500/20'
         },
         {
             icon: MessageSquare,
-            number: '2',
+            number: '02',
             title: { en: 'Compare', ru: 'Сравнение', he: 'השוואה' },
             desc: {
                 en: 'Chat with professionals and compare offers',
                 ru: 'Общайтесь с профессионалами и сравнивайте',
                 he: 'שוחחו עם מקצוענים והשוו הצעות'
             },
-            color: 'bg-violet-50 text-violet-600'
+            gradient: 'from-violet-500 to-purple-400',
+            bgGlow: 'bg-violet-500/20'
         },
         {
             icon: CalendarCheck,
-            number: '3',
+            number: '03',
             title: { en: 'Book', ru: 'Бронь', he: 'הזמנה' },
             desc: {
                 en: 'Confirm your booking and enjoy your event',
                 ru: 'Подтвердите бронь и наслаждайтесь',
                 he: 'אשרו הזמנה ותהנו מהאירוע'
             },
-            color: 'bg-emerald-50 text-emerald-600'
+            gradient: 'from-emerald-500 to-teal-400',
+            bgGlow: 'bg-emerald-500/20'
         }
     ];
 
     return (
-        <section className="py-16 md:py-24 bg-gray-50">
-            <div className="max-w-7xl mx-auto px-4 md:px-6">
+        <section className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden">
+            {/* Background decoration */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl" />
+                <div className="absolute -bottom-40 -left-40 w-80 h-80 bg-violet-500/5 dark:bg-violet-500/10 rounded-full blur-3xl" />
+            </div>
+
+            <div className="max-w-7xl mx-auto px-4 md:px-6 relative">
                 {/* Header */}
                 <motion.div
-                    className="text-center mb-12 md:mb-16"
+                    className="text-center mb-16 md:mb-20"
                     initial={{ opacity: 0, y: 20 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
                 >
-                    <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-3">
+                    <motion.span
+                        className="inline-block px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full"
+                        initial={{ opacity: 0, scale: 0.9 }}
+                        whileInView={{ opacity: 1, scale: 1 }}
+                        viewport={{ once: true }}
+                    >
+                        {lang === 'ru' ? 'Просто как 1-2-3' : lang === 'he' ? 'פשוט כמו 1-2-3' : 'Easy as 1-2-3'}
+                    </motion.span>
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                         {t.title}
                     </h2>
-                    <p className="text-gray-500 max-w-md mx-auto">
+                    <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto text-lg">
                         {t.subtitle}
                     </p>
                 </motion.div>
 
                 {/* Steps */}
-                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8">
+                <div className="grid grid-cols-1 md:grid-cols-3 gap-6 md:gap-8 lg:gap-12">
                     {steps.map((step, index) => {
                         const Icon = step.icon;
                         return (
                             <motion.div
                                 key={index}
-                                className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
-                                initial={{ opacity: 0, y: 20 }}
+                                className="relative group"
+                                initial={{ opacity: 0, y: 30 }}
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
-                                transition={{ delay: index * 0.1 }}
+                                transition={{ delay: index * 0.15 }}
                             >
-                                {/* Number Badge */}
-                                <div className="flex items-center gap-4 mb-4">
+                                {/* Card */}
+                                <div className={cn(
+                                    "relative bg-white dark:bg-slate-800/50 rounded-3xl p-8 md:p-10",
+                                    "border border-gray-100 dark:border-slate-700/50",
+                                    "shadow-lg shadow-gray-200/50 dark:shadow-none",
+                                    "transition-all duration-500",
+                                    "hover:shadow-xl hover:shadow-gray-200/70 dark:hover:shadow-lg dark:hover:shadow-black/20",
+                                    "hover:-translate-y-2"
+                                )}>
+                                    {/* Glow effect on hover */}
                                     <div className={cn(
-                                        "w-12 h-12 rounded-xl flex items-center justify-center",
-                                        step.color
-                                    )}>
-                                        <Icon className="w-6 h-6" />
+                                        "absolute -inset-px rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 blur-xl",
+                                        step.bgGlow
+                                    )} />
+
+                                    {/* Content */}
+                                    <div className="relative">
+                                        {/* Number + Icon Row */}
+                                        <div className="flex items-center justify-between mb-6">
+                                            <div className={cn(
+                                                "w-14 h-14 rounded-2xl flex items-center justify-center",
+                                                "bg-gradient-to-br",
+                                                step.gradient,
+                                                "shadow-lg"
+                                            )}>
+                                                <Icon className="w-7 h-7 text-white" />
+                                            </div>
+                                            <span className={cn(
+                                                "text-5xl font-black bg-gradient-to-br bg-clip-text text-transparent",
+                                                step.gradient,
+                                                "opacity-20 group-hover:opacity-40 transition-opacity"
+                                            )}>
+                                                {step.number}
+                                            </span>
+                                        </div>
+
+                                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                                            {step.title[lang] || step.title.en}
+                                        </h3>
+                                        <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                                            {step.desc[lang] || step.desc.en}
+                                        </p>
                                     </div>
-                                    <span className="text-3xl font-bold text-gray-200">
-                                        {step.number}
-                                    </span>
                                 </div>
 
-                                <h3 className="text-lg font-semibold text-gray-900 mb-2">
-                                    {step.title[lang] || step.title.en}
-                                </h3>
-                                <p className="text-gray-500 text-sm leading-relaxed">
-                                    {step.desc[lang] || step.desc.en}
-                                </p>
+                                {/* Connector Arrow (except last) */}
+                                {index < steps.length - 1 && (
+                                    <div className="hidden md:flex absolute top-1/2 -right-4 lg:-right-6 transform -translate-y-1/2 z-10">
+                                        <ArrowRight className="w-6 h-6 text-gray-300 dark:text-slate-600" />
+                                    </div>
+                                )}
                             </motion.div>
                         );
                     })}

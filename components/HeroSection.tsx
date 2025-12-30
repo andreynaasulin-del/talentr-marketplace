@@ -199,7 +199,7 @@ export default function HeroSection() {
     );
 
     return (
-        <section className="relative min-h-[85vh] md:min-h-[88vh] flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600">
+        <section className="relative min-h-[85vh] md:min-h-[88vh] flex items-center justify-center bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
             {/* Content */}
             <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-8 md:py-12">
                 {/* Headline - Clean & Simple */}
@@ -398,7 +398,7 @@ export default function HeroSection() {
             {/* Simple Wave */}
             <div className="absolute bottom-0 left-0 right-0">
                 <svg viewBox="0 0 1440 60" fill="none" className="w-full" preserveAspectRatio="none">
-                    <path d="M0 60L1440 60V30C1200 45 960 55 720 50C480 45 240 35 0 40V60Z" fill="white" />
+                    <path d="M0 60L1440 60V30C1200 45 960 55 720 50C480 45 240 35 0 40V60Z" className="fill-white dark:fill-slate-900" />
                 </svg>
             </div>
         </section>

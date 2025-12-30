@@ -95,10 +95,10 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     };
 
     return (
-        <div className="relative py-4 md:py-6">
+        <div className="relative py-4 md:py-6 bg-white dark:bg-slate-900">
             {/* Header - Mobile Compact */}
             <div className="px-4 md:px-6 mb-3 md:mb-4">
-                <h3 className="text-xs md:text-sm font-bold text-gray-400 uppercase tracking-widest">
+                <h3 className="text-xs md:text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
                     {lang === 'he' ? 'קטגוריות' : lang === 'ru' ? 'КАТЕГОРИИ' : 'CATEGORIES'}
                 </h3>
             </div>
@@ -125,7 +125,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                                 "flex-shrink-0 font-semibold text-xs md:text-sm transition-all duration-300",
                                 isActive
                                     ? 'text-white shadow-lg'
-                                    : 'bg-gray-100 text-gray-700 hover:bg-gray-200 active:bg-gray-300'
+                                    : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 active:bg-gray-300 dark:active:bg-slate-600'
                             )}
                             style={isActive ? {
                                 background: `linear-gradient(135deg, ${category.color.includes('gray') ? '#374151, #1f2937' : category.color.replace('from-', '').replace(' to-', ', ').split(', ').map(c => c.includes('-500') ? c.replace('-500', '-500').replace(c.split('-')[0] + '-', '#') : c.replace('-600', '-600').replace(c.split('-')[0] + '-', '#')).join(', ')})`
@@ -144,7 +144,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                             )}
                             <Icon className={cn(
                                 "relative z-10 w-3.5 h-3.5 md:w-4 md:h-4",
-                                isActive ? 'text-white' : 'text-gray-500'
+                                isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
                             )} />
                             <span className="relative z-10 whitespace-nowrap">
                                 {category.label[lang] || category.label.en}
@@ -157,13 +157,13 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
             {/* Edge Fades - Responsive */}
             <div
                 className={cn(
-                    "absolute left-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-r from-white to-transparent z-10 pointer-events-none transition-opacity",
+                    "absolute left-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10 pointer-events-none transition-opacity",
                     canScrollLeft ? 'opacity-100' : 'opacity-0'
                 )}
             />
             <div
                 className={cn(
-                    "absolute right-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-l from-white to-transparent z-10 pointer-events-none transition-opacity",
+                    "absolute right-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none transition-opacity",
                     canScrollRight ? 'opacity-100' : 'opacity-0'
                 )}
             />
