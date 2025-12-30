@@ -61,22 +61,22 @@ export default function HeroSection() {
 
     const timeBasedGreetings = {
         en: {
-            morning: "Good morning! When is your event and what are you celebrating?",
-            afternoon: "Hey! Planning something special? When's your event?",
-            evening: "Good evening! Tell me about your upcoming event",
-            night: "Planning ahead? Tell me about your event"
+            morning: "Good morning! 🎉 Planning a wedding, birthday, or corporate event? Tell me the date and I'll find the perfect pros for you!",
+            afternoon: "Hey there! 🎊 Looking for a photographer, DJ, or maybe a host for your special day? I'll help you find the best match!",
+            evening: "Good evening! ✨ Whether it's an intimate dinner or a grand celebration - tell me what you're planning and I'll suggest the perfect talent!",
+            night: "Hey night owl! 🌙 Planning something exciting? Share your event details and let me find amazing professionals for you!"
         },
         ru: {
-            morning: "Доброе утро! Когда ваше мероприятие и что празднуете?",
-            afternoon: "Привет! Планируете праздник? Расскажите подробнее",
-            evening: "Добрый вечер! Расскажите о вашем мероприятии",
-            night: "Планируете заранее? Расскажите о мероприятии"
+            morning: "Доброе утро! 🎉 Планируете свадьбу, день рождения или корпоратив? Расскажите дату и я найду лучших специалистов!",
+            afternoon: "Привет! 🎊 Ищете фотографа, DJ или ведущего? Расскажите о мероприятии — подберу идеальный вариант!",
+            evening: "Добрый вечер! ✨ Камерный ужин или грандиозный праздник — расскажите, что планируете, и я найду талантливых профи!",
+            night: "Привет, полуночник! 🌙 Планируете что-то крутое? Поделитесь деталями и я подберу классных специалистов!"
         },
         he: {
-            morning: "בוקר טוב! מתי האירוע שלכם ומה חוגגים?",
-            afternoon: "היי! מתכננים משהו מיוחד? מתי האירוע?",
-            evening: "ערב טוב! ספרו לי על האירוע שלכם",
-            night: "מתכננים מראש? ספרו על האירוע"
+            morning: "בוקר טוב! 🎉 מתכננים חתונה, יום הולדת או אירוע עסקי? ספרו לי את התאריך ואמצא לכם את המקצוענים הכי טובים!",
+            afternoon: "היי! 🎊 מחפשים צלם, DJ או אולי מנחה ליום המיוחד? אני אעזור לכם למצוא את ההתאמה המושלמת!",
+            evening: "ערב טוב! ✨ בין אם זה ארוחת ערב אינטימית או חגיגה גדולה - ספרו לי מה אתם מתכננים ואציע לכם כישרונות מעולים!",
+            night: "היי ינשוף לילה! 🌙 מתכננים משהו מרגש? שתפו את הפרטים ואני אמצא לכם אנשי מקצוע מדהימים!"
         }
     };
 
