@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import CategoryRail from '@/components/CategoryRail';
+import UseCaseCards from '@/components/UseCaseCards';
 import { supabase } from '@/lib/supabase';
 
 // Dynamic imports for below-fold components (lazy loading)
@@ -63,6 +64,9 @@ export default function Home() {
                     }} />
                 </div>
             </section>
+
+            {/* Use Case Cards */}
+            <UseCaseCards />
 
             {/* Vendor Grid - Only show when category selected */}
             {selectedCategory !== 'All' && (

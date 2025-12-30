@@ -29,6 +29,7 @@ export default function HeroSection() {
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const [isChatOpen, setIsChatOpen] = useState(false);
     const [userCity, setUserCity] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
@@ -127,6 +128,11 @@ export default function HeroSection() {
     const sendMessage = async (text?: string) => {
         const messageText = text || input.trim();
         if (!messageText) return;
+
+        // Open chat on first message
+        if (!isChatOpen) {
+            setIsChatOpen(true);
+        }
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -240,33 +246,50 @@ export default function HeroSection() {
                     </p>
                 </motion.div>
 
-                {/* Chat Container - Compact */}
+                {/* Chat Container - Compact or Expanded */}
                 <motion.div
                     className="bg-white rounded-2xl shadow-lg overflow-hidden max-w-lg mx-auto"
                     initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
+                    animate={{
+                        opacity: 1,
+                        y: 0,
+                        height: isChatOpen ? 'auto' : 'auto'
+                    }}
                     transition={{ duration: 0.5, delay: 0.1 }}
                 >
-                    {/* Chat Header - Compact */}
-                    <div className="bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2.5 text-white">
-                        <div className="flex items-center gap-2">
-                            <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
-                                <Sparkles className="w-3.5 h-3.5" />
+                    {/* Chat Header - Only show when chat is open */}
+                    {isChatOpen && (
+                        <motion.div
+                            className="bg-gradient-to-r from-blue-600 to-indigo-600 px-3 py-2.5 text-white"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            transition={{ duration: 0.3 }}
+                        >
+                            <div className="flex items-center gap-2">
+                                <div className="w-7 h-7 rounded-lg bg-white/20 flex items-center justify-center">
+                                    <Sparkles className="w-3.5 h-3.5" />
+                                </div>
+                                <div>
+                                    <h3 className="font-semibold text-sm leading-tight">
+                                        {lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Assistant'}
+                                    </h3>
+                                    <p className="text-[10px] text-white/70 flex items-center gap-1">
+                                        <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
+                                        {lang === 'ru' ? 'Онлайн' : lang === 'he' ? 'מחובר' : 'Online'}
+                                    </p>
+                                </div>
                             </div>
-                            <div>
-                                <h3 className="font-semibold text-sm leading-tight">
-                                    {lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Assistant'}
-                                </h3>
-                                <p className="text-[10px] text-white/70 flex items-center gap-1">
-                                    <span className="w-1.5 h-1.5 bg-green-400 rounded-full" />
-                                    {lang === 'ru' ? 'Онлайн' : lang === 'he' ? 'מחובר' : 'Online'}
-                                </p>
-                            </div>
-                        </div>
-                    </div>
+                        </motion.div>
+                    )}
 
-                    {/* Messages - Compact */}
-                    <div className="h-[180px] sm:h-[200px] overflow-y-auto p-3 space-y-2 bg-gray-50">
+                    {/* Messages - Only show when chat is open */}
+                    {isChatOpen && (
+                        <motion.div
+                            className="h-[180px] sm:h-[200px] overflow-y-auto p-3 space-y-2 bg-gray-50"
+                            initial={{ opacity: 0, height: 0 }}
+                            animate={{ opacity: 1, height: 'auto' }}
+                            transition={{ duration: 0.3 }}
+                        >
                         <AnimatePresence mode="popLayout">
                             {messages.map((msg) => (
                                 <motion.div
@@ -320,13 +343,14 @@ export default function HeroSection() {
                         )}
 
                         <div ref={messagesEndRef} />
-                    </div>
+                        </motion.div>
+                    )}
 
-                    {/* Quick Prompts - Compact */}
+                    {/* Quick Prompts - Show when chat is NOT open */}
                     <AnimatePresence>
-                        {messages.length <= 1 && (
+                        {!isChatOpen && (
                             <motion.div
-                                className="px-3 py-2 border-t border-gray-100 bg-white"
+                                className="px-3 py-3 bg-white"
                                 initial={{ opacity: 0 }}
                                 animate={{ opacity: 1 }}
                                 exit={{ opacity: 0 }}
