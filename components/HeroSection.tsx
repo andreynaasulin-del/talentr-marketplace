@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, ArrowRight, MessageCircle, Users, Calendar, Award } from 'lucide-react';
+import { Send, Sparkles, Star, ArrowRight, MessageCircle } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -107,13 +107,6 @@ export default function HeroSection() {
             "DJ למסיבה",
             "מנחה לאירוע",
         ]
-    };
-
-    // Stats for social proof (real-looking but static)
-    const stats = {
-        en: { pros: '500+', events: '2,000+', cities: '15+' },
-        ru: { pros: '500+', events: '2,000+', cities: '15+' },
-        he: { pros: '500+', events: '2,000+', cities: '15+' }
     };
 
     // Reset greeting when language changes
@@ -247,42 +240,6 @@ export default function HeroSection() {
                                 : 'Photographers, DJs, MCs and more for your event'
                         }
                     </p>
-                </motion.div>
-
-                {/* Stats Bar - Social Proof */}
-                <motion.div
-                    className="flex justify-center gap-6 md:gap-10 mb-8"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.2 }}
-                >
-                    <div className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-white/90">
-                            <Users className="w-4 h-4" />
-                            <span className="text-xl md:text-2xl font-bold">{stats[lang].pros}</span>
-                        </div>
-                        <p className="text-xs md:text-sm text-white/70">
-                            {lang === 'ru' ? 'специалистов' : lang === 'he' ? 'מקצוענים' : 'professionals'}
-                        </p>
-                    </div>
-                    <div className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-white/90">
-                            <Calendar className="w-4 h-4" />
-                            <span className="text-xl md:text-2xl font-bold">{stats[lang].events}</span>
-                        </div>
-                        <p className="text-xs md:text-sm text-white/70">
-                            {lang === 'ru' ? 'мероприятий' : lang === 'he' ? 'אירועים' : 'events'}
-                        </p>
-                    </div>
-                    <div className="text-center">
-                        <div className="flex items-center justify-center gap-1.5 text-white/90">
-                            <Award className="w-4 h-4" />
-                            <span className="text-xl md:text-2xl font-bold">{stats[lang].cities}</span>
-                        </div>
-                        <p className="text-xs md:text-sm text-white/70">
-                            {lang === 'ru' ? 'городов' : lang === 'he' ? 'ערים' : 'cities'}
-                        </p>
-                    </div>
                 </motion.div>
 
                 {/* Chat Container - Clean & Modern */}
