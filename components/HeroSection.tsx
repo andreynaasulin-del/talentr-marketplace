@@ -204,19 +204,33 @@ export default function HeroSection() {
             <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-8 md:py-12">
                 {/* Headline - Clean & Simple */}
                 <motion.div
-                    className="text-center mb-6 md:mb-8"
+                    className="text-center mb-6 md:mb-8 px-2"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.5 }}
                 >
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
-                        {lang === 'ru' ? 'Найдите' : lang === 'he' ? 'מצא את' : 'Find the'}
-                        <br />
-                        <span className="text-white/90">
-                            {lang === 'ru' ? 'идеального специалиста' : lang === 'he' ? 'הטאלנט המושלם' : 'perfect talent'}
-                        </span>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight leading-tight">
+                        {lang === 'ru' ? (
+                            <>
+                                Найдите идеального
+                                <br />
+                                <span className="text-white/90">специалиста</span>
+                            </>
+                        ) : lang === 'he' ? (
+                            <>
+                                מצא את הטאלנט
+                                <br />
+                                <span className="text-white/90">המושלם</span>
+                            </>
+                        ) : (
+                            <>
+                                Find the perfect
+                                <br />
+                                <span className="text-white/90">talent</span>
+                            </>
+                        )}
                     </h1>
-                    <p className="text-base md:text-lg text-white/80">
+                    <p className="text-base md:text-lg text-white/80 max-w-md mx-auto">
                         {lang === 'ru'
                             ? 'Опишите, что нужно — AI найдёт лучших'
                             : lang === 'he'
