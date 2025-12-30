@@ -1,12 +1,13 @@
 'use client';
 
 import Link from 'next/link';
-import { Search, User, LogOut, Globe, ChevronDown, Calendar, Heart } from 'lucide-react';
+import { Search, User, LogOut, Globe, ChevronDown, Calendar, Heart, Moon, Sun } from 'lucide-react';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
 import { useFavorites } from '@/context/FavoritesContext';
+import { useTheme } from '@/context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import { toast } from 'sonner';
@@ -18,6 +19,7 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const { language, setLanguage, t } = useLanguage();
     const { favoritesCount } = useFavorites();
+    const { theme, toggleTheme } = useTheme();
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -94,6 +96,44 @@ export default function Navbar() {
 
                     {/* Right Actions */}
                     <div className="flex items-center gap-1 md:gap-4">
+                        {/* Theme Toggle */}
+                        <motion.button
+                            onClick={toggleTheme}
+                            className={cn(
+                                "p-2.5 rounded-xl transition-all duration-300",
+                                "text-gray-600 dark:text-gray-300",
+                                "hover:bg-gray-100 dark:hover:bg-slate-800",
+                                "hover:scale-110"
+                            )}
+                            whileHover={{ scale: 1.1 }}
+                            whileTap={{ scale: 0.95 }}
+                            title={theme === 'light' ? 'Switch to dark mode' : 'Switch to light mode'}
+                        >
+                            <AnimatePresence mode="wait" initial={false}>
+                                {theme === 'light' ? (
+                                    <motion.div
+                                        key="moon"
+                                        initial={{ rotate: -90, opacity: 0 }}
+                                        animate={{ rotate: 0, opacity: 1 }}
+                                        exit={{ rotate: 90, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <Moon className="w-5 h-5" />
+                                    </motion.div>
+                                ) : (
+                                    <motion.div
+                                        key="sun"
+                                        initial={{ rotate: 90, opacity: 0 }}
+                                        animate={{ rotate: 0, opacity: 1 }}
+                                        exit={{ rotate: -90, opacity: 0 }}
+                                        transition={{ duration: 0.2 }}
+                                    >
+                                        <Sun className="w-5 h-5" />
+                                    </motion.div>
+                                )}
+                            </AnimatePresence>
+                        </motion.button>
+
                         {/* Language Switcher */}
                         <div className="relative">
                             <motion.button
