@@ -30,11 +30,17 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
         }
     }, []);
 
-    // Update DOM when theme changes
+    // Update DOM when theme changes - instant switch
     useEffect(() => {
         if (mounted) {
+            // Remove transition temporarily for instant switch
+            document.documentElement.style.transition = 'none';
             document.documentElement.classList.toggle('dark', theme === 'dark');
             localStorage.setItem('theme', theme);
+            // Re-enable transitions after a frame
+            requestAnimationFrame(() => {
+                document.documentElement.style.transition = '';
+            });
         }
     }, [theme, mounted]);
 

@@ -47,7 +47,7 @@ export default function Home() {
     }
 
     return (
-        <main className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
+        <main className="min-h-screen bg-white dark:bg-slate-900">
             <Navbar />
 
             <HeroSection />

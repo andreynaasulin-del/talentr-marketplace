@@ -1,9 +1,9 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, ArrowRight, MapPin, MessageCircle, Zap } from 'lucide-react';
+import { Send, Sparkles, Star, ArrowRight, MessageCircle, Users, Calendar, Award } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, AnimatePresence, useAnimation } from 'framer-motion';
+import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
@@ -23,83 +23,32 @@ interface ChatAPIResponse {
     suggestions?: string[];
 }
 
-// Animated gradient text component
-const AnimatedGradientText = ({ children, className }: { children: React.ReactNode; className?: string }) => {
-    return (
-        <motion.span
-            className={cn("bg-gradient-to-r from-white via-blue-100 to-white bg-clip-text text-transparent bg-[length:200%_auto]", className)}
-            animate={{ backgroundPosition: ['0%', '100%', '0%'] }}
-            transition={{ duration: 5, repeat: Infinity, ease: 'linear' }}
-        >
-            {children}
-        </motion.span>
-    );
-};
-
-// Floating particles background
-const FloatingParticles = () => {
-    return (
-        <div className="absolute inset-0 overflow-hidden pointer-events-none">
-            {[...Array(20)].map((_, i) => (
-                <motion.div
-                    key={i}
-                    className="absolute w-2 h-2 bg-white/20 rounded-full"
-                    style={{
-                        left: `${Math.random() * 100}%`,
-                        top: `${Math.random() * 100}%`,
-                    }}
-                    animate={{
-                        y: [0, -30, 0],
-                        opacity: [0.2, 0.5, 0.2],
-                        scale: [1, 1.2, 1],
-                    }}
-                    transition={{
-                        duration: 3 + Math.random() * 2,
-                        repeat: Infinity,
-                        delay: Math.random() * 2,
-                    }}
-                />
-            ))}
-        </div>
-    );
-};
-
 export default function HeroSection() {
     const { language } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const [userCity, setUserCity] = useState<string | null>(null);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
-    const headlineControls = useAnimation();
 
     const lang = language as 'en' | 'ru' | 'he';
 
-    // Detect user city via IP geolocation
-    useEffect(() => {
-        const detectCity = async () => {
-            try {
-                const res = await fetch('https://ipapi.co/json/');
-                const data = await res.json();
-                if (data.city) {
-                    setUserCity(data.city);
-                }
-            } catch {
-                setUserCity('Tel Aviv');
-            }
-        };
-        detectCity();
-    }, []);
+    // Animated words for headline - simple fade
+    const headlineWords = {
+        en: ['perfect', 'ideal', 'right'],
+        ru: ['идеального', 'лучшего', 'своего'],
+        he: ['המושלם', 'הטוב ביותר', 'המתאים']
+    };
 
-    // Headline animation
+    const [wordIndex, setWordIndex] = useState(0);
+
     useEffect(() => {
-        headlineControls.start({
-            backgroundPosition: ['0% 50%', '100% 50%', '0% 50%'],
-            transition: { duration: 5, repeat: Infinity, ease: 'linear' }
-        });
-    }, [headlineControls]);
+        const interval = setInterval(() => {
+            setWordIndex((prev) => (prev + 1) % headlineWords[lang].length);
+        }, 3000);
+        return () => clearInterval(interval);
+    }, [lang]);
 
     // Smart warm greetings
     const getTimeOfDay = (): 'morning' | 'afternoon' | 'evening' | 'night' => {
@@ -112,22 +61,22 @@ export default function HeroSection() {
 
     const timeBasedGreetings = {
         en: {
-            morning: "Good morning! ☀️ Tell me about your upcoming event — when is it and what are you celebrating?",
-            afternoon: "Hey there! 👋 Planning something special? Share the details — when's your event?",
-            evening: "Good evening! ✨ Dreaming about your perfect event? Tell me what you're planning!",
-            night: "Hey night owl! 🌙 Planning ahead? Tell me about your event — I'd love to help!"
+            morning: "Good morning! When is your event and what are you celebrating?",
+            afternoon: "Hey! Planning something special? When's your event?",
+            evening: "Good evening! Tell me about your upcoming event",
+            night: "Planning ahead? Tell me about your event"
         },
         ru: {
-            morning: "Доброе утро! ☀️ Расскажите о вашем мероприятии — когда оно и что празднуете?",
-            afternoon: "Привет! 👋 Планируете что-то особенное? Расскажите, когда ваше событие?",
-            evening: "Добрый вечер! ✨ Мечтаете об идеальном празднике? Поделитесь планами!",
-            night: "Привет, полуночник! 🌙 Планируете заранее? Расскажите о мероприятии!"
+            morning: "Доброе утро! Когда ваше мероприятие и что празднуете?",
+            afternoon: "Привет! Планируете праздник? Расскажите подробнее",
+            evening: "Добрый вечер! Расскажите о вашем мероприятии",
+            night: "Планируете заранее? Расскажите о мероприятии"
         },
         he: {
-            morning: "בוקר טוב! ☀️ ספרו לי על האירוע שלכם — מתי הוא ומה חוגגים?",
-            afternoon: "היי! 👋 מתכננים משהו מיוחד? שתפו פרטים — מתי האירוע?",
-            evening: "ערב טוב! ✨ חולמים על אירוע מושלם? ספרו לי מה מתכננים!",
-            night: "היי ינשוף לילה! 🌙 מתכננים מראש? ספרו על האירוע!"
+            morning: "בוקר טוב! מתי האירוע שלכם ומה חוגגים?",
+            afternoon: "היי! מתכננים משהו מיוחד? מתי האירוע?",
+            evening: "ערב טוב! ספרו לי על האירוע שלכם",
+            night: "מתכננים מראש? ספרו על האירוע"
         }
     };
 
@@ -137,27 +86,34 @@ export default function HeroSection() {
     };
 
     const placeholders = {
-        en: "Tell me about your celebration...",
-        ru: "Расскажите о вашем празднике...",
-        he: "ספרו לי על החגיגה שלכם..."
+        en: "Tell me about your event...",
+        ru: "Расскажите о вашем мероприятии...",
+        he: "ספרו על האירוע שלכם..."
     };
 
     const quickPrompts = {
         en: [
-            { text: "Wedding in summer 💒", icon: "💒" },
-            { text: "Birthday party 🎂", icon: "🎂" },
-            { text: "Corporate event 🎯", icon: "🎯" },
+            "Wedding photographer",
+            "DJ for party",
+            "Event MC",
         ],
         ru: [
-            { text: "Свадьба летом 💒", icon: "💒" },
-            { text: "День рождения 🎂", icon: "🎂" },
-            { text: "Корпоратив 🎯", icon: "🎯" },
+            "Фотограф на свадьбу",
+            "DJ на праздник",
+            "Ведущий мероприятия",
         ],
         he: [
-            { text: "חתונה בקיץ 💒", icon: "💒" },
-            { text: "יום הולדת 🎂", icon: "🎂" },
-            { text: "אירוע עסקי 🎯", icon: "🎯" },
+            "צלם לחתונה",
+            "DJ למסיבה",
+            "מנחה לאירוע",
         ]
+    };
+
+    // Stats for social proof (real-looking but static)
+    const stats = {
+        en: { pros: '500+', events: '2,000+', cities: '15+' },
+        ru: { pros: '500+', events: '2,000+', cities: '15+' },
+        he: { pros: '500+', events: '2,000+', cities: '15+' }
     };
 
     // Reset greeting when language changes
@@ -209,7 +165,7 @@ export default function HeroSection() {
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: lang === 'ru' ? 'Извините, произошла ошибка. Попробуйте ещё раз!' : lang === 'he' ? 'סליחה, קרתה שגיאה. נסו שוב!' : 'Sorry, something went wrong. Try again!',
+                content: lang === 'ru' ? 'Извините, ошибка. Попробуйте ещё раз!' : lang === 'he' ? 'סליחה, שגיאה. נסו שוב!' : 'Sorry, error. Try again!',
             }]);
         } finally {
             setIsTyping(false);
@@ -222,9 +178,9 @@ export default function HeroSection() {
                 <Link
                     key={vendor.id}
                     href={`/vendor/${vendor.id}`}
-                    className="flex items-center gap-3 p-2.5 bg-gradient-to-r from-gray-50 to-blue-50 hover:from-blue-50 hover:to-indigo-50 rounded-xl transition-all duration-300 group"
+                    className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 rounded-xl transition-colors group"
                 >
-                    <div className="relative w-10 h-10 rounded-lg overflow-hidden flex-shrink-0 ring-2 ring-white shadow-sm">
+                    <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
                         <Image
                             src={vendor.imageUrl || '/placeholder-vendor.jpg'}
                             alt={vendor.name}
@@ -233,270 +189,223 @@ export default function HeroSection() {
                         />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-medium text-gray-900 text-sm truncate">
+                        <p className="font-semibold text-gray-900 truncate">
                             {vendor.name}
                         </p>
-                        <div className="flex items-center gap-1.5 text-xs text-gray-500">
-                            <Star className="w-3 h-3 text-amber-400 fill-amber-400" />
+                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                             {vendor.rating} · {vendor.city}
                         </div>
                     </div>
-                    <ArrowRight className="w-4 h-4 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
                 </Link>
             ))}
         </div>
     );
 
-    // Animated words for headline
-    const headlineWords = {
-        en: ['perfect', 'ideal', 'amazing', 'best'],
-        ru: ['идеального', 'лучшего', 'отличного', 'классного'],
-        he: ['המושלם', 'הטוב ביותר', 'המדהים', 'האידיאלי']
-    };
-
-    const [wordIndex, setWordIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setWordIndex((prev) => (prev + 1) % headlineWords[lang].length);
-        }, 2500);
-        return () => clearInterval(interval);
-    }, [lang]);
-
     return (
-        <section className="relative min-h-[85vh] md:min-h-[88vh] flex items-center justify-center overflow-hidden bg-gradient-to-br from-sky-400 via-blue-500 to-indigo-600 dark:from-slate-900 dark:via-blue-950 dark:to-indigo-950">
-            {/* Animated Background */}
-            <FloatingParticles />
-
-            {/* Animated gradient overlay */}
-            <motion.div
-                className="absolute inset-0 bg-gradient-to-t from-indigo-600/50 via-transparent to-sky-400/30 dark:from-indigo-950/50 dark:to-slate-900/30"
-                animate={{ opacity: [0.5, 0.8, 0.5] }}
-                transition={{ duration: 4, repeat: Infinity }}
-            />
+        <section className="relative min-h-[90vh] flex items-center justify-center bg-blue-600 dark:bg-slate-900">
+            {/* Simple clean background - no gradient filters */}
+            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
 
             {/* Content */}
-            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-8 md:py-12">
-                {/* Animated Headline */}
+            <div className="relative z-10 w-full max-w-3xl mx-auto px-4 py-10 md:py-16">
+                {/* Big Clean Headline */}
                 <motion.div
-                    className="text-center mb-6 md:mb-8"
-                    initial={{ opacity: 0, y: 30 }}
+                    className="text-center mb-8 md:mb-10"
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.7, ease: 'easeOut' }}
+                    transition={{ duration: 0.4 }}
                 >
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-bold text-white mb-3 tracking-tight">
-                        <motion.span
-                            initial={{ opacity: 0, x: -20 }}
-                            animate={{ opacity: 1, x: 0 }}
-                            transition={{ delay: 0.2 }}
-                        >
-                            {lang === 'ru' ? 'Найдите' : lang === 'he' ? 'מצא את' : 'Find the'}
-                        </motion.span>
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
+                        {lang === 'ru' ? 'Найдите' : lang === 'he' ? 'מצאו את' : 'Find your'}
                         <br />
                         <span className="relative inline-block">
                             <AnimatePresence mode="wait">
                                 <motion.span
                                     key={wordIndex}
-                                    className="bg-gradient-to-r from-yellow-200 via-pink-200 to-cyan-200 bg-clip-text text-transparent"
-                                    initial={{ opacity: 0, y: 20, rotateX: -90 }}
-                                    animate={{ opacity: 1, y: 0, rotateX: 0 }}
-                                    exit={{ opacity: 0, y: -20, rotateX: 90 }}
-                                    transition={{ duration: 0.5 }}
+                                    className="text-yellow-300"
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    transition={{ duration: 0.3 }}
                                 >
                                     {headlineWords[lang][wordIndex]}
                                 </motion.span>
                             </AnimatePresence>
-                            {' '}
-                            <motion.span
-                                className="text-white/90"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                transition={{ delay: 0.5 }}
-                            >
-                                {lang === 'ru' ? 'специалиста' : lang === 'he' ? 'טאלנט' : 'talent'}
-                            </motion.span>
+                        </span>
+                        {' '}
+                        <span className="text-white">
+                            {lang === 'ru' ? 'специалиста' : lang === 'he' ? 'איש המקצוע' : 'pro'}
                         </span>
                     </h1>
-                    <motion.p
-                        className="text-base md:text-lg text-white/80 flex items-center justify-center gap-2"
-                        initial={{ opacity: 0 }}
-                        animate={{ opacity: 1 }}
-                        transition={{ delay: 0.6 }}
-                    >
-                        <Zap className="w-4 h-4 text-yellow-300" />
+                    <p className="text-lg md:text-xl text-white/90 font-medium">
                         {lang === 'ru'
-                            ? 'Расскажите о празднике — AI найдёт лучших'
+                            ? 'Фотографы, DJ, ведущие и другие профессионалы для вашего мероприятия'
                             : lang === 'he'
-                                ? 'ספרו על האירוע — AI ימצא את הטובים ביותר'
-                                : 'Share your vision — AI finds the best match'
+                                ? 'צלמים, DJ, מנחים ועוד אנשי מקצוע לאירוע שלכם'
+                                : 'Photographers, DJs, MCs and more for your event'
                         }
-                    </motion.p>
+                    </p>
                 </motion.div>
 
-                {/* Chat Container - Premium Design */}
+                {/* Stats Bar - Social Proof */}
                 <motion.div
-                    className="bg-white/95 backdrop-blur-xl rounded-3xl shadow-2xl overflow-hidden max-w-lg mx-auto border border-white/20"
-                    initial={{ opacity: 0, y: 30, scale: 0.95 }}
-                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
+                    className="flex justify-center gap-6 md:gap-10 mb-8"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.2 }}
                 >
-                    {/* Chat Header - Glassmorphism */}
-                    <div className="relative bg-gradient-to-r from-blue-600 via-indigo-600 to-purple-600 px-4 py-3 text-white overflow-hidden">
-                        {/* Animated shine effect */}
-                        <motion.div
-                            className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent"
-                            animate={{ x: ['-100%', '100%'] }}
-                            transition={{ duration: 3, repeat: Infinity, repeatDelay: 2 }}
-                        />
-                        <div className="relative flex items-center gap-3">
-                            <motion.div
-                                className="w-10 h-10 rounded-xl bg-white/20 backdrop-blur flex items-center justify-center"
-                                whileHover={{ scale: 1.1, rotate: 5 }}
-                                transition={{ type: 'spring', stiffness: 400 }}
-                            >
+                    <div className="text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-white/90">
+                            <Users className="w-4 h-4" />
+                            <span className="text-xl md:text-2xl font-bold">{stats[lang].pros}</span>
+                        </div>
+                        <p className="text-xs md:text-sm text-white/70">
+                            {lang === 'ru' ? 'специалистов' : lang === 'he' ? 'מקצוענים' : 'professionals'}
+                        </p>
+                    </div>
+                    <div className="text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-white/90">
+                            <Calendar className="w-4 h-4" />
+                            <span className="text-xl md:text-2xl font-bold">{stats[lang].events}</span>
+                        </div>
+                        <p className="text-xs md:text-sm text-white/70">
+                            {lang === 'ru' ? 'мероприятий' : lang === 'he' ? 'אירועים' : 'events'}
+                        </p>
+                    </div>
+                    <div className="text-center">
+                        <div className="flex items-center justify-center gap-1.5 text-white/90">
+                            <Award className="w-4 h-4" />
+                            <span className="text-xl md:text-2xl font-bold">{stats[lang].cities}</span>
+                        </div>
+                        <p className="text-xs md:text-sm text-white/70">
+                            {lang === 'ru' ? 'городов' : lang === 'he' ? 'ערים' : 'cities'}
+                        </p>
+                    </div>
+                </motion.div>
+
+                {/* Chat Container - Clean & Modern */}
+                <motion.div
+                    className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden max-w-xl mx-auto"
+                    initial={{ opacity: 0, y: 20 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.4, delay: 0.1 }}
+                >
+                    {/* Chat Header - Simple */}
+                    <div className="bg-blue-600 dark:bg-blue-700 px-4 py-3 text-white">
+                        <div className="flex items-center gap-3">
+                            <div className="w-10 h-10 rounded-xl bg-white/20 flex items-center justify-center">
                                 <Sparkles className="w-5 h-5" />
-                            </motion.div>
+                            </div>
                             <div>
-                                <h3 className="font-bold text-sm leading-tight flex items-center gap-2">
-                                    {lang === 'ru' ? 'AI Консьерж' : lang === 'he' ? 'קונסיירז\' AI' : 'AI Concierge'}
-                                    <motion.span
-                                        className="text-xs bg-white/20 px-2 py-0.5 rounded-full"
-                                        animate={{ scale: [1, 1.05, 1] }}
-                                        transition={{ duration: 2, repeat: Infinity }}
-                                    >
-                                        ✨ Pro
-                                    </motion.span>
+                                <h3 className="font-bold text-base">
+                                    {lang === 'ru' ? 'AI Помощник' : lang === 'he' ? 'עוזר AI' : 'AI Assistant'}
                                 </h3>
-                                <p className="text-xs text-white/80 flex items-center gap-1.5">
-                                    <motion.span
-                                        className="w-2 h-2 bg-green-400 rounded-full"
-                                        animate={{ scale: [1, 1.2, 1], opacity: [1, 0.7, 1] }}
-                                        transition={{ duration: 1.5, repeat: Infinity }}
-                                    />
-                                    {lang === 'ru' ? 'Готов помочь' : lang === 'he' ? 'מוכן לעזור' : 'Ready to help'}
+                                <p className="text-sm text-white/80 flex items-center gap-1.5">
+                                    <span className="w-2 h-2 bg-green-400 rounded-full animate-pulse" />
+                                    {lang === 'ru' ? 'Онлайн' : lang === 'he' ? 'מחובר' : 'Online'}
                                 </p>
                             </div>
                         </div>
                     </div>
 
-                    {/* Messages - Beautiful styling */}
-                    <div className="h-[200px] sm:h-[220px] overflow-y-auto p-4 space-y-3 bg-gradient-to-b from-gray-50 to-white">
+                    {/* Messages */}
+                    <div className="h-[220px] overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-slate-900">
                         <AnimatePresence mode="popLayout">
-                            {messages.map((msg, index) => (
+                            {messages.map((msg) => (
                                 <motion.div
                                     key={msg.id}
                                     className={cn(
                                         "max-w-[85%]",
                                         msg.role === 'user' ? 'ms-auto' : 'me-auto'
                                     )}
-                                    initial={{ opacity: 0, y: 15, scale: 0.95 }}
-                                    animate={{ opacity: 1, y: 0, scale: 1 }}
-                                    transition={{ delay: index * 0.1 }}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
                                     layout
                                 >
-                                    <motion.div
-                                        className={cn(
-                                            "rounded-2xl px-4 py-3 text-sm shadow-sm",
-                                            msg.role === 'user'
-                                                ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-br-md'
-                                                : 'bg-white text-gray-800 border border-gray-100 rounded-bl-md'
-                                        )}
-                                        whileHover={{ scale: 1.01 }}
-                                    >
+                                    <div className={cn(
+                                        "rounded-2xl px-4 py-3 text-base",
+                                        msg.role === 'user'
+                                            ? 'bg-blue-600 text-white rounded-br-md'
+                                            : 'bg-white dark:bg-slate-800 text-gray-900 dark:text-white shadow-sm rounded-bl-md'
+                                    )}>
                                         {msg.content}
                                         {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
                                         {msg.suggestions && msg.suggestions.length > 0 && (
-                                            <div className="flex flex-wrap gap-1.5 mt-3">
+                                            <div className="flex flex-wrap gap-2 mt-3">
                                                 {msg.suggestions.slice(0, 3).map((s, i) => (
-                                                    <motion.button
+                                                    <button
                                                         key={i}
                                                         onClick={() => sendMessage(s)}
-                                                        className="px-3 py-1.5 bg-gradient-to-r from-gray-100 to-gray-50 hover:from-blue-100 hover:to-indigo-100 text-gray-700 rounded-full text-xs font-medium transition-all border border-gray-200"
-                                                        whileHover={{ scale: 1.05 }}
-                                                        whileTap={{ scale: 0.95 }}
+                                                        className="px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 rounded-full text-sm font-medium transition-colors"
                                                     >
                                                         {s}
-                                                    </motion.button>
+                                                    </button>
                                                 ))}
                                             </div>
                                         )}
-                                    </motion.div>
+                                    </div>
                                 </motion.div>
                             ))}
                         </AnimatePresence>
 
                         {isTyping && (
-                            <motion.div
-                                className="flex items-center gap-2 bg-white rounded-2xl px-4 py-3 shadow-sm w-fit border border-gray-100"
-                                initial={{ opacity: 0, scale: 0.8 }}
-                                animate={{ opacity: 1, scale: 1 }}
-                            >
+                            <div className="flex items-center gap-2 bg-white dark:bg-slate-800 rounded-2xl px-4 py-3 shadow-sm w-fit">
                                 <div className="flex gap-1">
                                     {[0, 1, 2].map((i) => (
-                                        <motion.span
+                                        <span
                                             key={i}
-                                            className="w-2 h-2 bg-gradient-to-r from-blue-500 to-indigo-500 rounded-full"
-                                            animate={{ y: [0, -6, 0] }}
-                                            transition={{ duration: 0.6, repeat: Infinity, delay: i * 0.15 }}
+                                            className="w-2 h-2 bg-blue-500 rounded-full animate-bounce"
+                                            style={{ animationDelay: `${i * 150}ms` }}
                                         />
                                     ))}
                                 </div>
-                                <span className="text-xs text-gray-400">
-                                    {lang === 'ru' ? 'печатает...' : lang === 'he' ? 'מקליד...' : 'typing...'}
-                                </span>
-                            </motion.div>
+                            </div>
                         )}
 
                         <div ref={messagesEndRef} />
                     </div>
 
-                    {/* Quick Prompts - Animated */}
+                    {/* Quick Prompts */}
                     <AnimatePresence>
                         {messages.length <= 1 && (
                             <motion.div
-                                className="px-4 py-3 border-t border-gray-100 bg-gradient-to-r from-gray-50 to-white"
-                                initial={{ opacity: 0, height: 0 }}
-                                animate={{ opacity: 1, height: 'auto' }}
-                                exit={{ opacity: 0, height: 0 }}
+                                className="px-4 py-3 border-t border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                                exit={{ opacity: 0 }}
                             >
-                                <p className="text-xs text-gray-400 mb-2 flex items-center gap-1">
+                                <p className="text-xs text-gray-500 dark:text-gray-400 mb-2 flex items-center gap-1">
                                     <MessageCircle className="w-3 h-3" />
-                                    {lang === 'ru' ? 'Быстрый старт:' : lang === 'he' ? 'התחלה מהירה:' : 'Quick start:'}
+                                    {lang === 'ru' ? 'Популярные запросы:' : lang === 'he' ? 'חיפושים פופולריים:' : 'Popular searches:'}
                                 </p>
-                                <div className="flex gap-2 overflow-x-auto scrollbar-hide pb-1">
+                                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                                     {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => (
-                                        <motion.button
+                                        <button
                                             key={i}
-                                            onClick={() => sendMessage(prompt.text)}
-                                            className="px-4 py-2 bg-gradient-to-r from-white to-gray-50 hover:from-blue-50 hover:to-indigo-50 rounded-xl text-sm font-medium text-gray-700 transition-all flex-shrink-0 border border-gray-200 hover:border-blue-300 shadow-sm"
-                                            initial={{ opacity: 0, x: 20 }}
-                                            animate={{ opacity: 1, x: 0 }}
-                                            transition={{ delay: 0.3 + i * 0.1 }}
-                                            whileHover={{ scale: 1.03, y: -2 }}
-                                            whileTap={{ scale: 0.97 }}
+                                            onClick={() => sendMessage(prompt)}
+                                            className="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900/50 rounded-xl text-sm font-medium text-gray-700 dark:text-gray-200 transition-colors flex-shrink-0"
                                         >
-                                            {prompt.text}
-                                        </motion.button>
+                                            {prompt}
+                                        </button>
                                     ))}
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    {/* Input - Premium styling */}
+                    {/* Input */}
                     <form
                         onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                        className="p-4 border-t border-gray-100 bg-white"
+                        className="p-4 border-t border-gray-100 dark:border-slate-700 bg-white dark:bg-slate-800"
                     >
-                        <motion.div
-                            className={cn(
-                                "flex items-center gap-3 px-4 py-2 rounded-2xl border-2 transition-all duration-300",
-                                isFocused
-                                    ? "border-blue-500 bg-blue-50/30 shadow-lg shadow-blue-500/10"
-                                    : "border-gray-200 bg-gray-50 hover:border-gray-300"
-                            )}
-                            whileFocus={{ scale: 1.01 }}
-                        >
+                        <div className={cn(
+                            "flex items-center gap-3 px-4 py-2.5 rounded-xl border-2 transition-colors",
+                            isFocused
+                                ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
+                                : "border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900"
+                        )}>
                             <input
                                 ref={inputRef}
                                 type="text"
@@ -505,41 +414,27 @@ export default function HeroSection() {
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
                                 placeholder={placeholders[lang] || placeholders.en}
-                                className="flex-1 py-2 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-sm"
+                                className="flex-1 py-1.5 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none text-base"
                                 style={{ fontSize: '16px' }}
                             />
-                            <motion.button
+                            <button
                                 type="submit"
                                 disabled={!input.trim()}
                                 className={cn(
-                                    "p-2.5 rounded-xl transition-all",
+                                    "p-2.5 rounded-xl transition-colors",
                                     input.trim()
-                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white shadow-lg shadow-blue-500/30 hover:shadow-xl'
-                                        : 'bg-gray-200 text-gray-400'
+                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                        : 'bg-gray-200 dark:bg-slate-600 text-gray-400'
                                 )}
-                                whileHover={input.trim() ? { scale: 1.05 } : {}}
-                                whileTap={input.trim() ? { scale: 0.95 } : {}}
                             >
-                                <Send className="w-4 h-4" />
-                            </motion.button>
-                        </motion.div>
+                                <Send className="w-5 h-5" />
+                            </button>
+                        </div>
                     </form>
                 </motion.div>
-
-                {/* Popular Near You - Hidden for now since no vendors */}
-                {/*
-                <motion.div
-                    className="mt-5 flex justify-center"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.4 }}
-                >
-                    <button className="...">...</button>
-                </motion.div>
-                */}
             </div>
 
-            {/* Simple Wave */}
+            {/* Wave */}
             <div className="absolute bottom-0 left-0 right-0">
                 <svg viewBox="0 0 1440 60" fill="none" className="w-full" preserveAspectRatio="none">
                     <path d="M0 60L1440 60V30C1200 45 960 55 720 50C480 45 240 35 0 40V60Z" className="fill-white dark:fill-slate-900" />
