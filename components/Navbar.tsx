@@ -20,7 +20,18 @@ export default function Navbar() {
     const [mounted, setMounted] = useState(false);
     const { language, setLanguage, t } = useLanguage();
     const { favoritesCount } = useFavorites();
-    const { theme, toggleTheme } = useTheme();
+
+    // Safely get theme context
+    let theme: 'light' | 'dark' = 'light';
+    let toggleTheme = () => {};
+
+    try {
+        const themeContext = useTheme();
+        theme = themeContext.theme;
+        toggleTheme = themeContext.toggleTheme;
+    } catch {
+        // ThemeProvider not available during SSR
+    }
 
     useEffect(() => {
         setMounted(true);
