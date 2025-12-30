@@ -12,11 +12,11 @@ import Link from 'next/link';
 
 // Skeleton loader for cards
 const VendorCardSkeleton = () => (
-    <div className="bg-white rounded-2xl overflow-hidden border border-gray-100 animate-pulse">
-        <div className="aspect-[4/3] bg-gray-100" />
+    <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-700 animate-pulse">
+        <div className="aspect-[4/3] bg-gray-100 dark:bg-slate-700" />
         <div className="p-4 space-y-3">
-            <div className="h-4 bg-gray-100 rounded w-3/4" />
-            <div className="h-3 bg-gray-100 rounded w-1/2" />
+            <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-3/4" />
+            <div className="h-3 bg-gray-100 dark:bg-slate-700 rounded w-1/2" />
         </div>
     </div>
 );
@@ -66,27 +66,27 @@ export default function FeaturedVendors() {
     const t = content[lang] || content.en;
 
     return (
-        <section id="featured-vendors" className="py-16 md:py-24 bg-white">
+        <section id="featured-vendors" className="py-16 md:py-24 bg-white dark:bg-slate-900">
             <div className="max-w-7xl mx-auto px-4 md:px-6">
                 {/* Header */}
                 <div className="flex flex-col md:flex-row md:items-end justify-between gap-4 mb-10 md:mb-12">
                     <div>
                         <div className="flex items-center gap-2 mb-2">
-                            <Verified className="w-5 h-5 text-blue-600" />
-                            <span className="text-sm font-semibold text-blue-600 uppercase tracking-wide">
+                            <Verified className="w-5 h-5 text-blue-600 dark:text-blue-400" />
+                            <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
                                 {lang === 'ru' ? 'Проверенные' : lang === 'he' ? 'מאומתים' : 'Verified'}
                             </span>
                         </div>
-                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 mb-2">
+                        <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">
                             {t.title}
                         </h2>
-                        <p className="text-gray-500">
+                        <p className="text-gray-500 dark:text-gray-400">
                             {t.subtitle}
                         </p>
                     </div>
 
                     <Link href="/vendors" className="hidden md:block">
-                        <button className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white rounded-full font-medium transition-colors">
+                        <button className="flex items-center gap-2 px-5 py-2.5 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 rounded-full font-medium transition-colors">
                             {t.viewAll}
                             <ArrowRight className="w-4 h-4" />
                         </button>
@@ -120,7 +120,7 @@ export default function FeaturedVendors() {
                         ))}
                     </motion.div>
                 ) : (
-                    <div className="text-center py-16 text-gray-500">
+                    <div className="text-center py-16 text-gray-500 dark:text-gray-400">
                         {t.noVendors}
                     </div>
                 )}
@@ -128,7 +128,7 @@ export default function FeaturedVendors() {
                 {/* Mobile View All */}
                 <div className="mt-8 md:hidden">
                     <Link href="/vendors" className="block">
-                        <button className="w-full py-3 bg-gray-900 hover:bg-gray-800 text-white rounded-full font-medium transition-colors flex items-center justify-center gap-2">
+                        <button className="w-full py-3 bg-gray-900 dark:bg-white hover:bg-gray-800 dark:hover:bg-gray-100 text-white dark:text-gray-900 rounded-full font-medium transition-colors flex items-center justify-center gap-2">
                             {t.viewAll}
                             <ArrowRight className="w-4 h-4" />
                         </button>

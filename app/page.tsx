@@ -9,7 +9,7 @@ import { supabase } from '@/lib/supabase';
 
 // Dynamic imports for below-fold components (lazy loading)
 const VendorGrid = dynamic(() => import('@/components/VendorGrid'), {
-    loading: () => <div className="h-96 animate-pulse bg-gray-100 rounded-3xl" />
+    loading: () => <div className="h-96 animate-pulse bg-gray-100 dark:bg-slate-800 rounded-3xl" />
 });
 const FeaturedVendors = dynamic(() => import('@/components/FeaturedVendors'));
 const HowItWorks = dynamic(() => import('@/components/HowItWorks'));
@@ -40,14 +40,14 @@ export default function Home() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white">
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
                 <div className="w-10 h-10 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-white">
+        <main className="min-h-screen bg-white dark:bg-slate-900 transition-colors duration-300">
             <Navbar />
 
             <HeroSection />
@@ -72,14 +72,10 @@ export default function Home() {
             )}
 
             {/* Featured Vendors */}
-            <section className="py-16 md:py-24">
-                <FeaturedVendors />
-            </section>
+            <FeaturedVendors />
 
             {/* How It Works */}
-            <section className="py-16 md:py-24 bg-gray-50">
-                <HowItWorks />
-            </section>
+            <HowItWorks />
 
             <Footer />
         </main>
