@@ -31,6 +31,7 @@ export default function HeroSection() {
     const [isFocused, setIsFocused] = useState(false);
     const [isChatOpen, setIsChatOpen] = useState(false);
     const [userCity, setUserCity] = useState<string | null>(null);
+    const [placeholderIndex, setPlaceholderIndex] = useState(0);
     const messagesEndRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
@@ -88,11 +89,33 @@ export default function HeroSection() {
         return timeBasedGreetings[lang]?.[timeOfDay] || timeBasedGreetings.en[timeOfDay];
     };
 
-    const placeholders = {
-        en: "What do you need?",
-        ru: "Что вам нужно?",
-        he: "מה אתם מחפשים?"
+    const placeholderVariants = {
+        en: [
+            "When is your event and what specialist do you need? 📅",
+            "Tell me about your celebration... 🎉",
+            "What's the occasion? 🎯"
+        ],
+        ru: [
+            "Когда ваше мероприятие и какой специалист нужен? 📅",
+            "Расскажите о вашем празднике... 🎉",
+            "Какой повод празднуем? 🎯"
+        ],
+        he: [
+            "מתי האירוע ואיזה מומחה צריך? 📅",
+            "ספר לי על החגיגה... 🎉",
+            "מה הסיבה? 🎯"
+        ]
     };
+
+    // Rotate placeholder text
+    useEffect(() => {
+        if (!isFocused && !input && !isChatOpen) {
+            const interval = setInterval(() => {
+                setPlaceholderIndex((prev) => (prev + 1) % placeholderVariants[lang].length);
+            }, 3000);
+            return () => clearInterval(interval);
+        }
+    }, [isFocused, input, isChatOpen, lang]);
 
     const quickPrompts = {
         en: [
@@ -350,35 +373,54 @@ export default function HeroSection() {
                     <AnimatePresence>
                         {!isChatOpen && (
                             <motion.div
-                                className="px-3 py-3 bg-white"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                                exit={{ opacity: 0 }}
+                                className="px-3 py-3 bg-white rounded-b-2xl"
+                                initial={{ opacity: 0, y: -10 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                exit={{ opacity: 0, y: -10 }}
+                                transition={{ duration: 0.3 }}
                             >
-                                <div className="flex gap-1.5 overflow-x-auto scrollbar-hide">
+                                <div className="flex gap-2 overflow-x-auto scrollbar-hide">
                                     {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => (
-                                        <button
+                                        <motion.button
                                             key={i}
                                             onClick={() => sendMessage(prompt.text)}
-                                            className="px-3 py-1.5 bg-gray-100 hover:bg-gray-200 rounded-full text-xs font-medium text-gray-700 transition-colors flex-shrink-0"
+                                            className="px-4 py-2 bg-gradient-to-r from-gray-50 to-gray-100 hover:from-blue-50 hover:to-indigo-50 border border-gray-200 hover:border-blue-300 rounded-full text-xs font-semibold text-gray-700 hover:text-blue-700 transition-all duration-300 flex-shrink-0 shadow-sm hover:shadow-md"
+                                            whileHover={{ scale: 1.05 }}
+                                            whileTap={{ scale: 0.95 }}
+                                            initial={{ opacity: 0, y: 10 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            transition={{ delay: i * 0.1 }}
                                         >
                                             {prompt.text}
-                                        </button>
+                                        </motion.button>
                                     ))}
                                 </div>
                             </motion.div>
                         )}
                     </AnimatePresence>
 
-                    {/* Input - Compact */}
+                    {/* Input - Compact with Animation */}
                     <form
                         onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
                         className="p-3 border-t border-gray-100 bg-white"
                     >
-                        <div className={cn(
-                            "flex items-center gap-2 px-3 py-1.5 rounded-full border transition-colors",
-                            isFocused ? "border-blue-500 bg-blue-50/30" : "border-gray-200 bg-gray-50"
-                        )}>
+                        <motion.div
+                            className={cn(
+                                "flex items-center gap-2 px-4 py-3 rounded-full border-2 transition-all duration-300",
+                                isFocused
+                                    ? "border-blue-500 bg-blue-50/50 shadow-lg shadow-blue-100"
+                                    : "border-gray-200 bg-gray-50 hover:border-gray-300 hover:shadow-md"
+                            )}
+                            animate={!isFocused && !input ? {
+                                scale: [1, 1.01, 1],
+                                borderColor: ['rgb(229, 231, 235)', 'rgb(191, 219, 254)', 'rgb(229, 231, 235)']
+                            } : {}}
+                            transition={{
+                                duration: 2,
+                                repeat: Infinity,
+                                repeatDelay: 1
+                            }}
+                        >
                             <input
                                 ref={inputRef}
                                 type="text"
@@ -386,23 +428,24 @@ export default function HeroSection() {
                                 onChange={(e) => setInput(e.target.value)}
                                 onFocus={() => setIsFocused(true)}
                                 onBlur={() => setIsFocused(false)}
-                                placeholder={placeholders[lang] || placeholders.en}
-                                className="flex-1 py-1.5 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-sm"
+                                placeholder={placeholderVariants[lang][placeholderIndex]}
+                                className="flex-1 py-0.5 bg-transparent text-gray-900 placeholder:text-gray-500 focus:outline-none text-sm font-medium"
                                 style={{ fontSize: '16px' }}
                             />
-                            <button
+                            <motion.button
                                 type="submit"
                                 disabled={!input.trim()}
                                 className={cn(
-                                    "p-1.5 rounded-full transition-colors",
+                                    "p-2 rounded-full transition-all duration-300",
                                     input.trim()
-                                        ? 'bg-blue-600 text-white hover:bg-blue-700'
+                                        ? 'bg-gradient-to-r from-blue-600 to-indigo-600 text-white hover:shadow-lg hover:scale-105'
                                         : 'bg-gray-200 text-gray-400'
                                 )}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                <Send className="w-3.5 h-3.5" />
-                            </button>
-                        </div>
+                                <Send className="w-4 h-4" />
+                            </motion.button>
+                        </motion.div>
                     </form>
                 </motion.div>
 
