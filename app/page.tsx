@@ -75,11 +75,6 @@ export default function Home() {
                 </section>
             )}
 
-            {/* Featured Vendors */}
-            <section className="py-16 md:py-24">
-                <FeaturedVendors />
-            </section>
-
             {/* How It Works */}
             <section className="py-16 md:py-24 bg-gray-50">
                 <HowItWorks />
