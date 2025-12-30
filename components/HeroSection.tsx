@@ -204,9 +204,9 @@ export default function HeroSection() {
     );
 
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center bg-blue-600 dark:bg-slate-900">
-            {/* Simple clean background - no gradient filters */}
-            <div className="absolute inset-0 bg-[radial-gradient(circle_at_30%_20%,rgba(255,255,255,0.1),transparent_50%)]" />
+        <section className="relative min-h-[90vh] flex items-center justify-center bg-slate-900 dark:bg-slate-950">
+            {/* Subtle gradient overlay */}
+            <div className="absolute inset-0 bg-gradient-to-b from-slate-800/50 to-slate-900" />
 
             {/* Content */}
             <div className="relative z-10 w-full max-w-3xl mx-auto px-4 py-10 md:py-16">
@@ -224,7 +224,7 @@ export default function HeroSection() {
                             <AnimatePresence mode="wait">
                                 <motion.span
                                     key={wordIndex}
-                                    className="text-yellow-300"
+                                    className="text-sky-400"
                                     initial={{ opacity: 0, y: 10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
