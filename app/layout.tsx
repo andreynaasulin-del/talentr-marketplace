@@ -109,6 +109,7 @@ export default function RootLayout({
                     <LanguageProvider>
                         <FavoritesProvider>
                             {children}
+                            <CookieConsent />
                         </FavoritesProvider>
                     </LanguageProvider>
                 </ThemeProvider>
@@ -126,7 +127,6 @@ export default function RootLayout({
                 />
                 <Analytics />
                 <SpeedInsights />
-                <CookieConsent />
             </body>
         </html>
     );
