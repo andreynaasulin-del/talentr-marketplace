@@ -7,6 +7,7 @@ import { ThemeProvider } from '@/context/ThemeContext';
 import { Toaster } from 'sonner';
 import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
+import CookieConsent from '@/components/CookieConsent';
 
 
 // Optimize font loading
@@ -125,6 +126,7 @@ export default function RootLayout({
                 />
                 <Analytics />
                 <SpeedInsights />
+                <CookieConsent />
             </body>
         </html>
     );

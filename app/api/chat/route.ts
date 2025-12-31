@@ -310,36 +310,144 @@ Ask ONE clarifying question. Examples:
 ## Current Context
 [VENDOR_CONTEXT]`;
 
-// ===== GENERATE FOLLOW-UP SUGGESTIONS =====
+// ===== GENERATE SMART FOLLOW-UP SUGGESTIONS =====
 function generateSuggestions(
     extracted: { category?: VendorCategory; eventType?: string; city?: City },
-    language: string
+    language: string,
+    hasVendors: boolean
 ): string[] {
-    const suggestions: Record<string, string[]> = {
-        en: [],
-        ru: [],
-        he: [],
-    };
+    const lang = language as 'en' | 'ru' | 'he';
 
-    if (extracted.eventType === 'Wedding') {
-        suggestions.en = ['Find a photographer', 'Find a DJ', 'Find a videographer', 'Find decorators'];
-        suggestions.ru = ['Найти фотографа', 'Найти диджея', 'Найти видеографа', 'Найти декоратора'];
-        suggestions.he = ['מצא צלם', "מצא דיג'יי", 'מצא צלם וידאו', 'מצא מעצב'];
-    } else if (extracted.eventType === 'Bar Mitzvah' || extracted.eventType === 'Bat Mitzvah') {
-        suggestions.en = ['Find a DJ', 'Find an animator', 'Find a photographer', 'Find a magician'];
-        suggestions.ru = ['Найти диджея', 'Найти аниматора', 'Найти фотографа', 'Найти фокусника'];
-        suggestions.he = ["מצא דיג'יי", 'מצא אנימטור', 'מצא צלם', 'מצא קוסם'];
-    } else if (extracted.eventType === 'Birthday') {
-        suggestions.en = ['Find an animator', 'Find a photographer', 'Find decorations', 'Find a magician'];
-        suggestions.ru = ['Найти аниматора', 'Найти фотографа', 'Найти декор', 'Найти фокусника'];
-        suggestions.he = ['מצא אנימטור', 'מצא צלם', 'מצא קישוטים', 'מצא קוסם'];
-    } else if (!extracted.category) {
-        suggestions.en = ['I need a photographer', 'I need a DJ', 'I need a singer', 'Planning a wedding'];
-        suggestions.ru = ['Нужен фотограф', 'Нужен диджей', 'Нужен певец', 'Планирую свадьбу'];
-        suggestions.he = ['אני צריך צלם', "אני צריך דיג'יי", 'אני צריך זמר', 'מתכנן חתונה'];
+    // Context-aware suggestions based on what's already extracted
+
+    // If we found vendors for a category, suggest related services or next steps
+    if (hasVendors && extracted.category) {
+        const relatedSuggestions: Record<VendorCategory, Record<string, string[]>> = {
+            'DJ': {
+                en: ['Also need a photographer', 'Show me singers', 'Need lighting/decor'],
+                ru: ['Ещё нужен фотограф', 'Покажи певцов', 'Нужен декор'],
+                he: ['גם צריך צלם', 'הראה זמרים', 'צריך עיצוב'],
+            },
+            'Photographer': {
+                en: ['Also need a videographer', 'Show me DJs', 'Need makeup artist'],
+                ru: ['Ещё нужен видеограф', 'Покажи диджеев', 'Нужен визажист'],
+                he: ['גם צריך צלם וידאו', "הראה דיג'יים", 'צריך מאפרת'],
+            },
+            'Singer': {
+                en: ['Also need a DJ', 'Show me musicians', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи музыкантов', 'Нужен фотограф'],
+                he: ["גם צריך דיג'יי", 'הראה מוזיקאים', 'צריך צלם'],
+            },
+            'MC': {
+                en: ['Also need a DJ', 'Show me comedians', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи комиков', 'Нужен фотограф'],
+                he: ["גם צריך דיג'יי", 'הראה קומיקאים', 'צריך צלם'],
+            },
+            'Videographer': {
+                en: ['Also need a photographer', 'Show me DJs', 'Need lighting'],
+                ru: ['Ещё нужен фотограф', 'Покажи диджеев', 'Нужен свет'],
+                he: ['גם צריך צלם', "הראה דיג'יים", 'צריך תאורה'],
+            },
+            'Magician': {
+                en: ['Also need an animator', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужен аниматор', 'Покажи диджеев', 'Нужен фотограф'],
+                he: ['גם צריך אנימטור', "הראה דיג'יים", 'צריך צלם'],
+            },
+            'Musician': {
+                en: ['Also need a singer', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужен певец', 'Покажи диджеев', 'Нужен фотограф'],
+                he: ['גם צריך זמר', "הראה דיג'יים", 'צריך צלם'],
+            },
+            'Comedian': {
+                en: ['Also need a DJ', 'Show me MCs', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи ведущих', 'Нужен фотограф'],
+                he: ["גם צריך דיג'יי", 'הראה מנחים', 'צריך צלם'],
+            },
+            'Dancer': {
+                en: ['Also need a DJ', 'Show me singers', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи певцов', 'Нужен фотограф'],
+                he: ["גם צריך דיג'יי", 'הראה זמרים', 'צריך צלם'],
+            },
+            'Bartender': {
+                en: ['Also need bar show', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужно бар-шоу', 'Покажи диджеев', 'Нужен фотограф'],
+                he: ['גם צריך בר שואו', "הראה דיג'יים", 'צריך צלם'],
+            },
+            'Bar Show': {
+                en: ['Also need a bartender', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужен бармен', 'Покажи диджеев', 'Нужен фотограф'],
+                he: ['גם צריך ברמן', "הראה דיג'יים", 'צריך צלם'],
+            },
+            'Event Decor': {
+                en: ['Also need flowers', 'Show me photographers', 'Need lighting'],
+                ru: ['Ещё нужны цветы', 'Покажи фотографов', 'Нужен свет'],
+                he: ['גם צריך פרחים', 'הראה צלמים', 'צריך תאורה'],
+            },
+            'Kids Animator': {
+                en: ['Also need a magician', 'Show me face painters', 'Need a photographer'],
+                ru: ['Ещё нужен фокусник', 'Покажи аквагрим', 'Нужен фотограф'],
+                he: ['גם צריך קוסם', 'הראה ציור פנים', 'צריך צלם'],
+            },
+            'Face Painter': {
+                en: ['Also need an animator', 'Show me magicians', 'Need a photographer'],
+                ru: ['Ещё нужен аниматор', 'Покажи фокусников', 'Нужен фотограф'],
+                he: ['גם צריך אנימטור', 'הראה קוסמים', 'צריך צלם'],
+            },
+            'Piercing/Tattoo': {
+                en: ['Also need makeup', 'Show me photographers', 'Need decorations'],
+                ru: ['Ещё нужен макияж', 'Покажи фотографов', 'Нужен декор'],
+                he: ['גם צריך איפור', 'הראה צלמים', 'צריך קישוט'],
+            },
+            'Chef': {
+                en: ['Also need a bartender', 'Show me decorators', 'Need a photographer'],
+                ru: ['Ещё нужен бармен', 'Покажи декораторов', 'Нужен фотограф'],
+                he: ['גם צריך ברמן', 'הראה מעצבים', 'צריך צלם'],
+            },
+        };
+
+        return relatedSuggestions[extracted.category]?.[lang] || relatedSuggestions[extracted.category]?.en || [];
     }
 
-    return suggestions[language] || suggestions.en;
+    // If category selected but asking for city
+    if (extracted.category && !extracted.city) {
+        return {
+            en: ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat'],
+            ru: ['Тель-Авив', 'Хайфа', 'Иерусалим', 'Эйлат'],
+            he: ['תל אביב', 'חיפה', 'ירושלים', 'אילת'],
+        }[lang] || [];
+    }
+
+    // Based on event type - suggest relevant professionals
+    if (extracted.eventType === 'Wedding') {
+        return {
+            en: ['Need a photographer', 'Need a DJ', 'Need a videographer'],
+            ru: ['Нужен фотограф', 'Нужен диджей', 'Нужен видеограф'],
+            he: ['צריך צלם', "צריך דיג'יי", 'צריך צלם וידאו'],
+        }[lang] || [];
+    }
+
+    if (extracted.eventType === 'Bar Mitzvah' || extracted.eventType === 'Bat Mitzvah') {
+        return {
+            en: ['Need a DJ', 'Need an animator', 'Need a photographer'],
+            ru: ['Нужен диджей', 'Нужен аниматор', 'Нужен фотограф'],
+            he: ["צריך דיג'יי", 'צריך אנימטור', 'צריך צלם'],
+        }[lang] || [];
+    }
+
+    if (extracted.eventType === 'Birthday') {
+        return {
+            en: ['Need an animator', 'Need a photographer', 'Need a magician'],
+            ru: ['Нужен аниматор', 'Нужен фотограф', 'Нужен фокусник'],
+            he: ['צריך אנימטור', 'צריך צלם', 'צריך קוסם'],
+        }[lang] || [];
+    }
+
+    // Default - no context yet
+    return {
+        en: ['Planning a wedding', 'Birthday party', 'Corporate event'],
+        ru: ['Планирую свадьбу', 'День рождения', 'Корпоратив'],
+        he: ['מתכנן חתונה', 'יום הולדת', 'אירוע עסקי'],
+    }[lang] || [];
 }
 
 // ===== AI RESPONSE GENERATION =====
@@ -528,8 +636,8 @@ export async function POST(request: NextRequest) {
             language
         );
 
-        // Generate follow-up suggestions
-        const suggestions = generateSuggestions(mergedExtracted, language);
+        // Generate follow-up suggestions based on context
+        const suggestions = generateSuggestions(mergedExtracted, language, vendors.length > 0);
 
         const result: ChatResponse = {
             response,

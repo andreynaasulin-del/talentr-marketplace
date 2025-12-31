@@ -52,9 +52,9 @@ export default function HeroSection() {
     }, [lang]);
 
     const placeholders = {
-        en: "What kind of event are you planning?",
-        ru: "Какое мероприятие вы планируете?",
-        he: "איזה אירוע אתם מתכננים?"
+        en: "What are you celebrating? I'll help you find the perfect pro ✨",
+        ru: "Какой праздник планируете? Помогу найти лучших ✨",
+        he: "מה אתם חוגגים? אמצא לכם את המקצוענים הכי טובים ✨"
     };
 
     const quickPrompts = {
