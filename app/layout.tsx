@@ -109,6 +109,7 @@ export default function RootLayout({
                     <LanguageProvider>
                         <FavoritesProvider>
                             {children}
+                            <CookieConsent />
                         </FavoritesProvider>
                     </LanguageProvider>
                 </ThemeProvider>
