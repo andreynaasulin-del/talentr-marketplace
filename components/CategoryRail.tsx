@@ -1,14 +1,10 @@
 'use client';
 
-import {
-    Camera, Video, Music, Mic, Sparkles, Mic2, Music2,
-    Smile, Users, Wine, GlassWater, Palette, Baby,
-    Paintbrush, Scissors, ChefHat
-} from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import Image from 'next/image';
 
 type Category =
     | 'Photographer'
@@ -25,34 +21,107 @@ type Category =
     | 'Event Decor'
     | 'Kids Animator'
     | 'Face Painter'
-    | 'Piercing/Tattoo'
     | 'Chef'
     | 'All';
 
 interface CategoryItem {
     id: Category;
     label: { en: string; ru: string; he: string };
-    icon: React.ElementType;
+    image: string;
     color: string;
 }
 
 const categories: CategoryItem[] = [
-    { id: 'All', label: { en: 'All', ru: 'Все', he: 'הכל' }, icon: Sparkles, color: 'from-gray-600 to-gray-800' },
-    { id: 'Photographer', label: { en: 'Photo', ru: 'Фото', he: 'צילום' }, icon: Camera, color: 'from-blue-500 to-blue-600' },
-    { id: 'Videographer', label: { en: 'Video', ru: 'Видео', he: 'וידאו' }, icon: Video, color: 'from-red-500 to-red-600' },
-    { id: 'DJ', label: { en: 'DJ', ru: 'DJ', he: 'DJ' }, icon: Music, color: 'from-purple-500 to-purple-600' },
-    { id: 'MC', label: { en: 'MC', ru: 'Ведущий', he: 'מנחה' }, icon: Mic, color: 'from-amber-500 to-amber-600' },
-    { id: 'Magician', label: { en: 'Magic', ru: 'Магия', he: 'קסם' }, icon: Sparkles, color: 'from-indigo-500 to-indigo-600' },
-    { id: 'Singer', label: { en: 'Singer', ru: 'Певец', he: 'זמר' }, icon: Mic2, color: 'from-pink-500 to-pink-600' },
-    { id: 'Musician', label: { en: 'Music', ru: 'Музыка', he: 'מוזיקה' }, icon: Music2, color: 'from-emerald-500 to-emerald-600' },
-    { id: 'Comedian', label: { en: 'Comedy', ru: 'Юмор', he: 'קומיקאי' }, icon: Smile, color: 'from-yellow-500 to-yellow-600' },
-    { id: 'Dancer', label: { en: 'Dance', ru: 'Танцы', he: 'ריקוד' }, icon: Users, color: 'from-rose-500 to-rose-600' },
-    { id: 'Bartender', label: { en: 'Bar', ru: 'Бар', he: 'בר' }, icon: Wine, color: 'from-orange-500 to-orange-600' },
-    { id: 'Bar Show', label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'שואו בר' }, icon: GlassWater, color: 'from-cyan-500 to-cyan-600' },
-    { id: 'Event Decor', label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' }, icon: Palette, color: 'from-violet-500 to-violet-600' },
-    { id: 'Kids Animator', label: { en: 'Kids', ru: 'Дети', he: 'ילדים' }, icon: Baby, color: 'from-lime-500 to-lime-600' },
-    { id: 'Face Painter', label: { en: 'Paint', ru: 'Грим', he: 'איפור' }, icon: Paintbrush, color: 'from-fuchsia-500 to-fuchsia-600' },
-    { id: 'Chef', label: { en: 'Chef', ru: 'Шеф', he: 'שף' }, icon: ChefHat, color: 'from-teal-500 to-teal-600' },
+    {
+        id: 'Photographer',
+        label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' },
+        image: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=300&h=300&fit=crop',
+        color: 'from-blue-500/90 to-blue-600/90'
+    },
+    {
+        id: 'Videographer',
+        label: { en: 'Videographer', ru: 'Видеограф', he: 'צלם וידאו' },
+        image: 'https://images.unsplash.com/photo-1579632652768-6cb9dcf85912?w=300&h=300&fit=crop',
+        color: 'from-red-500/90 to-red-600/90'
+    },
+    {
+        id: 'DJ',
+        label: { en: 'DJ', ru: 'DJ', he: 'DJ' },
+        image: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=300&h=300&fit=crop',
+        color: 'from-purple-500/90 to-purple-600/90'
+    },
+    {
+        id: 'MC',
+        label: { en: 'MC / Host', ru: 'Ведущий', he: 'מנחה' },
+        image: 'https://images.unsplash.com/photo-1559223607-a43c990c692c?w=300&h=300&fit=crop',
+        color: 'from-amber-500/90 to-amber-600/90'
+    },
+    {
+        id: 'Singer',
+        label: { en: 'Singer', ru: 'Певец', he: 'זמר' },
+        image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=300&h=300&fit=crop',
+        color: 'from-pink-500/90 to-pink-600/90'
+    },
+    {
+        id: 'Musician',
+        label: { en: 'Musician', ru: 'Музыкант', he: 'מוזיקאי' },
+        image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&h=300&fit=crop',
+        color: 'from-emerald-500/90 to-emerald-600/90'
+    },
+    {
+        id: 'Magician',
+        label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' },
+        image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=300&h=300&fit=crop',
+        color: 'from-indigo-500/90 to-indigo-600/90'
+    },
+    {
+        id: 'Comedian',
+        label: { en: 'Comedian', ru: 'Комик', he: 'קומיקאי' },
+        image: 'https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=300&h=300&fit=crop',
+        color: 'from-yellow-500/90 to-yellow-600/90'
+    },
+    {
+        id: 'Dancer',
+        label: { en: 'Dancer', ru: 'Танцор', he: 'רקדן' },
+        image: 'https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=300&h=300&fit=crop',
+        color: 'from-rose-500/90 to-rose-600/90'
+    },
+    {
+        id: 'Bartender',
+        label: { en: 'Bartender', ru: 'Бармен', he: 'ברמן' },
+        image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&h=300&fit=crop',
+        color: 'from-orange-500/90 to-orange-600/90'
+    },
+    {
+        id: 'Bar Show',
+        label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'שואו בר' },
+        image: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=300&h=300&fit=crop',
+        color: 'from-cyan-500/90 to-cyan-600/90'
+    },
+    {
+        id: 'Event Decor',
+        label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' },
+        image: 'https://images.unsplash.com/photo-1478146059778-26028b07395a?w=300&h=300&fit=crop',
+        color: 'from-violet-500/90 to-violet-600/90'
+    },
+    {
+        id: 'Kids Animator',
+        label: { en: 'Kids Animator', ru: 'Аниматор', he: 'אנימטור' },
+        image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=300&h=300&fit=crop',
+        color: 'from-lime-500/90 to-lime-600/90'
+    },
+    {
+        id: 'Face Painter',
+        label: { en: 'Face Paint', ru: 'Аквагрим', he: 'ציור פנים' },
+        image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=300&h=300&fit=crop',
+        color: 'from-fuchsia-500/90 to-fuchsia-600/90'
+    },
+    {
+        id: 'Chef',
+        label: { en: 'Chef', ru: 'Шеф-повар', he: 'שף' },
+        image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=300&h=300&fit=crop',
+        color: 'from-teal-500/90 to-teal-600/90'
+    },
 ];
 
 interface CategoryRailProps {
@@ -62,111 +131,129 @@ interface CategoryRailProps {
 export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     const [activeCategory, setActiveCategory] = useState<Category>('All');
     const { language } = useLanguage();
-    const scrollRef = useRef<HTMLDivElement>(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(true);
 
     const lang = language as 'en' | 'ru' | 'he';
 
-    const checkScroll = () => {
-        if (scrollRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-            setCanScrollLeft(scrollLeft > 10);
-            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-        }
-    };
-
-    useEffect(() => {
-        checkScroll();
-        const el = scrollRef.current;
-        if (el) {
-            el.addEventListener('scroll', checkScroll);
-            window.addEventListener('resize', checkScroll);
-        }
-        return () => {
-            if (el) el.removeEventListener('scroll', checkScroll);
-            window.removeEventListener('resize', checkScroll);
-        };
-    }, []);
-
     const handleCategoryClick = (categoryId: Category) => {
-        setActiveCategory(categoryId);
-        onCategoryChange?.(categoryId);
+        const newCategory = activeCategory === categoryId ? 'All' : categoryId;
+        setActiveCategory(newCategory);
+        onCategoryChange?.(newCategory);
     };
 
     return (
-        <div className="relative py-4 md:py-6 bg-white dark:bg-slate-900">
-            {/* Header - Mobile Compact */}
-            <div className="px-4 md:px-6 mb-3 md:mb-4">
-                <h3 className="text-xs md:text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                    {lang === 'he' ? 'קטגוריות' : lang === 'ru' ? 'КАТЕГОРИИ' : 'CATEGORIES'}
-                </h3>
+        <div className="py-6 md:py-10 bg-white dark:bg-slate-900">
+            {/* Header */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6">
+                <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+                    {lang === 'he' ? 'מצאו כישרונות' : lang === 'ru' ? 'Найти таланты' : 'Find Talents'}
+                </h2>
+                <p className="text-gray-500 dark:text-gray-400 mt-1">
+                    {lang === 'he' ? 'בחרו קטגוריה' : lang === 'ru' ? 'Выберите категорию' : 'Choose a category'}
+                </p>
             </div>
 
-            {/* Scrollable Container */}
-            <div
-                ref={scrollRef}
-                className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide px-4 md:px-6 pb-2"
-                style={{
-                    scrollBehavior: 'smooth',
-                    WebkitOverflowScrolling: 'touch'
-                }}
-            >
-                {categories.map((category, index) => {
-                    const Icon = category.icon;
-                    const isActive = activeCategory === category.id;
+            {/* Grid of Category Tiles */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
+                    {categories.map((category, index) => {
+                        const isActive = activeCategory === category.id;
 
-                    return (
-                        <motion.button
-                            key={category.id}
-                            onClick={() => handleCategoryClick(category.id)}
-                            className={cn(
-                                "relative flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-xl md:rounded-2xl",
-                                "flex-shrink-0 font-semibold text-xs md:text-sm transition-all duration-300",
-                                isActive
-                                    ? 'text-white shadow-lg'
-                                    : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 active:bg-gray-300 dark:active:bg-slate-600'
-                            )}
-                            style={isActive ? {
-                                background: `linear-gradient(135deg, ${category.color.includes('gray') ? '#374151, #1f2937' : category.color.replace('from-', '').replace(' to-', ', ').split(', ').map(c => c.includes('-500') ? c.replace('-500', '-500').replace(c.split('-')[0] + '-', '#') : c.replace('-600', '-600').replace(c.split('-')[0] + '-', '#')).join(', ')})`
-                            } : {}}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.03 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {isActive && (
-                                <motion.div
-                                    className={cn("absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-r", category.color)}
-                                    layoutId="activeCategory"
-                                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        return (
+                            <motion.button
+                                key={category.id}
+                                onClick={() => handleCategoryClick(category.id)}
+                                className={cn(
+                                    "relative aspect-square rounded-2xl overflow-hidden group",
+                                    "transition-all duration-300",
+                                    isActive
+                                        ? 'ring-4 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 scale-[1.02]'
+                                        : 'hover:scale-105 active:scale-95'
+                                )}
+                                initial={{ opacity: 0, y: 20 }}
+                                animate={{ opacity: 1, y: 0 }}
+                                transition={{ delay: index * 0.03 }}
+                                whileHover={{ y: -4 }}
+                            >
+                                {/* Background Image */}
+                                <Image
+                                    src={category.image}
+                                    alt={category.label[lang]}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 12.5vw"
                                 />
-                            )}
-                            <Icon className={cn(
-                                "relative z-10 w-3.5 h-3.5 md:w-4 md:h-4",
-                                isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
-                            )} />
-                            <span className="relative z-10 whitespace-nowrap">
-                                {category.label[lang] || category.label.en}
-                            </span>
-                        </motion.button>
-                    );
-                })}
+
+                                {/* Gradient Overlay */}
+                                <div className={cn(
+                                    "absolute inset-0 bg-gradient-to-t",
+                                    isActive ? category.color : 'from-black/70 via-black/30 to-transparent',
+                                    "transition-all duration-300"
+                                )} />
+
+                                {/* Label */}
+                                <div className="absolute inset-x-0 bottom-0 p-2 md:p-3">
+                                    <p className={cn(
+                                        "text-white font-bold text-xs md:text-sm text-center leading-tight",
+                                        "drop-shadow-lg"
+                                    )}>
+                                        {category.label[lang]}
+                                    </p>
+                                </div>
+
+                                {/* Active Indicator */}
+                                {isActive && (
+                                    <motion.div
+                                        className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', stiffness: 500 }}
+                                    >
+                                        <svg className="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                    </motion.div>
+                                )}
+                            </motion.button>
+                        );
+                    })}
+                </div>
             </div>
 
-            {/* Edge Fades - Responsive */}
-            <div
-                className={cn(
-                    "absolute left-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10 pointer-events-none transition-opacity",
-                    canScrollLeft ? 'opacity-100' : 'opacity-0'
-                )}
-            />
-            <div
-                className={cn(
-                    "absolute right-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none transition-opacity",
-                    canScrollRight ? 'opacity-100' : 'opacity-0'
-                )}
-            />
+            {/* Selected Category Indicator */}
+            {activeCategory !== 'All' && (
+                <motion.div
+                    className="max-w-7xl mx-auto px-4 md:px-6 mt-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                >
+                    <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                                {lang === 'he'
+                                    ? `מציג ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                    : lang === 'ru'
+                                        ? `Показаны: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                        : `Showing: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                }
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                setActiveCategory('All');
+                                onCategoryChange?.('All');
+                            }}
+                            className="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-colors"
+                        >
+                            {lang === 'he' ? 'נקה' : lang === 'ru' ? 'Сбросить' : 'Clear'}
+                        </button>
+                    </div>
+                </motion.div>
+            )}
         </div>
     );
 }
