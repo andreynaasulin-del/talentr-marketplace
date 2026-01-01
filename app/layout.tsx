@@ -127,7 +127,6 @@ export default function RootLayout({
                 />
                 <Analytics />
                 <SpeedInsights />
-                <CookieConsent />
             </body>
         </html>
     );
