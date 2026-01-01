@@ -1,14 +1,11 @@
 'use client';
 
-import { useState } from 'react';
+import { useState, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import {
-    Camera, Video, Music, Mic, Sparkles, Mic2, Music2,
-    Smile, Users, Wine, GlassWater, Palette, Baby,
-    Paintbrush, ChefHat
-} from 'lucide-react';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 type Category =
     | 'Photographer'
@@ -31,116 +28,100 @@ type Category =
 interface CategoryItem {
     id: Category;
     label: { en: string; ru: string; he: string };
-    icon: React.ElementType;
-    bgColor: string;
-    iconColor: string;
+    image: string;
+    gradient: string;
 }
 
 const categories: CategoryItem[] = [
     {
         id: 'Photographer',
         label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' },
-        icon: Camera,
-        bgColor: 'bg-blue-100 dark:bg-blue-900/30',
-        iconColor: 'text-blue-600 dark:text-blue-400'
+        image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-blue-600 to-cyan-500'
     },
     {
         id: 'Videographer',
-        label: { en: 'Video', ru: 'Видео', he: 'וידאו' },
-        icon: Video,
-        bgColor: 'bg-red-100 dark:bg-red-900/30',
-        iconColor: 'text-red-600 dark:text-red-400'
+        label: { en: 'Videographer', ru: 'Видеограф', he: 'צלם וידאו' },
+        image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-red-600 to-orange-500'
     },
     {
         id: 'DJ',
         label: { en: 'DJ', ru: 'DJ', he: 'DJ' },
-        icon: Music,
-        bgColor: 'bg-purple-100 dark:bg-purple-900/30',
-        iconColor: 'text-purple-600 dark:text-purple-400'
+        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-purple-600 to-pink-500'
     },
     {
         id: 'MC',
-        label: { en: 'MC', ru: 'Ведущий', he: 'מנחה' },
-        icon: Mic,
-        bgColor: 'bg-amber-100 dark:bg-amber-900/30',
-        iconColor: 'text-amber-600 dark:text-amber-400'
+        label: { en: 'MC / Host', ru: 'Ведущий', he: 'מנחה' },
+        image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-amber-600 to-yellow-500'
     },
     {
         id: 'Singer',
         label: { en: 'Singer', ru: 'Певец', he: 'זמר' },
-        icon: Mic2,
-        bgColor: 'bg-pink-100 dark:bg-pink-900/30',
-        iconColor: 'text-pink-600 dark:text-pink-400'
+        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-pink-600 to-rose-500'
     },
     {
         id: 'Musician',
         label: { en: 'Musician', ru: 'Музыкант', he: 'מוזיקאי' },
-        icon: Music2,
-        bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
-        iconColor: 'text-emerald-600 dark:text-emerald-400'
+        image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-emerald-600 to-teal-500'
     },
     {
         id: 'Magician',
         label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' },
-        icon: Sparkles,
-        bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
-        iconColor: 'text-indigo-600 dark:text-indigo-400'
+        image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-indigo-600 to-violet-500'
     },
     {
         id: 'Comedian',
-        label: { en: 'Comedian', ru: 'Комик', he: 'קומיקאי' },
-        icon: Smile,
-        bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
-        iconColor: 'text-yellow-600 dark:text-yellow-400'
+        label: { en: 'Comedian', ru: 'Комик', he: 'סטנדאפ' },
+        image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-yellow-500 to-amber-400'
     },
     {
         id: 'Dancer',
         label: { en: 'Dancer', ru: 'Танцор', he: 'רקדן' },
-        icon: Users,
-        bgColor: 'bg-rose-100 dark:bg-rose-900/30',
-        iconColor: 'text-rose-600 dark:text-rose-400'
+        image: 'https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-rose-600 to-pink-500'
     },
     {
         id: 'Bartender',
         label: { en: 'Bartender', ru: 'Бармен', he: 'ברמן' },
-        icon: Wine,
-        bgColor: 'bg-orange-100 dark:bg-orange-900/30',
-        iconColor: 'text-orange-600 dark:text-orange-400'
+        image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-orange-600 to-amber-500'
     },
     {
         id: 'Bar Show',
         label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'בר שואו' },
-        icon: GlassWater,
-        bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
-        iconColor: 'text-cyan-600 dark:text-cyan-400'
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-cyan-600 to-blue-500'
     },
     {
         id: 'Event Decor',
         label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' },
-        icon: Palette,
-        bgColor: 'bg-violet-100 dark:bg-violet-900/30',
-        iconColor: 'text-violet-600 dark:text-violet-400'
+        image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-violet-600 to-purple-500'
     },
     {
         id: 'Kids Animator',
         label: { en: 'Kids', ru: 'Аниматор', he: 'אנימטור' },
-        icon: Baby,
-        bgColor: 'bg-lime-100 dark:bg-lime-900/30',
-        iconColor: 'text-lime-600 dark:text-lime-400'
+        image: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-lime-500 to-green-500'
     },
     {
         id: 'Face Painter',
         label: { en: 'Face Paint', ru: 'Аквагрим', he: 'ציור פנים' },
-        icon: Paintbrush,
-        bgColor: 'bg-fuchsia-100 dark:bg-fuchsia-900/30',
-        iconColor: 'text-fuchsia-600 dark:text-fuchsia-400'
+        image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-fuchsia-600 to-pink-500'
     },
     {
         id: 'Chef',
-        label: { en: 'Chef', ru: 'Шеф', he: 'שף' },
-        icon: ChefHat,
-        bgColor: 'bg-teal-100 dark:bg-teal-900/30',
-        iconColor: 'text-teal-600 dark:text-teal-400'
+        label: { en: 'Chef', ru: 'Шеф-повар', he: 'שף' },
+        image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-teal-600 to-cyan-500'
     },
 ];
 
@@ -151,6 +132,7 @@ interface CategoryRailProps {
 export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     const [activeCategory, setActiveCategory] = useState<Category>('All');
     const { language } = useLanguage();
+    const scrollRef = useRef<HTMLDivElement>(null);
 
     const lang = language as 'en' | 'ru' | 'he';
 
@@ -160,23 +142,54 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
         onCategoryChange?.(newCategory);
     };
 
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const scrollAmount = 300;
+            scrollRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
+    };
+
     return (
-        <div className="py-6 md:py-10 bg-white dark:bg-slate-900">
+        <div className="py-8 md:py-12 bg-white dark:bg-slate-900">
             {/* Header */}
-            <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6">
-                <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
-                    {lang === 'he' ? 'מצאו כישרונות' : lang === 'ru' ? 'Найти таланты' : 'Find Talents'}
-                </h2>
-                <p className="text-gray-500 dark:text-gray-400 mt-1">
-                    {lang === 'he' ? 'בחרו קטגוריה' : lang === 'ru' ? 'Выберите категорию' : 'Choose a category'}
-                </p>
+            <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6 flex items-end justify-between">
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+                        {lang === 'he' ? 'מצאו כישרונות' : lang === 'ru' ? 'Найти таланты' : 'Find Talents'}
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                        {lang === 'he' ? 'בחרו קטגוריה' : lang === 'ru' ? 'Выберите категорию' : 'Choose a category'}
+                    </p>
+                </div>
+
+                {/* Navigation arrows */}
+                <div className="hidden md:flex gap-2">
+                    <button
+                        onClick={() => scroll('left')}
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    </button>
+                    <button
+                        onClick={() => scroll('right')}
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                    >
+                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    </button>
+                </div>
             </div>
 
-            {/* Grid of Category Tiles - Wolt Style */}
-            <div className="max-w-7xl mx-auto px-4 md:px-6">
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-5">
+            {/* Horizontal Scroll Container - Wolt Style */}
+            <div className="relative">
+                <div
+                    ref={scrollRef}
+                    className="flex gap-4 overflow-x-auto scrollbar-hide px-4 md:px-6 pb-4"
+                    style={{ scrollSnapType: 'x mandatory' }}
+                >
                     {categories.map((category, index) => {
-                        const Icon = category.icon;
                         const isActive = activeCategory === category.id;
 
                         return (
@@ -184,50 +197,48 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                                 key={category.id}
                                 onClick={() => handleCategoryClick(category.id)}
                                 className={cn(
-                                    "relative flex flex-col items-center gap-2 p-3 md:p-4 rounded-2xl",
-                                    "transition-all duration-200",
-                                    "hover:shadow-lg hover:-translate-y-1",
-                                    "active:scale-95",
-                                    isActive
-                                        ? 'bg-blue-500 shadow-lg shadow-blue-500/30'
-                                        : category.bgColor
+                                    "relative flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-3xl overflow-hidden group",
+                                    "transition-all duration-300",
+                                    isActive && 'ring-4 ring-blue-500 ring-offset-4 dark:ring-offset-slate-900'
                                 )}
+                                style={{ scrollSnapAlign: 'start' }}
                                 initial={{ opacity: 0, scale: 0.9 }}
                                 animate={{ opacity: 1, scale: 1 }}
-                                transition={{ delay: index * 0.03 }}
+                                transition={{ delay: index * 0.05 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
                             >
-                                {/* Icon */}
+                                {/* Background Image */}
+                                <Image
+                                    src={category.image}
+                                    alt={category.label[lang]}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                    sizes="(max-width: 768px) 128px, 160px"
+                                />
+
+                                {/* Gradient Overlay */}
                                 <div className={cn(
-                                    "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center",
-                                    isActive
-                                        ? 'bg-white/20'
-                                        : 'bg-white dark:bg-slate-800 shadow-sm'
-                                )}>
-                                    <Icon className={cn(
-                                        "w-6 h-6 md:w-7 md:h-7",
-                                        isActive ? 'text-white' : category.iconColor
-                                    )} />
-                                </div>
+                                    "absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent",
+                                    "group-hover:from-black/90"
+                                )} />
 
                                 {/* Label */}
-                                <span className={cn(
-                                    "text-xs md:text-sm font-semibold text-center leading-tight",
-                                    isActive
-                                        ? 'text-white'
-                                        : 'text-gray-700 dark:text-gray-200'
-                                )}>
-                                    {category.label[lang]}
-                                </span>
+                                <div className="absolute inset-x-0 bottom-0 p-3 md:p-4">
+                                    <p className="text-white font-bold text-sm md:text-base text-center drop-shadow-lg">
+                                        {category.label[lang]}
+                                    </p>
+                                </div>
 
-                                {/* Active checkmark */}
+                                {/* Active Indicator */}
                                 {isActive && (
                                     <motion.div
-                                        className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md"
+                                        className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg"
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
                                         transition={{ type: 'spring', stiffness: 500 }}
                                     >
-                                        <svg className="w-3 h-3 text-blue-500" fill="currentColor" viewBox="0 0 20 20">
+                                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
                                             <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
                                         </svg>
                                     </motion.div>
