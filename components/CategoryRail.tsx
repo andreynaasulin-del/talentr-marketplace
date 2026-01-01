@@ -4,7 +4,11 @@ import { useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import Image from 'next/image';
+import {
+    Camera, Video, Music, Mic, Sparkles, Mic2, Music2,
+    Smile, Users, Wine, GlassWater, Palette, Baby,
+    Paintbrush, ChefHat
+} from 'lucide-react';
 
 type Category =
     | 'Photographer'
@@ -27,100 +31,116 @@ type Category =
 interface CategoryItem {
     id: Category;
     label: { en: string; ru: string; he: string };
-    image: string;
-    color: string;
+    icon: React.ElementType;
+    bgColor: string;
+    iconColor: string;
 }
 
 const categories: CategoryItem[] = [
     {
         id: 'Photographer',
         label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' },
-        image: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?w=300&h=300&fit=crop',
-        color: 'from-blue-500/90 to-blue-600/90'
+        icon: Camera,
+        bgColor: 'bg-blue-100 dark:bg-blue-900/30',
+        iconColor: 'text-blue-600 dark:text-blue-400'
     },
     {
         id: 'Videographer',
-        label: { en: 'Videographer', ru: 'Видеограф', he: 'צלם וידאו' },
-        image: 'https://images.unsplash.com/photo-1579632652768-6cb9dcf85912?w=300&h=300&fit=crop',
-        color: 'from-red-500/90 to-red-600/90'
+        label: { en: 'Video', ru: 'Видео', he: 'וידאו' },
+        icon: Video,
+        bgColor: 'bg-red-100 dark:bg-red-900/30',
+        iconColor: 'text-red-600 dark:text-red-400'
     },
     {
         id: 'DJ',
         label: { en: 'DJ', ru: 'DJ', he: 'DJ' },
-        image: 'https://images.unsplash.com/photo-1571266028243-e4733b0f0bb0?w=300&h=300&fit=crop',
-        color: 'from-purple-500/90 to-purple-600/90'
+        icon: Music,
+        bgColor: 'bg-purple-100 dark:bg-purple-900/30',
+        iconColor: 'text-purple-600 dark:text-purple-400'
     },
     {
         id: 'MC',
-        label: { en: 'MC / Host', ru: 'Ведущий', he: 'מנחה' },
-        image: 'https://images.unsplash.com/photo-1559223607-a43c990c692c?w=300&h=300&fit=crop',
-        color: 'from-amber-500/90 to-amber-600/90'
+        label: { en: 'MC', ru: 'Ведущий', he: 'מנחה' },
+        icon: Mic,
+        bgColor: 'bg-amber-100 dark:bg-amber-900/30',
+        iconColor: 'text-amber-600 dark:text-amber-400'
     },
     {
         id: 'Singer',
         label: { en: 'Singer', ru: 'Певец', he: 'זמר' },
-        image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?w=300&h=300&fit=crop',
-        color: 'from-pink-500/90 to-pink-600/90'
+        icon: Mic2,
+        bgColor: 'bg-pink-100 dark:bg-pink-900/30',
+        iconColor: 'text-pink-600 dark:text-pink-400'
     },
     {
         id: 'Musician',
         label: { en: 'Musician', ru: 'Музыкант', he: 'מוזיקאי' },
-        image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=300&h=300&fit=crop',
-        color: 'from-emerald-500/90 to-emerald-600/90'
+        icon: Music2,
+        bgColor: 'bg-emerald-100 dark:bg-emerald-900/30',
+        iconColor: 'text-emerald-600 dark:text-emerald-400'
     },
     {
         id: 'Magician',
         label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' },
-        image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=300&h=300&fit=crop',
-        color: 'from-indigo-500/90 to-indigo-600/90'
+        icon: Sparkles,
+        bgColor: 'bg-indigo-100 dark:bg-indigo-900/30',
+        iconColor: 'text-indigo-600 dark:text-indigo-400'
     },
     {
         id: 'Comedian',
         label: { en: 'Comedian', ru: 'Комик', he: 'קומיקאי' },
-        image: 'https://images.unsplash.com/photo-1527224857830-43a7acc85260?w=300&h=300&fit=crop',
-        color: 'from-yellow-500/90 to-yellow-600/90'
+        icon: Smile,
+        bgColor: 'bg-yellow-100 dark:bg-yellow-900/30',
+        iconColor: 'text-yellow-600 dark:text-yellow-400'
     },
     {
         id: 'Dancer',
         label: { en: 'Dancer', ru: 'Танцор', he: 'רקדן' },
-        image: 'https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=300&h=300&fit=crop',
-        color: 'from-rose-500/90 to-rose-600/90'
+        icon: Users,
+        bgColor: 'bg-rose-100 dark:bg-rose-900/30',
+        iconColor: 'text-rose-600 dark:text-rose-400'
     },
     {
         id: 'Bartender',
         label: { en: 'Bartender', ru: 'Бармен', he: 'ברמן' },
-        image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=300&h=300&fit=crop',
-        color: 'from-orange-500/90 to-orange-600/90'
+        icon: Wine,
+        bgColor: 'bg-orange-100 dark:bg-orange-900/30',
+        iconColor: 'text-orange-600 dark:text-orange-400'
     },
     {
         id: 'Bar Show',
-        label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'שואו בר' },
-        image: 'https://images.unsplash.com/photo-1470337458703-46ad1756a187?w=300&h=300&fit=crop',
-        color: 'from-cyan-500/90 to-cyan-600/90'
+        label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'בר שואו' },
+        icon: GlassWater,
+        bgColor: 'bg-cyan-100 dark:bg-cyan-900/30',
+        iconColor: 'text-cyan-600 dark:text-cyan-400'
     },
     {
         id: 'Event Decor',
         label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' },
-        image: 'https://images.unsplash.com/photo-1478146059778-26028b07395a?w=300&h=300&fit=crop',
-        color: 'from-violet-500/90 to-violet-600/90'
+        icon: Palette,
+        bgColor: 'bg-violet-100 dark:bg-violet-900/30',
+        iconColor: 'text-violet-600 dark:text-violet-400'
     },
     {
         id: 'Kids Animator',
-        label: { en: 'Kids Animator', ru: 'Аниматор', he: 'אנימטור' },
-        image: 'https://images.unsplash.com/photo-1587654780291-39c9404d746b?w=300&h=300&fit=crop',
-        color: 'from-lime-500/90 to-lime-600/90'
+        label: { en: 'Kids', ru: 'Аниматор', he: 'אנימטור' },
+        icon: Baby,
+        bgColor: 'bg-lime-100 dark:bg-lime-900/30',
+        iconColor: 'text-lime-600 dark:text-lime-400'
     },
     {
         id: 'Face Painter',
         label: { en: 'Face Paint', ru: 'Аквагрим', he: 'ציור פנים' },
-        image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=300&h=300&fit=crop',
-        color: 'from-fuchsia-500/90 to-fuchsia-600/90'
+        icon: Paintbrush,
+        bgColor: 'bg-fuchsia-100 dark:bg-fuchsia-900/30',
+        iconColor: 'text-fuchsia-600 dark:text-fuchsia-400'
     },
     {
         id: 'Chef',
-        label: { en: 'Chef', ru: 'Шеф-повар', he: 'שף' },
-        image: 'https://images.unsplash.com/photo-1556910103-1c02745aae4d?w=300&h=300&fit=crop',
-        color: 'from-teal-500/90 to-teal-600/90'
+        label: { en: 'Chef', ru: 'Шеф', he: 'שף' },
+        icon: ChefHat,
+        bgColor: 'bg-teal-100 dark:bg-teal-900/30',
+        iconColor: 'text-teal-600 dark:text-teal-400'
     },
 ];
 
@@ -152,10 +172,11 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                 </p>
             </div>
 
-            {/* Grid of Category Tiles */}
+            {/* Grid of Category Tiles - Wolt Style */}
             <div className="max-w-7xl mx-auto px-4 md:px-6">
-                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-3 md:gap-4">
+                <div className="grid grid-cols-3 sm:grid-cols-4 md:grid-cols-5 lg:grid-cols-6 xl:grid-cols-8 gap-4 md:gap-5">
                     {categories.map((category, index) => {
+                        const Icon = category.icon;
                         const isActive = activeCategory === category.id;
 
                         return (
@@ -163,47 +184,45 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                                 key={category.id}
                                 onClick={() => handleCategoryClick(category.id)}
                                 className={cn(
-                                    "relative aspect-square rounded-2xl overflow-hidden group",
-                                    "transition-all duration-300",
+                                    "relative flex flex-col items-center gap-2 p-3 md:p-4 rounded-2xl",
+                                    "transition-all duration-200",
+                                    "hover:shadow-lg hover:-translate-y-1",
+                                    "active:scale-95",
                                     isActive
-                                        ? 'ring-4 ring-blue-500 ring-offset-2 dark:ring-offset-slate-900 scale-[1.02]'
-                                        : 'hover:scale-105 active:scale-95'
+                                        ? 'bg-blue-500 shadow-lg shadow-blue-500/30'
+                                        : category.bgColor
                                 )}
-                                initial={{ opacity: 0, y: 20 }}
-                                animate={{ opacity: 1, y: 0 }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
                                 transition={{ delay: index * 0.03 }}
-                                whileHover={{ y: -4 }}
                             >
-                                {/* Background Image */}
-                                <Image
-                                    src={category.image}
-                                    alt={category.label[lang]}
-                                    fill
-                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
-                                    sizes="(max-width: 640px) 33vw, (max-width: 768px) 25vw, (max-width: 1024px) 20vw, 12.5vw"
-                                />
-
-                                {/* Gradient Overlay */}
+                                {/* Icon */}
                                 <div className={cn(
-                                    "absolute inset-0 bg-gradient-to-t",
-                                    isActive ? category.color : 'from-black/70 via-black/30 to-transparent',
-                                    "transition-all duration-300"
-                                )} />
-
-                                {/* Label */}
-                                <div className="absolute inset-x-0 bottom-0 p-2 md:p-3">
-                                    <p className={cn(
-                                        "text-white font-bold text-xs md:text-sm text-center leading-tight",
-                                        "drop-shadow-lg"
-                                    )}>
-                                        {category.label[lang]}
-                                    </p>
+                                    "w-12 h-12 md:w-14 md:h-14 rounded-2xl flex items-center justify-center",
+                                    isActive
+                                        ? 'bg-white/20'
+                                        : 'bg-white dark:bg-slate-800 shadow-sm'
+                                )}>
+                                    <Icon className={cn(
+                                        "w-6 h-6 md:w-7 md:h-7",
+                                        isActive ? 'text-white' : category.iconColor
+                                    )} />
                                 </div>
 
-                                {/* Active Indicator */}
+                                {/* Label */}
+                                <span className={cn(
+                                    "text-xs md:text-sm font-semibold text-center leading-tight",
+                                    isActive
+                                        ? 'text-white'
+                                        : 'text-gray-700 dark:text-gray-200'
+                                )}>
+                                    {category.label[lang]}
+                                </span>
+
+                                {/* Active checkmark */}
                                 {isActive && (
                                     <motion.div
-                                        className="absolute top-2 right-2 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-lg"
+                                        className="absolute -top-1 -right-1 w-5 h-5 bg-white rounded-full flex items-center justify-center shadow-md"
                                         initial={{ scale: 0 }}
                                         animate={{ scale: 1 }}
                                         transition={{ type: 'spring', stiffness: 500 }}
@@ -235,7 +254,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                         <div className="flex-1">
                             <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                                 {lang === 'he'
-                                    ? `מציג ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                    ? `מציג: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
                                     : lang === 'ru'
                                         ? `Показаны: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
                                         : `Showing: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
