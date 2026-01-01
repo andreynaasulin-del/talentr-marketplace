@@ -194,15 +194,15 @@ export default function HeroSection() {
                         </span>
                         {' '}
                         <span className="text-white">
-                            {lang === 'ru' ? 'специалиста' : lang === 'he' ? 'איש המקצוע' : 'pro'}
+                            {lang === 'ru' ? 'таланта' : lang === 'he' ? 'כישרון' : 'talent'}
                         </span>
                     </h1>
                     <p className="text-lg md:text-xl text-white/90 font-medium">
                         {lang === 'ru'
-                            ? 'Фотографы, DJ, ведущие и другие профессионалы для вашего мероприятия'
+                            ? 'Фотографы, DJ, ведущие и другие таланты для вашего мероприятия'
                             : lang === 'he'
-                                ? 'צלמים, DJ, מנחים ועוד אנשי מקצוע לאירוע שלכם'
-                                : 'Photographers, DJs, MCs and more for your event'
+                                ? 'צלמים, DJ, מנחים ועוד כישרונות לאירוע שלכם'
+                                : 'Photographers, DJs, MCs and more talents for your event'
                         }
                     </p>
                 </motion.div>
