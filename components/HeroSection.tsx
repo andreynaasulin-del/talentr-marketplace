@@ -30,10 +30,10 @@ interface ChatAPIResponse {
     mood?: string[];
 }
 
-// Animated words - Wolt style
+// Animated words - micro-entertainment vibe (no weddings/corporate)
 const animatedWords = {
-    en: ['WEDDINGS', 'BIRTHDAYS', 'PARTIES', 'EVENTS', 'DREAMS'],
-    he: ['חתונות', 'ימי הולדת', 'מסיבות', 'אירועים', 'חלומות']
+    en: ['VIBES', 'LAUGHS', 'CHILL', 'WOW', 'ART'],
+    he: ['וייב', 'צחוק', "צ׳יל", 'וואו', 'ארט']
 };
 
 export default function HeroSection() {
@@ -75,8 +75,8 @@ export default function HeroSection() {
     }, [lang, messages.length]);
 
     const placeholders = {
-        en: "What are you celebrating? ✨",
-        he: "מה אתם חוגגים? ✨"
+        en: "What do you want to feel today? 😎",
+        he: "מה בא לכם להרגיש היום? 😎"
     };
 
     useEffect(() => {
