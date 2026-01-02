@@ -126,7 +126,7 @@ function PackageCube({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; t: any
                         <span className="inline-block text-[10px] font-bold text-white/50 uppercase tracking-widest mb-1.5">
                             {pkg.category}
                         </span>
-                        <h3 className="text-lg md:text-xl font-black text-white leading-tight mb-2 drop-shadow-md">
+                        <h3 className="text-lg md:text-xl font-black text-white leading-snug mb-2 drop-shadow-md min-h-[3rem]">
                             {pkg.title[lang]}
                         </h3>
                     </div>
