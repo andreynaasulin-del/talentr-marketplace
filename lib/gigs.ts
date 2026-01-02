@@ -307,7 +307,7 @@ export const packages: Package[] = [
         talentId: 'talent-014',
         talentName: { en: 'Elena Glow', he: 'אלנה גלאו' },
         category: 'Musician',
-        image: 'https://images.unsplash.com/photo-1465821508027-561b82d5df75?w=600&h=600&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1558618666-fcd25c85cd64?w=600&h=600&fit=crop&q=80',
         fixedPrice: 1900,
         duration: 45,
         includes: { 
@@ -370,7 +370,7 @@ export const packages: Package[] = [
         talentId: 'talent-017',
         talentName: { en: 'Velvet Rose', he: 'ורד הקטיפה' },
         category: 'Performer',
-        image: 'https://images.unsplash.com/photo-1514525253344-99a42999628a?w=600&h=600&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1518834107812-67b0b7c58434?w=600&h=600&fit=crop&q=80',
         fixedPrice: 3500,
         duration: 40,
         includes: { 
@@ -412,7 +412,7 @@ export const packages: Package[] = [
         talentId: 'talent-019',
         talentName: { en: 'The Dram Society', he: 'חברת הדראם' },
         category: 'Sommelier',
-        image: 'https://images.unsplash.com/photo-1527281400828-ac737c6f5d53?w=600&h=600&fit=crop&q=80',
+        image: 'https://images.unsplash.com/photo-1569529465841-dfecdab7503b?w=600&h=600&fit=crop&q=80',
         fixedPrice: 3800,
         duration: 90,
         includes: { 
