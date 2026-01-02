@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, ArrowRight, Shield, CheckCircle2, Zap, Bot, Camera, Music, Mic } from 'lucide-react';
+import { Send, Star, ArrowRight, Bot } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -35,40 +35,12 @@ export default function HeroSection() {
 
     const lang = language as 'en' | 'he';
 
-    // Animated words for headline
-    const headlineWords = {
-        en: ['perfect', 'ideal', 'right'],
-        he: ['המושלם', 'הטוב ביותר', 'המתאים']
-    };
-
-    const [wordIndex, setWordIndex] = useState(0);
-
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setWordIndex((prev) => (prev + 1) % headlineWords[lang].length);
-        }, 3000);
-        return () => clearInterval(interval);
-    }, [lang]);
-
     const placeholders = {
-        en: "What are you celebrating? I'll help you find the perfect pro ✨",
-        he: "מה אתם חוגגים? אמצא לכם את המקצוענים הכי טובים ✨"
+        en: "What are you celebrating? ✨",
+        he: "מה אתם חוגגים? ✨"
     };
 
-    const quickPrompts = {
-        en: [
-            { text: "Wedding photographer", icon: Camera },
-            { text: "DJ for party", icon: Music },
-            { text: "Event MC", icon: Mic },
-        ],
-        he: [
-            { text: "צלם לחתונה", icon: Camera },
-            { text: "DJ למסיבה", icon: Music },
-            { text: "מנחה לאירוע", icon: Mic },
-        ]
-    };
-
-    // Scroll to bottom of messages without moving the page
+    // Scroll to bottom of messages
     useEffect(() => {
         if (messagesContainerRef.current && chatExpanded) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -79,7 +51,6 @@ export default function HeroSection() {
         const messageText = text || input.trim();
         if (!messageText) return;
 
-        // Expand chat on first message
         if (!chatExpanded) {
             setChatExpanded(true);
         }
@@ -116,7 +87,7 @@ export default function HeroSection() {
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: lang === 'he' ? 'סליחה, שגיאה. נסו שוב!' : 'Sorry, error. Try again!',
+                content: lang === 'he' ? 'שגיאה, נסו שוב' : 'Error, try again',
             }]);
         } finally {
             setIsTyping(false);
@@ -155,67 +126,43 @@ export default function HeroSection() {
     );
 
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center bg-blue-600 dark:bg-slate-900">
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/30 to-blue-700/50 dark:from-slate-800/50 dark:to-slate-900" />
-
+        <section className="relative min-h-[70vh] md:min-h-[75vh] flex items-center justify-center bg-[#009de0]">
+            {/* Wolt-style solid color - no gradients */}
+            
             {/* Content */}
-            <div className="relative z-10 w-full max-w-3xl mx-auto px-4 py-10 md:py-16">
-                {/* Headline */}
+            <div className="relative z-10 w-full max-w-xl mx-auto px-4 py-8 md:py-12">
+                {/* Headline - Minimal like Wolt */}
                 <motion.div
-                    className="text-center mb-8 md:mb-10"
-                    initial={{ opacity: 0, y: 20 }}
+                    className="text-center mb-6 md:mb-8"
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
+                    transition={{ duration: 0.3 }}
                 >
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
-                        {lang === 'he' ? 'מצאו את הכישרון' : 'Find your'}
-                        <br />
-                        <span className="relative inline-block">
-                            <AnimatePresence mode="wait">
-                                <motion.span
-                                    key={wordIndex}
-                                    className="text-sky-400"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    {headlineWords[lang][wordIndex]}
-                                </motion.span>
-                            </AnimatePresence>
-                        </span>
-                        {' '}
-                        <span className="text-white">
-                            {lang === 'he' ? '' : 'talent'}
-                        </span>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2 leading-tight">
+                        {lang === 'he' ? 'מצאו כישרונות.' : 'Find talent.'}
                     </h1>
                     <p className="text-lg md:text-xl text-white/90 font-medium">
-                        {lang === 'he'
-                            ? 'צלמים, DJ, מנחים ועוד כישרונות לאירוע שלכם'
-                            : 'Photographers, DJs, MCs and more talents for your event'
-                        }
+                        {lang === 'he' ? 'לכל אירוע.' : 'For any event.'}
                     </p>
                 </motion.div>
 
-                {/* Compact AI Search Bar */}
+                {/* AI Search Bar - Wolt style */}
                 <motion.div
-                    className="max-w-xl mx-auto"
-                    initial={{ opacity: 0, y: 20 }}
+                    initial={{ opacity: 0, y: 15 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
+                    transition={{ duration: 0.3, delay: 0.1 }}
                 >
-                    <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                         {/* Expanded Chat Area */}
                         <AnimatePresence>
                             {chatExpanded && (
                                 <motion.div
                                     ref={messagesContainerRef}
-                                    className="max-h-[300px] overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-700"
+                                    className="max-h-[280px] overflow-y-auto p-4 space-y-3 bg-gray-50 border-b border-gray-100"
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
+                                    transition={{ duration: 0.2 }}
                                 >
                                     {messages.map((msg) => (
                                         <motion.div
@@ -224,16 +171,16 @@ export default function HeroSection() {
                                                 "max-w-[85%]",
                                                 msg.role === 'user' ? 'ms-auto' : 'me-auto'
                                             )}
-                                            initial={{ opacity: 0, y: 10 }}
+                                            initial={{ opacity: 0, y: 8 }}
                                             animate={{ opacity: 1, y: 0 }}
                                         >
                                             {msg.role === 'assistant' ? (
                                                 <div className="flex items-start gap-2">
-                                                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
+                                                    <div className="w-7 h-7 rounded-lg bg-[#009de0] flex items-center justify-center flex-shrink-0">
                                                         <Bot className="w-4 h-4 text-white" />
                                                     </div>
-                                                    <div className="bg-white dark:bg-slate-800 rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-gray-100 dark:border-slate-700">
-                                                        <p className="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">{msg.content}</p>
+                                                    <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-gray-100">
+                                                        <p className="text-gray-800 text-sm leading-relaxed">{msg.content}</p>
                                                         {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
                                                         {msg.suggestions && msg.suggestions.length > 0 && (
                                                             <div className="flex flex-wrap gap-1.5 mt-2">
@@ -241,7 +188,7 @@ export default function HeroSection() {
                                                                     <button
                                                                         key={i}
                                                                         onClick={() => sendMessage(s)}
-                                                                        className="px-2.5 py-1 bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium transition-colors"
+                                                                        className="px-2.5 py-1 bg-[#009de0]/10 hover:bg-[#009de0]/20 text-[#009de0] rounded-full text-xs font-medium transition-colors"
                                                                     >
                                                                         {s}
                                                                     </button>
@@ -251,7 +198,7 @@ export default function HeroSection() {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="bg-blue-600 text-white rounded-xl rounded-br-sm px-3 py-2 shadow-sm">
+                                                <div className="bg-[#009de0] text-white rounded-xl rounded-br-sm px-3 py-2 shadow-sm">
                                                     <p className="text-sm">{msg.content}</p>
                                                 </div>
                                             )}
@@ -260,17 +207,17 @@ export default function HeroSection() {
 
                                     {isTyping && (
                                         <div className="flex items-start gap-2">
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
+                                            <div className="w-7 h-7 rounded-lg bg-[#009de0] flex items-center justify-center">
                                                 <Bot className="w-4 h-4 text-white" />
                                             </div>
-                                            <div className="bg-white dark:bg-slate-800 rounded-xl px-4 py-3 shadow-sm border border-gray-100 dark:border-slate-700">
+                                            <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-100">
                                                 <div className="flex gap-1">
                                                     {[0, 1, 2].map((i) => (
                                                         <motion.span
                                                             key={i}
-                                                            className="w-2 h-2 bg-blue-500 rounded-full"
-                                                            animate={{ y: [0, -6, 0] }}
-                                                            transition={{ duration: 0.5, delay: i * 0.1, repeat: Infinity }}
+                                                            className="w-2 h-2 bg-[#009de0] rounded-full"
+                                                            animate={{ y: [0, -5, 0] }}
+                                                            transition={{ duration: 0.4, delay: i * 0.1, repeat: Infinity }}
                                                         />
                                                     ))}
                                                 </div>
@@ -281,20 +228,17 @@ export default function HeroSection() {
                             )}
                         </AnimatePresence>
 
-                        {/* Input Area */}
+                        {/* Input Area - Clean, thumb-friendly */}
                         <form
                             onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
                             className="p-3"
                         >
                             <div className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all",
+                                "flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all",
                                 isFocused
-                                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
-                                    : "border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900"
+                                    ? "border-[#009de0] bg-[#009de0]/5"
+                                    : "border-gray-200 bg-gray-50"
                             )}>
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-white" />
-                                </div>
                                 <input
                                     ref={inputRef}
                                     type="text"
@@ -303,75 +247,31 @@ export default function HeroSection() {
                                     onFocus={() => setIsFocused(true)}
                                     onBlur={() => setIsFocused(false)}
                                     placeholder={placeholders[lang] || placeholders.en}
-                                    className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none text-base"
-                                    style={{ fontSize: '16px' }}
+                                    className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-base"
+                                    style={{ fontSize: '16px' }} // Prevents iOS zoom
                                 />
                                 <button
                                     type="submit"
                                     disabled={!input.trim()}
                                     className={cn(
-                                        "p-2.5 rounded-lg transition-all",
+                                        "p-2.5 rounded-xl transition-all",
                                         input.trim()
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-200 dark:bg-slate-700 text-gray-400'
+                                            ? 'bg-[#009de0] text-white active:scale-95'
+                                            : 'bg-gray-200 text-gray-400'
                                     )}
                                 >
-                                    <Send className="w-4 h-4" />
+                                    <Send className="w-5 h-5" />
                                 </button>
                             </div>
                         </form>
-
-                        {/* Quick Prompts - only when not expanded */}
-                        <AnimatePresence>
-                            {!chatExpanded && (
-                                <motion.div
-                                    className="px-3 pb-3"
-                                    initial={{ opacity: 1 }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                >
-                                    <div className="flex gap-2 flex-wrap justify-center">
-                                        {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => {
-                                            const IconComponent = prompt.icon;
-                                            return (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => sendMessage(prompt.text)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors"
-                                                >
-                                                    <IconComponent className="w-3.5 h-3.5 text-blue-500" />
-                                                    {prompt.text}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Trust Badges */}
-                    <div className="flex items-center justify-center gap-4 sm:gap-6 mt-6 flex-wrap">
-                        {[
-                            { icon: Shield, text: { en: 'Secure', he: 'מאובטח' } },
-                            { icon: CheckCircle2, text: { en: 'Verified pros', he: 'מקצוענים מאומתים' } },
-                            { icon: Zap, text: { en: 'Instant reply', he: 'תגובה מיידית' } },
-                        ].map((badge, i) => (
-                            <div
-                                key={i}
-                                className="flex items-center gap-1.5 text-white/80"
-                            >
-                                <badge.icon className="w-4 h-4" />
-                                <span className="text-sm font-medium">{badge.text[lang]}</span>
-                            </div>
-                        ))}
                     </div>
                 </motion.div>
             </div>
 
-            {/* Wave */}
+            {/* Clean wave transition */}
             <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 60" fill="none" className="w-full" preserveAspectRatio="none">
-                    <path d="M0 60L1440 60V30C1200 45 960 55 720 50C480 45 240 35 0 40V60Z" className="fill-white dark:fill-slate-900" />
+                <svg viewBox="0 0 1440 40" fill="none" className="w-full" preserveAspectRatio="none">
+                    <path d="M0 40L1440 40V20C1200 30 960 35 720 32C480 29 240 25 0 28V40Z" className="fill-white dark:fill-slate-900" />
                 </svg>
             </div>
         </section>

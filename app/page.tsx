@@ -1,25 +1,17 @@
 'use client';
 
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect } from 'react';
 import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
-import CategoryRail from '@/components/CategoryRail';
 import GigCarousel from '@/components/GigCarousel';
 import { supabase } from '@/lib/supabase';
 
-// Dynamic imports for below-fold components (lazy loading)
-const VendorGrid = dynamic(() => import('@/components/VendorGrid'), {
-    loading: () => <div className="h-96 animate-pulse bg-gray-100 dark:bg-slate-800 rounded-3xl" />
-});
-// FeaturedVendors temporarily hidden until we have vendors
-const HowItWorks = dynamic(() => import('@/components/HowItWorks'));
+// Dynamic imports for below-fold components
 const Footer = dynamic(() => import('@/components/Footer'));
 
 export default function Home() {
     const [isLoading, setIsLoading] = useState(true);
-    const [selectedCategory, setSelectedCategory] = useState('All');
-    const vendorGridRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const checkAuth = async () => {
@@ -53,32 +45,8 @@ export default function Home() {
 
             <HeroSection />
 
-            {/* Floating Gig Cards - Wolt style */}
+            {/* Square Gig Cards - Wolt style, NO prices */}
             <GigCarousel />
-
-            {/* Categories */}
-            <section className="py-8 md:py-12">
-                <div className="max-w-7xl mx-auto">
-                    <CategoryRail onCategoryChange={(cat) => {
-                        setSelectedCategory(cat);
-                        if (cat !== 'All') {
-                            vendorGridRef.current?.scrollIntoView({ behavior: 'smooth', block: 'start' });
-                        }
-                    }} />
-                </div>
-            </section>
-
-            {/* Vendor Grid - Only show when category selected */}
-            {selectedCategory !== 'All' && (
-                <section ref={vendorGridRef} className="py-12 md:py-20 scroll-mt-20">
-                    <VendorGrid category={selectedCategory} />
-                </section>
-            )}
-
-            {/* Featured Vendors - hidden until we have vendors */}
-
-            {/* How It Works */}
-            <HowItWorks />
 
             <Footer />
         </main>
