@@ -21,7 +21,6 @@ export default function JoinPage() {
     const languages = [
         { code: 'en' as const, label: 'English', flag: '🇺🇸' },
         { code: 'he' as const, label: 'עברית', flag: '🇮🇱' },
-        { code: 'ru' as const, label: 'Русский', flag: '🇷🇺' },
     ];
 
     const currentLang = languages.find((l) => l.code === language) || languages[0];
@@ -36,29 +35,29 @@ export default function JoinPage() {
     });
 
     const categories = [
-        { id: 'Photographer', icon: '📸', label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' } },
-        { id: 'Videographer', icon: '🎬', label: { en: 'Videographer', ru: 'Видеограф', he: 'צלם וידאו' } },
-        { id: 'DJ', icon: '🎧', label: { en: 'DJ', ru: 'DJ', he: 'DJ' } },
-        { id: 'MC', icon: '🎤', label: { en: 'MC / Host', ru: 'Ведущий', he: 'מנחה' } },
-        { id: 'Magician', icon: '🎩', label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' } },
-        { id: 'Singer', icon: '🎵', label: { en: 'Singer', ru: 'Певец', he: 'זמר' } },
-        { id: 'Musician', icon: '🎸', label: { en: 'Musician', ru: 'Музыкант', he: 'מוזיקאי' } },
-        { id: 'Bartender', icon: '🍸', label: { en: 'Bartender', ru: 'Бармен', he: 'ברמן' } },
-        { id: 'Event Decor', icon: '🎨', label: { en: 'Event Decor', ru: 'Декоратор', he: 'עיצוב אירועים' } },
-        { id: 'Kids Animator', icon: '🎈', label: { en: 'Kids Animator', ru: 'Аниматор', he: 'אנימטור' } },
-        { id: 'Chef', icon: '👨‍🍳', label: { en: 'Chef', ru: 'Повар', he: 'שף' } },
-        { id: 'Dancer', icon: '💃', label: { en: 'Dancer', ru: 'Танцор', he: 'רקדן' } },
+        { id: 'Photographer', icon: '📸', label: { en: 'Photographer', he: 'צלם' } },
+        { id: 'Videographer', icon: '🎬', label: { en: 'Videographer', he: 'צלם וידאו' } },
+        { id: 'DJ', icon: '🎧', label: { en: 'DJ', he: 'DJ' } },
+        { id: 'MC', icon: '🎤', label: { en: 'MC / Host', he: 'מנחה' } },
+        { id: 'Magician', icon: '🎩', label: { en: 'Magician', he: 'קוסם' } },
+        { id: 'Singer', icon: '🎵', label: { en: 'Singer', he: 'זמר' } },
+        { id: 'Musician', icon: '🎸', label: { en: 'Musician', he: 'מוזיקאי' } },
+        { id: 'Bartender', icon: '🍸', label: { en: 'Bartender', he: 'ברמן' } },
+        { id: 'Event Decor', icon: '🎨', label: { en: 'Event Decor', he: 'עיצוב אירועים' } },
+        { id: 'Kids Animator', icon: '🎈', label: { en: 'Kids Animator', he: 'אנימטור' } },
+        { id: 'Chef', icon: '👨‍🍳', label: { en: 'Chef', he: 'שף' } },
+        { id: 'Dancer', icon: '💃', label: { en: 'Dancer', he: 'רקדן' } },
     ];
 
     const cities = [
-        { id: 'Tel Aviv', label: { en: 'Tel Aviv', ru: 'Тель-Авив', he: 'תל אביב' } },
-        { id: 'Jerusalem', label: { en: 'Jerusalem', ru: 'Иерусалим', he: 'ירושלים' } },
-        { id: 'Haifa', label: { en: 'Haifa', ru: 'Хайфа', he: 'חיפה' } },
-        { id: 'Eilat', label: { en: 'Eilat', ru: 'Эйлат', he: 'אילת' } },
-        { id: 'Rishon LeZion', label: { en: 'Rishon LeZion', ru: 'Ришон ле-Цион', he: 'ראשון לציון' } },
-        { id: 'Netanya', label: { en: 'Netanya', ru: 'Нетания', he: 'נתניה' } },
-        { id: 'Ashdod', label: { en: 'Ashdod', ru: 'Ашдод', he: 'אשדוד' } },
-        { id: 'Beer Sheva', label: { en: 'Beer Sheva', ru: 'Беэр-Шева', he: 'באר שבע' } },
+        { id: 'Tel Aviv', label: { en: 'Tel Aviv', he: 'תל אביב' } },
+        { id: 'Jerusalem', label: { en: 'Jerusalem', he: 'ירושלים' } },
+        { id: 'Haifa', label: { en: 'Haifa', he: 'חיפה' } },
+        { id: 'Eilat', label: { en: 'Eilat', he: 'אילת' } },
+        { id: 'Rishon LeZion', label: { en: 'Rishon LeZion', he: 'ראשון לציון' } },
+        { id: 'Netanya', label: { en: 'Netanya', he: 'נתניה' } },
+        { id: 'Ashdod', label: { en: 'Ashdod', he: 'אשדוד' } },
+        { id: 'Beer Sheva', label: { en: 'Beer Sheva', he: 'באר שבע' } },
     ];
 
     const content = {
@@ -81,26 +80,6 @@ export default function JoinPage() {
             creating: "Creating...",
             progress: "Step",
             of: "of",
-        },
-        ru: {
-            steps: [
-                { title: "Как тебя зовут?", subtitle: "Начнём со знакомства" },
-                { title: "Твой email?", subtitle: "Для входа в аккаунт" },
-                { title: "Придумай пароль", subtitle: "Защити свой аккаунт" },
-                { title: "Чем занимаешься?", subtitle: "Выбери специализацию" },
-                { title: "Где работаешь?", subtitle: "Выбери город" },
-                { title: "Номер телефона", subtitle: "Для уведомлений о заказах" },
-            ],
-            namePlaceholder: "Твоё полное имя",
-            emailPlaceholder: "твой@email.com",
-            passwordPlaceholder: "Минимум 6 символов",
-            phonePlaceholder: "50-123-4567",
-            next: "Далее",
-            back: "Назад",
-            finish: "Создать аккаунт",
-            creating: "Создаём...",
-            progress: "Шаг",
-            of: "из",
         },
         he: {
             steps: [
@@ -133,37 +112,37 @@ export default function JoinPage() {
         switch (currentStep) {
             case 0:
                 if (!formData.fullName.trim()) {
-                    setError(language === 'ru' ? 'Введи имя' : language === 'he' ? 'הכנס שם' : 'Enter your name');
+                    setError(language === 'he' ? 'הכנס שם' : 'Enter your name');
                     return false;
                 }
                 break;
             case 1:
                 if (!formData.email.includes('@')) {
-                    setError(language === 'ru' ? 'Неверный email' : language === 'he' ? 'אימייל לא תקין' : 'Invalid email');
+                    setError(language === 'he' ? 'אימייל לא תקין' : 'Invalid email');
                     return false;
                 }
                 break;
             case 2:
                 if (formData.password.length < 6) {
-                    setError(language === 'ru' ? 'Минимум 6 символов' : language === 'he' ? 'מינימום 6 תווים' : 'Minimum 6 characters');
+                    setError(language === 'he' ? 'מינימום 6 תווים' : 'Minimum 6 characters');
                     return false;
                 }
                 break;
             case 3:
                 if (!formData.category) {
-                    setError(language === 'ru' ? 'Выбери специальность' : language === 'he' ? 'בחר התמחות' : 'Select a specialty');
+                    setError(language === 'he' ? 'בחר התמחות' : 'Select a specialty');
                     return false;
                 }
                 break;
             case 4:
                 if (!formData.city) {
-                    setError(language === 'ru' ? 'Выбери город' : language === 'he' ? 'בחר עיר' : 'Select a city');
+                    setError(language === 'he' ? 'בחר עיר' : 'Select a city');
                     return false;
                 }
                 break;
             case 5:
                 if (!formData.phone.trim()) {
-                    setError(language === 'ru' ? 'Введи телефон' : language === 'he' ? 'הכנס טלפון' : 'Enter phone number');
+                    setError(language === 'he' ? 'הכנס טלפון' : 'Enter phone number');
                     return false;
                 }
                 break;
@@ -417,10 +396,10 @@ export default function JoinPage() {
 
                     <div className="max-w-lg">
                         <h2 className="text-5xl font-bold leading-tight mb-6">
-                            {language === 'ru' ? 'Развивай свой бизнес' : language === 'he' ? 'צמיח את העסק שלך' : 'Grow your business'}
+                            {language === 'he' ? 'צמיח את העסק שלך' : 'Grow your business'}
                         </h2>
                         <p className="text-xl text-white/80">
-                            {language === 'ru' ? 'Присоединяйся к 500+ профессионалам на Talentr' : language === 'he' ? 'הצטרף ל-500+ מקצוענים ב-Talentr' : 'Join 500+ professionals on Talentr'}
+                            {language === 'he' ? 'הצטרף ל-500+ מקצוענים ב-Talentr' : 'Join 500+ professionals on Talentr'}
                         </p>
                     </div>
 
@@ -567,9 +546,9 @@ export default function JoinPage() {
 
                 {/* Footer */}
                 <div className="p-4 text-center text-sm text-white/70">
-                    {language === 'ru' ? 'Уже с нами?' : language === 'he' ? 'כבר שותף?' : 'Already a partner?'}{' '}
+                    {language === 'he' ? 'כבר שותף?' : 'Already a partner?'}{' '}
                     <Link href="/signin" className="text-white font-semibold hover:underline">
-                        {language === 'ru' ? 'Войти' : language === 'he' ? 'התחבר' : 'Sign in'}
+                        {language === 'he' ? 'התחבר' : 'Sign in'}
                     </Link>
                 </div>
             </div>

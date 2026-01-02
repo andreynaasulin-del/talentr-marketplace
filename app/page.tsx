@@ -5,6 +5,7 @@ import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import CategoryRail from '@/components/CategoryRail';
+import GigCarousel from '@/components/GigCarousel';
 import { supabase } from '@/lib/supabase';
 
 // Dynamic imports for below-fold components (lazy loading)
@@ -51,6 +52,9 @@ export default function Home() {
             <Navbar />
 
             <HeroSection />
+
+            {/* Floating Gig Cards - Wolt style */}
+            <GigCarousel />
 
             {/* Categories */}
             <section className="py-8 md:py-12">

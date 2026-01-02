@@ -27,7 +27,7 @@ type Category =
 
 interface CategoryItem {
     id: Category;
-    label: { en: string; ru: string; he: string };
+    label: { en: string; he: string };
     image: string;
     gradient: string;
 }
@@ -35,91 +35,91 @@ interface CategoryItem {
 const categories: CategoryItem[] = [
     {
         id: 'Photographer',
-        label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' },
+        label: { en: 'Photographer', he: 'צלם' },
         image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&h=400&fit=crop&q=80',
         gradient: 'from-blue-600 to-cyan-500'
     },
     {
         id: 'Videographer',
-        label: { en: 'Videographer', ru: 'Видеограф', he: 'צלם וידאו' },
+        label: { en: 'Videographer', he: 'צלם וידאו' },
         image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=400&fit=crop&q=80',
         gradient: 'from-red-600 to-orange-500'
     },
     {
         id: 'DJ',
-        label: { en: 'DJ', ru: 'DJ', he: 'DJ' },
+        label: { en: 'DJ', he: 'DJ' },
         image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&q=80',
         gradient: 'from-purple-600 to-pink-500'
     },
     {
         id: 'MC',
-        label: { en: 'MC / Host', ru: 'Ведущий', he: 'מנחה' },
+        label: { en: 'MC / Host', he: 'מנחה' },
         image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=400&fit=crop&q=80',
         gradient: 'from-amber-600 to-yellow-500'
     },
     {
         id: 'Singer',
-        label: { en: 'Singer', ru: 'Певец', he: 'זמר' },
+        label: { en: 'Singer', he: 'זמר' },
         image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&q=80',
         gradient: 'from-pink-600 to-rose-500'
     },
     {
         id: 'Musician',
-        label: { en: 'Musician', ru: 'Музыкант', he: 'מוזיקאי' },
+        label: { en: 'Musician', he: 'מוזיקאי' },
         image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop&q=80',
         gradient: 'from-emerald-600 to-teal-500'
     },
     {
         id: 'Magician',
-        label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' },
+        label: { en: 'Magician', he: 'קוסם' },
         image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=400&h=400&fit=crop&q=80',
         gradient: 'from-indigo-600 to-violet-500'
     },
     {
         id: 'Comedian',
-        label: { en: 'Comedian', ru: 'Комик', he: 'סטנדאפ' },
+        label: { en: 'Comedian', he: 'סטנדאפ' },
         image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=400&h=400&fit=crop&q=80',
         gradient: 'from-yellow-500 to-amber-400'
     },
     {
         id: 'Dancer',
-        label: { en: 'Dancer', ru: 'Танцор', he: 'רקדן' },
+        label: { en: 'Dancer', he: 'רקדן' },
         image: 'https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=400&h=400&fit=crop&q=80',
         gradient: 'from-rose-600 to-pink-500'
     },
     {
         id: 'Bartender',
-        label: { en: 'Bartender', ru: 'Бармен', he: 'ברמן' },
+        label: { en: 'Bartender', he: 'ברמן' },
         image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=400&fit=crop&q=80',
         gradient: 'from-orange-600 to-amber-500'
     },
     {
         id: 'Bar Show',
-        label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'בר שואו' },
+        label: { en: 'Bar Show', he: 'בר שואו' },
         image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=400&fit=crop&q=80',
         gradient: 'from-cyan-600 to-blue-500'
     },
     {
         id: 'Event Decor',
-        label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' },
+        label: { en: 'Decor', he: 'עיצוב' },
         image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop&q=80',
         gradient: 'from-violet-600 to-purple-500'
     },
     {
         id: 'Kids Animator',
-        label: { en: 'Kids', ru: 'Аниматор', he: 'אנימטור' },
+        label: { en: 'Kids', he: 'אנימטור' },
         image: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=400&h=400&fit=crop&q=80',
         gradient: 'from-lime-500 to-green-500'
     },
     {
         id: 'Face Painter',
-        label: { en: 'Face Paint', ru: 'Аквагрим', he: 'ציור פנים' },
+        label: { en: 'Face Paint', he: 'ציור פנים' },
         image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=400&fit=crop&q=80',
         gradient: 'from-fuchsia-600 to-pink-500'
     },
     {
         id: 'Chef',
-        label: { en: 'Chef', ru: 'Шеф-повар', he: 'שף' },
+        label: { en: 'Chef', he: 'שף' },
         image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&h=400&fit=crop&q=80',
         gradient: 'from-teal-600 to-cyan-500'
     },
@@ -134,7 +134,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     const { language } = useLanguage();
     const scrollRef = useRef<HTMLDivElement>(null);
 
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = language as 'en' | 'he';
 
     const handleCategoryClick = (categoryId: Category) => {
         const newCategory = activeCategory === categoryId ? 'All' : categoryId;
@@ -158,10 +158,10 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
             <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6 flex items-end justify-between">
                 <div>
                     <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
-                        {lang === 'he' ? 'מצאו כישרונות' : lang === 'ru' ? 'Найти таланты' : 'Find Talents'}
+                        {lang === 'he' ? 'מצאו כישרונות' : 'Find Talents'}
                     </h2>
                     <p className="text-gray-500 dark:text-gray-400 mt-1">
-                        {lang === 'he' ? 'בחרו קטגוריה' : lang === 'ru' ? 'Выберите категорию' : 'Choose a category'}
+                        {lang === 'he' ? 'בחרו קטגוריה' : 'Choose a category'}
                     </p>
                 </div>
 
@@ -266,9 +266,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                             <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
                                 {lang === 'he'
                                     ? `מציג: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
-                                    : lang === 'ru'
-                                        ? `Показаны: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
-                                        : `Showing: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                    : `Showing: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
                                 }
                             </p>
                         </div>
@@ -279,7 +277,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                             }}
                             className="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-colors"
                         >
-                            {lang === 'he' ? 'נקה' : lang === 'ru' ? 'Сбросить' : 'Clear'}
+                            {lang === 'he' ? 'נקה' : 'Clear'}
                         </button>
                     </div>
                 </motion.div>

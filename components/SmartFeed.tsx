@@ -25,48 +25,48 @@ const categoryCards = [
     {
         id: 'photographer',
         icon: Camera,
-        label: { en: 'Photographer', ru: 'Фотограф', he: 'צלם' },
-        query: { en: 'photographer for my event', ru: 'фотограф на мероприятие', he: 'צלם לאירוע' },
+        label: { en: 'Photographer', he: 'צלם' },
+        query: { en: 'photographer for my event', he: 'צלם לאירוע' },
         color: 'bg-blue-500',
         image: 'https://images.unsplash.com/photo-1554048612-b6a482bc67e5?auto=format&fit=crop&w=200&q=80'
     },
     {
         id: 'dj',
         icon: Music,
-        label: { en: 'DJ', ru: 'Диджей', he: "דיג'יי" },
-        query: { en: 'DJ for party', ru: 'DJ на вечеринку', he: "דיג'יי למסיבה" },
+        label: { en: 'DJ', he: "דיג'יי" },
+        query: { en: 'DJ for party', he: "דיג'יי למסיבה" },
         color: 'bg-purple-500',
         image: 'https://images.unsplash.com/photo-1571266028243-e4773f3a6a1a?auto=format&fit=crop&w=200&q=80'
     },
     {
         id: 'singer',
         icon: Mic2,
-        label: { en: 'Singer', ru: 'Певец', he: 'זמר' },
-        query: { en: 'singer for event', ru: 'певец на мероприятие', he: 'זמר לאירוע' },
+        label: { en: 'Singer', he: 'זמר' },
+        query: { en: 'singer for event', he: 'זמר לאירוע' },
         color: 'bg-pink-500',
         image: 'https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=200&q=80'
     },
     {
         id: 'magician',
         icon: Wand2,
-        label: { en: 'Magician', ru: 'Фокусник', he: 'קוסם' },
-        query: { en: 'magician for kids party', ru: 'фокусник на детский праздник', he: 'קוסם למסיבת ילדים' },
+        label: { en: 'Magician', he: 'קוסם' },
+        query: { en: 'magician for kids party', he: 'קוסם למסיבת ילדים' },
         color: 'bg-indigo-500',
         image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?auto=format&fit=crop&w=200&q=80'
     },
     {
         id: 'decor',
         icon: Palette,
-        label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' },
-        query: { en: 'event decoration', ru: 'оформление мероприятия', he: 'עיצוב אירוע' },
+        label: { en: 'Decor', he: 'עיצוב' },
+        query: { en: 'event decoration', he: 'עיצוב אירוע' },
         color: 'bg-amber-500',
         image: 'https://images.unsplash.com/photo-1478146896981-b80fe463b330?auto=format&fit=crop&w=200&q=80'
     },
     {
         id: 'animator',
         icon: Users,
-        label: { en: 'Animator', ru: 'Аниматор', he: 'אנימטור' },
-        query: { en: 'kids animator', ru: 'аниматор для детей', he: 'אנימטור לילדים' },
+        label: { en: 'Animator', he: 'אנימטור' },
+        query: { en: 'kids animator', he: 'אנימטור לילדים' },
         color: 'bg-green-500',
         image: 'https://images.unsplash.com/photo-1566576912321-d58ddd7a6088?auto=format&fit=crop&w=200&q=80'
     },
@@ -148,11 +148,9 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
             const errorMessage: Message = {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: language === 'ru'
-                    ? '😅 Упс! Что-то пошло не так. Попробуем ещё раз?'
-                    : language === 'he'
-                        ? '😅 אופס! משהו השבש. ננסה שוב?'
-                        : '😅 Oops! Something went wrong. Try again?',
+                content: language === 'he'
+                    ? '😅 אופס! משהו השבש. ננסה שוב?'
+                    : '😅 Oops! Something went wrong. Try again?',
                 timestamp: new Date()
             };
             setMessages(prev => [...prev, errorMessage]);
@@ -193,12 +191,12 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
     const vendorMessage = getLatestVendorMessage();
 
     const handleRefineSearch = () => {
-        setInput(language === 'ru' ? 'покажи ещё варианты' : language === 'he' ? 'הראה עוד אפשרויות' : 'show me more options');
+        setInput(language === 'he' ? 'הראה עוד אפשרויות' : 'show me more options');
         inputRef.current?.focus();
     };
 
     const handleDifferentCity = () => {
-        setInput(language === 'ru' ? 'искать в другом городе' : language === 'he' ? 'חפש בעיר אחרת' : 'search in different city');
+        setInput(language === 'he' ? 'חפש בעיר אחרת' : 'search in different city');
         inputRef.current?.focus();
     };
 
@@ -227,14 +225,12 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
                     {/* Welcome Text */}
                     <div className="text-center max-w-lg mb-12">
                         <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
-                            {language === 'ru' ? 'Привет! Я Talentr AI' : language === 'he' ? 'היי! אני Talentr AI' : "Hey! I'm Talentr AI"}
+                            {language === 'he' ? 'היי! אני Talentr AI' : "Hey! I'm Talentr AI"}
                         </h2>
                         <p className="text-xl text-gray-500 leading-relaxed font-medium">
-                            {language === 'ru'
-                                ? 'Расскажи о своём событии — я найду идеальных специалистов за секунды.'
-                                : language === 'he'
-                                    ? 'ספר לי על האירוע שלך - אמצא את המקצוענים המושלמים תוך שניות.'
-                                    : "Describe your event — I'll find the perfect professionals in seconds."}
+                            {language === 'he'
+                                ? 'ספר לי על האירוע שלך - אמצא את המקצוענים המושלמים תוך שניות.'
+                                : "Describe your event — I'll find the perfect professionals in seconds."}
                         </p>
                     </div>
 
@@ -357,7 +353,7 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
                         <div className="flex items-center justify-between mb-8">
                             <div>
                                 <h4 className="text-xl font-bold text-gray-900 mb-1">
-                                    {language === 'ru' ? 'Лучшие совпадения' : language === 'he' ? 'התאמות מובילות' : 'Top Matches'}
+                                    {language === 'he' ? 'התאמות מובילות' : 'Top Matches'}
                                 </h4>
                                 <p className="text-sm text-gray-500 font-bold">
                                     {activeCardIndex + 1} / {vendorMessage.vendors.length} {t('vendors found')}
@@ -440,9 +436,7 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
                             placeholder={
                                 language === 'he'
                                     ? '...מה אתה מחפש?'
-                                    : language === 'ru'
-                                        ? 'Опиши, кого ищешь...'
-                                        : 'Describe who you are looking for...'
+                                    : 'Describe who you are looking for...'
                             }
                             className="w-full h-16 ps-6 pe-16 bg-gray-50 border border-gray-100 rounded-[24px] text-lg text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500/30 focus:bg-white focus:shadow-glow transition-all duration-300"
                         />

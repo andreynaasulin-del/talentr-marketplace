@@ -21,10 +21,10 @@ export default function TermsPage() {
                         <FileText className="w-8 h-8 text-blue-600" />
                     </div>
                     <h1 className="text-4xl font-black text-gray-900 mb-4">
-                        {language === 'ru' ? 'Условия использования' : language === 'he' ? 'תנאי שימוש' : 'Terms of Service'}
+                        {language === 'he' ? 'תנאי שימוש' : 'Terms of Service'}
                     </h1>
                     <p className="text-gray-500">
-                        {language === 'ru' ? 'Последнее обновление:' : 'Last updated:'} {lastUpdated}
+                        Last updated: {lastUpdated}
                     </p>
                 </div>
 

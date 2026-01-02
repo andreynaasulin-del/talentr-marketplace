@@ -40,7 +40,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
     const handleSubmit = async (e: React.FormEvent) => {
         e.preventDefault();
         if (!newReview.text.trim()) {
-            toast.error(language === 'ru' ? 'Напишите отзыв' : 'Please write a review');
+            toast.error('Please write a review');
             return;
         }
 
@@ -50,11 +50,9 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
         await new Promise(resolve => setTimeout(resolve, 1500));
 
         toast.success(
-            language === 'ru'
-                ? '✨ Спасибо за отзыв!'
-                : language === 'he'
-                    ? '✨ תודה על הביקורת!'
-                    : '✨ Thank you for your review!'
+            language === 'he'
+                ? '✨ תודה על הביקורת!'
+                : '✨ Thank you for your review!'
         );
 
         setNewReview({ rating: 5, text: '', eventType: 'Wedding' });
@@ -70,7 +68,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
             <div className="flex items-center justify-between mb-8">
                 <div>
                     <h3 className="text-2xl font-black text-gray-900 mb-2">
-                        {language === 'ru' ? 'Отзывы клиентов' : language === 'he' ? 'ביקורות לקוחות' : 'Client Reviews'}
+                        {language === 'he' ? 'ביקורות לקוחות' : 'Client Reviews'}
                     </h3>
                     <div className="flex items-center gap-3">
                         <div className="flex items-center gap-1">
@@ -98,7 +96,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                     whileTap={{ scale: 0.98 }}
                 >
                     <Star className="w-4 h-4" />
-                    {language === 'ru' ? 'Написать отзыв' : language === 'he' ? 'כתוב ביקורת' : 'Write Review'}
+                    {language === 'he' ? 'כתוב ביקורת' : 'Write Review'}
                 </motion.button>
             </div>
 
@@ -115,7 +113,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                         {/* Rating Selection */}
                         <div className="mb-4">
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                {language === 'ru' ? 'Ваша оценка' : 'Your Rating'}
+                                Your Rating
                             </label>
                             <div className="flex gap-2">
                                 {[1, 2, 3, 4, 5].map((star) => (
@@ -142,7 +140,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                         {/* Event Type */}
                         <div className="mb-4">
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                {language === 'ru' ? 'Тип мероприятия' : 'Event Type'}
+                                Event Type
                             </label>
                             <select
                                 value={newReview.eventType}
@@ -160,12 +158,12 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                         {/* Review Text */}
                         <div className="mb-4">
                             <label className="block text-sm font-bold text-gray-700 mb-2">
-                                {language === 'ru' ? 'Ваш отзыв' : 'Your Review'}
+                                Your Review
                             </label>
                             <textarea
                                 value={newReview.text}
                                 onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
-                                placeholder={language === 'ru' ? 'Расскажите о вашем опыте...' : 'Share your experience...'}
+                                placeholder="Share your experience..."
                                 className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:outline-none font-medium min-h-[120px] resize-none"
                             />
                         </div>
@@ -182,7 +180,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                             ) : (
                                 <>
                                     <Send className="w-5 h-5" />
-                                    {language === 'ru' ? 'Отправить отзыв' : 'Submit Review'}
+                                    Submit Review
                                 </>
                             )}
                         </motion.button>
@@ -203,18 +201,14 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                             <Star className="w-10 h-10 text-blue-500" />
                         </div>
                         <h4 className="text-xl font-bold text-gray-900 mb-2">
-                            {language === 'ru'
-                                ? 'Пока нет отзывов'
-                                : language === 'he'
-                                    ? 'אין עדיין ביקורות'
-                                    : 'No reviews yet'}
+                            {language === 'he'
+                                ? 'אין עדיין ביקורות'
+                                : 'No reviews yet'}
                         </h4>
                         <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                            {language === 'ru'
-                                ? `Станьте первым, кто оставит отзыв о ${vendorName}!`
-                                : language === 'he'
-                                    ? `היו הראשונים לכתוב ביקורת על ${vendorName}!`
-                                    : `Be the first to review ${vendorName}!`}
+                            {language === 'he'
+                                ? `היו הראשונים לכתוב ביקורת על ${vendorName}!`
+                                : `Be the first to review ${vendorName}!`}
                         </p>
                         <motion.button
                             onClick={() => setShowForm(true)}
@@ -223,7 +217,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                             whileTap={{ scale: 0.98 }}
                         >
                             <Star className="w-4 h-4" />
-                            {language === 'ru' ? 'Написать отзыв' : language === 'he' ? 'כתוב ביקורת' : 'Write a Review'}
+                            {language === 'he' ? 'כתוב ביקורת' : 'Write a Review'}
                         </motion.button>
                     </motion.div>
                 ) : (
@@ -294,7 +288,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                 >
-                    {language === 'ru' ? 'Показать все отзывы' : 'Show all reviews'}
+                    Show all reviews
                 </motion.button>
             )}
         </div>

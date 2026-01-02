@@ -38,7 +38,6 @@ export default function VendorGrid({ category = 'All' }: VendorGridProps) {
 
     const sectionTitle = {
         en: category === 'All' ? 'All Professionals' : `${category}s`,
-        ru: category === 'All' ? 'Все специалисты' : category,
         he: category === 'All' ? 'כל אנשי המקצוע' : category
     };
 
@@ -70,7 +69,7 @@ export default function VendorGrid({ category = 'All' }: VendorGridProps) {
                         whileTap={{ scale: 0.98 }}
                     >
                         <SlidersHorizontal className="w-4 h-4" />
-                        {language === 'ru' ? 'Фильтры' : language === 'he' ? 'מסננים' : 'Filters'}
+                        {language === 'he' ? 'מסננים' : 'Filters'}
                     </motion.button>
                 </div>
 
@@ -105,11 +104,9 @@ export default function VendorGrid({ category = 'All' }: VendorGridProps) {
                     <div className="text-center py-20">
                         <Filter className="w-16 h-16 text-gray-300 dark:text-gray-600 mx-auto mb-4" />
                         <p className="text-gray-500 dark:text-gray-400 text-lg font-medium">
-                            {language === 'ru'
-                                ? 'Специалисты в этой категории не найдены'
-                                : language === 'he'
-                                    ? 'לא נמצאו מקצוענים בקטגוריה זו'
-                                    : 'No professionals found in this category'}
+                            {language === 'he'
+                                ? 'לא נמצאו מקצוענים בקטגוריה זו'
+                                : 'No professionals found in this category'}
                         </p>
                     </div>
                 )}

@@ -46,13 +46,11 @@ export default function Testimonials() {
 
     const sectionTitle = {
         en: 'What Our Clients Say',
-        ru: 'Отзывы наших клиентов',
         he: 'מה הלקוחות שלנו אומרים'
     };
 
     const sectionSubtitle = {
         en: 'Join thousands of happy customers who found their perfect event professionals',
-        ru: 'Присоединяйтесь к тысячам довольных клиентов, которые нашли идеальных специалистов',
         he: 'הצטרפו לאלפי לקוחות מרוצים שמצאו את אנשי המקצוע המושלמים'
     };
 
@@ -71,7 +69,7 @@ export default function Testimonials() {
                     >
                         <Star className="w-4 h-4 text-yellow-500 fill-yellow-500" />
                         <span className="text-sm font-bold text-yellow-700 dark:text-yellow-400">
-                            {language === 'ru' ? '4.9 из 5 — средняя оценка' : language === 'he' ? '4.9 מתוך 5 - ממוצע' : '4.9 out of 5 — Average Rating'}
+                            {language === 'he' ? '4.9 מתוך 5 - ממוצע' : '4.9 out of 5 — Average Rating'}
                         </span>
                     </motion.div>
 
@@ -144,25 +142,25 @@ export default function Testimonials() {
                     <div className="text-center">
                         <p className="text-4xl font-black text-blue-600 dark:text-blue-400">2,500+</p>
                         <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">
-                            {language === 'ru' ? 'Специалистов' : language === 'he' ? 'אנשי מקצוע' : 'Professionals'}
+                            {language === 'he' ? 'אנשי מקצוע' : 'Professionals'}
                         </p>
                     </div>
                     <div className="text-center">
                         <p className="text-4xl font-black text-purple-600 dark:text-purple-400">10,000+</p>
                         <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">
-                            {language === 'ru' ? 'Мероприятий' : language === 'he' ? 'אירועים' : 'Events Booked'}
+                            {language === 'he' ? 'אירועים' : 'Events Booked'}
                         </p>
                     </div>
                     <div className="text-center">
                         <p className="text-4xl font-black text-green-600 dark:text-green-400">98%</p>
                         <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">
-                            {language === 'ru' ? 'Довольных' : language === 'he' ? 'שביעות רצון' : 'Satisfaction'}
+                            {language === 'he' ? 'שביעות רצון' : 'Satisfaction'}
                         </p>
                     </div>
                     <div className="text-center">
                         <p className="text-4xl font-black text-orange-600 dark:text-orange-400">15+</p>
                         <p className="text-gray-500 dark:text-gray-400 font-medium mt-1">
-                            {language === 'ru' ? 'Городов' : language === 'he' ? 'ערים' : 'Cities'}
+                            {language === 'he' ? 'ערים' : 'Cities'}
                         </p>
                     </div>
                 </motion.div>

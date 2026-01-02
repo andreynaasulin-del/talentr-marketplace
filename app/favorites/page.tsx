@@ -34,24 +34,18 @@ export default function FavoritesPage() {
     }, [favorites, favoritesLoading]);
 
     const t = {
-        title: language === 'ru' ? 'Избранное' : language === 'he' ? 'מועדפים' : 'Favorites',
-        subtitle: language === 'ru'
-            ? 'Сохранённые профессионалы для ваших мероприятий'
-            : language === 'he'
-                ? 'אנשי מקצוע שמורים לאירועים שלך'
-                : 'Your saved professionals for upcoming events',
-        empty: language === 'ru'
-            ? 'У вас пока нет избранных'
-            : language === 'he'
-                ? 'עדיין אין לך מועדפים'
-                : 'No favorites yet',
-        emptyDesc: language === 'ru'
-            ? 'Нажимайте ❤️ на карточках профессионалов, чтобы сохранить их здесь'
-            : language === 'he'
-                ? 'לחץ על ❤️ בכרטיסי אנשי מקצוע כדי לשמור אותם כאן'
-                : 'Tap the ❤️ on vendor cards to save them here',
-        browse: language === 'ru' ? 'Найти профессионалов' : language === 'he' ? 'מצא אנשי מקצוע' : 'Browse Professionals',
-        count: language === 'ru' ? 'сохранено' : language === 'he' ? 'שמורים' : 'saved',
+        title: language === 'he' ? 'מועדפים' : 'Favorites',
+        subtitle: language === 'he'
+            ? 'אנשי מקצוע שמורים לאירועים שלך'
+            : 'Your saved professionals for upcoming events',
+        empty: language === 'he'
+            ? 'עדיין אין לך מועדפים'
+            : 'No favorites yet',
+        emptyDesc: language === 'he'
+            ? 'לחץ על ❤️ בכרטיסי אנשי מקצוע כדי לשמור אותם כאן'
+            : 'Tap the ❤️ on vendor cards to save them here',
+        browse: language === 'he' ? 'מצא אנשי מקצוע' : 'Browse Professionals',
+        count: language === 'he' ? 'שמורים' : 'saved',
     };
 
     return (
@@ -71,7 +65,7 @@ export default function FavoritesPage() {
                         className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-6 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
-                        {language === 'ru' ? 'На главную' : language === 'he' ? 'לדף הבית' : 'Back to Home'}
+                        {language === 'he' ? 'לדף הבית' : 'Back to Home'}
                     </Link>
 
                     <div className="flex items-center gap-4 mb-4">

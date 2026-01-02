@@ -71,7 +71,7 @@ export default function DashboardPage() {
         .filter(b => b.status === 'pending')
         .map(b => ({
             id: b.id,
-            date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : language === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'short' }),
+            date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', { day: 'numeric', month: 'short' }),
             eventType: b.event_type,
             clientName: 'Client',
             budget: '₪2,500',
@@ -82,7 +82,7 @@ export default function DashboardPage() {
         .slice(0, 3)
         .map(b => ({
             id: b.id,
-            date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : language === 'ru' ? 'ru-RU' : 'en-US', { day: 'numeric', month: 'short' }),
+            date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', { day: 'numeric', month: 'short' }),
             event: `${b.event_type}`,
             status: b.status === 'confirmed' ? t('Confirmed') : t('Pending'),
         }));
@@ -143,8 +143,8 @@ export default function DashboardPage() {
                 setBookings(data as Booking[]);
             }
             toast.success(action === 'confirmed'
-                ? (language === 'ru' ? '✅ Бронирование подтверждено!' : '✅ Booking confirmed!')
-                : (language === 'ru' ? 'Бронирование отклонено' : 'Booking declined')
+                ? (language === 'he' ? '✅ ההזמנה אושרה!' : '✅ Booking confirmed!')
+                : (language === 'he' ? 'ההזמנה נדחתה' : 'Booking declined')
             );
         } catch (error) {
             console.error('Error updating booking:', error);
@@ -157,7 +157,7 @@ export default function DashboardPage() {
         const link = `https://event-marketplace-mvp.vercel.app/vendor/${vendorId}`;
         navigator.clipboard.writeText(link);
         setCopied(true);
-        toast.success(language === 'ru' ? '🔗 Ссылка скопирована!' : '🔗 Link copied!');
+        toast.success(language === 'he' ? '🔗 הקישור הועתק!' : '🔗 Link copied!');
         setTimeout(() => setCopied(false), 2000);
     };
 
@@ -173,8 +173,8 @@ export default function DashboardPage() {
         {
             id: 'bio',
             icon: FileText,
-            title: language === 'ru' ? 'Заполните описание' : language === 'he' ? 'מלא את הביוגרפיה' : 'Complete your Bio',
-            description: language === 'ru' ? 'Расскажите о себе и своих услугах' : 'Tell clients about yourself',
+            title: language === 'he' ? 'מלא את הביוגרפיה' : 'Complete your Bio',
+            description: language === 'he' ? 'ספר ללקוחות על עצמך' : 'Tell clients about yourself',
             completed: !!(vendorProfile?.bio && vendorProfile.bio.length > 10),
             href: '/dashboard/settings',
             color: 'from-blue-500 to-indigo-500',
@@ -182,8 +182,8 @@ export default function DashboardPage() {
         {
             id: 'photos',
             icon: Camera,
-            title: language === 'ru' ? 'Загрузите фото' : language === 'he' ? 'העלה תמונות' : 'Upload Portfolio Photos',
-            description: language === 'ru' ? 'Покажите свои лучшие работы' : 'Show your best work',
+            title: language === 'he' ? 'העלה תמונות' : 'Upload Portfolio Photos',
+            description: language === 'he' ? 'הראה את העבודות הטובות שלך' : 'Show your best work',
             completed: !!(vendorProfile?.portfolio_gallery && vendorProfile.portfolio_gallery.length > 0),
             href: '/dashboard/settings',
             color: 'from-purple-500 to-pink-500',
@@ -192,8 +192,8 @@ export default function DashboardPage() {
         {
             id: 'pricing',
             icon: Tag,
-            title: language === 'ru' ? 'Установите цены' : language === 'he' ? 'קבע מחירים' : 'Set your Pricing',
-            description: language === 'ru' ? 'Укажите стоимость услуг' : 'Set your service rates',
+            title: language === 'he' ? 'קבע מחירים' : 'Set your Pricing',
+            description: language === 'he' ? 'קבע את תעריפי השירותים שלך' : 'Set your service rates',
             completed: !!(vendorProfile?.price_from && vendorProfile.price_from > 0),
             href: '/dashboard/settings',
             color: 'from-amber-500 to-orange-500',
@@ -226,7 +226,7 @@ export default function DashboardPage() {
                         <div className="flex items-center gap-2">
                             <div className="w-3 h-3 bg-green-500 rounded-full animate-pulse"></div>
                             <span className="text-gray-600 font-medium">
-                                {language === 'ru' ? 'Доступен для бронирований' : 'Available for bookings'}
+                                {language === 'he' ? 'זמין להזמנות' : 'Available for bookings'}
                             </span>
                         </div>
                     </div>
@@ -235,7 +235,7 @@ export default function DashboardPage() {
                         className="inline-flex items-center gap-2 px-6 py-3 bg-gray-900 hover:bg-gray-800 text-white font-bold rounded-xl transition-all shadow-lg"
                     >
                         <Pencil className="w-5 h-5" />
-                        {language === 'ru' ? 'Редактировать профиль' : language === 'he' ? 'ערוך פרופיל' : 'Edit My Profile'}
+                        {language === 'he' ? 'ערוך פרופיל' : 'Edit My Profile'}
                     </Link>
                 </div>
 
@@ -257,10 +257,10 @@ export default function DashboardPage() {
                                 </div>
                                 <div>
                                     <h2 className="text-2xl md:text-3xl font-black mb-2">
-                                        {language === 'ru' ? 'Добро пожаловать в Talentr!' : 'Welcome to Talentr!'}
+                                        {language === 'he' ? 'ברוכים הבאים ל-Talentr!' : 'Welcome to Talentr!'}
                                     </h2>
                                     <p className="text-white/80 text-lg">
-                                        {language === 'ru' ? 'Давайте подготовим ваш профиль к успеху' : "Let's get your profile ready for success"}
+                                        {language === 'he' ? 'בואו נכין את הפרופיל שלך להצלחה' : "Let's get your profile ready for success"}
                                     </p>
                                 </div>
                             </div>
@@ -269,7 +269,7 @@ export default function DashboardPage() {
                             <div className="mb-8">
                                 <div className="flex items-center justify-between mb-3">
                                     <span className="text-sm font-bold text-white/80">
-                                        {language === 'ru' ? 'Прогресс профиля' : 'Profile Progress'}
+                                        {language === 'he' ? 'התקדמות הפרופיל' : 'Profile Progress'}
                                     </span>
                                     <span className="text-2xl font-black">{profileCompletion}%</span>
                                 </div>
@@ -314,7 +314,7 @@ export default function DashboardPage() {
                                                 </div>
                                                 {action.critical && !action.completed && (
                                                     <span className="text-xs font-bold bg-red-500 px-2 py-1 rounded-full">
-                                                        {language === 'ru' ? 'Важно!' : 'Critical!'}
+                                                        {language === 'he' ? 'קריטי!' : 'Critical!'}
                                                     </span>
                                                 )}
                                             </div>
@@ -327,7 +327,7 @@ export default function DashboardPage() {
                                             <p className="text-white/60 text-sm">{action.description}</p>
                                             {!action.completed && (
                                                 <div className="mt-3 flex items-center gap-1 text-sm font-semibold text-white/80 group-hover:text-white transition-colors">
-                                                    {language === 'ru' ? 'Начать' : 'Start'}
+                                                    {language === 'he' ? 'התחל' : 'Start'}
                                                     <ArrowRight className="w-4 h-4 group-hover:translate-x-1 transition-transform" />
                                                 </div>
                                             )}
@@ -349,7 +349,7 @@ export default function DashboardPage() {
                             </div>
                             {confirmedBookings > 0 && (
                                 <span className="text-sm font-bold text-green-600 bg-green-50 px-3 py-1 rounded-full">
-                                    {confirmedBookings} {language === 'ru' ? 'брон.' : 'bookings'}
+                                    {confirmedBookings} {language === 'he' ? 'הזמנות' : 'bookings'}
                                 </span>
                             )}
                         </div>
@@ -395,11 +395,11 @@ export default function DashboardPage() {
                                 <Share2 className="w-10 h-10 text-gray-400" />
                             </div>
                             <h3 className="text-xl font-bold text-gray-900 mb-2">
-                                {language === 'ru' ? 'Пока нет запросов' : 'No requests yet'}
+                                {language === 'he' ? 'אין בקשות עדיין' : 'No requests yet'}
                             </h3>
                             <p className="text-gray-500 mb-6 max-w-sm mx-auto">
-                                {language === 'ru'
-                                    ? 'Поделитесь ссылкой на профиль, чтобы получать бронирования'
+                                {language === 'he'
+                                    ? 'שתף את הקישור לפרופיל שלך כדי להתחיל לקבל הזמנות'
                                     : 'Share your profile link to start getting bookings'}
                             </p>
                             <button
@@ -408,8 +408,8 @@ export default function DashboardPage() {
                             >
                                 {copied ? <CheckCircle className="w-5 h-5" /> : <Copy className="w-5 h-5" />}
                                 {copied
-                                    ? (language === 'ru' ? 'Скопировано!' : 'Copied!')
-                                    : (language === 'ru' ? 'Копировать ссылку на профиль' : 'Copy profile link')}
+                                    ? (language === 'he' ? 'הועתק!' : 'Copied!')
+                                    : (language === 'he' ? 'העתק קישור לפרופיל' : 'Copy profile link')}
                             </button>
                         </div>
                     ) : (
@@ -473,7 +473,7 @@ export default function DashboardPage() {
                     {recentActivity.length === 0 ? (
                         <div className="text-center py-12 text-gray-500">
                             <Clock className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                            <p>{language === 'ru' ? 'Активность появится здесь' : 'Activity will appear here'}</p>
+                            <p>{language === 'he' ? 'פעילות תופיע כאן' : 'Activity will appear here'}</p>
                         </div>
                     ) : (
                         <div className="space-y-4">

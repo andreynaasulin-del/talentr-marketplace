@@ -79,7 +79,6 @@ export default function SignUpPage() {
     const languages = [
         { code: 'en' as const, label: 'English', flag: '🇺🇸' },
         { code: 'he' as const, label: 'עברית', flag: '🇮🇱' },
-        { code: 'ru' as const, label: 'Русский', flag: '🇷🇺' },
     ];
 
     const currentLang = languages.find((l) => l.code === language) || languages[0];

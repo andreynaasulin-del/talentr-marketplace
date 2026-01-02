@@ -33,12 +33,11 @@ export default function HeroSection() {
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = language as 'en' | 'he';
 
     // Animated words for headline
     const headlineWords = {
         en: ['perfect', 'ideal', 'right'],
-        ru: ['идеального', 'лучшего', 'своего'],
         he: ['המושלם', 'הטוב ביותר', 'המתאים']
     };
 
@@ -53,7 +52,6 @@ export default function HeroSection() {
 
     const placeholders = {
         en: "What are you celebrating? I'll help you find the perfect pro ✨",
-        ru: "Какой праздник планируете? Помогу найти лучших ✨",
         he: "מה אתם חוגגים? אמצא לכם את המקצוענים הכי טובים ✨"
     };
 
@@ -62,11 +60,6 @@ export default function HeroSection() {
             { text: "Wedding photographer", icon: Camera },
             { text: "DJ for party", icon: Music },
             { text: "Event MC", icon: Mic },
-        ],
-        ru: [
-            { text: "Фотограф на свадьбу", icon: Camera },
-            { text: "DJ на праздник", icon: Music },
-            { text: "Ведущий мероприятия", icon: Mic },
         ],
         he: [
             { text: "צלם לחתונה", icon: Camera },
@@ -123,7 +116,7 @@ export default function HeroSection() {
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: lang === 'ru' ? 'Извините, ошибка. Попробуйте ещё раз!' : lang === 'he' ? 'סליחה, שגיאה. נסו שוב!' : 'Sorry, error. Try again!',
+                content: lang === 'he' ? 'סליחה, שגיאה. נסו שוב!' : 'Sorry, error. Try again!',
             }]);
         } finally {
             setIsTyping(false);
@@ -176,7 +169,7 @@ export default function HeroSection() {
                     transition={{ duration: 0.4 }}
                 >
                     <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
-                        {lang === 'ru' ? 'Найдите' : lang === 'he' ? 'מצאו את' : 'Find your'}
+                        {lang === 'he' ? 'מצאו את הכישרון' : 'Find your'}
                         <br />
                         <span className="relative inline-block">
                             <AnimatePresence mode="wait">
@@ -194,15 +187,13 @@ export default function HeroSection() {
                         </span>
                         {' '}
                         <span className="text-white">
-                            {lang === 'ru' ? 'таланта' : lang === 'he' ? 'כישרון' : 'talent'}
+                            {lang === 'he' ? '' : 'talent'}
                         </span>
                     </h1>
                     <p className="text-lg md:text-xl text-white/90 font-medium">
-                        {lang === 'ru'
-                            ? 'Фотографы, DJ, ведущие и другие таланты для вашего мероприятия'
-                            : lang === 'he'
-                                ? 'צלמים, DJ, מנחים ועוד כישרונות לאירוע שלכם'
-                                : 'Photographers, DJs, MCs and more talents for your event'
+                        {lang === 'he'
+                            ? 'צלמים, DJ, מנחים ועוד כישרונות לאירוע שלכם'
+                            : 'Photographers, DJs, MCs and more talents for your event'
                         }
                     </p>
                 </motion.div>
@@ -361,9 +352,9 @@ export default function HeroSection() {
                     {/* Trust Badges */}
                     <div className="flex items-center justify-center gap-4 sm:gap-6 mt-6 flex-wrap">
                         {[
-                            { icon: Shield, text: { en: 'Secure', ru: 'Безопасно', he: 'מאובטח' } },
-                            { icon: CheckCircle2, text: { en: 'Verified pros', ru: 'Проверенные профи', he: 'מקצוענים מאומתים' } },
-                            { icon: Zap, text: { en: 'Instant reply', ru: 'Мгновенный ответ', he: 'תגובה מיידית' } },
+                            { icon: Shield, text: { en: 'Secure', he: 'מאובטח' } },
+                            { icon: CheckCircle2, text: { en: 'Verified pros', he: 'מקצוענים מאומתים' } },
+                            { icon: Zap, text: { en: 'Instant reply', he: 'תגובה מיידית' } },
                         ].map((badge, i) => (
                             <div
                                 key={i}

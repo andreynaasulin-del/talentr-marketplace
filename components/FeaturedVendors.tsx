@@ -26,7 +26,7 @@ export default function FeaturedVendors() {
     const [featuredVendors, setFeaturedVendors] = useState<Vendor[]>([]);
     const [loading, setLoading] = useState(true);
 
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = language as 'en' | 'he';
 
     useEffect(() => {
         const fetchFeatured = async () => {
@@ -49,12 +49,6 @@ export default function FeaturedVendors() {
             viewAll: 'View all',
             noVendors: 'No professionals found',
         },
-        ru: {
-            title: 'Рекомендуемые специалисты',
-            subtitle: 'Лучшие профессионалы для ваших мероприятий',
-            viewAll: 'Смотреть всех',
-            noVendors: 'Специалисты не найдены',
-        },
         he: {
             title: 'אנשי מקצוע מומלצים',
             subtitle: 'הטובים ביותר לאירועים שלכם',
@@ -74,7 +68,7 @@ export default function FeaturedVendors() {
                         <div className="flex items-center gap-2 mb-2">
                             <Verified className="w-5 h-5 text-blue-600 dark:text-blue-400" />
                             <span className="text-sm font-semibold text-blue-600 dark:text-blue-400 uppercase tracking-wide">
-                                {lang === 'ru' ? 'Проверенные' : lang === 'he' ? 'מאומתים' : 'Verified'}
+                                {lang === 'he' ? 'מאומתים' : 'Verified'}
                             </span>
                         </div>
                         <h2 className="text-2xl md:text-3xl font-bold text-gray-900 dark:text-white mb-2">

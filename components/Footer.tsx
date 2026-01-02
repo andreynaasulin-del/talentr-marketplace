@@ -9,7 +9,7 @@ import { cn } from '@/lib/utils';
 export default function Footer() {
     const { language } = useLanguage();
     const currentYear = new Date().getFullYear();
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = language as 'en' | 'he';
 
     const content = {
         en: {
@@ -20,15 +20,6 @@ export default function Footer() {
             about: 'About',
             made: 'Made with',
             in: 'in Israel'
-        },
-        ru: {
-            tagline: 'Найдите идеального специалиста',
-            terms: 'Условия',
-            privacy: 'Приватность',
-            partner: 'Для партнёров',
-            about: 'О нас',
-            made: 'Сделано с',
-            in: 'в Израиле'
         },
         he: {
             tagline: 'מצא את איש המקצוע המושלם',
@@ -80,7 +71,7 @@ export default function Footer() {
                     >
                         <Globe className="w-4 h-4 md:w-5 md:h-5" />
                         <span className="text-sm font-medium">
-                            {lang === 'en' ? 'English' : lang === 'ru' ? 'Русский' : 'עברית'}
+                            {lang === 'en' ? 'English' : 'עברית'}
                         </span>
                     </motion.div>
                 </div>

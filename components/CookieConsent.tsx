@@ -12,7 +12,7 @@ export default function CookieConsent() {
     const { language } = useLanguage();
     const [isVisible, setIsVisible] = useState(false);
 
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = language as 'en' | 'he';
 
     const content = {
         en: {
@@ -20,12 +20,6 @@ export default function CookieConsent() {
             privacy: 'Privacy Policy',
             accept: 'Accept',
             decline: 'Decline',
-        },
-        ru: {
-            text: 'Мы используем cookies для улучшения сервиса.',
-            privacy: 'Политика конфиденциальности',
-            accept: 'Принять',
-            decline: 'Отклонить',
         },
         he: {
             text: 'אנחנו משתמשים בעוגיות לשיפור החוויה.',

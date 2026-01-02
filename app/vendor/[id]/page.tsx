@@ -258,18 +258,14 @@ export default function VendorPage() {
                                         <Calendar className="w-10 h-10 text-gray-400" />
                                     </div>
                                     <h4 className="text-xl font-bold text-gray-900 mb-2">
-                                        {language === 'ru'
-                                            ? 'Портфолио скоро появится'
-                                            : language === 'he'
-                                                ? 'הפורטפוליו יגיע בקרוב'
-                                                : 'Portfolio coming soon'}
+                                        {language === 'he'
+                                            ? 'הפורטפוליו יגיע בקרוב'
+                                            : 'Portfolio coming soon'}
                                     </h4>
                                     <p className="text-gray-500 max-w-sm mx-auto">
-                                        {language === 'ru'
-                                            ? `${vendor.name} скоро добавит свои работы`
-                                            : language === 'he'
-                                                ? `${vendor.name} יוסיף את העבודות שלו בקרוב`
-                                                : `${vendor.name} will add their work samples soon`}
+                                        {language === 'he'
+                                            ? `${vendor.name} יוסיף את העבודות שלו בקרוב`
+                                            : `${vendor.name} will add their work samples soon`}
                                     </p>
                                 </div>
                             )}
@@ -309,11 +305,9 @@ export default function VendorPage() {
 
                                     <a
                                         href={`https://wa.me/${vendor.phone || '972501234567'}?text=${encodeURIComponent(
-                                            language === 'ru'
-                                                ? `Привет! Меня интересуют ваши услуги. Нашёл вас на Talentr.`
-                                                : language === 'he'
-                                                    ? `שלום! אני מעוניין בשירותים שלך. מצאתי אותך ב-Talentr.`
-                                                    : `Hi! I'm interested in your services. Found you on Talentr.`
+                                            language === 'he'
+                                                ? `שלום! אני מעוניין בשירותים שלך. מצאתי אותך ב-Talentr.`
+                                                : `Hi! I'm interested in your services. Found you on Talentr.`
                                         )}`}
                                         target="_blank"
                                         rel="noopener noreferrer"

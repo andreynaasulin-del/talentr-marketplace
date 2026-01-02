@@ -120,12 +120,12 @@ export default function SettingsPage() {
             if (error) throw error;
 
             toast.success(
-                language === 'ru' ? '✅ Профиль сохранён!' : '✅ Profile saved!',
-                { description: language === 'ru' ? 'Изменения применены' : 'Changes applied successfully' }
+                language === 'he' ? '✅ הפרופיל נשמר!' : '✅ Profile saved!',
+                { description: language === 'he' ? 'השינויים הוחלו' : 'Changes applied successfully' }
             );
         } catch (error) {
             console.error('Error saving profile:', error);
-            toast.error(language === 'ru' ? 'Ошибка сохранения' : 'Error saving profile');
+            toast.error(language === 'he' ? 'שגיאה בשמירה' : 'Error saving profile');
         } finally {
             setSaving(false);
         }
@@ -134,7 +134,7 @@ export default function SettingsPage() {
     const addPhotoToGallery = () => {
         if (!newPhotoUrl.trim()) return;
         if (!newPhotoUrl.startsWith('http')) {
-            toast.error(language === 'ru' ? 'Введите корректный URL' : 'Please enter a valid URL');
+            toast.error(language === 'he' ? 'אנא הכנס URL תקין' : 'Please enter a valid URL');
             return;
         }
 
@@ -143,7 +143,7 @@ export default function SettingsPage() {
             portfolio_gallery: [...formData.portfolio_gallery, newPhotoUrl.trim()]
         });
         setNewPhotoUrl('');
-        toast.success(language === 'ru' ? '📸 Фото добавлено!' : '📸 Photo added!');
+        toast.success(language === 'he' ? '📸 התמונה נוספה!' : '📸 Photo added!');
     };
 
     const removePhotoFromGallery = (index: number) => {
@@ -184,10 +184,10 @@ export default function SettingsPage() {
                         </Link>
                         <div>
                             <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
-                                {language === 'ru' ? 'Настройки профиля' : 'Profile Settings'}
+                                {language === 'he' ? 'הגדרות פרופיל' : 'Profile Settings'}
                             </h1>
                             <p className="text-gray-500">
-                                {language === 'ru' ? 'Заполните данные для получения бронирований' : 'Complete your profile to get bookings'}
+                                {language === 'he' ? 'מלא את הפרטים כדי לקבל הזמנות' : 'Complete your profile to get bookings'}
                             </p>
                         </div>
                     </div>
@@ -197,7 +197,7 @@ export default function SettingsPage() {
                         className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50"
                     >
                         {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                        {language === 'ru' ? 'Сохранить' : 'Save'}
+                        {language === 'he' ? 'שמור' : 'Save'}
                     </button>
                 </div>
 
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                 <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-sm font-bold text-gray-600">
-                            {language === 'ru' ? 'Прогресс профиля' : 'Profile Completion'}
+                            {language === 'he' ? 'השלמת פרופיל' : 'Profile Completion'}
                         </span>
                         <span className="text-lg font-black text-blue-600">{Math.round(progressPercent)}%</span>
                     </div>
@@ -229,13 +229,13 @@ export default function SettingsPage() {
                     >
                         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                             <UserIcon className="w-5 h-5 text-blue-600" />
-                            {language === 'ru' ? 'Основная информация' : 'Basic Information'}
+                            {language === 'he' ? 'מידע בסיסי' : 'Basic Information'}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    {language === 'ru' ? 'Полное имя' : 'Full Name'}
+                                    {language === 'he' ? 'שם מלא' : 'Full Name'}
                                 </label>
                                 <input
                                     type="text"
@@ -263,7 +263,7 @@ export default function SettingsPage() {
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">
                                     <Phone className="w-4 h-4 inline mr-1" />
-                                    {language === 'ru' ? 'Телефон (WhatsApp)' : 'Phone (WhatsApp)'}
+                                    {language === 'he' ? 'טלפון (WhatsApp)' : 'Phone (WhatsApp)'}
                                 </label>
                                 <input
                                     type="tel"
@@ -277,7 +277,7 @@ export default function SettingsPage() {
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">
                                     <Camera className="w-4 h-4 inline mr-1" />
-                                    {language === 'ru' ? 'URL фото профиля' : 'Profile Photo URL'}
+                                    {language === 'he' ? 'URL תמונת פרופיל' : 'Profile Photo URL'}
                                 </label>
                                 <input
                                     type="url"
@@ -299,7 +299,7 @@ export default function SettingsPage() {
                     >
                         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                             <FileText className="w-5 h-5 text-purple-600" />
-                            {language === 'ru' ? 'О себе' : 'About You'}
+                            {language === 'he' ? 'אודות' : 'About You'}
                             {formData.bio.length > 10 && <CheckCircle className="w-5 h-5 text-green-500" />}
                         </h2>
 
@@ -308,12 +308,12 @@ export default function SettingsPage() {
                             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                             rows={5}
                             className="w-full p-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none resize-none"
-                            placeholder={language === 'ru'
-                                ? 'Расскажите о своём опыте, стиле работы и почему клиенты выбирают вас...'
+                            placeholder={language === 'he'
+                                ? 'ספר ללקוחות על הניסיון שלך, סגנון העבודה ולמה כדאי להזמין אותך...'
                                 : 'Tell clients about your experience, style, and why they should book you...'}
                         />
                         <p className="text-sm text-gray-400 mt-2">
-                            {formData.bio.length}/500 {language === 'ru' ? 'символов' : 'characters'}
+                            {formData.bio.length}/500 {language === 'he' ? 'תווים' : 'characters'}
                         </p>
                     </motion.div>
 
@@ -326,14 +326,14 @@ export default function SettingsPage() {
                     >
                         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                             <Tag className="w-5 h-5 text-amber-600" />
-                            {language === 'ru' ? 'Категория и цены' : 'Category & Pricing'}
+                            {language === 'he' ? 'קטגוריה ומחירים' : 'Category & Pricing'}
                             {formData.price_from > 0 && <CheckCircle className="w-5 h-5 text-green-500" />}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    {language === 'ru' ? 'Категория' : 'Category'}
+                                    {language === 'he' ? 'קטגוריה' : 'Category'}
                                 </label>
                                 <select
                                     value={formData.category}
@@ -350,7 +350,7 @@ export default function SettingsPage() {
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">
                                     <MapPin className="w-4 h-4 inline mr-1" />
-                                    {language === 'ru' ? 'Город' : 'City'}
+                                    {language === 'he' ? 'עיר' : 'City'}
                                 </label>
                                 <select
                                     value={formData.city}
@@ -366,7 +366,7 @@ export default function SettingsPage() {
 
                             <div>
                                 <label className="block text-sm font-bold text-gray-700 mb-2">
-                                    {language === 'ru' ? 'Цена от (₪)' : 'Price from (₪)'}
+                                    {language === 'he' ? 'מחיר החל מ (₪)' : 'Price from (₪)'}
                                 </label>
                                 <input
                                     type="number"
@@ -389,13 +389,13 @@ export default function SettingsPage() {
                     >
                         <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
                             <Camera className="w-5 h-5 text-pink-600" />
-                            {language === 'ru' ? 'Портфолио' : 'Portfolio Gallery'}
+                            {language === 'he' ? 'גלריית עבודות' : 'Portfolio Gallery'}
                             {formData.portfolio_gallery.length > 0 && <CheckCircle className="w-5 h-5 text-green-500" />}
                         </h2>
 
                         <p className="text-gray-500 mb-6">
-                            {language === 'ru'
-                                ? 'Добавьте ссылки на ваши лучшие работы (URL изображений)'
+                            {language === 'he'
+                                ? 'הוסף קישורים לעבודות הטובות שלך (URL של תמונות)'
                                 : 'Add URLs to your best work samples (image URLs)'}
                         </p>
 
@@ -414,7 +414,7 @@ export default function SettingsPage() {
                                 className="px-6 h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all flex items-center gap-2"
                             >
                                 <Plus className="w-5 h-5" />
-                                {language === 'ru' ? 'Добавить' : 'Add'}
+                                {language === 'he' ? 'הוסף' : 'Add'}
                             </button>
                         </div>
 
@@ -442,7 +442,7 @@ export default function SettingsPage() {
                             <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl">
                                 <Camera className="w-12 h-12 mx-auto mb-4 text-gray-300" />
                                 <p className="text-gray-400">
-                                    {language === 'ru' ? 'Нет фотографий в портфолио' : 'No photos in portfolio yet'}
+                                    {language === 'he' ? 'אין עדיין תמונות בגלריה' : 'No photos in portfolio yet'}
                                 </p>
                             </div>
                         )}
@@ -456,7 +456,7 @@ export default function SettingsPage() {
                             className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-blue-500/30"
                         >
                             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
-                            {language === 'ru' ? 'Сохранить изменения' : 'Save Changes'}
+                            {language === 'he' ? 'שמור שינויים' : 'Save Changes'}
                         </button>
                     </div>
                 </div>
