@@ -4,7 +4,7 @@ User-agent: *
 Allow: /
 
 # Sitemap
-Sitemap: https://event-marketplace-mvp.vercel.app/sitemap.xml
+Sitemap: https://talentr.co.il/sitemap.xml
 
 # Disallow admin areas
 Disallow: /api/

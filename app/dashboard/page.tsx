@@ -154,7 +154,7 @@ export default function DashboardPage() {
 
     // Copy profile link
     const copyProfileLink = () => {
-        const link = `https://event-marketplace-mvp.vercel.app/vendor/${vendorId}`;
+        const link = `https://talentr.co.il/vendor/${vendorId}`;
         navigator.clipboard.writeText(link);
         setCopied(true);
         toast.success(language === 'he' ? '🔗 הקישור הועתק!' : '🔗 Link copied!');

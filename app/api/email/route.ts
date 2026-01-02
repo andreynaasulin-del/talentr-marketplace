@@ -1,5 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { Resend } from 'resend';
+import { SITE_URL } from '@/lib/constants';
 
 // Initialize Resend (will work in production with RESEND_API_KEY)
 const resend = process.env.RESEND_API_KEY
@@ -59,7 +60,7 @@ const templates = {
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <a href="https://event-marketplace-mvp.vercel.app/bookings" 
+                    <a href="${SITE_URL}/bookings" 
                        style="display: inline-block; background: #3b82f6; color: white; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px;">
                         View My Bookings
                     </a>
@@ -116,7 +117,7 @@ const templates = {
                 </div>
                 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <a href="https://event-marketplace-mvp.vercel.app/dashboard" 
+                    <a href="${SITE_URL}/dashboard" 
                        style="display: inline-block; background: #10b981; color: white; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px; margin-right: 10px;">
                         Accept Booking
                     </a>
@@ -177,7 +178,7 @@ const templates = {
                 ` : ''}
                 
                 <div style="text-align: center; margin-bottom: 30px;">
-                    <a href="https://event-marketplace-mvp.vercel.app/bookings" 
+                    <a href="${SITE_URL}/bookings" 
                        style="display: inline-block; background: #3b82f6; color: white; padding: 16px 32px; border-radius: 12px; text-decoration: none; font-weight: 700; font-size: 16px;">
                         View Booking Details
                     </a>
