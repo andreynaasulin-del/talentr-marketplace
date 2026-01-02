@@ -4,6 +4,7 @@ import { filterVendors } from '@/lib/vendors';
 import { Vendor, VendorCategory, City } from '@/types';
 import { rateLimit, getClientIP, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
 import { chatMessageSchema } from '@/lib/validations';
+import { pickPackages, MoodTag } from '@/lib/gigs';
 
 // ===== OPENAI INITIALIZATION =====
 let openai: OpenAI | null = null;
@@ -29,6 +30,9 @@ interface _EventContext {
 interface ChatResponse {
     response: string;
     vendors: Vendor[];
+    mood?: MoodTag[];
+    packages?: ReturnType<typeof pickPackages>;
+    surprise?: string;
     extracted: {
         category?: VendorCategory;
         city?: City;
@@ -450,6 +454,27 @@ function generateSuggestions(
     }[lang] || [];
 }
 
+// ===== MOOD DETECTION (LIGHTWEIGHT) =====
+function detectMood(message: string): MoodTag[] {
+    const lower = message.toLowerCase();
+    const tags: Set<MoodTag> = new Set();
+
+    const addIf = (conds: (string | RegExp)[], tag: MoodTag) => {
+        if (conds.some(c => typeof c === 'string' ? lower.includes(c) : c.test(lower))) {
+            tags.add(tag);
+        }
+    };
+
+    addIf(['😂', 'fun', 'laugh', 'lol', 'xd', 'смеш', 'угар', 'весел', 'מצחיק'], 'fun');
+    addIf(['romantic', 'love', 'date', '❤️', 'роман', 'свидан', 'אהבה'], 'romantic');
+    addIf(['chill', 'calm', 'relax', '🧘', 'zen', 'тихо', 'спокой', 'רגוע'], 'chill');
+    addIf(['wow', 'shock', '🔥', 'эпик', 'вау', 'תדהמה'], 'wow');
+    addIf(['art', 'creative', 'sketch', 'мурал', 'арт', 'ציור', 'גרפיטי'], 'artsy');
+
+    if (tags.size === 0) tags.add('fun');
+    return Array.from(tags);
+}
+
 // ===== AI RESPONSE GENERATION =====
 async function generateAIResponse(
     message: string,
@@ -609,6 +634,9 @@ export async function POST(request: NextRequest) {
         // Extract entities from message
         const extracted = extractFromMessage(message);
 
+        // Detect mood tags for micro-entertainment flow
+        const mood = detectMood(message);
+
         // Merge with existing context
         const mergedExtracted = {
             ...existingContext,
@@ -627,6 +655,12 @@ export async function POST(request: NextRequest) {
             6
         );
 
+        // Pick micro-entertainment packages by mood
+        const packages = pickPackages(mood, 3);
+        const surprise = Math.random() > 0.6
+            ? '🎁 Сюрприз при первом заказе: мини-бонус от артиста'
+            : undefined;
+
         // Generate AI response
         const response = await generateAIResponse(
             message,
@@ -642,6 +676,9 @@ export async function POST(request: NextRequest) {
         const result: ChatResponse = {
             response,
             vendors,
+            mood,
+            packages,
+            surprise,
             extracted: mergedExtracted,
             suggestions: suggestions.slice(0, 4),
         };

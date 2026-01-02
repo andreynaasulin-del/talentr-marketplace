@@ -8,6 +8,7 @@ import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Vendor } from '@/types';
+import { GigPackage } from '@/lib/gigs';
 
 interface Message {
     id: string;
@@ -15,12 +16,18 @@ interface Message {
     content: string;
     vendors?: Vendor[];
     suggestions?: string[];
+    packages?: GigPackage[];
+    surprise?: string;
+    mood?: string[];
 }
 
 interface ChatAPIResponse {
     response: string;
     vendors: Vendor[];
     suggestions?: string[];
+    packages?: GigPackage[];
+    surprise?: string;
+    mood?: string[];
 }
 
 // Animated words - Wolt style
@@ -50,6 +57,22 @@ export default function HeroSection() {
         }, 2500);
         return () => clearInterval(interval);
     }, [words.length]);
+
+    // Initial greeting message
+    useEffect(() => {
+        if (messages.length === 0) {
+            setMessages([
+                {
+                    id: 'greet',
+                    role: 'assistant',
+                    content: lang === 'he'
+                        ? 'היי, אני הקייפ-בוט שלך! מה בא לך להרגיש היום? 😎'
+                        : 'Hey, I’m your vibe-bot! What do you want to feel today? 😎',
+                }
+            ]);
+            setChatExpanded(true);
+        }
+    }, [lang, messages.length]);
 
     const placeholders = {
         en: "What are you celebrating? ✨",
@@ -93,6 +116,9 @@ export default function HeroSection() {
                 content: data.response,
                 vendors: data.vendors,
                 suggestions: data.suggestions,
+                packages: data.packages,
+                surprise: data.surprise,
+                mood: data.mood,
             }]);
         } catch (error) {
             console.error('Chat error:', error);
@@ -200,6 +226,37 @@ export default function HeroSection() {
                                                                 ))}
                                                             </div>
                                                         )}
+                                            {msg.packages && msg.packages.length > 0 && (
+                                                <div className="mt-3 grid grid-cols-1 gap-3">
+                                                    {msg.packages.map(pkg => (
+                                                        <button
+                                                            key={pkg.id}
+                                                            onClick={() => sendMessage(pkg.title[lang])}
+                                                            className="w-full text-left bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-100 p-3 flex gap-3 items-center transition-colors"
+                                                        >
+                                                            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
+                                                                <Image src={pkg.image} alt={pkg.title[lang]} fill className="object-cover" />
+                                                            </div>
+                                                            <div className="min-w-0">
+                                                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
+                                                                    <span>{pkg.emoji}</span>
+                                                                    <span className="truncate">{pkg.title[lang]}</span>
+                                                                </div>
+                                                                <p className="text-xs text-gray-600 line-clamp-2">{pkg.subtitle[lang]}</p>
+                                                                <div className="text-[11px] text-gray-500 mt-1">
+                                                                    {pkg.duration} · {pkg.priceHint}
+                                                                </div>
+                                                            </div>
+                                                            <span className="text-[#009de0] text-sm font-semibold flex-shrink-0">OK</span>
+                                                        </button>
+                                                    ))}
+                                                    {msg.surprise && (
+                                                        <div className="text-xs text-gray-600 bg-[#009de0]/5 border border-[#009de0]/10 rounded-lg p-2">
+                                                            {msg.surprise}
+                                                        </div>
+                                                    )}
+                                                </div>
+                                            )}
                                                     </div>
                                                 </div>
                                             ) : (
@@ -227,7 +284,20 @@ export default function HeroSection() {
                             )}
                         </AnimatePresence>
 
-                        <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-3">
+                        <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-3 space-y-2">
+                            {/* Quick emoji CTAs */}
+                            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
+                                {['😂', '🎩', '🎸', '🧘‍♂️', '🎁'].map((emoji) => (
+                                    <button
+                                        key={emoji}
+                                        type="button"
+                                        onClick={() => sendMessage(emoji)}
+                                        className="px-3 py-2 bg-[#009de0]/10 text-[#009de0] rounded-full text-sm font-semibold hover:bg-[#009de0]/20 transition"
+                                    >
+                                        {emoji}
+                                    </button>
+                                ))}
+                            </div>
                             <div className={cn(
                                 "flex items-center gap-3 px-4 py-4 rounded-xl border-2 transition-all",
                                 isFocused ? "border-[#009de0] bg-[#009de0]/5" : "border-gray-200 bg-gray-50"
