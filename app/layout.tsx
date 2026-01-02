@@ -43,7 +43,7 @@ export const metadata: Metadata = {
     openGraph: {
         title: 'Talentr - Find the Best Event Professionals',
         description: 'Connect with top-rated photographers, DJs, MCs, and more for your events in Israel.',
-        url: 'https://talentr.co.il',
+        url: 'https://event-marketplace-mvp.vercel.app',
         siteName: 'Talentr',
         images: [
             {
