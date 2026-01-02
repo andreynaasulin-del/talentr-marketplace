@@ -53,10 +53,8 @@ export default function Navbar() {
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
                 <div className="flex items-center justify-between">
-                    {/* Logo */}
                     <Logo 
                         size="lg" 
-                        variant={isScrolled ? 'dark' : 'light'} 
                     />
 
                     {/* Right: CTAs + Lang */}

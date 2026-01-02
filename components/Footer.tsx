@@ -37,7 +37,7 @@ export default function Footer() {
                     {/* Logo & Tagline */}
                     <div>
                         <div className="mb-3">
-                            <Logo size="lg" variant="light" />
+                            <Logo size="lg" />
                         </div>
                         <p className="text-white/40 text-sm max-w-xs">
                             {t.tagline}
