@@ -2,37 +2,40 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== DESIGN SYSTEM TOKENS ===== */
+/* ===== DESIGN SYSTEM TOKENS - UNIFIED BLUE THEME ===== */
 :root {
-  /* Brand Colors */
-  --brand-primary: #3B82F6;
-  --brand-secondary: #8B5CF6;
-  --brand-gradient: linear-gradient(135deg, #3B82F6 0%, #8B5CF6 100%);
+  /* Brand Colors - Wolt-inspired Blue */
+  --brand-primary: #009de0;
+  --brand-secondary: #0077b6;
+  --brand-light: #48cae4;
+  --brand-gradient: linear-gradient(135deg, #009de0 0%, #0077b6 100%);
 
-  /* Surfaces */
+  /* Surfaces - Light Mode */
   --surface: #FFFFFF;
-  --surface-elevated: rgba(255, 255, 255, 0.85);
-  --background: #FFFFFF;
-  --background-subtle: #F8FAFC;
+  --surface-elevated: rgba(255, 255, 255, 0.95);
+  --background: #f0f9ff;
+  --background-subtle: #e0f2fe;
+  --background-hero: #009de0;
 
   /* Borders */
-  --border-light: rgba(0, 0, 0, 0.06);
-  --border-medium: rgba(0, 0, 0, 0.1);
+  --border-light: rgba(0, 157, 224, 0.1);
+  --border-medium: rgba(0, 157, 224, 0.2);
 
   /* Text */
-  --text-primary: #0F172A;
-  --text-secondary: #64748B;
-  --text-muted: #94A3B8;
+  --text-primary: #0c4a6e;
+  --text-secondary: #0369a1;
+  --text-muted: #7dd3fc;
+  --text-on-brand: #FFFFFF;
 
   /* Shadows */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.04);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.06);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.08);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.12);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.16);
-  --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.25);
+  --shadow-xs: 0 1px 2px rgba(0, 157, 224, 0.04);
+  --shadow-sm: 0 2px 8px rgba(0, 157, 224, 0.08);
+  --shadow-md: 0 4px 16px rgba(0, 157, 224, 0.12);
+  --shadow-lg: 0 8px 32px rgba(0, 157, 224, 0.16);
+  --shadow-xl: 0 16px 48px rgba(0, 157, 224, 0.20);
+  --shadow-glow: 0 0 40px rgba(0, 157, 224, 0.3);
   --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.08), 0 0 1px rgba(0, 0, 0, 0.1);
-  --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.15), 0 0 1px rgba(0, 0, 0, 0.1);
+  --shadow-card-hover: 0 12px 40px rgba(0, 157, 224, 0.2), 0 0 1px rgba(0, 0, 0, 0.1);
 
   /* Transitions */
   --ease-smooth: cubic-bezier(0.4, 0, 0.2, 1);
@@ -42,32 +45,33 @@
   --duration-slow: 500ms;
 }
 
-/* Dark Mode Variables */
+/* Dark Mode - Deep Blue Theme */
 .dark {
-  /* Surfaces */
-  --surface: #0f172a;
-  --surface-elevated: rgba(30, 41, 59, 0.9);
-  --background: #0f172a;
-  --background-subtle: #1e293b;
+  /* Surfaces - Deep Blue */
+  --surface: #0a1628;
+  --surface-elevated: rgba(15, 35, 60, 0.95);
+  --background: #0a1628;
+  --background-subtle: #0f2340;
+  --background-hero: #0a1628;
 
   /* Borders */
-  --border-light: rgba(255, 255, 255, 0.06);
-  --border-medium: rgba(255, 255, 255, 0.1);
+  --border-light: rgba(0, 157, 224, 0.1);
+  --border-medium: rgba(0, 157, 224, 0.2);
 
   /* Text */
-  --text-primary: #f1f5f9;
-  --text-secondary: #94a3b8;
-  --text-muted: #64748b;
+  --text-primary: #f0f9ff;
+  --text-secondary: #7dd3fc;
+  --text-muted: #0369a1;
 
-  /* Shadows - more subtle in dark mode with glow effect */
-  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.2);
-  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.3);
-  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.4);
-  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.5);
-  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.6);
-  --shadow-glow: 0 0 40px rgba(59, 130, 246, 0.4);
-  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.3), 0 0 1px rgba(255, 255, 255, 0.05);
-  --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 1px rgba(255, 255, 255, 0.1);
+  /* Shadows */
+  --shadow-xs: 0 1px 2px rgba(0, 0, 0, 0.3);
+  --shadow-sm: 0 2px 8px rgba(0, 0, 0, 0.4);
+  --shadow-md: 0 4px 16px rgba(0, 0, 0, 0.5);
+  --shadow-lg: 0 8px 32px rgba(0, 0, 0, 0.6);
+  --shadow-xl: 0 16px 48px rgba(0, 0, 0, 0.7);
+  --shadow-glow: 0 0 40px rgba(0, 157, 224, 0.3);
+  --shadow-card: 0 2px 12px rgba(0, 0, 0, 0.4), 0 0 1px rgba(0, 157, 224, 0.1);
+  --shadow-card-hover: 0 12px 40px rgba(0, 0, 0, 0.5), 0 0 1px rgba(0, 157, 224, 0.2);
 }
 
 /* ===== BASE STYLES ===== */

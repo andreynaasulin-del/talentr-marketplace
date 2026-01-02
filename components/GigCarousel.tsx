@@ -38,7 +38,7 @@ export default function GigCarousel() {
     const secondRow = allPackages.slice(10, 20);
 
     return (
-        <section id="packages" className="py-20 md:py-28 bg-slate-950 overflow-visible">
+        <section id="packages" className="py-20 md:py-28 bg-[#0a1628] overflow-visible">
             <div className="max-w-7xl mx-auto px-4 md:px-8 mb-12">
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
@@ -108,7 +108,7 @@ function PackageCube({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; t: any
     return (
         <Link
             href={`/package/${pkg.id}`}
-            className="group block relative aspect-square overflow-hidden rounded-[32px] md:rounded-[40px] bg-slate-900 border border-white/5 transition-all duration-500 hover:border-white/20"
+            className="group block relative aspect-square overflow-hidden rounded-[32px] md:rounded-[40px] bg-[#0f2340] border border-[#009de0]/10 transition-all duration-500 hover:border-[#009de0]/30"
         >
             {/* Image */}
             <Image
@@ -120,7 +120,7 @@ function PackageCube({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; t: any
             />
             
             {/* Overlay */}
-            <div className="absolute inset-0 bg-gradient-to-t from-slate-950 via-slate-950/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
+            <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-[#0a1628]/20 to-transparent opacity-60 group-hover:opacity-80 transition-opacity duration-500" />
 
             {/* Content Bottom */}
             <div className="absolute inset-x-0 bottom-0 p-5 md:p-6 transform translate-y-2 group-hover:translate-y-0 transition-transform duration-500">

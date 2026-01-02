@@ -126,7 +126,7 @@ export default function Navbar() {
                         {/* Primary CTA: Find Talent */}
                         <Link
                             href="#packages"
-                            className="px-4 md:px-5 py-2 md:py-2.5 bg-slate-900 text-white text-sm font-bold rounded-lg hover:bg-slate-800 transition-colors"
+                            className="px-4 md:px-5 py-2 md:py-2.5 bg-[#0a1628] text-white text-sm font-bold rounded-lg hover:bg-[#0f2340] transition-colors"
                         >
                             {t.findTalent}
                         </Link>
