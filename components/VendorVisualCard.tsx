@@ -17,11 +17,9 @@ function VendorVisualCard({ vendor, context }: VendorVisualCardProps) {
     const [isLiked, setIsLiked] = useState(false);
 
     const whatsappMessage = encodeURIComponent(
-        language === 'ru'
-            ? `Привет, ${vendor.name}! Нашёл вас на Talentr${context ? ` для ${context}` : ''}. Можем обсудить детали?`
-            : language === 'he'
-                ? `שלום ${vendor.name}! מצאתי אותך ב-Talentr${context ? ` עבור ${context}` : ''}. נוכל לדון בפרטים?`
-                : `Hi ${vendor.name}! I found you on Talentr${context ? ` for ${context}` : ''}. Can we discuss details?`
+        language === 'he'
+            ? `שלום ${vendor.name}! מצאתי אותך ב-Talentr${context ? ` עבור ${context}` : ''}. נוכל לדון בפרטים?`
+            : `Hi ${vendor.name}! I found you on Talentr${context ? ` for ${context}` : ''}. Can we discuss details?`
     );
 
     const whatsappUrl = vendor.phone

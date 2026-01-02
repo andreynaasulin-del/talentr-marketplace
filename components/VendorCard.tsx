@@ -145,7 +145,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                     >
                                         <Crown className="w-3.5 h-3.5 text-white" />
                                         <span className="text-xs font-bold text-white">
-                                            {language === 'ru' ? 'Топ' : language === 'he' ? 'מוביל' : 'Top'}
+                                            {language === 'he' ? 'מוביל' : 'Top'}
                                         </span>
                                     </motion.div>
                                 )}
@@ -158,7 +158,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                     >
                                         <Shield className="w-3.5 h-3.5 text-blue-600" />
                                         <span className="text-xs font-semibold text-gray-800">
-                                            {language === 'ru' ? 'Проверен' : language === 'he' ? 'מאומת' : 'Verified'}
+                                            {language === 'he' ? 'מאומת' : 'Verified'}
                                         </span>
                                     </motion.div>
                                 )}

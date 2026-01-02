@@ -37,14 +37,13 @@ export default function Navbar() {
 
     const handleSignOut = async () => {
         await supabase.auth.signOut();
-        toast.success(language === 'ru' ? 'Вы вышли из аккаунта' : language === 'he' ? 'התנתקת בהצלחה' : 'Signed out successfully');
+        toast.success(language === 'he' ? 'התנתקת בהצלחה' : 'Signed out successfully');
         router.push('/');
     };
 
     const languages = [
         { code: 'en' as const, label: 'English', flag: '🇺🇸' },
         { code: 'he' as const, label: 'עברית', flag: '🇮🇱' },
-        { code: 'ru' as const, label: 'Русский', flag: '🇷🇺' },
     ];
 
     const currentLang = languages.find((l) => l.code === language) || languages[0];
@@ -203,7 +202,7 @@ export default function Navbar() {
                                     <Link
                                         href="/favorites"
                                         className="relative p-2.5 text-gray-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-all"
-                                        title={language === 'ru' ? 'Избранное' : language === 'he' ? 'מועדפים' : 'Favorites'}
+                                        title={language === 'he' ? 'מועדפים' : 'Favorites'}
                                     >
                                         <Heart className="w-5 h-5" />
                                         {favoritesCount > 0 && (
@@ -224,7 +223,7 @@ export default function Navbar() {
                                         )}
                                     >
                                         <Calendar className="w-4 h-4" />
-                                        {language === 'ru' ? 'Заказы' : language === 'he' ? 'הזמנות' : 'Bookings'}
+                                        {language === 'he' ? 'הזמנות' : 'Bookings'}
                                     </Link>
                                 </motion.div>
                                 <motion.button

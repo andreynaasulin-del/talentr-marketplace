@@ -9,11 +9,10 @@ export default function AppBanner() {
 
     const content = {
         en: { badge: 'Coming Soon', title: 'Get the Talentr App', subtitle: 'Book professionals on the go. Download our app for iOS and Android.', cta: 'Get Early Access' },
-        ru: { badge: 'Скоро', title: 'Скачайте приложение Talentr', subtitle: 'Бронируйте специалистов на ходу. Скоро на iOS и Android.', cta: 'Получить ранний доступ' },
         he: { badge: 'בקרוב', title: 'הורידו את אפליקציית Talentr', subtitle: 'הזמינו אנשי מקצוע בדרכים. בקרוב ל-iOS ו-Android.', cta: 'קבלו גישה מוקדמת' }
     };
 
-    const t = content[language as keyof typeof content];
+    const t = content[language as keyof typeof content] || content.en;
 
     return (
         <section className="py-16 bg-gradient-to-r from-blue-600 via-purple-600 to-blue-600 relative overflow-hidden">
@@ -53,7 +52,7 @@ export default function AppBanner() {
                 </div>
 
                 <motion.div initial={{ opacity: 0, y: 20 }} whileInView={{ opacity: 1, y: 0 }} viewport={{ once: true }} transition={{ delay: 0.4 }} className="mt-10 flex flex-col sm:flex-row gap-4 max-w-xl mx-auto md:mx-0">
-                    <input type="email" placeholder={language === 'ru' ? 'Ваш email' : language === 'he' ? 'האימייל שלך' : 'Your email'} className="flex-1 px-6 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl text-white placeholder:text-white/50 focus:outline-none focus:border-white/50 transition-colors" />
+                    <input type="email" placeholder={language === 'he' ? 'האימייל שלך' : 'Your email'} className="flex-1 px-6 py-4 bg-white/10 backdrop-blur-sm border-2 border-white/20 rounded-2xl text-white placeholder:text-white/50 focus:outline-none focus:border-white/50 transition-colors" />
                     <motion.button whileHover={{ scale: 1.02 }} whileTap={{ scale: 0.98 }} className="flex items-center justify-center gap-2 px-8 py-4 bg-white text-blue-600 rounded-2xl font-bold shadow-lg hover:shadow-xl transition-shadow">
                         {t.cta}
                         <ArrowRight className="w-5 h-5" />

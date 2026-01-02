@@ -51,21 +51,21 @@ export default function BookingsPage() {
 
     const getStatusBadge = (status: string) => {
         const statusConfig: Record<string, { color: string; icon: React.ReactNode; label: string }> = {
-            pending: { color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', icon: <Clock className="w-4 h-4" />, label: language === 'ru' ? 'Ожидает' : language === 'he' ? 'ממתין' : 'Pending' },
-            confirmed: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="w-4 h-4" />, label: language === 'ru' ? 'Подтверждено' : language === 'he' ? 'מאושר' : 'Confirmed' },
-            declined: { color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: <XCircle className="w-4 h-4" />, label: language === 'ru' ? 'Отклонено' : language === 'he' ? 'נדחה' : 'Declined' },
-            completed: { color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', icon: <CheckCircle className="w-4 h-4" />, label: language === 'ru' ? 'Завершено' : language === 'he' ? 'הושלם' : 'Completed' },
-            cancelled: { color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400', icon: <XCircle className="w-4 h-4" />, label: language === 'ru' ? 'Отменено' : language === 'he' ? 'בוטל' : 'Cancelled' }
+            pending: { color: 'bg-amber-100 text-amber-700 dark:bg-amber-900/30 dark:text-amber-400', icon: <Clock className="w-4 h-4" />, label: language === 'he' ? 'ממתין' : 'Pending' },
+            confirmed: { color: 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400', icon: <CheckCircle className="w-4 h-4" />, label: language === 'he' ? 'מאושר' : 'Confirmed' },
+            declined: { color: 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400', icon: <XCircle className="w-4 h-4" />, label: language === 'he' ? 'נדחה' : 'Declined' },
+            completed: { color: 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400', icon: <CheckCircle className="w-4 h-4" />, label: language === 'he' ? 'הושלם' : 'Completed' },
+            cancelled: { color: 'bg-gray-100 text-gray-700 dark:bg-gray-900/30 dark:text-gray-400', icon: <XCircle className="w-4 h-4" />, label: language === 'he' ? 'בוטל' : 'Cancelled' }
         };
         const config = statusConfig[status] || statusConfig.pending;
         return <span className={`inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-sm font-bold ${config.color}`}>{config.icon}{config.label}</span>;
     };
 
-    const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString(language === 'ru' ? 'ru-RU' : language === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
+    const formatDate = (dateString: string) => new Date(dateString).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', { year: 'numeric', month: 'long', day: 'numeric' });
 
-    const pageTitle = language === 'ru' ? 'Мои заказы' : language === 'he' ? 'ההזמנות שלי' : 'My Bookings';
-    const emptyMessage = language === 'ru' ? 'У вас пока нет заказов' : language === 'he' ? 'אין לך עדיין הזמנות' : 'You have no bookings yet';
-    const browseText = language === 'ru' ? 'Найти специалистов' : language === 'he' ? 'חפש אנשי מקצוע' : 'Browse Professionals';
+    const pageTitle = language === 'he' ? 'ההזמנות שלי' : 'My Bookings';
+    const emptyMessage = language === 'he' ? 'אין לך עדיין הזמנות' : 'You have no bookings yet';
+    const browseText = language === 'he' ? 'חפש אנשי מקצוע' : 'Browse Professionals';
 
     return (
         <div className="min-h-screen bg-white dark:bg-slate-900">
@@ -78,7 +78,7 @@ export default function BookingsPage() {
                     <div className="text-center py-20">
                         <div className="w-20 h-20 bg-gray-100 dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-6"><Calendar className="w-10 h-10 text-gray-400" /></div>
                         <h2 className="text-2xl font-bold text-gray-900 dark:text-white mb-3">{emptyMessage}</h2>
-                        <p className="text-gray-500 dark:text-gray-400 mb-8">{language === 'ru' ? 'Забронируйте первого специалиста!' : language === 'he' ? 'הזמינו את איש המקצוע הראשון!' : 'Book your first professional!'}</p>
+                        <p className="text-gray-500 dark:text-gray-400 mb-8">{language === 'he' ? 'הזמינו את איש המקצוע הראשון!' : 'Book your first professional!'}</p>
                         <Link href="/" className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-2xl hover:bg-blue-700 transition-colors">{browseText}</Link>
                     </div>
                 ) : (

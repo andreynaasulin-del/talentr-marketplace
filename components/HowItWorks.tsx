@@ -7,16 +7,12 @@ import { cn } from '@/lib/utils';
 
 export default function HowItWorks() {
     const { language } = useLanguage();
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = language as 'en' | 'he';
 
     const content = {
         en: {
             title: 'How it works',
             subtitle: 'Find and book professionals in 3 simple steps',
-        },
-        ru: {
-            title: 'Как это работает',
-            subtitle: 'Найдите и забронируйте специалиста за 3 шага',
         },
         he: {
             title: 'איך זה עובד',
@@ -30,10 +26,9 @@ export default function HowItWorks() {
         {
             icon: Search,
             number: '01',
-            title: { en: 'Search', ru: 'Поиск', he: 'חיפוש' },
+            title: { en: 'Search', he: 'חיפוש' },
             desc: {
                 en: 'Describe what you need or browse categories',
-                ru: 'Опишите, что нужно, или выберите категорию',
                 he: 'תארו מה אתם צריכים או חפשו קטגוריות'
             },
             gradient: 'from-blue-500 to-cyan-400',
@@ -42,10 +37,9 @@ export default function HowItWorks() {
         {
             icon: MessageSquare,
             number: '02',
-            title: { en: 'Compare', ru: 'Сравнение', he: 'השוואה' },
+            title: { en: 'Compare', he: 'השוואה' },
             desc: {
                 en: 'Chat with professionals and compare offers',
-                ru: 'Общайтесь с профессионалами и сравнивайте',
                 he: 'שוחחו עם מקצוענים והשוו הצעות'
             },
             gradient: 'from-violet-500 to-purple-400',
@@ -54,10 +48,9 @@ export default function HowItWorks() {
         {
             icon: CalendarCheck,
             number: '03',
-            title: { en: 'Book', ru: 'Бронь', he: 'הזמנה' },
+            title: { en: 'Book', he: 'הזמנה' },
             desc: {
                 en: 'Confirm your booking and enjoy your event',
-                ru: 'Подтвердите бронь и наслаждайтесь',
                 he: 'אשרו הזמנה ותהנו מהאירוע'
             },
             gradient: 'from-emerald-500 to-teal-400',
@@ -87,7 +80,7 @@ export default function HowItWorks() {
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                     >
-                        {lang === 'ru' ? 'Просто как 1-2-3' : lang === 'he' ? 'פשוט כמו 1-2-3' : 'Easy as 1-2-3'}
+                        {lang === 'he' ? 'פשוט כמו 1-2-3' : 'Easy as 1-2-3'}
                     </motion.span>
                     <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
                         {t.title}

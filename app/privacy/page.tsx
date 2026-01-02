@@ -21,10 +21,10 @@ export default function PrivacyPage() {
                         <Shield className="w-8 h-8 text-green-600" />
                     </div>
                     <h1 className="text-4xl font-black text-gray-900 mb-4">
-                        {language === 'ru' ? 'Политика конфиденциальности' : language === 'he' ? 'מדיניות פרטיות' : 'Privacy Policy'}
+                        {language === 'he' ? 'מדיניות פרטיות' : 'Privacy Policy'}
                     </h1>
                     <p className="text-gray-500">
-                        {language === 'ru' ? 'Последнее обновление:' : 'Last updated:'} {lastUpdated}
+                        Last updated: {lastUpdated}
                     </p>
                 </div>
 

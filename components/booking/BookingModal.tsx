@@ -23,23 +23,23 @@ interface BookingModalProps {
 
 // Event types with localization and icons
 const EVENT_TYPES = [
-    { id: 'wedding', icon: '💍', en: 'Wedding', ru: 'Свадьба', he: 'חתונה' },
-    { id: 'bar_mitzvah', icon: '✡️', en: 'Bar/Bat Mitzvah', ru: 'Бар/Бат Мицва', he: 'בר/בת מצווה' },
-    { id: 'birthday', icon: '🎂', en: 'Birthday', ru: 'День рождения', he: 'יום הולדת' },
-    { id: 'corporate', icon: '💼', en: 'Corporate', ru: 'Корпоратив', he: 'אירוע עסקי' },
-    { id: 'party', icon: '🎉', en: 'Party', ru: 'Вечеринка', he: 'מסיבה' },
-    { id: 'anniversary', icon: '❤️', en: 'Anniversary', ru: 'Годовщина', he: 'יום נישואין' },
-    { id: 'graduation', icon: '🎓', en: 'Graduation', ru: 'Выпускной', he: 'סיום' },
-    { id: 'other', icon: '✨', en: 'Other', ru: 'Другое', he: 'אחר' },
+    { id: 'wedding', icon: '💍', en: 'Wedding', he: 'חתונה' },
+    { id: 'bar_mitzvah', icon: '✡️', en: 'Bar/Bat Mitzvah', he: 'בר/בת מצווה' },
+    { id: 'birthday', icon: '🎂', en: 'Birthday', he: 'יום הולדת' },
+    { id: 'corporate', icon: '💼', en: 'Corporate', he: 'אירוע עסקי' },
+    { id: 'party', icon: '🎉', en: 'Party', he: 'מסיבה' },
+    { id: 'anniversary', icon: '❤️', en: 'Anniversary', he: 'יום נישואין' },
+    { id: 'graduation', icon: '🎓', en: 'Graduation', he: 'סיום' },
+    { id: 'other', icon: '✨', en: 'Other', he: 'אחר' },
 ];
 
 // Guest count options
 const GUEST_OPTIONS = [
-    { value: '1-20', label: { en: 'Intimate (1-20)', ru: 'Камерное (1-20)', he: 'אינטימי (1-20)' } },
-    { value: '21-50', label: { en: 'Small (21-50)', ru: 'Небольшое (21-50)', he: 'קטן (21-50)' } },
-    { value: '51-100', label: { en: 'Medium (51-100)', ru: 'Среднее (51-100)', he: 'בינוני (51-100)' } },
-    { value: '101-200', label: { en: 'Large (101-200)', ru: 'Большое (101-200)', he: 'גדול (101-200)' } },
-    { value: '200+', label: { en: 'Grand (200+)', ru: 'Грандиозное (200+)', he: 'גרנדיוזי (200+)' } },
+    { value: '1-20', label: { en: 'Intimate (1-20)', he: 'אינטימי (1-20)' } },
+    { value: '21-50', label: { en: 'Small (21-50)', he: 'קטן (21-50)' } },
+    { value: '51-100', label: { en: 'Medium (51-100)', he: 'בינוני (51-100)' } },
+    { value: '101-200', label: { en: 'Large (101-200)', he: 'גדול (101-200)' } },
+    { value: '200+', label: { en: 'Grand (200+)', he: 'גרנדיוזי (200+)' } },
 ];
 
 type Step = 'event' | 'details' | 'message' | 'confirm';
@@ -74,11 +74,9 @@ export default function BookingModal({
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 toast.error(t('loginRequired'), {
-                    description: language === 'ru'
-                        ? 'Войдите чтобы забронировать'
-                        : language === 'he'
-                            ? 'התחבר כדי להזמין'
-                            : 'Sign in to make a booking'
+                    description: language === 'he'
+                        ? 'התחבר כדי להזמין'
+                        : 'Sign in to make a booking'
                 });
                 setTimeout(() => router.push('/signin?redirect=/bookings'), 1500);
             } else {
@@ -89,7 +87,7 @@ export default function BookingModal({
     }, [router, t, language]);
 
     const getEventLabel = (event: typeof EVENT_TYPES[0]) => {
-        return event[language as keyof typeof event] || event.en;
+        return (event as Record<string, string>)[language] || event.en;
     };
 
     const getGuestLabel = (option: typeof GUEST_OPTIONS[0]) => {
@@ -97,10 +95,10 @@ export default function BookingModal({
     };
 
     const steps: { id: Step; label: string }[] = [
-        { id: 'event', label: language === 'ru' ? 'Событие' : language === 'he' ? 'אירוע' : 'Event' },
-        { id: 'details', label: language === 'ru' ? 'Детали' : language === 'he' ? 'פרטים' : 'Details' },
-        { id: 'message', label: language === 'ru' ? 'Сообщение' : language === 'he' ? 'הודעה' : 'Message' },
-        { id: 'confirm', label: language === 'ru' ? 'Готово' : language === 'he' ? 'סיום' : 'Confirm' },
+        { id: 'event', label: language === 'he' ? 'אירוע' : 'Event' },
+        { id: 'details', label: language === 'he' ? 'פרטים' : 'Details' },
+        { id: 'message', label: language === 'he' ? 'הודעה' : 'Message' },
+        { id: 'confirm', label: language === 'he' ? 'סיום' : 'Confirm' },
     ];
 
     const currentStepIndex = steps.findIndex(s => s.id === currentStep);
@@ -216,15 +214,12 @@ export default function BookingModal({
             }
 
             toast.success(
-                language === 'ru' ? '🎉 Заявка отправлена!'
-                    : language === 'he' ? '🎉 הבקשה נשלחה!'
-                        : '🎉 Booking Sent!',
+                language === 'he' ? '🎉 הבקשה נשלחה!'
+                    : '🎉 Booking Sent!',
                 {
-                    description: language === 'ru'
-                        ? `${vendorName} получит уведомление`
-                        : language === 'he'
-                            ? `${vendorName} יקבל התראה`
-                            : `${vendorName} will be notified`,
+                    description: language === 'he'
+                        ? `${vendorName} יקבל התראה`
+                        : `${vendorName} will be notified`,
                 }
             );
 
@@ -232,7 +227,7 @@ export default function BookingModal({
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : 'Failed to send booking';
             setError(errorMessage);
-            toast.error(language === 'ru' ? 'Ошибка' : language === 'he' ? 'שגיאה' : 'Error', {
+            toast.error(language === 'he' ? 'שגיאה' : 'Error', {
                 description: errorMessage,
             });
         } finally {
@@ -295,7 +290,7 @@ export default function BookingModal({
                 <div className="px-6 py-5 flex items-center justify-between border-b border-gray-100">
                     <div>
                         <h3 className="text-xl font-black text-gray-900">
-                            {language === 'ru' ? 'Забронировать' : language === 'he' ? 'הזמנה' : 'Book Now'}
+                            {language === 'he' ? 'הזמנה' : 'Book Now'}
                         </h3>
                         <p className="text-sm text-gray-500 font-medium">{vendorName}</p>
                     </div>
@@ -352,14 +347,12 @@ export default function BookingModal({
                                     </div>
                                 </motion.div>
                                 <h4 className="text-2xl font-black text-gray-900 mb-2">
-                                    {language === 'ru' ? 'Заявка отправлена!' : language === 'he' ? 'הבקשה נשלחה!' : 'Request Sent!'}
+                                    {language === 'he' ? 'הבקשה נשלחה!' : 'Request Sent!'}
                                 </h4>
                                 <p className="text-gray-500 max-w-xs mx-auto">
-                                    {language === 'ru'
-                                        ? `${vendorName} получит уведомление и свяжется с вами`
-                                        : language === 'he'
-                                            ? `${vendorName} יקבל הודעה ויצור קשר`
-                                            : `${vendorName} will receive a notification and contact you`}
+                                    {language === 'he'
+                                        ? `${vendorName} יקבל הודעה ויצור קשר`
+                                        : `${vendorName} will receive a notification and contact you`}
                                 </p>
                             </motion.div>
                         ) : (
@@ -376,7 +369,7 @@ export default function BookingModal({
                                     >
                                         <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
                                             <Sparkles className="w-5 h-5 text-blue-500" />
-                                            {language === 'ru' ? 'Какое мероприятие?' : language === 'he' ? 'איזה אירוע?' : 'What type of event?'}
+                                            {language === 'he' ? 'איזה אירוע?' : 'What type of event?'}
                                         </h4>
                                         <div className="grid grid-cols-2 gap-3">
                                             {EVENT_TYPES.map((event) => (
@@ -418,7 +411,7 @@ export default function BookingModal({
                                         <div>
                                             <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
                                                 <Calendar className="w-4 h-4 text-blue-500" />
-                                                {language === 'ru' ? 'Дата события' : language === 'he' ? 'תאריך האירוע' : 'Event Date'} *
+                                                {language === 'he' ? 'תאריך האירוע' : 'Event Date'} *
                                             </label>
                                             <input
                                                 type="date"
@@ -433,7 +426,7 @@ export default function BookingModal({
                                         <div>
                                             <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
                                                 <Clock className="w-4 h-4 text-blue-500" />
-                                                {language === 'ru' ? 'Время (опционально)' : language === 'he' ? 'שעה (אופציונלי)' : 'Time (optional)'}
+                                                {language === 'he' ? 'שעה (אופציונלי)' : 'Time (optional)'}
                                             </label>
                                             <input
                                                 type="time"
@@ -446,7 +439,7 @@ export default function BookingModal({
                                         <div>
                                             <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
                                                 <Users className="w-4 h-4 text-blue-500" />
-                                                {language === 'ru' ? 'Количество гостей' : language === 'he' ? 'מספר אורחים' : 'Guest Count'}
+                                                {language === 'he' ? 'מספר אורחים' : 'Guest Count'}
                                             </label>
                                             <div className="grid grid-cols-2 gap-2">
                                                 {GUEST_OPTIONS.map((option) => (
@@ -481,18 +474,16 @@ export default function BookingModal({
                                     >
                                         <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
                                             <MessageSquare className="w-4 h-4 text-blue-500" />
-                                            {language === 'ru' ? 'Сообщение для специалиста' : language === 'he' ? 'הודעה לאיש המקצוע' : 'Message to the pro'}
+                                            {language === 'he' ? 'הודעה לאיש המקצוע' : 'Message to the pro'}
                                         </label>
                                         <textarea
                                             value={formData.details}
                                             onChange={(e) => setFormData({ ...formData, details: e.target.value })}
                                             className="w-full p-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none text-gray-900 min-h-[180px] resize-none"
                                             placeholder={
-                                                language === 'ru'
-                                                    ? 'Расскажите подробнее о вашем мероприятии, пожеланиях, особых требованиях...'
-                                                    : language === 'he'
-                                                        ? 'ספר לנו עוד על האירוע שלך, העדפות, דרישות מיוחדות...'
-                                                        : 'Tell us more about your event, preferences, special requirements...'
+                                                language === 'he'
+                                                    ? 'ספר לנו עוד על האירוע שלך, העדפות, דרישות מיוחדות...'
+                                                    : 'Tell us more about your event, preferences, special requirements...'
                                             }
                                         />
                                     </motion.div>
@@ -510,33 +501,33 @@ export default function BookingModal({
                                         className="space-y-4"
                                     >
                                         <h4 className="text-lg font-bold text-gray-900 mb-4">
-                                            {language === 'ru' ? 'Подтвердите детали' : language === 'he' ? 'אשר פרטים' : 'Confirm Details'}
+                                            {language === 'he' ? 'אשר פרטים' : 'Confirm Details'}
                                         </h4>
 
                                         <div className="bg-gray-50 rounded-2xl p-5 space-y-4">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{language === 'ru' ? 'Специалист' : language === 'he' ? 'איש מקצוע' : 'Professional'}</span>
+                                                <span className="text-gray-500">{language === 'he' ? 'איש מקצוע' : 'Professional'}</span>
                                                 <span className="font-bold text-gray-900">{vendorName}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{language === 'ru' ? 'Событие' : language === 'he' ? 'אירוע' : 'Event'}</span>
+                                                <span className="text-gray-500">{language === 'he' ? 'אירוע' : 'Event'}</span>
                                                 <span className="font-bold text-gray-900">
                                                     {EVENT_TYPES.find(e => e.id === formData.eventType)?.icon} {getEventLabel(EVENT_TYPES.find(e => e.id === formData.eventType) || EVENT_TYPES[0])}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{language === 'ru' ? 'Дата' : language === 'he' ? 'תאריך' : 'Date'}</span>
+                                                <span className="text-gray-500">{language === 'he' ? 'תאריך' : 'Date'}</span>
                                                 <span className="font-bold text-gray-900">{formData.eventDate}</span>
                                             </div>
                                             {formData.eventTime && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-gray-500">{language === 'ru' ? 'Время' : language === 'he' ? 'שעה' : 'Time'}</span>
+                                                    <span className="text-gray-500">{language === 'he' ? 'שעה' : 'Time'}</span>
                                                     <span className="font-bold text-gray-900">{formData.eventTime}</span>
                                                 </div>
                                             )}
                                             {formData.guestCount && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-gray-500">{language === 'ru' ? 'Гостей' : language === 'he' ? 'אורחים' : 'Guests'}</span>
+                                                    <span className="text-gray-500">{language === 'he' ? 'אורחים' : 'Guests'}</span>
                                                     <span className="font-bold text-gray-900">{formData.guestCount}</span>
                                                 </div>
                                             )}
@@ -562,7 +553,7 @@ export default function BookingModal({
                                 onClick={prevStep}
                                 className="px-5 py-3 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all"
                             >
-                                {language === 'ru' ? 'Назад' : language === 'he' ? 'חזרה' : 'Back'}
+                                {language === 'he' ? 'חזרה' : 'Back'}
                             </button>
                         ) : (
                             <div />
@@ -579,7 +570,7 @@ export default function BookingModal({
                                 ) : (
                                     <>
                                         <CheckCircle className="w-5 h-5" />
-                                        {language === 'ru' ? 'Отправить' : language === 'he' ? 'שלח' : 'Submit'}
+                                        {language === 'he' ? 'שלח' : 'Submit'}
                                     </>
                                 )}
                             </button>
@@ -589,7 +580,7 @@ export default function BookingModal({
                                 disabled={!canProceed()}
                                 className="flex-1 max-w-[200px] py-4 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2 hover:bg-blue-700 transition-all disabled:opacity-50 disabled:cursor-not-allowed"
                             >
-                                {language === 'ru' ? 'Далее' : language === 'he' ? 'הבא' : 'Next'}
+                                {language === 'he' ? 'הבא' : 'Next'}
                                 <ChevronRight className="w-5 h-5" />
                             </button>
                         )}

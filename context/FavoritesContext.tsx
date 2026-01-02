@@ -80,16 +80,14 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         // Show toast
         if (isCurrentlyFavorite) {
             toast.success(
-                language === 'ru' ? 'Удалено из избранного'
-                    : language === 'he' ? 'הוסר מהמועדפים'
-                        : 'Removed from favorites',
+                language === 'he' ? 'הוסר מהמועדפים'
+                    : 'Removed from favorites',
                 { description: vendorName }
             );
         } else {
             toast.success(
-                language === 'ru' ? '❤️ Добавлено в избранное'
-                    : language === 'he' ? '❤️ נוסף למועדפים'
-                        : '❤️ Added to favorites',
+                language === 'he' ? '❤️ נוסף למועדפים'
+                    : '❤️ Added to favorites',
                 { description: vendorName }
             );
         }

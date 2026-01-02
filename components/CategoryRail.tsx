@@ -1,14 +1,11 @@
 'use client';
 
-import {
-    Camera, Video, Music, Mic, Sparkles, Mic2, Music2,
-    Smile, Users, Wine, GlassWater, Palette, Baby,
-    Paintbrush, Scissors, ChefHat
-} from 'lucide-react';
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { ChevronLeft, ChevronRight } from 'lucide-react';
+import Image from 'next/image';
 
 type Category =
     | 'Photographer'
@@ -25,34 +22,107 @@ type Category =
     | 'Event Decor'
     | 'Kids Animator'
     | 'Face Painter'
-    | 'Piercing/Tattoo'
     | 'Chef'
     | 'All';
 
 interface CategoryItem {
     id: Category;
-    label: { en: string; ru: string; he: string };
-    icon: React.ElementType;
-    color: string;
+    label: { en: string; he: string };
+    image: string;
+    gradient: string;
 }
 
 const categories: CategoryItem[] = [
-    { id: 'All', label: { en: 'All', ru: 'Все', he: 'הכל' }, icon: Sparkles, color: 'from-gray-600 to-gray-800' },
-    { id: 'Photographer', label: { en: 'Photo', ru: 'Фото', he: 'צילום' }, icon: Camera, color: 'from-blue-500 to-blue-600' },
-    { id: 'Videographer', label: { en: 'Video', ru: 'Видео', he: 'וידאו' }, icon: Video, color: 'from-red-500 to-red-600' },
-    { id: 'DJ', label: { en: 'DJ', ru: 'DJ', he: 'DJ' }, icon: Music, color: 'from-purple-500 to-purple-600' },
-    { id: 'MC', label: { en: 'MC', ru: 'Ведущий', he: 'מנחה' }, icon: Mic, color: 'from-amber-500 to-amber-600' },
-    { id: 'Magician', label: { en: 'Magic', ru: 'Магия', he: 'קסם' }, icon: Sparkles, color: 'from-indigo-500 to-indigo-600' },
-    { id: 'Singer', label: { en: 'Singer', ru: 'Певец', he: 'זמר' }, icon: Mic2, color: 'from-pink-500 to-pink-600' },
-    { id: 'Musician', label: { en: 'Music', ru: 'Музыка', he: 'מוזיקה' }, icon: Music2, color: 'from-emerald-500 to-emerald-600' },
-    { id: 'Comedian', label: { en: 'Comedy', ru: 'Юмор', he: 'קומיקאי' }, icon: Smile, color: 'from-yellow-500 to-yellow-600' },
-    { id: 'Dancer', label: { en: 'Dance', ru: 'Танцы', he: 'ריקוד' }, icon: Users, color: 'from-rose-500 to-rose-600' },
-    { id: 'Bartender', label: { en: 'Bar', ru: 'Бар', he: 'בר' }, icon: Wine, color: 'from-orange-500 to-orange-600' },
-    { id: 'Bar Show', label: { en: 'Bar Show', ru: 'Бар Шоу', he: 'שואו בר' }, icon: GlassWater, color: 'from-cyan-500 to-cyan-600' },
-    { id: 'Event Decor', label: { en: 'Decor', ru: 'Декор', he: 'עיצוב' }, icon: Palette, color: 'from-violet-500 to-violet-600' },
-    { id: 'Kids Animator', label: { en: 'Kids', ru: 'Дети', he: 'ילדים' }, icon: Baby, color: 'from-lime-500 to-lime-600' },
-    { id: 'Face Painter', label: { en: 'Paint', ru: 'Грим', he: 'איפור' }, icon: Paintbrush, color: 'from-fuchsia-500 to-fuchsia-600' },
-    { id: 'Chef', label: { en: 'Chef', ru: 'Шеф', he: 'שף' }, icon: ChefHat, color: 'from-teal-500 to-teal-600' },
+    {
+        id: 'Photographer',
+        label: { en: 'Photographer', he: 'צלם' },
+        image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-blue-600 to-cyan-500'
+    },
+    {
+        id: 'Videographer',
+        label: { en: 'Videographer', he: 'צלם וידאו' },
+        image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-red-600 to-orange-500'
+    },
+    {
+        id: 'DJ',
+        label: { en: 'DJ', he: 'DJ' },
+        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-purple-600 to-pink-500'
+    },
+    {
+        id: 'MC',
+        label: { en: 'MC / Host', he: 'מנחה' },
+        image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-amber-600 to-yellow-500'
+    },
+    {
+        id: 'Singer',
+        label: { en: 'Singer', he: 'זמר' },
+        image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-pink-600 to-rose-500'
+    },
+    {
+        id: 'Musician',
+        label: { en: 'Musician', he: 'מוזיקאי' },
+        image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-emerald-600 to-teal-500'
+    },
+    {
+        id: 'Magician',
+        label: { en: 'Magician', he: 'קוסם' },
+        image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-indigo-600 to-violet-500'
+    },
+    {
+        id: 'Comedian',
+        label: { en: 'Comedian', he: 'סטנדאפ' },
+        image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-yellow-500 to-amber-400'
+    },
+    {
+        id: 'Dancer',
+        label: { en: 'Dancer', he: 'רקדן' },
+        image: 'https://images.unsplash.com/photo-1508700929628-666bc8bd84ea?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-rose-600 to-pink-500'
+    },
+    {
+        id: 'Bartender',
+        label: { en: 'Bartender', he: 'ברמן' },
+        image: 'https://images.unsplash.com/photo-1514362545857-3bc16c4c7d1b?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-orange-600 to-amber-500'
+    },
+    {
+        id: 'Bar Show',
+        label: { en: 'Bar Show', he: 'בר שואו' },
+        image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-cyan-600 to-blue-500'
+    },
+    {
+        id: 'Event Decor',
+        label: { en: 'Decor', he: 'עיצוב' },
+        image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-violet-600 to-purple-500'
+    },
+    {
+        id: 'Kids Animator',
+        label: { en: 'Kids', he: 'אנימטור' },
+        image: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-lime-500 to-green-500'
+    },
+    {
+        id: 'Face Painter',
+        label: { en: 'Face Paint', he: 'ציור פנים' },
+        image: 'https://images.unsplash.com/photo-1596464716127-f2a82984de30?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-fuchsia-600 to-pink-500'
+    },
+    {
+        id: 'Chef',
+        label: { en: 'Chef', he: 'שף' },
+        image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=400&h=400&fit=crop&q=80',
+        gradient: 'from-teal-600 to-cyan-500'
+    },
 ];
 
 interface CategoryRailProps {
@@ -63,110 +133,155 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     const [activeCategory, setActiveCategory] = useState<Category>('All');
     const { language } = useLanguage();
     const scrollRef = useRef<HTMLDivElement>(null);
-    const [canScrollLeft, setCanScrollLeft] = useState(false);
-    const [canScrollRight, setCanScrollRight] = useState(true);
 
-    const lang = language as 'en' | 'ru' | 'he';
-
-    const checkScroll = () => {
-        if (scrollRef.current) {
-            const { scrollLeft, scrollWidth, clientWidth } = scrollRef.current;
-            setCanScrollLeft(scrollLeft > 10);
-            setCanScrollRight(scrollLeft < scrollWidth - clientWidth - 10);
-        }
-    };
-
-    useEffect(() => {
-        checkScroll();
-        const el = scrollRef.current;
-        if (el) {
-            el.addEventListener('scroll', checkScroll);
-            window.addEventListener('resize', checkScroll);
-        }
-        return () => {
-            if (el) el.removeEventListener('scroll', checkScroll);
-            window.removeEventListener('resize', checkScroll);
-        };
-    }, []);
+    const lang = language as 'en' | 'he';
 
     const handleCategoryClick = (categoryId: Category) => {
-        setActiveCategory(categoryId);
-        onCategoryChange?.(categoryId);
+        const newCategory = activeCategory === categoryId ? 'All' : categoryId;
+        setActiveCategory(newCategory);
+        onCategoryChange?.(newCategory);
+    };
+
+    const scroll = (direction: 'left' | 'right') => {
+        if (scrollRef.current) {
+            const scrollAmount = 300;
+            scrollRef.current.scrollBy({
+                left: direction === 'left' ? -scrollAmount : scrollAmount,
+                behavior: 'smooth'
+            });
+        }
     };
 
     return (
-        <div className="relative py-4 md:py-6 bg-white dark:bg-slate-900">
-            {/* Header - Mobile Compact */}
-            <div className="px-4 md:px-6 mb-3 md:mb-4">
-                <h3 className="text-xs md:text-sm font-bold text-gray-400 dark:text-gray-500 uppercase tracking-widest">
-                    {lang === 'he' ? 'קטגוריות' : lang === 'ru' ? 'КАТЕГОРИИ' : 'CATEGORIES'}
-                </h3>
+        <div className="py-8 md:py-12 bg-white dark:bg-slate-900">
+            {/* Header */}
+            <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6 flex items-end justify-between">
+                <div>
+                    <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+                        {lang === 'he' ? 'מצאו כישרונות' : 'Find Talents'}
+                    </h2>
+                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                        {lang === 'he' ? 'בחרו קטגוריה' : 'Choose a category'}
+                    </p>
+                </div>
+
+                {/* Navigation arrows */}
+                <div className="hidden md:flex gap-2">
+                    <button
+                        onClick={() => scroll('left')}
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                    >
+                        <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    </button>
+                    <button
+                        onClick={() => scroll('right')}
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                    >
+                        <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
+                    </button>
+                </div>
             </div>
 
-            {/* Scrollable Container */}
-            <div
-                ref={scrollRef}
-                className="flex gap-2 md:gap-3 overflow-x-auto scrollbar-hide px-4 md:px-6 pb-2"
-                style={{
-                    scrollBehavior: 'smooth',
-                    WebkitOverflowScrolling: 'touch'
-                }}
-            >
-                {categories.map((category, index) => {
-                    const Icon = category.icon;
-                    const isActive = activeCategory === category.id;
+            {/* Horizontal Scroll Container - Wolt Style */}
+            <div className="relative">
+                <div
+                    ref={scrollRef}
+                    className="flex gap-4 overflow-x-auto scrollbar-hide px-4 md:px-6 pb-4"
+                    style={{ scrollSnapType: 'x mandatory' }}
+                >
+                    {categories.map((category, index) => {
+                        const isActive = activeCategory === category.id;
 
-                    return (
-                        <motion.button
-                            key={category.id}
-                            onClick={() => handleCategoryClick(category.id)}
-                            className={cn(
-                                "relative flex items-center gap-1.5 md:gap-2 px-3 md:px-4 py-2 md:py-2.5 rounded-xl md:rounded-2xl",
-                                "flex-shrink-0 font-semibold text-xs md:text-sm transition-all duration-300",
-                                isActive
-                                    ? 'text-white shadow-lg'
-                                    : 'bg-gray-100 dark:bg-slate-800 text-gray-700 dark:text-gray-300 hover:bg-gray-200 dark:hover:bg-slate-700 active:bg-gray-300 dark:active:bg-slate-600'
-                            )}
-                            style={isActive ? {
-                                background: `linear-gradient(135deg, ${category.color.includes('gray') ? '#374151, #1f2937' : category.color.replace('from-', '').replace(' to-', ', ').split(', ').map(c => c.includes('-500') ? c.replace('-500', '-500').replace(c.split('-')[0] + '-', '#') : c.replace('-600', '-600').replace(c.split('-')[0] + '-', '#')).join(', ')})`
-                            } : {}}
-                            initial={{ opacity: 0, y: 10 }}
-                            animate={{ opacity: 1, y: 0 }}
-                            transition={{ delay: index * 0.03 }}
-                            whileTap={{ scale: 0.95 }}
-                        >
-                            {isActive && (
-                                <motion.div
-                                    className={cn("absolute inset-0 rounded-xl md:rounded-2xl bg-gradient-to-r", category.color)}
-                                    layoutId="activeCategory"
-                                    transition={{ type: 'spring', stiffness: 400, damping: 30 }}
+                        return (
+                            <motion.button
+                                key={category.id}
+                                onClick={() => handleCategoryClick(category.id)}
+                                className={cn(
+                                    "relative flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-3xl overflow-hidden group",
+                                    "transition-all duration-300",
+                                    isActive && 'ring-4 ring-blue-500 ring-offset-4 dark:ring-offset-slate-900'
+                                )}
+                                style={{ scrollSnapAlign: 'start' }}
+                                initial={{ opacity: 0, scale: 0.9 }}
+                                animate={{ opacity: 1, scale: 1 }}
+                                transition={{ delay: index * 0.05 }}
+                                whileHover={{ scale: 1.05 }}
+                                whileTap={{ scale: 0.95 }}
+                            >
+                                {/* Background Image */}
+                                <Image
+                                    src={category.image}
+                                    alt={category.label[lang]}
+                                    fill
+                                    className="object-cover transition-transform duration-500 group-hover:scale-110"
+                                    sizes="(max-width: 768px) 128px, 160px"
                                 />
-                            )}
-                            <Icon className={cn(
-                                "relative z-10 w-3.5 h-3.5 md:w-4 md:h-4",
-                                isActive ? 'text-white' : 'text-gray-500 dark:text-gray-400'
-                            )} />
-                            <span className="relative z-10 whitespace-nowrap">
-                                {category.label[lang] || category.label.en}
-                            </span>
-                        </motion.button>
-                    );
-                })}
+
+                                {/* Gradient Overlay */}
+                                <div className={cn(
+                                    "absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent",
+                                    "group-hover:from-black/90"
+                                )} />
+
+                                {/* Label */}
+                                <div className="absolute inset-x-0 bottom-0 p-3 md:p-4">
+                                    <p className="text-white font-bold text-sm md:text-base text-center drop-shadow-lg">
+                                        {category.label[lang]}
+                                    </p>
+                                </div>
+
+                                {/* Active Indicator */}
+                                {isActive && (
+                                    <motion.div
+                                        className="absolute top-3 right-3 w-6 h-6 bg-blue-500 rounded-full flex items-center justify-center shadow-lg"
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        transition={{ type: 'spring', stiffness: 500 }}
+                                    >
+                                        <svg className="w-4 h-4 text-white" fill="currentColor" viewBox="0 0 20 20">
+                                            <path fillRule="evenodd" d="M16.707 5.293a1 1 0 010 1.414l-8 8a1 1 0 01-1.414 0l-4-4a1 1 0 011.414-1.414L8 12.586l7.293-7.293a1 1 0 011.414 0z" clipRule="evenodd" />
+                                        </svg>
+                                    </motion.div>
+                                )}
+                            </motion.button>
+                        );
+                    })}
+                </div>
             </div>
 
-            {/* Edge Fades - Responsive */}
-            <div
-                className={cn(
-                    "absolute left-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-r from-white dark:from-slate-900 to-transparent z-10 pointer-events-none transition-opacity",
-                    canScrollLeft ? 'opacity-100' : 'opacity-0'
-                )}
-            />
-            <div
-                className={cn(
-                    "absolute right-0 top-0 bottom-0 w-8 md:w-12 bg-gradient-to-l from-white dark:from-slate-900 to-transparent z-10 pointer-events-none transition-opacity",
-                    canScrollRight ? 'opacity-100' : 'opacity-0'
-                )}
-            />
+            {/* Selected Category Indicator */}
+            {activeCategory !== 'All' && (
+                <motion.div
+                    className="max-w-7xl mx-auto px-4 md:px-6 mt-6"
+                    initial={{ opacity: 0, y: 10 }}
+                    animate={{ opacity: 1, y: 0 }}
+                >
+                    <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+                        <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
+                            <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+                            </svg>
+                        </div>
+                        <div className="flex-1">
+                            <p className="text-sm text-blue-600 dark:text-blue-400 font-medium">
+                                {lang === 'he'
+                                    ? `מציג: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                    : `Showing: ${categories.find(c => c.id === activeCategory)?.label[lang]}`
+                                }
+                            </p>
+                        </div>
+                        <button
+                            onClick={() => {
+                                setActiveCategory('All');
+                                onCategoryChange?.('All');
+                            }}
+                            className="px-4 py-2 text-sm font-semibold text-blue-600 dark:text-blue-400 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-xl transition-colors"
+                        >
+                            {lang === 'he' ? 'נקה' : 'Clear'}
+                        </button>
+                    </div>
+                </motion.div>
+            )}
         </div>
     );
 }

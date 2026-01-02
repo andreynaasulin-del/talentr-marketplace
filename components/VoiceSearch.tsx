@@ -56,7 +56,7 @@ export default function VoiceSearch({ onTranscript, className }: VoiceSearchProp
             recognition.interimResults = true;
 
             // Set language based on current app language
-            recognition.lang = language === 'ru' ? 'ru-RU' : language === 'he' ? 'he-IL' : 'en-US';
+            recognition.lang = language === 'he' ? 'he-IL' : 'en-US';
 
             recognition.onstart = () => {
                 setIsListening(true);
@@ -113,9 +113,9 @@ export default function VoiceSearch({ onTranscript, className }: VoiceSearchProp
 
     const getTooltip = () => {
         if (isListening) {
-            return language === 'ru' ? 'Слушаю...' : language === 'he' ? 'מקשיב...' : 'Listening...';
+            return language === 'he' ? 'מקשיב...' : 'Listening...';
         }
-        return language === 'ru' ? 'Голосовой поиск' : language === 'he' ? 'חיפוש קולי' : 'Voice search';
+        return language === 'he' ? 'חיפוש קולי' : 'Voice search';
     };
 
     return (
@@ -183,7 +183,7 @@ export default function VoiceSearch({ onTranscript, className }: VoiceSearchProp
                         <div className="flex items-center gap-2 mb-2">
                             <Loader2 className="w-4 h-4 text-blue-500 animate-spin" />
                             <span className="text-xs font-bold text-gray-400 uppercase tracking-wide">
-                                {language === 'ru' ? 'Распознаю...' : 'Recognizing...'}
+                                Recognizing...
                             </span>
                         </div>
                         <p className="text-gray-900 font-medium">{transcript}</p>
