@@ -1,14 +1,11 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import dynamic from 'next/dynamic';
 import Navbar from '@/components/Navbar';
 import HeroSection from '@/components/HeroSection';
 import GigCarousel from '@/components/GigCarousel';
 import { supabase } from '@/lib/supabase';
-
-// Dynamic imports for below-fold components
-const Footer = dynamic(() => import('@/components/Footer'));
+import { motion } from 'framer-motion';
 
 export default function Home() {
     const [isLoading, setIsLoading] = useState(true);
@@ -33,22 +30,36 @@ export default function Home() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-slate-900">
-                <div className="w-10 h-10 border-3 border-blue-500 border-t-transparent rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-slate-950">
+                <motion.div 
+                    className="w-12 h-12 border-2 border-cyan-500 border-t-transparent rounded-full"
+                    animate={{ rotate: 360 }}
+                    transition={{ duration: 1, repeat: Infinity, ease: 'linear' }}
+                />
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-white dark:bg-slate-900">
+        <main className="min-h-screen bg-slate-950">
             <Navbar />
-
             <HeroSection />
-
-            {/* Square Gig Cards - Wolt style, NO prices */}
             <GigCarousel />
-
-            <Footer />
+            
+            {/* Minimal Footer */}
+            <footer className="py-8 bg-slate-950 border-t border-white/5">
+                <div className="max-w-6xl mx-auto px-6">
+                    <div className="flex flex-col sm:flex-row items-center justify-between gap-4">
+                        <p dir="ltr" className="text-sm text-white/30 font-medium">
+                            talent<span className="text-cyan-400">r</span> © {new Date().getFullYear()}
+                        </p>
+                        <div className="flex items-center gap-6 text-sm text-white/30">
+                            <a href="/privacy" className="hover:text-white transition-colors">Privacy</a>
+                            <a href="/terms" className="hover:text-white transition-colors">Terms</a>
+                        </div>
+                    </div>
+                </div>
+            </footer>
         </main>
     );
 }

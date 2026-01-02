@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Heebo } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { FavoritesProvider } from '@/context/FavoritesContext';
@@ -9,21 +9,21 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import CookieConsent from '@/components/CookieConsent';
 
-
-// Optimize font loading
-const inter = Inter({
-    subsets: ['latin'],
+// Heebo - Modern geometric sans-serif with excellent Hebrew support
+const heebo = Heebo({
+    subsets: ['latin', 'hebrew'],
     display: 'swap',
-    variable: '--font-inter',
+    variable: '--font-heebo',
+    weight: ['300', '400', '500', '600', '700', '800', '900'],
 });
 
 export const metadata: Metadata = {
     title: {
-        default: 'Talentr - Find the Best Event Professionals in Israel',
+        default: 'Talentr - Premium Talent Concierge',
         template: '%s | Talentr'
     },
-    description: 'Connect with top-rated photographers, DJs, MCs, magicians, and more for your events. Book trusted professionals in Tel Aviv, Haifa, Jerusalem and across Israel.',
-    keywords: ['event professionals', 'wedding photographer Israel', 'DJ Tel Aviv', 'event planner', 'bar mitzvah entertainment', 'corporate events Israel'],
+    description: 'Connect with elite photographers, DJs, MCs, magicians, and more. Premium talent booking for exclusive experiences in Israel.',
+    keywords: ['premium talent', 'exclusive entertainment', 'luxury events Israel', 'private concierge', 'elite performers'],
     authors: [{ name: 'Talentr' }],
     creator: 'Talentr',
     publisher: 'Talentr',
@@ -41,8 +41,8 @@ export const metadata: Metadata = {
         },
     },
     openGraph: {
-        title: 'Talentr - Find the Best Event Professionals',
-        description: 'Connect with top-rated photographers, DJs, MCs, and more for your events in Israel.',
+        title: 'Talentr - Premium Talent Concierge',
+        description: 'Elite talent booking for exclusive experiences.',
         url: 'https://talentr.co.il',
         siteName: 'Talentr',
         images: [
@@ -50,7 +50,7 @@ export const metadata: Metadata = {
                 url: '/og-image.png',
                 width: 1200,
                 height: 630,
-                alt: 'Talentr - Event Marketplace',
+                alt: 'Talentr - Premium Concierge',
             },
         ],
         locale: 'en_US',
@@ -58,8 +58,8 @@ export const metadata: Metadata = {
     },
     twitter: {
         card: 'summary_large_image',
-        title: 'Talentr - Find the Best Event Professionals',
-        description: 'Connect with top-rated professionals for your events in Israel.',
+        title: 'Talentr - Premium Talent Concierge',
+        description: 'Elite talent booking for exclusive experiences.',
         images: ['/og-image.png'],
     },
     robots: {
@@ -82,10 +82,7 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-    themeColor: [
-        { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-        { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
-    ],
+    themeColor: '#0f172a',
     width: 'device-width',
     initialScale: 1,
     maximumScale: 5,
@@ -97,13 +94,12 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={inter.variable} suppressHydrationWarning>
+        <html lang="en" className={`${heebo.variable} dark`} suppressHydrationWarning>
             <head>
-                {/* Preconnect to external domains for performance */}
                 <link rel="preconnect" href="https://images.unsplash.com" />
                 <link rel="dns-prefetch" href="https://images.unsplash.com" />
             </head>
-            <body className={`${inter.className} antialiased`}>
+            <body className={`${heebo.className} antialiased bg-slate-950 text-white`}>
                 <ThemeProvider>
                     <LanguageProvider>
                         <FavoritesProvider>
@@ -116,11 +112,14 @@ export default function RootLayout({
                     position="top-center"
                     richColors
                     closeButton
+                    theme="dark"
                     toastOptions={{
                         style: {
-                            background: 'white',
-                            border: '1px solid #e5e7eb',
+                            background: 'rgba(30, 41, 59, 0.95)',
+                            backdropFilter: 'blur(12px)',
+                            border: '1px solid rgba(255,255,255,0.1)',
                             borderRadius: '16px',
+                            color: 'white',
                         },
                     }}
                 />
