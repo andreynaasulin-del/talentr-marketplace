@@ -77,7 +77,9 @@ If something is not mentioned, use null for that field.`;
         // Step 3: Generate AI recommendation summary
         const recommendationPrompt = language === 'he'
             ? `בהתבסס על הבקשה "${query}", כתוב משפט קצר (עד 20 מילים) שמסביר מה מצאנו. אל תשתמש במרכאות.`
-            : `Based on the request "${query}", write a short sentence (max 20 words) explaining what we found. No quotes.`;
+            : language === 'ru'
+                ? `На основе запроса "${query}", напиши короткое предложение (до 20 слов) объясняющее что мы нашли. Без кавычек.`
+                : `Based on the request "${query}", write a short sentence (max 20 words) explaining what we found. No quotes.`;
 
         const summaryCompletion = await openai.chat.completions.create({
             model: 'gpt-4o',  // Premium model for better summaries

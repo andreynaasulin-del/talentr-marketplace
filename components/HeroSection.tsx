@@ -1,69 +1,73 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ArrowUp, Sparkles, Star, Plus } from 'lucide-react';
+import { Send, Star, ArrowRight, Bot, Sun, Moon } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Vendor } from '@/types';
-import { gigPackages, GigPackage } from '@/lib/gigs';
 
 interface Message {
     id: string;
     role: 'user' | 'assistant';
     content: string;
     vendors?: Vendor[];
-    packages?: GigPackage[];
     suggestions?: string[];
 }
 
 interface ChatAPIResponse {
     response: string;
     vendors: Vendor[];
-    packages?: GigPackage[];
     suggestions?: string[];
 }
 
+const animatedWords = {
+    en: ['WEDDINGS', 'BIRTHDAYS', 'PARTIES', 'EVENTS', 'DREAMS'],
+    he: ['חתונות', 'ימי הולדת', 'מסיבות', 'אירועים', 'חלומות']
+};
+
 export default function HeroSection() {
     const { language } = useLanguage();
+    const { theme } = useTheme();
     const [messages, setMessages] = useState<Message[]>([]);
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
+    const [chatExpanded, setChatExpanded] = useState(false);
+    const [wordIndex, setWordIndex] = useState(0);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const lang = language as 'en' | 'he';
+    const words = animatedWords[lang];
+    const isDark = theme === 'dark';
+
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setWordIndex((prev) => (prev + 1) % words.length);
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [words.length]);
 
     const placeholders = {
-        en: "Ask me anything...",
-        he: "שאל אותי כל דבר..."
+        en: "What are you celebrating? ✨",
+        he: "מה אתם חוגגים? ✨"
     };
 
-    // Welcome message
     useEffect(() => {
-        const welcomeMsg: Message = {
-            id: 'welcome',
-            role: 'assistant',
-            content: lang === 'he' 
-                ? 'שלום, אני הקונסיירז׳ האישי שלך. מה החוויה שאתה מחפש?'
-                : 'Hello, I\'m your personal concierge. What experience are you looking for?',
-            packages: gigPackages.slice(0, 3),
-        };
-        setMessages([welcomeMsg]);
-    }, [lang]);
-
-    useEffect(() => {
-        if (messagesContainerRef.current) {
+        if (messagesContainerRef.current && chatExpanded) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
-    }, [messages]);
+    }, [messages, chatExpanded]);
 
     const sendMessage = async (text?: string) => {
         const messageText = text || input.trim();
         if (!messageText) return;
+
+        if (!chatExpanded) setChatExpanded(true);
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -89,7 +93,6 @@ export default function HeroSection() {
                 role: 'assistant',
                 content: data.response,
                 vendors: data.vendors,
-                packages: data.packages,
                 suggestions: data.suggestions,
             }]);
         } catch (error) {
@@ -97,7 +100,7 @@ export default function HeroSection() {
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: lang === 'he' ? 'משהו השתבש. נסה שוב.' : 'Something went wrong. Please try again.',
+                content: lang === 'he' ? 'שגיאה, נסו שוב' : 'Error, try again',
             }]);
         } finally {
             setIsTyping(false);
@@ -105,249 +108,227 @@ export default function HeroSection() {
     };
 
     const renderVendorCards = (vendors: Vendor[]) => (
-        <div className="mt-6 space-y-3">
+        <div className="mt-3 space-y-2">
             {vendors.slice(0, 2).map((vendor) => (
                 <Link
                     key={vendor.id}
                     href={`/vendor/${vendor.id}`}
-                    className="group flex items-center gap-4 p-4 bg-slate-800/50 hover:bg-slate-800 rounded-2xl border border-white/5 hover:border-cyan-500/30 transition-all duration-300 hover:ring-2 hover:ring-cyan-500/20 hover:scale-[1.01]"
+                    className={cn(
+                        "flex items-center gap-3 p-3 rounded-xl transition-colors group",
+                        isDark 
+                            ? "bg-slate-700/50 hover:bg-slate-700" 
+                            : "bg-gray-50 hover:bg-[#009de0]/10"
+                    )}
                 >
-                    <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-cyan-500/30 transition-all">
+                    <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
                         <Image src={vendor.imageUrl || '/placeholder-vendor.jpg'} alt={vendor.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-white truncate">{vendor.name}</p>
-                        <div className="flex items-center gap-2 text-sm text-white/50">
+                        <p className={cn("font-semibold truncate", isDark ? "text-white" : "text-gray-900")}>{vendor.name}</p>
+                        <div className={cn("flex items-center gap-1.5 text-sm", isDark ? "text-gray-400" : "text-gray-500")}>
                             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                            <span>{vendor.rating}</span>
-                            <span className="text-white/20">·</span>
-                            <span>{vendor.city}</span>
+                            {vendor.rating} · {vendor.city}
                         </div>
                     </div>
-                    <div className="w-10 h-10 rounded-full bg-cyan-500/10 flex items-center justify-center group-hover:bg-cyan-500 transition-all duration-300">
-                        <Plus className="w-5 h-5 text-cyan-400 group-hover:text-white transition-colors" />
-                    </div>
+                    <ArrowRight className={cn("w-5 h-5 transition-all", isDark ? "text-gray-500 group-hover:text-cyan-400" : "text-gray-400 group-hover:text-[#009de0]")} />
                 </Link>
             ))}
         </div>
     );
 
-    const renderPackages = (packages: GigPackage[]) => (
-        <div className="mt-6 space-y-3">
-            {packages.map(pkg => (
-                <motion.button
-                    key={pkg.id}
-                    onClick={() => sendMessage(pkg.title[lang])}
-                    className="group w-full text-left p-5 bg-slate-800/50 hover:bg-slate-800 rounded-2xl border border-white/5 hover:border-amber-500/30 transition-all duration-300 hover:ring-2 hover:ring-amber-500/20 hover:scale-[1.01]"
-                    whileTap={{ scale: 0.99 }}
-                >
-                    <div className="flex items-center gap-4">
-                        {/* Large Thumbnail */}
-                        <div className="relative w-20 h-20 rounded-xl overflow-hidden flex-shrink-0 ring-2 ring-white/10 group-hover:ring-amber-500/30 transition-all">
-                            <Image 
-                                src={pkg.image} 
-                                alt={pkg.title[lang]} 
-                                fill 
-                                className="object-cover transition-transform duration-500 group-hover:scale-110" 
-                            />
-                            {/* Emoji badge */}
-                            <div className="absolute bottom-1 end-1 w-7 h-7 bg-slate-900/90 backdrop-blur-sm rounded-lg flex items-center justify-center text-sm">
-                                {pkg.emoji}
-                            </div>
-                        </div>
-
-                        {/* Content */}
-                        <div className="flex-1 min-w-0">
-                            <h4 className="font-bold text-white text-lg truncate group-hover:text-amber-400 transition-colors">
-                                {pkg.title[lang]}
-                            </h4>
-                            <p className="text-sm text-white/40 line-clamp-1 mt-0.5">
-                                {pkg.subtitle[lang]}
-                            </p>
-                            <div className="flex items-center gap-2 mt-2">
-                                <span className="px-2 py-0.5 bg-white/5 rounded-md text-xs text-white/50">
-                                    {pkg.duration}
-                                </span>
-                            </div>
-                        </div>
-
-                        {/* Select Button */}
-                        <div className="flex-shrink-0">
-                            <div className="w-12 h-12 rounded-full bg-amber-500/10 flex items-center justify-center group-hover:bg-amber-500 transition-all duration-300">
-                                <Plus className="w-6 h-6 text-amber-400 group-hover:text-slate-950 transition-colors" />
-                            </div>
-                        </div>
-                    </div>
-                </motion.button>
-            ))}
-        </div>
-    );
-
     return (
-        <section className="relative min-h-screen flex items-center justify-center overflow-hidden pt-20">
-            {/* Deep gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-slate-950 via-slate-900 to-slate-950" />
-            
-            {/* Radial glow behind card */}
-            <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-cyan-500/5 rounded-full blur-[120px] pointer-events-none" />
-            <div className="absolute top-1/3 right-1/4 w-[400px] h-[400px] bg-amber-500/5 rounded-full blur-[100px] pointer-events-none" />
+        <section className={cn(
+            "relative min-h-[80vh] flex items-center justify-center overflow-hidden transition-colors duration-300",
+            isDark ? "bg-slate-900" : "bg-[#009de0]"
+        )}>
+            {/* Background glow for dark mode */}
+            {isDark && (
+                <>
+                    <div className="absolute top-1/4 left-1/4 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px] pointer-events-none" />
+                    <div className="absolute bottom-1/4 right-1/4 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px] pointer-events-none" />
+                </>
+            )}
 
-            <div className="relative z-10 w-full max-w-xl mx-auto px-4 py-12">
-                {/* Header */}
-                <motion.div 
-                    className="text-center mb-10"
+            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-12 md:py-16">
+                {/* Headline */}
+                <div className="text-center mb-10 md:mb-12">
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight mb-2">
+                        {lang === 'he' ? 'כישרונות.' : 'TALENT.'}
+                    </h1>
+                    
+                    <div className="relative" style={{ height: '1.1em' }}>
+                        <AnimatePresence mode="wait">
+                            <motion.h2
+                                key={wordIndex}
+                                className={cn(
+                                    "text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black leading-none tracking-tight absolute inset-0 flex items-center justify-center",
+                                    isDark ? "text-cyan-400" : "text-white"
+                                )}
+                                initial={{ y: 50, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -50, opacity: 0 }}
+                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
+                            >
+                                {words[wordIndex]}.
+                            </motion.h2>
+                        </AnimatePresence>
+                    </div>
+                </div>
+
+                {/* Chat Container */}
+                <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                    {/* Premium Badge */}
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full mb-8">
-                        <Sparkles className="w-4 h-4 text-amber-400" />
-                        <span className="text-xs font-semibold text-white/70 uppercase tracking-widest">
-                            {lang === 'he' ? 'קונסיירז׳ פרימיום' : 'Premium Concierge'}
-                        </span>
-                    </div>
-
-                    {/* Main Headline */}
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-extrabold text-white tracking-tight leading-tight drop-shadow-2xl">
-                        {lang === 'he' ? 'מצא את הכישרון' : 'Find Your Perfect'}
-                        <br />
-                        <span className="bg-gradient-to-r from-cyan-400 to-blue-500 bg-clip-text text-transparent">
-                            {lang === 'he' ? 'המושלם' : 'Talent'}
-                        </span>
-                    </h1>
-
-                    {/* Subtitle */}
-                    <p className="mt-6 text-lg text-slate-400 max-w-md mx-auto">
-                        {lang === 'he' 
-                            ? 'חוויות בלעדיות, בהתאמה אישית מושלמת'
-                            : 'Exclusive experiences, perfectly curated for you'}
-                    </p>
-                </motion.div>
-
-                {/* Chat Container - Premium Glass */}
-                <motion.div
-                    className="bg-slate-900/60 backdrop-blur-2xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl shadow-black/50"
-                    initial={{ opacity: 0, y: 30 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                    {/* Messages */}
-                    <div
-                        ref={messagesContainerRef}
-                        className="max-h-[450px] overflow-y-auto p-6 space-y-6 scrollbar-hide"
-                    >
+                    <div className={cn(
+                        "rounded-2xl shadow-2xl overflow-hidden transition-colors duration-300",
+                        isDark ? "bg-slate-800/90 backdrop-blur-xl border border-white/10" : "bg-white"
+                    )}>
                         <AnimatePresence>
-                            {messages.map((msg) => (
+                            {chatExpanded && (
                                 <motion.div
-                                    key={msg.id}
+                                    ref={messagesContainerRef}
                                     className={cn(
-                                        "max-w-[95%]",
-                                        msg.role === 'user' ? 'ms-auto' : 'me-auto'
+                                        "max-h-[260px] overflow-y-auto p-4 space-y-3 border-b",
+                                        isDark ? "bg-slate-800/50 border-white/5" : "bg-gray-50 border-gray-100"
                                     )}
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    transition={{ duration: 0.3 }}
+                                    initial={{ height: 0, opacity: 0 }}
+                                    animate={{ height: 'auto', opacity: 1 }}
+                                    exit={{ height: 0, opacity: 0 }}
                                 >
-                                    {msg.role === 'assistant' ? (
-                                        <div>
-                                            <p className="text-white/90 text-base leading-relaxed">{msg.content}</p>
-                                            {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
-                                            {msg.packages && msg.packages.length > 0 && renderPackages(msg.packages)}
-                                            {msg.suggestions && msg.suggestions.length > 0 && (
-                                                <div className="flex flex-wrap gap-2 mt-5">
-                                                    {msg.suggestions.slice(0, 3).map((s, i) => (
-                                                        <button
-                                                            key={i}
-                                                            onClick={() => sendMessage(s)}
-                                                            className="px-4 py-2.5 bg-white/5 hover:bg-white/10 text-white/60 hover:text-white rounded-xl text-sm font-medium border border-white/5 hover:border-white/20 transition-all duration-200"
-                                                        >
-                                                            {s}
-                                                        </button>
-                                                    ))}
+                                    {messages.map((msg) => (
+                                        <motion.div
+                                            key={msg.id}
+                                            className={cn("max-w-[85%]", msg.role === 'user' ? 'ms-auto' : 'me-auto')}
+                                            initial={{ opacity: 0, y: 8 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                        >
+                                            {msg.role === 'assistant' ? (
+                                                <div className="flex items-start gap-2">
+                                                    <div className={cn(
+                                                        "w-7 h-7 rounded-lg flex items-center justify-center flex-shrink-0",
+                                                        isDark ? "bg-cyan-500" : "bg-[#009de0]"
+                                                    )}>
+                                                        <Bot className="w-4 h-4 text-white" />
+                                                    </div>
+                                                    <div className={cn(
+                                                        "rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border",
+                                                        isDark ? "bg-slate-700 border-slate-600" : "bg-white border-gray-100"
+                                                    )}>
+                                                        <p className={cn("text-sm", isDark ? "text-gray-200" : "text-gray-800")}>{msg.content}</p>
+                                                        {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
+                                                        {msg.suggestions && (
+                                                            <div className="flex flex-wrap gap-1.5 mt-2">
+                                                                {msg.suggestions.slice(0, 3).map((s, i) => (
+                                                                    <button 
+                                                                        key={i} 
+                                                                        onClick={() => sendMessage(s)} 
+                                                                        className={cn(
+                                                                            "px-2.5 py-1 rounded-full text-xs font-medium transition-colors",
+                                                                            isDark 
+                                                                                ? "bg-cyan-500/20 hover:bg-cyan-500/30 text-cyan-400" 
+                                                                                : "bg-[#009de0]/10 hover:bg-[#009de0]/20 text-[#009de0]"
+                                                                        )}
+                                                                    >
+                                                                        {s}
+                                                                    </button>
+                                                                ))}
+                                                            </div>
+                                                        )}
+                                                    </div>
+                                                </div>
+                                            ) : (
+                                                <div className={cn(
+                                                    "text-white rounded-xl rounded-br-sm px-3 py-2",
+                                                    isDark ? "bg-cyan-600" : "bg-[#009de0]"
+                                                )}>
+                                                    <p className="text-sm">{msg.content}</p>
                                                 </div>
                                             )}
-                                        </div>
-                                    ) : (
-                                        <div className="bg-white text-slate-900 rounded-2xl rounded-be-md px-5 py-3 shadow-lg">
-                                            <p className="text-base font-medium">{msg.content}</p>
+                                        </motion.div>
+                                    ))}
+                                    {isTyping && (
+                                        <div className="flex items-start gap-2">
+                                            <div className={cn(
+                                                "w-7 h-7 rounded-lg flex items-center justify-center",
+                                                isDark ? "bg-cyan-500" : "bg-[#009de0]"
+                                            )}>
+                                                <Bot className="w-4 h-4 text-white" />
+                                            </div>
+                                            <div className={cn(
+                                                "rounded-xl px-4 py-3 border",
+                                                isDark ? "bg-slate-700 border-slate-600" : "bg-white border-gray-100"
+                                            )}>
+                                                <div className="flex gap-1">
+                                                    {[0, 1, 2].map((i) => (
+                                                        <motion.span 
+                                                            key={i} 
+                                                            className={cn("w-2 h-2 rounded-full", isDark ? "bg-cyan-400" : "bg-[#009de0]")} 
+                                                            animate={{ y: [0, -5, 0] }} 
+                                                            transition={{ duration: 0.4, delay: i * 0.1, repeat: Infinity }} 
+                                                        />
+                                                    ))}
+                                                </div>
+                                            </div>
                                         </div>
                                     )}
                                 </motion.div>
-                            ))}
+                            )}
                         </AnimatePresence>
 
-                        {isTyping && (
-                            <motion.div
-                                className="flex items-center gap-2"
-                                initial={{ opacity: 0 }}
-                                animate={{ opacity: 1 }}
-                            >
-                                {[0, 1, 2].map((i) => (
-                                    <motion.span
-                                        key={i}
-                                        className="w-2.5 h-2.5 bg-cyan-400/60 rounded-full"
-                                        animate={{ scale: [1, 1.3, 1], opacity: [0.5, 1, 0.5] }}
-                                        transition={{ duration: 0.8, delay: i * 0.15, repeat: Infinity }}
-                                    />
-                                ))}
-                            </motion.div>
-                        )}
+                        <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-3">
+                            <div className={cn(
+                                "flex items-center gap-3 px-4 py-4 rounded-xl border-2 transition-all",
+                                isDark 
+                                    ? isFocused 
+                                        ? "border-cyan-500 bg-slate-700" 
+                                        : "border-slate-600 bg-slate-700/50"
+                                    : isFocused 
+                                        ? "border-[#009de0] bg-[#009de0]/5" 
+                                        : "border-gray-200 bg-gray-50"
+                            )}>
+                                <input
+                                    ref={inputRef}
+                                    type="text"
+                                    value={input}
+                                    onChange={(e) => setInput(e.target.value)}
+                                    onFocus={() => setIsFocused(true)}
+                                    onBlur={() => setIsFocused(false)}
+                                    placeholder={placeholders[lang]}
+                                    className={cn(
+                                        "flex-1 bg-transparent focus:outline-none text-base",
+                                        isDark ? "text-white placeholder:text-gray-400" : "text-gray-900 placeholder:text-gray-400"
+                                    )}
+                                    style={{ fontSize: '16px' }}
+                                />
+                                <button
+                                    type="submit"
+                                    disabled={!input.trim()}
+                                    className={cn(
+                                        "p-3 rounded-xl transition-all",
+                                        input.trim() 
+                                            ? isDark 
+                                                ? 'bg-cyan-500 text-white active:scale-95' 
+                                                : 'bg-[#009de0] text-white active:scale-95' 
+                                            : isDark 
+                                                ? 'bg-slate-600 text-slate-400' 
+                                                : 'bg-gray-200 text-gray-400'
+                                    )}
+                                >
+                                    <Send className="w-5 h-5" />
+                                </button>
+                            </div>
+                        </form>
                     </div>
-
-                    {/* Input Area - Prominent */}
-                    <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-4 border-t border-white/5">
-                        <div className={cn(
-                            "flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300",
-                            isFocused 
-                                ? "bg-slate-800 ring-2 ring-cyan-500/50" 
-                                : "bg-slate-800/60"
-                        )}>
-                            <input
-                                ref={inputRef}
-                                type="text"
-                                value={input}
-                                onChange={(e) => setInput(e.target.value)}
-                                onFocus={() => setIsFocused(true)}
-                                onBlur={() => setIsFocused(false)}
-                                placeholder={placeholders[lang]}
-                                className="flex-1 bg-transparent text-white placeholder:text-white/30 focus:outline-none text-base font-medium"
-                                style={{ fontSize: '16px' }}
-                            />
-                            <motion.button
-                                type="submit"
-                                disabled={!input.trim()}
-                                className={cn(
-                                    "p-3.5 rounded-xl font-bold transition-all duration-200",
-                                    input.trim() 
-                                        ? 'bg-gradient-to-r from-cyan-500 to-blue-500 text-white shadow-lg shadow-cyan-500/30 hover:shadow-cyan-500/50' 
-                                        : 'bg-white/10 text-white/30'
-                                )}
-                                whileHover={input.trim() ? { scale: 1.05 } : {}}
-                                whileTap={input.trim() ? { scale: 0.95 } : {}}
-                            >
-                                <ArrowUp className="w-5 h-5" />
-                            </motion.button>
-                        </div>
-                    </form>
                 </motion.div>
+            </div>
 
-                {/* Trust indicators */}
-                <motion.div 
-                    className="flex items-center justify-center gap-8 mt-10 text-white/30 text-sm"
-                    initial={{ opacity: 0 }}
-                    animate={{ opacity: 1 }}
-                    transition={{ delay: 0.6 }}
-                >
-                    <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                        {lang === 'he' ? 'כישרונות מאומתים' : 'Verified Talents'}
-                    </span>
-                    <span className="flex items-center gap-2">
-                        <span className="w-2 h-2 bg-emerald-400 rounded-full animate-pulse" />
-                        {lang === 'he' ? 'תשלום מאובטח' : 'Secure Payment'}
-                    </span>
-                </motion.div>
+            {/* Wave */}
+            <div className="absolute bottom-0 left-0 right-0">
+                <svg viewBox="0 0 1440 50" fill="none" className="w-full" preserveAspectRatio="none">
+                    <path d="M0 50L1440 50V25C1200 35 960 40 720 38C480 36 240 30 0 32V50Z" className={isDark ? "fill-slate-900" : "fill-white"} />
+                </svg>
             </div>
         </section>
     );

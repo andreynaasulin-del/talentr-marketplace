@@ -538,7 +538,6 @@ textarea {
   position: relative;
   overflow: hidden;
 }
-
 .shine-effect::before {
   content: '';
   position: absolute;

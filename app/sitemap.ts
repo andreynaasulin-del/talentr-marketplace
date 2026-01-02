@@ -1,8 +1,7 @@
 import { MetadataRoute } from 'next';
-import { SITE_URL } from '@/lib/constants';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = SITE_URL;
+    const baseUrl = 'https://event-marketplace-mvp.vercel.app';
 
     // Static pages
     const staticPages = [

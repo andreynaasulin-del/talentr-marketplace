@@ -66,7 +66,7 @@ export type ContactFormData = z.infer<typeof contactSchema>;
 // ===== CHAT/AI SCHEMA =====
 export const chatMessageSchema = z.object({
     message: z.string().min(1, 'Message is required').max(500, 'Message too long'),
-    language: z.enum(['en', 'he']).default('en'),
+    language: z.enum(['en', 'ru', 'he']).default('en'),
 });
 
 export type ChatMessageData = z.infer<typeof chatMessageSchema>;

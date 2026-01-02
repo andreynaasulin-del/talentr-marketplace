@@ -4,7 +4,6 @@ import { filterVendors } from '@/lib/vendors';
 import { Vendor, VendorCategory, City } from '@/types';
 import { rateLimit, getClientIP, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
 import { chatMessageSchema } from '@/lib/validations';
-import { pickPackages, MoodTag } from '@/lib/gigs';
 
 // ===== OPENAI INITIALIZATION =====
 let openai: OpenAI | null = null;
@@ -30,9 +29,6 @@ interface _EventContext {
 interface ChatResponse {
     response: string;
     vendors: Vendor[];
-    mood?: MoodTag[];
-    packages?: ReturnType<typeof pickPackages>;
-    surprise?: string;
     extracted: {
         category?: VendorCategory;
         city?: City;
@@ -247,28 +243,30 @@ async function findVendors(
     }
 }
 
-// ===== AI SYSTEM PROMPT (MICRO-ENTERTAINMENT / IMPULSE) =====
-const SYSTEM_PROMPT = `You are Talentr AI — a vibe-first concierge that helps people in Israel instantly book micro-entertainment “packages” (small, premium, ready-to-go experiences).
+// ===== ENHANCED AI SYSTEM PROMPT =====
+const SYSTEM_PROMPT = `You are Talentr AI Concierge - an expert event planner assistant helping people find the perfect entertainment and service professionals for their events in Israel.
 
 ## Your Personality
-- Dominant & caring: confident, fast, supportive
-- Playful and witty when user is bored / spontaneous
-- Uses 1–2 emojis max (never spammy)
-- Matches the user's language and energy
+- Warm, enthusiastic, and genuinely helpful
+- Expert knowledge about Israeli events and traditions
+- Speaks naturally with personality, not robotic
+- Uses 1-2 relevant emojis per message (not excessive)
+- Matches the user's energy and language style
 
 ## Your Expertise
-You help users book “micro packages” like:
-- 😂 Standup for 2–4 people
-- 🎩 Interactive close-up magic
-- 🎸 Romantic acoustic for a date
-- 🧘‍♂️ Yoga + live music chill session
-- 🎨 Balcony street-art / live sketch
-- 🎷 Sunset sax / lo-fi set
-- 🔥 Pocket fire show (wow moment)
+You help find professionals for:
+- 📸 Photographers & Videographers
+- 🎵 DJs, Musicians, Singers
+- 🎤 MCs, Hosts, Comedians
+- 🎩 Magicians, Kids Animators
+- 💐 Event Decorators, Florists
+- 🍸 Bartenders, Bar Shows
+- 👨‍🍳 Chefs, Catering
+- 💄 Makeup Artists, Face Painters
 
-## Core Product Rule
-No “agency talk”. No long planning. Assume users want impulse joy.
-Guide them to: pick a vibe → pick a package → confirm time/location → book.
+## Event Types You Know
+Weddings, Bar/Bat Mitzvahs, Birthdays, Corporate events, Private parties, 
+Graduations, Anniversaries, Engagements, Baby Showers, Jewish holidays
 
 ## Cities You Cover
 Tel Aviv, Haifa, Jerusalem, Eilat, Rishon LeZion, Netanya, Ashdod, 
@@ -276,35 +274,38 @@ Beer Sheva, Petah Tikva, Herzliya, Ramat Gan
 
 ## Response Guidelines
 
-### Always keep it short & actionable (2–4 sentences)
-- Offer 2–3 options max (or ask ONE question)
-- Prefer yes/no or emoji choice
-- Create “impulse” momentum: “Want it today?” / “30 minutes?” / “Surprise me?”
+### When user specifies what they need:
+1. Acknowledge their request enthusiastically
+2. If vendors found: "I found some amazing [category]s for you! ✨"
+3. Suggest 1-2 related services they might need
 
 ### When request is vague:
-Ask ONE clarifying question:
-- “What vibe do you want right now: 😂 fun / 🧘‍♂️ chill / ❤️ romantic / 🔥 wow / 🎨 artsy?”
+Ask ONE clarifying question. Examples:
+- "What kind of event are you planning?"
+- "Which city will the event be in?"
+- "What's the vibe you're going for?"
 
-### Booking flow (minimal)
-If user picks something: ask ONLY what’s missing:
-- “City?” (if unknown)
-- “When? (now / today / this week)” (if unknown)
-- Optional: “How many people?”
+### Smart follow-ups based on event type:
+- Wedding → Suggest photographer, videographer, DJ, flowers
+- Bar Mitzvah → Suggest DJ, photographer, animator, decor
+- Birthday → Suggest photographer, entertainment, decor
+- Corporate → Suggest photographer, MC, catering
 
 ### Pricing questions:
-"Prices depend on the package. I’ll show you 2–3 options and you pick the vibe. 💬"
+"Prices vary based on experience and packages. I'd recommend checking a few profiles to compare. Most pros on Talentr offer free consultations! 💬"
 
 ## Language Rules
 - ALWAYS respond in the same language the user writes in
 - English → English
+- Russian (Русский) → Russian 
 - Hebrew (עברית) → Hebrew (RTL)
 
 ## Important Rules
 1. Keep responses SHORT (2-4 sentences max)
 2. Never invent vendor names or specific prices
 3. Be positive and solution-oriented
-4. Always guide toward booking action
-5. If no match, offer a “Surprise me” option
+4. Guide toward booking action
+5. If no vendors found, suggest alternatives
 
 ## Current Context
 [VENDOR_CONTEXT]`;
@@ -315,7 +316,7 @@ function generateSuggestions(
     language: string,
     hasVendors: boolean
 ): string[] {
-    const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
+    const lang = language as 'en' | 'ru' | 'he';
 
     // Context-aware suggestions based on what's already extracted
 
@@ -324,66 +325,82 @@ function generateSuggestions(
         const relatedSuggestions: Record<VendorCategory, Record<string, string[]>> = {
             'DJ': {
                 en: ['Also need a photographer', 'Show me singers', 'Need lighting/decor'],
+                ru: ['Ещё нужен фотограф', 'Покажи певцов', 'Нужен декор'],
                 he: ['גם צריך צלם', 'הראה זמרים', 'צריך עיצוב'],
             },
             'Photographer': {
                 en: ['Also need a videographer', 'Show me DJs', 'Need makeup artist'],
+                ru: ['Ещё нужен видеограф', 'Покажи диджеев', 'Нужен визажист'],
                 he: ['גם צריך צלם וידאו', "הראה דיג'יים", 'צריך מאפרת'],
             },
             'Singer': {
                 en: ['Also need a DJ', 'Show me musicians', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи музыкантов', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה מוזיקאים', 'צריך צלם'],
             },
             'MC': {
                 en: ['Also need a DJ', 'Show me comedians', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи комиков', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה קומיקאים', 'צריך צלם'],
             },
             'Videographer': {
                 en: ['Also need a photographer', 'Show me DJs', 'Need lighting'],
+                ru: ['Ещё нужен фотограф', 'Покажи диджеев', 'Нужен свет'],
                 he: ['גם צריך צלם', "הראה דיג'יים", 'צריך תאורה'],
             },
             'Magician': {
                 en: ['Also need an animator', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужен аниматор', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך אנימטור', "הראה דיג'יים", 'צריך צלם'],
             },
             'Musician': {
                 en: ['Also need a singer', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужен певец', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך זמר', "הראה דיג'יים", 'צריך צלם'],
             },
             'Comedian': {
                 en: ['Also need a DJ', 'Show me MCs', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи ведущих', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה מנחים', 'צריך צלם'],
             },
             'Dancer': {
                 en: ['Also need a DJ', 'Show me singers', 'Need a photographer'],
+                ru: ['Ещё нужен диджей', 'Покажи певцов', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה זמרים', 'צריך צלם'],
             },
             'Bartender': {
                 en: ['Also need bar show', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужно бар-шоу', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך בר שואו', "הראה דיג'יים", 'צריך צלם'],
             },
             'Bar Show': {
                 en: ['Also need a bartender', 'Show me DJs', 'Need a photographer'],
+                ru: ['Ещё нужен бармен', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך ברמן', "הראה דיג'יים", 'צריך צלם'],
             },
             'Event Decor': {
                 en: ['Also need flowers', 'Show me photographers', 'Need lighting'],
+                ru: ['Ещё нужны цветы', 'Покажи фотографов', 'Нужен свет'],
                 he: ['גם צריך פרחים', 'הראה צלמים', 'צריך תאורה'],
             },
             'Kids Animator': {
                 en: ['Also need a magician', 'Show me face painters', 'Need a photographer'],
+                ru: ['Ещё нужен фокусник', 'Покажи аквагрим', 'Нужен фотограф'],
                 he: ['גם צריך קוסם', 'הראה ציור פנים', 'צריך צלם'],
             },
             'Face Painter': {
                 en: ['Also need an animator', 'Show me magicians', 'Need a photographer'],
+                ru: ['Ещё нужен аниматор', 'Покажи фокусников', 'Нужен фотограф'],
                 he: ['גם צריך אנימטור', 'הראה קוסמים', 'צריך צלם'],
             },
             'Piercing/Tattoo': {
                 en: ['Also need makeup', 'Show me photographers', 'Need decorations'],
+                ru: ['Ещё нужен макияж', 'Покажи фотографов', 'Нужен декор'],
                 he: ['גם צריך איפור', 'הראה צלמים', 'צריך קישוט'],
             },
             'Chef': {
                 en: ['Also need a bartender', 'Show me decorators', 'Need a photographer'],
+                ru: ['Ещё нужен бармен', 'Покажи декораторов', 'Нужен фотограф'],
                 he: ['גם צריך ברמן', 'הראה מעצבים', 'צריך צלם'],
             },
         };
@@ -395,6 +412,7 @@ function generateSuggestions(
     if (extracted.category && !extracted.city) {
         return {
             en: ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat'],
+            ru: ['Тель-Авив', 'Хайфа', 'Иерусалим', 'Эйлат'],
             he: ['תל אביב', 'חיפה', 'ירושלים', 'אילת'],
         }[lang] || [];
     }
@@ -403,6 +421,7 @@ function generateSuggestions(
     if (extracted.eventType === 'Wedding') {
         return {
             en: ['Need a photographer', 'Need a DJ', 'Need a videographer'],
+            ru: ['Нужен фотограф', 'Нужен диджей', 'Нужен видеограф'],
             he: ['צריך צלם', "צריך דיג'יי", 'צריך צלם וידאו'],
         }[lang] || [];
     }
@@ -410,6 +429,7 @@ function generateSuggestions(
     if (extracted.eventType === 'Bar Mitzvah' || extracted.eventType === 'Bat Mitzvah') {
         return {
             en: ['Need a DJ', 'Need an animator', 'Need a photographer'],
+            ru: ['Нужен диджей', 'Нужен аниматор', 'Нужен фотограф'],
             he: ["צריך דיג'יי", 'צריך אנימטור', 'צריך צלם'],
         }[lang] || [];
     }
@@ -417,36 +437,17 @@ function generateSuggestions(
     if (extracted.eventType === 'Birthday') {
         return {
             en: ['Need an animator', 'Need a photographer', 'Need a magician'],
+            ru: ['Нужен аниматор', 'Нужен фотограф', 'Нужен фокусник'],
             he: ['צריך אנימטור', 'צריך צלם', 'צריך קוסם'],
         }[lang] || [];
     }
 
-    // Default - micro vibe picks (no “weddings/corporate” bias)
+    // Default - no context yet
     return {
-        en: ['😂 Make me laugh', '🧘‍♂️ Chill & relax', '🔥 I want wow'],
-        he: ['😂 תצחיק אותי', '🧘‍♂️ צ׳יל ורילקס', '🔥 תן לי וואו'],
+        en: ['Planning a wedding', 'Birthday party', 'Corporate event'],
+        ru: ['Планирую свадьбу', 'День рождения', 'Корпоратив'],
+        he: ['מתכנן חתונה', 'יום הולדת', 'אירוע עסקי'],
     }[lang] || [];
-}
-
-// ===== MOOD DETECTION (LIGHTWEIGHT) =====
-function detectMood(message: string): MoodTag[] {
-    const lower = message.toLowerCase();
-    const tags: Set<MoodTag> = new Set();
-
-    const addIf = (conds: (string | RegExp)[], tag: MoodTag) => {
-        if (conds.some(c => typeof c === 'string' ? lower.includes(c) : c.test(lower))) {
-            tags.add(tag);
-        }
-    };
-
-    addIf(['😂', 'fun', 'laugh', 'lol', 'xd', 'смеш', 'угар', 'весел', 'מצחיק'], 'fun');
-    addIf(['romantic', 'love', 'date', '❤️', 'роман', 'свидан', 'אהבה'], 'romantic');
-    addIf(['chill', 'calm', 'relax', '🧘', 'zen', 'тихо', 'спокой', 'רגוע'], 'chill');
-    addIf(['wow', 'shock', '🔥', 'эпик', 'вау', 'תדהמה'], 'wow');
-    addIf(['art', 'creative', 'sketch', 'мурал', 'арт', 'ציור', 'גרפיטי'], 'artsy');
-
-    if (tags.size === 0) tags.add('fun');
-    return Array.from(tags);
 }
 
 // ===== AI RESPONSE GENERATION =====
@@ -533,6 +534,16 @@ function generateFallbackResponse(
             askCategory: () =>
                 `What kind of professional are you looking for? Photographer, DJ, singer, or something else?`,
         },
+        ru: {
+            found: (count: number, cat: string, loc?: string) =>
+                `Отлично! Нашёл ${count} потрясающих специалистов${loc ? ` в ${loc}` : ''}! ✨ Посмотрите на этих профессионалов.`,
+            notFound: () =>
+                `Не нашёл точных совпадений. В каком городе вы ищете?`,
+            askEvent: () =>
+                `С удовольствием помогу! Какое мероприятие вы планируете? 🎉`,
+            askCategory: () =>
+                `Какого специалиста вы ищете? Фотографа, диджея, певца или кого-то ещё?`,
+        },
         he: {
             found: (count: number, cat: string, loc?: string) =>
                 `מצאתי ${count} מקצוענים מעולים${loc ? ` ב${loc}` : ''}! ✨ הנה הטובים ביותר.`,
@@ -545,7 +556,7 @@ function generateFallbackResponse(
         },
     };
 
-    const r = (language === 'he' ? responses.he : responses.en);
+    const r = responses[language as keyof typeof responses] || responses.en;
 
     if (vendors.length > 0) {
         return r.found(vendors.length, category || 'professional', city);
@@ -598,9 +609,6 @@ export async function POST(request: NextRequest) {
         // Extract entities from message
         const extracted = extractFromMessage(message);
 
-        // Detect mood tags for micro-entertainment flow
-        const mood = detectMood(message);
-
         // Merge with existing context
         const mergedExtracted = {
             ...existingContext,
@@ -619,14 +627,6 @@ export async function POST(request: NextRequest) {
             6
         );
 
-        // Pick micro-entertainment packages by mood
-        const packages = pickPackages(mood, 3);
-        const surprise = Math.random() > 0.6
-            ? (language === 'he'
-                ? '🎁 בונוס קטן בהזמנה הראשונה — הפתעה מהאמן'
-                : '🎁 First booking surprise — a small bonus from the talent')
-            : undefined;
-
         // Generate AI response
         const response = await generateAIResponse(
             message,
@@ -642,9 +642,6 @@ export async function POST(request: NextRequest) {
         const result: ChatResponse = {
             response,
             vendors,
-            mood,
-            packages,
-            surprise,
             extracted: mergedExtracted,
             suggestions: suggestions.slice(0, 4),
         };

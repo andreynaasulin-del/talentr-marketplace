@@ -246,4 +246,4 @@ event-marketplace-mvp/
 
 **Отчёт подготовлен:** Claude AI (Technical Audit)  
 **Верифицировано:** Codebase scan 27.12.2024  
-**Live URL:** https://talentr.co.il
+**Live URL:** https://event-marketplace-mvp.vercel.app
