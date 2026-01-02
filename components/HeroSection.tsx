@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { Send, Star, ArrowRight, Bot } from 'lucide-react';
+import { ArrowUpRight, Star, ArrowRight, Bot } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
@@ -244,7 +244,7 @@ export default function HeroSection() {
                                                                 </div>
                                                                 <p className="text-xs text-gray-600 line-clamp-2">{pkg.subtitle[lang]}</p>
                                                                 <div className="text-[11px] text-gray-500 mt-1">
-                                                                    {pkg.duration} · {pkg.priceHint}
+                                                                    {pkg.duration}
                                                                 </div>
                                                             </div>
                                                             <span className="text-[#009de0] text-sm font-semibold flex-shrink-0">OK</span>
@@ -321,7 +321,7 @@ export default function HeroSection() {
                                         input.trim() ? 'bg-[#009de0] text-white active:scale-95' : 'bg-gray-200 text-gray-400'
                                     )}
                                 >
-                                    <Send className="w-5 h-5" />
+                                    <ArrowUpRight className="w-5 h-5" />
                                 </button>
                             </div>
                         </form>

@@ -12,7 +12,7 @@ import CookieConsent from '@/components/CookieConsent';
 
 // Optimize font loading
 const inter = Inter({
-    subsets: ['latin', 'cyrillic'],
+    subsets: ['latin'],
     display: 'swap',
     variable: '--font-inter',
 });
@@ -37,7 +37,6 @@ export const metadata: Metadata = {
         canonical: '/',
         languages: {
             'en': '/en',
-            'ru': '/ru',
             'he': '/he',
         },
     },

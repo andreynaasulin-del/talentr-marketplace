@@ -15,9 +15,9 @@ interface SmartTipsProps {
 interface Tip {
     id: string;
     icon: React.ReactNode;
-    title: { en: string; ru: string; he: string };
-    description: { en: string; ru: string; he: string };
-    action?: { label: { en: string; ru: string; he: string }; onClick?: () => void };
+    title: { en: string; he: string };
+    description: { en: string; he: string };
+    action?: { label: { en: string; he: string }; onClick?: () => void };
     color: string;
 }
 
@@ -25,6 +25,7 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
     const { language } = useLanguage();
     const [activeTip, setActiveTip] = useState(0);
     const [isDismissed, setIsDismissed] = useState(false);
+    const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
 
     const tips: Tip[] = [
         {
@@ -32,12 +33,10 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
             icon: <Calendar className="w-5 h-5" />,
             title: {
                 en: '🎯 Pro Tip: Best booking time',
-                ru: '🎯 Совет: Лучшее время бронирования',
                 he: '🎯 טיפ: הזמן הטוב ביותר להזמנה'
             },
             description: {
                 en: `Book ${vendorName} 2-3 months in advance for the best rates and availability.`,
-                ru: `Забронируйте ${vendorName} за 2-3 месяца для лучших цен и доступности.`,
                 he: `הזמן את ${vendorName} 2-3 חודשים מראש לקבלת המחירים והזמינות הטובים ביותר.`
             },
             color: 'from-blue-500 to-cyan-500'
@@ -47,16 +46,14 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
             icon: <MessageCircle className="w-5 h-5" />,
             title: {
                 en: '💬 Quick Response',
-                ru: '💬 Быстрый ответ',
                 he: '💬 תגובה מהירה'
             },
             description: {
                 en: 'This vendor typically responds within 1 hour on WhatsApp. Try chatting now!',
-                ru: 'Этот специалист обычно отвечает в WhatsApp в течение часа. Напишите сейчас!',
                 he: 'הספק הזה בדרך כלל מגיב תוך שעה בווצאפ. נסה לצ\'אט עכשיו!'
             },
             action: {
-                label: { en: 'Chat Now', ru: 'Написать', he: 'צ\'אט עכשיו' }
+                label: { en: 'Chat Now', he: 'צ\'אט עכשיו' }
             },
             color: 'from-green-500 to-emerald-500'
         },
@@ -65,12 +62,10 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
             icon: <Star className="w-5 h-5" />,
             title: {
                 en: '⭐ Top Performer',
-                ru: '⭐ Топ исполнитель',
                 he: '⭐ ביצועים מובילים'
             },
             description: {
                 en: `This ${vendorCategory.toLowerCase()} is in the top 10% of rated professionals on Talentr.`,
-                ru: `Этот ${vendorCategory.toLowerCase()} входит в топ-10% рейтинговых специалистов на Talentr.`,
                 he: `${vendorCategory} זה נמצא ב-10% המובילים של אנשי המקצוע המדורגים ב-Talentr.`
             },
             color: 'from-amber-500 to-orange-500'
@@ -147,10 +142,10 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                             transition={{ duration: 0.3 }}
                         >
                             <h4 className="font-bold text-gray-900 mb-1">
-                                {currentTip.title[language as keyof typeof currentTip.title]}
+                                {currentTip.title[lang]}
                             </h4>
                             <p className="text-sm text-gray-600 leading-relaxed">
-                                {currentTip.description[language as keyof typeof currentTip.description]}
+                                {currentTip.description[lang]}
                             </p>
                         </motion.div>
                     </AnimatePresence>
@@ -162,7 +157,7 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                             whileTap={{ scale: 0.98 }}
                             className="mt-4 flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700"
                         >
-                            {currentTip.action.label[language as keyof typeof currentTip.action.label]}
+                            {currentTip.action.label[lang]}
                             <ChevronRight className="w-4 h-4" />
                         </motion.button>
                     )}

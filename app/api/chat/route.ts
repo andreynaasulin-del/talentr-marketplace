@@ -297,7 +297,6 @@ If user picks something: ask ONLY what’s missing:
 ## Language Rules
 - ALWAYS respond in the same language the user writes in
 - English → English
-- Russian (Русский) → Russian 
 - Hebrew (עברית) → Hebrew (RTL)
 
 ## Important Rules
@@ -316,7 +315,7 @@ function generateSuggestions(
     language: string,
     hasVendors: boolean
 ): string[] {
-    const lang = language as 'en' | 'ru' | 'he';
+    const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
 
     // Context-aware suggestions based on what's already extracted
 
@@ -325,82 +324,66 @@ function generateSuggestions(
         const relatedSuggestions: Record<VendorCategory, Record<string, string[]>> = {
             'DJ': {
                 en: ['Also need a photographer', 'Show me singers', 'Need lighting/decor'],
-                ru: ['Ещё нужен фотограф', 'Покажи певцов', 'Нужен декор'],
                 he: ['גם צריך צלם', 'הראה זמרים', 'צריך עיצוב'],
             },
             'Photographer': {
                 en: ['Also need a videographer', 'Show me DJs', 'Need makeup artist'],
-                ru: ['Ещё нужен видеограф', 'Покажи диджеев', 'Нужен визажист'],
                 he: ['גם צריך צלם וידאו', "הראה דיג'יים", 'צריך מאפרת'],
             },
             'Singer': {
                 en: ['Also need a DJ', 'Show me musicians', 'Need a photographer'],
-                ru: ['Ещё нужен диджей', 'Покажи музыкантов', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה מוזיקאים', 'צריך צלם'],
             },
             'MC': {
                 en: ['Also need a DJ', 'Show me comedians', 'Need a photographer'],
-                ru: ['Ещё нужен диджей', 'Покажи комиков', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה קומיקאים', 'צריך צלם'],
             },
             'Videographer': {
                 en: ['Also need a photographer', 'Show me DJs', 'Need lighting'],
-                ru: ['Ещё нужен фотограф', 'Покажи диджеев', 'Нужен свет'],
                 he: ['גם צריך צלם', "הראה דיג'יים", 'צריך תאורה'],
             },
             'Magician': {
                 en: ['Also need an animator', 'Show me DJs', 'Need a photographer'],
-                ru: ['Ещё нужен аниматор', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך אנימטור', "הראה דיג'יים", 'צריך צלם'],
             },
             'Musician': {
                 en: ['Also need a singer', 'Show me DJs', 'Need a photographer'],
-                ru: ['Ещё нужен певец', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך זמר', "הראה דיג'יים", 'צריך צלם'],
             },
             'Comedian': {
                 en: ['Also need a DJ', 'Show me MCs', 'Need a photographer'],
-                ru: ['Ещё нужен диджей', 'Покажи ведущих', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה מנחים', 'צריך צלם'],
             },
             'Dancer': {
                 en: ['Also need a DJ', 'Show me singers', 'Need a photographer'],
-                ru: ['Ещё нужен диджей', 'Покажи певцов', 'Нужен фотограф'],
                 he: ["גם צריך דיג'יי", 'הראה זמרים', 'צריך צלם'],
             },
             'Bartender': {
                 en: ['Also need bar show', 'Show me DJs', 'Need a photographer'],
-                ru: ['Ещё нужно бар-шоу', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך בר שואו', "הראה דיג'יים", 'צריך צלם'],
             },
             'Bar Show': {
                 en: ['Also need a bartender', 'Show me DJs', 'Need a photographer'],
-                ru: ['Ещё нужен бармен', 'Покажи диджеев', 'Нужен фотограф'],
                 he: ['גם צריך ברמן', "הראה דיג'יים", 'צריך צלם'],
             },
             'Event Decor': {
                 en: ['Also need flowers', 'Show me photographers', 'Need lighting'],
-                ru: ['Ещё нужны цветы', 'Покажи фотографов', 'Нужен свет'],
                 he: ['גם צריך פרחים', 'הראה צלמים', 'צריך תאורה'],
             },
             'Kids Animator': {
                 en: ['Also need a magician', 'Show me face painters', 'Need a photographer'],
-                ru: ['Ещё нужен фокусник', 'Покажи аквагрим', 'Нужен фотограф'],
                 he: ['גם צריך קוסם', 'הראה ציור פנים', 'צריך צלם'],
             },
             'Face Painter': {
                 en: ['Also need an animator', 'Show me magicians', 'Need a photographer'],
-                ru: ['Ещё нужен аниматор', 'Покажи фокусников', 'Нужен фотограф'],
                 he: ['גם צריך אנימטור', 'הראה קוסמים', 'צריך צלם'],
             },
             'Piercing/Tattoo': {
                 en: ['Also need makeup', 'Show me photographers', 'Need decorations'],
-                ru: ['Ещё нужен макияж', 'Покажи фотографов', 'Нужен декор'],
                 he: ['גם צריך איפור', 'הראה צלמים', 'צריך קישוט'],
             },
             'Chef': {
                 en: ['Also need a bartender', 'Show me decorators', 'Need a photographer'],
-                ru: ['Ещё нужен бармен', 'Покажи декораторов', 'Нужен фотограф'],
                 he: ['גם צריך ברמן', 'הראה מעצבים', 'צריך צלם'],
             },
         };
@@ -412,7 +395,6 @@ function generateSuggestions(
     if (extracted.category && !extracted.city) {
         return {
             en: ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat'],
-            ru: ['Тель-Авив', 'Хайфа', 'Иерусалим', 'Эйлат'],
             he: ['תל אביב', 'חיפה', 'ירושלים', 'אילת'],
         }[lang] || [];
     }
@@ -421,7 +403,6 @@ function generateSuggestions(
     if (extracted.eventType === 'Wedding') {
         return {
             en: ['Need a photographer', 'Need a DJ', 'Need a videographer'],
-            ru: ['Нужен фотограф', 'Нужен диджей', 'Нужен видеограф'],
             he: ['צריך צלם', "צריך דיג'יי", 'צריך צלם וידאו'],
         }[lang] || [];
     }
@@ -429,7 +410,6 @@ function generateSuggestions(
     if (extracted.eventType === 'Bar Mitzvah' || extracted.eventType === 'Bat Mitzvah') {
         return {
             en: ['Need a DJ', 'Need an animator', 'Need a photographer'],
-            ru: ['Нужен диджей', 'Нужен аниматор', 'Нужен фотограф'],
             he: ["צריך דיג'יי", 'צריך אנימטור', 'צריך צלם'],
         }[lang] || [];
     }
@@ -437,7 +417,6 @@ function generateSuggestions(
     if (extracted.eventType === 'Birthday') {
         return {
             en: ['Need an animator', 'Need a photographer', 'Need a magician'],
-            ru: ['Нужен аниматор', 'Нужен фотограф', 'Нужен фокусник'],
             he: ['צריך אנימטור', 'צריך צלם', 'צריך קוסם'],
         }[lang] || [];
     }
@@ -445,7 +424,6 @@ function generateSuggestions(
     // Default - micro vibe picks (no “weddings/corporate” bias)
     return {
         en: ['😂 Make me laugh', '🧘‍♂️ Chill & relax', '🔥 I want wow'],
-        ru: ['😂 Хочу посмеяться', '🧘‍♂️ Чилл и релакс', '🔥 Хочу вау'],
         he: ['😂 תצחיק אותי', '🧘‍♂️ צ׳יל ורילקס', '🔥 תן לי וואו'],
     }[lang] || [];
 }
@@ -555,16 +533,6 @@ function generateFallbackResponse(
             askCategory: () =>
                 `What kind of professional are you looking for? Photographer, DJ, singer, or something else?`,
         },
-        ru: {
-            found: (count: number, cat: string, loc?: string) =>
-                `Отлично! Нашёл ${count} потрясающих специалистов${loc ? ` в ${loc}` : ''}! ✨ Посмотрите на этих профессионалов.`,
-            notFound: () =>
-                `Не нашёл точных совпадений. В каком городе вы ищете?`,
-            askEvent: () =>
-                `С удовольствием помогу! Какое мероприятие вы планируете? 🎉`,
-            askCategory: () =>
-                `Какого специалиста вы ищете? Фотографа, диджея, певца или кого-то ещё?`,
-        },
         he: {
             found: (count: number, cat: string, loc?: string) =>
                 `מצאתי ${count} מקצוענים מעולים${loc ? ` ב${loc}` : ''}! ✨ הנה הטובים ביותר.`,
@@ -577,7 +545,7 @@ function generateFallbackResponse(
         },
     };
 
-    const r = responses[language as keyof typeof responses] || responses.en;
+    const r = (language === 'he' ? responses.he : responses.en);
 
     if (vendors.length > 0) {
         return r.found(vendors.length, category || 'professional', city);
@@ -654,7 +622,9 @@ export async function POST(request: NextRequest) {
         // Pick micro-entertainment packages by mood
         const packages = pickPackages(mood, 3);
         const surprise = Math.random() > 0.6
-            ? '🎁 Сюрприз при первом заказе: мини-бонус от артиста'
+            ? (language === 'he'
+                ? '🎁 בונוס קטן בהזמנה הראשונה — הפתעה מהאמן'
+                : '🎁 First booking surprise — a small bonus from the talent')
             : undefined;
 
         // Generate AI response
