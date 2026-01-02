@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
+import Logo from '@/components/Logo';
 
 export default function Footer() {
     const { language } = useLanguage();
@@ -35,13 +36,8 @@ export default function Footer() {
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
                     {/* Logo & Tagline */}
                     <div>
-                        <div className="flex items-center gap-2 mb-3">
-                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
-                                <span className="text-slate-900 font-black text-sm">T</span>
-                            </div>
-                            <span className="text-xl font-bold text-white tracking-tight">
-                                Talentr
-                            </span>
+                        <div className="mb-3">
+                            <Logo size="lg" variant="light" />
                         </div>
                         <p className="text-white/40 text-sm max-w-xs">
                             {t.tagline}

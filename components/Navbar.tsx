@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { ChevronDown } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
@@ -52,18 +53,11 @@ export default function Navbar() {
         >
             <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
                 <div className="flex items-center justify-between">
-                    {/* Logo - Minimalist */}
-                    <Link href="/" className="flex items-center gap-2">
-                        <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
-                            <span className="text-white font-black text-sm">T</span>
-                        </div>
-                        <span className={cn(
-                            "text-xl font-bold tracking-tight transition-colors",
-                            isScrolled ? "text-slate-900" : "text-white"
-                        )}>
-                            Talentr
-                        </span>
-                    </Link>
+                    {/* Logo */}
+                    <Logo 
+                        size="lg" 
+                        variant={isScrolled ? 'dark' : 'light'} 
+                    />
 
                     {/* Right: CTAs + Lang */}
                     <div className="flex items-center gap-2 md:gap-3">

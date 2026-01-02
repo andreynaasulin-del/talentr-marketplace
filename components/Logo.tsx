@@ -5,56 +5,66 @@ import { cn } from '@/lib/utils';
 
 interface LogoProps {
     size?: 'sm' | 'md' | 'lg' | 'xl';
+    variant?: 'dark' | 'light';
     asLink?: boolean;
     className?: string;
 }
 
 const sizeClasses = {
-    sm: 'text-[18px]',
-    md: 'text-[24px]',
-    lg: 'text-[32px]',
-    xl: 'text-[48px]',
+    sm: 'text-lg',
+    md: 'text-xl',
+    lg: 'text-2xl',
+    xl: 'text-4xl',
 };
 
-export default function Logo({ size = 'md', asLink = true, className }: LogoProps) {
+const tailSizes = {
+    sm: { width: 8, height: 10, top: -2, right: -1 },
+    md: { width: 10, height: 12, top: -2, right: -1 },
+    lg: { width: 12, height: 14, top: -3, right: -1 },
+    xl: { width: 16, height: 20, top: -4, right: -2 },
+};
+
+export default function Logo({ size = 'md', variant = 'dark', asLink = true, className }: LogoProps) {
     const textClass = sizeClasses[size];
-    
+    const tail = tailSizes[size];
+
     const content = (
-        <span 
-            dir="ltr" 
+        <span
             className={cn(
-                "font-bold text-[#1a1a1a] dark:text-white flex items-baseline tracking-[-0.04em]",
+                "font-bold tracking-[-0.02em] inline-flex items-baseline",
                 textClass,
+                variant === 'dark' ? 'text-slate-900' : 'text-white',
                 className
             )}
         >
-            <span>talent</span>
-            <span className="relative inline-flex items-baseline ml-[0.05em]">
-                {/* SVG 'r' - STRICTLY MATCHED TO REFERENCE */}
-                <svg 
-                    className="h-[0.7em] w-auto overflow-visible translate-y-[0.05em]" 
-                    viewBox="0 0 20 20" 
-                    fill="none" 
-                    xmlns="http://www.w3.org/2000/svg"
-                >
-                    {/* Stem */}
-                    <path 
-                        d="M0 5H5V20H0V5Z" 
-                        fill="currentColor"
-                    />
-                    {/* The specific blue accent shape */}
-                    <path 
-                        d="M5 10C5 10 7 4 15 4C19 4 20 7 20 7C20 7 17 8.5 13 11.5C9 14.5 5 15 5 15V10Z" 
-                        fill="#009de0"
-                    />
-                </svg>
-            </span>
+            <span>talentr</span>
+            {/* Blue swoosh tail on the 'r' */}
+            <svg
+                className="relative"
+                style={{
+                    width: tail.width,
+                    height: tail.height,
+                    marginLeft: tail.right,
+                    marginTop: tail.top,
+                    marginBottom: 'auto',
+                }}
+                viewBox="0 0 12 16"
+                fill="none"
+                xmlns="http://www.w3.org/2000/svg"
+            >
+                <path
+                    d="M2 14C2 14 3 8 6 5C9 2 11 2 11 2"
+                    stroke="#3B82F6"
+                    strokeWidth="3"
+                    strokeLinecap="round"
+                />
+            </svg>
         </span>
     );
 
     if (asLink) {
         return (
-            <Link href="/" className="focus:outline-none group inline-block">
+            <Link href="/" className="focus:outline-none inline-block">
                 {content}
             </Link>
         );
