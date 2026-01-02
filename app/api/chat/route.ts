@@ -2,8 +2,9 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { filterVendors } from '@/lib/vendors';
 import { Vendor, VendorCategory, City } from '@/types';
-import { rateLimit, getClientIP, rateLimitHeaders, RATE_LIMITS } from '@/lib/rate-limit';
+import { rateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 import { chatMessageSchema } from '@/lib/validations';
+import { gigPackages, GigPackage, MoodTag } from '@/lib/gigs';
 
 // ===== OPENAI INITIALIZATION =====
 let openai: OpenAI | null = null;
@@ -19,159 +20,99 @@ function getOpenAI(): OpenAI | null {
 interface ChatResponse {
     response: string;
     vendors: Vendor[];
+    packages: GigPackage[];
     extracted: {
         category?: VendorCategory;
         city?: City;
         eventType?: string;
-        budget?: string;
-        guestCount?: number;
-        eventDate?: string;
+        mood?: MoodTag;
     };
     suggestions?: string[];
-    followUpQuestions?: string[];
+    surprise?: string;
 }
 
-// ===== ENHANCED KEYWORD MAPPINGS (EN/HE ONLY) =====
+// ===== MOOD DETECTION =====
+const moodKeywords: Record<MoodTag, string[]> = {
+    fun: ['laugh', 'funny', 'comedy', 'fun', 'party', 'צחוק', 'מצחיק', 'כיף', 'מסיבה', 'standup', '😂', '🎉'],
+    chill: ['relax', 'chill', 'acoustic', 'calm', 'vibes', 'רגוע', 'נינוח', 'וייבס', 'אקוסטי', '🧘', '🎸'],
+    romantic: ['romantic', 'love', 'date', 'anniversary', 'רומנטי', 'אהבה', 'דייט', 'יום נישואין', '❤️', '💕'],
+    wow: ['amazing', 'magic', 'wow', 'surprise', 'cool', 'מדהים', 'קסם', 'וואו', 'הפתעה', 'מגניב', '✨', '🎩'],
+    artsy: ['art', 'creative', 'painting', 'mural', 'אמנות', 'יצירתי', 'ציור', '🎨'],
+};
+
+function detectMood(message: string): MoodTag | undefined {
+    const lower = message.toLowerCase();
+    for (const [mood, keywords] of Object.entries(moodKeywords)) {
+        if (keywords.some(kw => lower.includes(kw))) {
+            return mood as MoodTag;
+        }
+    }
+    return undefined;
+}
+
+// ===== CATEGORY KEYWORDS (EN/HE ONLY) =====
 const categoryKeywords: Record<string, VendorCategory> = {
-    // English
-    'photographer': 'Photographer', 'photo': 'Photographer', 'photography': 'Photographer', 'photoshoot': 'Photographer',
-    'videographer': 'Videographer', 'video': 'Videographer', 'film': 'Videographer', 'filming': 'Videographer',
-    'dj': 'DJ', 'disc jockey': 'DJ', 'music': 'DJ',
-    'mc': 'MC', 'host': 'MC', 'emcee': 'MC', 'presenter': 'MC', 'master of ceremonies': 'MC',
-    'magician': 'Magician', 'magic': 'Magician', 'illusion': 'Magician', 'tricks': 'Magician',
-    'singer': 'Singer', 'vocalist': 'Singer', 'voice': 'Singer', 'singing': 'Singer',
-    'musician': 'Musician', 'band': 'Musician', 'live music': 'Musician', 'orchestra': 'Musician',
-    'comedian': 'Comedian', 'comedy': 'Comedian', 'standup': 'Comedian', 'funny': 'Comedian',
-    'dancer': 'Dancer', 'dance': 'Dancer', 'dancing': 'Dancer', 'choreography': 'Dancer',
-    'bartender': 'Bartender', 'bar': 'Bartender', 'cocktail': 'Bartender', 'drinks': 'Bartender',
-    'bar show': 'Bar Show', 'flair': 'Bar Show', 'bottle show': 'Bar Show',
-    'decor': 'Event Decor', 'decoration': 'Event Decor', 'flowers': 'Event Decor', 'balloons': 'Event Decor', 'design': 'Event Decor',
-    'kids': 'Kids Animator', 'children': 'Kids Animator', 'animator': 'Kids Animator', 'clown': 'Kids Animator',
-    'face paint': 'Face Painter', 'face painting': 'Face Painter', 'makeup artist': 'Face Painter',
-    'tattoo': 'Piercing/Tattoo', 'henna': 'Piercing/Tattoo', 'piercing': 'Piercing/Tattoo',
-    'chef': 'Chef', 'catering': 'Chef', 'food': 'Chef', 'cuisine': 'Chef', 'cooking': 'Chef',
-    // Hebrew
-    'צלם': 'Photographer', 'צילום': 'Photographer', 'תמונות': 'Photographer',
-    'וידאו': 'Videographer', 'צלם וידאו': 'Videographer', 'סרטון': 'Videographer',
-    "דיג'יי": 'DJ', 'מוזיקה': 'DJ', 'דיסק': 'DJ',
-    'מנחה': 'MC', 'מארח': 'MC', 'תמרה': 'MC',
-    'קוסם': 'Magician', 'קסמים': 'Magician', 'אשליות': 'Magician',
-    'זמר': 'Singer', 'זמרת': 'Singer', 'שירה': 'Singer',
-    'מוזיקאי': 'Musician', 'להקה': 'Musician', 'תזמורת': 'Musician',
-    'קומיקאי': 'Comedian', 'סטנדאפ': 'Comedian', 'הומור': 'Comedian',
-    'רקדן': 'Dancer', 'רקדנית': 'Dancer', 'ריקוד': 'Dancer',
-    'ברמן': 'Bartender', 'קוקטיילים': 'Bartender', 'משקאות': 'Bartender',
-    'עיצוב': 'Event Decor', 'קישוט': 'Event Decor', 'פרחים': 'Event Decor', 'בלונים': 'Event Decor',
-    'אנימטור': 'Kids Animator', 'הפעלה לילדים': 'Kids Animator', 'ליצן': 'Kids Animator',
-    'ציור פנים': 'Face Painter', 'איפור': 'Face Painter',
-    'שף': 'Chef', 'קייטרינג': 'Chef', 'אוכל': 'Chef',
+    'photographer': 'Photographer', 'photo': 'Photographer', 'צלם': 'Photographer',
+    'dj': 'DJ', 'music': 'DJ', "דיג'יי": 'DJ', 'מוזיקה': 'DJ',
+    'magician': 'Magician', 'magic': 'Magician', 'קוסם': 'Magician',
+    'singer': 'Singer', 'vocalist': 'Singer', 'זמר': 'Singer',
+    'musician': 'Musician', 'band': 'Musician', 'guitar': 'Musician', 'גיטרה': 'Musician',
+    'comedian': 'Comedian', 'comedy': 'Comedian', 'standup': 'Comedian', 'סטנדאפ': 'Comedian',
+    'dancer': 'Dancer', 'dance': 'Dancer', 'רקדן': 'Dancer',
+    'bartender': 'Bartender', 'cocktail': 'Bartender', 'ברמן': 'Bartender',
+    'chef': 'Chef', 'sushi': 'Chef', 'cooking': 'Chef', 'שף': 'Chef', 'סושי': 'Chef',
+    'kids': 'Kids Animator', 'children': 'Kids Animator', 'ילדים': 'Kids Animator',
 };
 
 const cityKeywords: Record<string, City> = {
-    // English
-    'tel aviv': 'Tel Aviv', 'telaviv': 'Tel Aviv', 'tlv': 'Tel Aviv', 'tel-aviv': 'Tel Aviv',
-    'haifa': 'Haifa', 'jerusalem': 'Jerusalem', 'eilat': 'Eilat',
-    'rishon': 'Rishon LeZion', 'rishon lezion': 'Rishon LeZion', 'rishon le zion': 'Rishon LeZion',
-    'netanya': 'Netanya', 'ashdod': 'Ashdod', 'beer sheva': 'Beer Sheva', 'beersheva': 'Beer Sheva',
-    'petah tikva': 'Petah Tikva', 'herzliya': 'Herzliya', 'ramat gan': 'Ramat Gan',
-    // Hebrew
-    'תל אביב': 'Tel Aviv', 'ת"א': 'Tel Aviv', 'חיפה': 'Haifa', 'ירושלים': 'Jerusalem',
-    'אילת': 'Eilat', 'ראשון לציון': 'Rishon LeZion', 'נתניה': 'Netanya', 'אשדוד': 'Ashdod',
-    'באר שבע': 'Beer Sheva', 'פתח תקווה': 'Petah Tikva', 'הרצליה': 'Herzliya', 'רמת גן': 'Ramat Gan',
+    'tel aviv': 'Tel Aviv', 'tlv': 'Tel Aviv', 'תל אביב': 'Tel Aviv',
+    'haifa': 'Haifa', 'חיפה': 'Haifa',
+    'jerusalem': 'Jerusalem', 'ירושלים': 'Jerusalem',
+    'eilat': 'Eilat', 'אילת': 'Eilat',
+    'herzliya': 'Herzliya', 'הרצליה': 'Herzliya',
+    'netanya': 'Netanya', 'נתניה': 'Netanya',
 };
 
-const eventKeywords: Record<string, string> = {
-    'wedding': 'Wedding', 'חתונה': 'Wedding', 'marriage': 'Wedding', 'bride': 'Wedding',
-    'bar mitzvah': 'Bar Mitzvah', 'bat mitzvah': 'Bat Mitzvah', 'בר מצווה': 'Bar Mitzvah', 'בת מצווה': 'Bat Mitzvah',
-    'birthday': 'Birthday', 'יום הולדת': 'Birthday', 'bday': 'Birthday',
-    'corporate': 'Corporate', 'אירוע עסקי': 'Corporate', 'company': 'Corporate', 'business': 'Corporate',
-    'party': 'Private Party', 'מסיבה': 'Private Party',
-    'graduation': 'Graduation', 'סיום': 'Graduation',
-    'anniversary': 'Anniversary', 'יום נישואין': 'Anniversary',
-    'engagement': 'Engagement', 'אירוסין': 'Engagement',
-    'baby shower': 'Baby Shower',
-    'new year': 'New Year Party',
-    'hanukkah': 'Hanukkah', 'חנוכה': 'Hanukkah',
-    'purim': 'Purim', 'פורים': 'Purim',
-};
-
-// Budget extraction patterns
-const budgetPatterns = [
-    /(\d+[,.]?\d*)\s*(shekel|nis|₪)/i,
-    /budget[:\s]+(\d+[,.]?\d*)/i,
-    /תקציב[:\s]+(\d+[,.]?\d*)/i,
-    /(\d+[,.]?\d*)[-–]\s*(\d+[,.]?\d*)\s*(shekel|nis|₪)?/i,
-];
-
-// Guest count patterns
-const guestPatterns = [
-    /(\d+)\s*(guests?|people|persons?|אורחים)/i,
-    /for\s+(\d+)/i,
-];
-
-// Date patterns
-const datePatterns = [
-    /(\d{1,2})[\/.-](\d{1,2})[\/.-](\d{2,4})/,
-    /(january|february|march|april|may|june|july|august|september|october|november|december)\s+\d{1,2}/i,
-];
-
-// ===== EXTRACTION FUNCTION =====
+// ===== EXTRACTION =====
 function extractFromMessage(message: string): {
     category?: VendorCategory;
     city?: City;
-    eventType?: string;
-    budget?: string;
-    guestCount?: number;
-    eventDate?: string;
+    mood?: MoodTag;
 } {
-    const lowerMessage = message.toLowerCase();
+    const lower = message.toLowerCase();
     let category: VendorCategory | undefined;
     let city: City | undefined;
-    let eventType: string | undefined;
-    let budget: string | undefined;
-    let guestCount: number | undefined;
-    let eventDate: string | undefined;
 
-    for (const [keyword, cat] of Object.entries(categoryKeywords)) {
-        if (lowerMessage.includes(keyword)) { category = cat; break; }
+    for (const [kw, cat] of Object.entries(categoryKeywords)) {
+        if (lower.includes(kw)) { category = cat; break; }
     }
-    for (const [keyword, c] of Object.entries(cityKeywords)) {
-        if (lowerMessage.includes(keyword)) { city = c; break; }
-    }
-    for (const [keyword, event] of Object.entries(eventKeywords)) {
-        if (lowerMessage.includes(keyword)) { eventType = event; break; }
-    }
-    for (const pattern of budgetPatterns) {
-        const match = message.match(pattern);
-        if (match) {
-            budget = match[1] + (match[2] ? ` ${match[2]}` : ' NIS');
-            break;
-        }
-    }
-    for (const pattern of guestPatterns) {
-        const match = message.match(pattern);
-        if (match) {
-            guestCount = parseInt(match[1]);
-            break;
-        }
-    }
-    for (const pattern of datePatterns) {
-        const match = message.match(pattern);
-        if (match) {
-            eventDate = match[0];
-            break;
-        }
+    for (const [kw, c] of Object.entries(cityKeywords)) {
+        if (lower.includes(kw)) { city = c; break; }
     }
 
-    return { category, city, eventType, budget, guestCount, eventDate };
+    const mood = detectMood(message);
+    return { category, city, mood };
+}
+
+// ===== FIND PACKAGES BY MOOD =====
+function findPackagesByMood(mood?: MoodTag, limit: number = 4): GigPackage[] {
+    if (!mood) {
+        // Return random mix
+        const shuffled = [...gigPackages].sort(() => Math.random() - 0.5);
+        return shuffled.slice(0, limit);
+    }
+    const matched = gigPackages.filter(pkg => pkg.moodTags.includes(mood));
+    if (matched.length >= limit) return matched.slice(0, limit);
+    // Fill with others
+    const others = gigPackages.filter(pkg => !pkg.moodTags.includes(mood));
+    return [...matched, ...others].slice(0, limit);
 }
 
 // ===== FIND VENDORS =====
 async function findVendors(
     category?: VendorCategory,
     city?: City,
-    eventType?: string,
-    limit: number = 6
+    limit: number = 3
 ): Promise<Vendor[]> {
     try {
         let results = await filterVendors({ category, city, minRating: 4.0 });
@@ -184,146 +125,241 @@ async function findVendors(
     }
 }
 
-// ===== ENHANCED AI SYSTEM PROMPT =====
-const SYSTEM_PROMPT = `You are Talentr AI Concierge - an expert personal assistant helping people find the perfect talent and service professionals for events in Israel.
+// ===== GAMIFICATION: RANDOM SURPRISE =====
+function generateSurprise(language: string): string | undefined {
+    const shouldSurprise = Math.random() < 0.25; // 25% chance
+    if (!shouldSurprise) return undefined;
 
-## Your Personality
-- Exclusive, sophisticated, and professional
-- Expert knowledge about Israeli events and trends
-- Warm but efficient, like a high-end concierge
-- Uses 1-2 relevant emojis per message max
-- Matches the user's energy
-
-## Response Guidelines
-### When request is processed:
-1. Acknowledge and confirm details
-2. Mention the curated list of professionals you found
-3. Offer a premium insight or tip
-
-### Language Rules
-- ALWAYS respond in the same language the user writes in
-- English → English
-- Hebrew (עברית) → Hebrew (RTL)
-- NEVER use Russian.
-
-## Important Rules
-1. Keep responses SHORT (2-3 sentences max)
-2. Never invent vendor names or prices
-3. Guide toward immediate action
-4. No fluff. Strictly premium quality.
-
-## Current Context
-[VENDOR_CONTEXT]`;
-
-// ===== GENERATE SMART FOLLOW-UP SUGGESTIONS =====
-function generateSuggestions(
-    extracted: { category?: VendorCategory; eventType?: string; city?: City },
-    language: string,
-    hasVendors: boolean
-): string[] {
-    const lang = language as 'en' | 'he';
-
-    if (hasVendors && extracted.category) {
-        const relatedSuggestions: Record<VendorCategory, Record<string, string[]>> = {
-            'DJ': {
-                en: ['Need a photographer?', 'Show me singers', 'Event decor'],
-                he: ['צריך צלם?', 'הראה זמרים', 'עיצוב אירועים'],
-            },
-            'Photographer': {
-                en: ['Need a videographer?', 'Show me DJs', 'Makeup artist'],
-                he: ['צריך צלם וידאו?', "הראה דיג'יים", 'מאפרת'],
-            },
-            // ... (keeping other categories short for brevity, default to generic)
-        };
-        const defaultRelated = {
-            en: ['Show more professionals', 'Find event decor', 'Which city?'],
-            he: ['הראה עוד אנשי מקצוע', 'מצא עיצוב אירועים', 'באיזו עיר?'],
-        };
-        return relatedSuggestions[extracted.category]?.[lang] || defaultRelated[lang] || [];
-    }
-
-    const defaultSuggestions = {
-        en: ['Planning a wedding', 'Birthday party', 'Corporate event'],
-        he: ['מתכנן חתונה', 'יום הולדת', 'אירוע עסקי'],
+    const surprises = {
+        en: [
+            "🎁 Secret bonus: First booking gets a free 10-min extension!",
+            "⚡ Flash deal: Book now and skip the queue!",
+            "🌟 VIP tip: This artist performed at Google's office party!",
+            "🎲 Lucky you! Ask for the 'sunset special' package",
+        ],
+        he: [
+            "🎁 בונוס סודי: הזמנה ראשונה מקבלת 10 דקות נוספות בחינם!",
+            "⚡ דיל בזק: הזמן עכשיו ודלג על התור!",
+            "🌟 טיפ VIP: האמן הזה הופיע במסיבה של גוגל!",
+            "🎲 מזל! בקש את חבילת ה-'sunset special'",
+        ],
     };
-    return defaultSuggestions[lang] || defaultSuggestions.en;
+
+    const list = surprises[language as 'en' | 'he'] || surprises.en;
+    return list[Math.floor(Math.random() * list.length)];
 }
 
-// ===== AI RESPONSE GENERATION =====
+// ===== AI SYSTEM PROMPT - IMPULSE VIBE-BOT =====
+const SYSTEM_PROMPT = `You are the Talentr Vibe-Bot - a fun, energetic assistant that helps people book micro-entertainment experiences in Israel.
+
+## Your Personality
+- Playful, spontaneous, and enthusiastic 😎
+- Like a friend who knows all the best artists
+- Uses 2-3 emojis naturally
+- Short, punchy responses (2-3 sentences MAX)
+- Creates excitement and FOMO
+
+## What You Help With
+NOT boring corporate events. You help with:
+- Surprise experiences for friends
+- Date night entertainment  
+- Balcony concerts
+- Private comedy shows
+- Art sessions
+- Chill acoustic vibes
+- Food experiences (sushi, cocktails)
+
+## Response Style Examples
+User: "I'm bored"
+You: "Let's fix that! 🔥 How about a comedian for your living room in 30 min? Or a guitar guy for sunset vibes? Pick: 😂 or 🎸"
+
+User: "Something for a date"
+You: "Ooh romantic! 💕 I've got the perfect acoustic guitarist - imagine private concert on your balcony. She's amazing!"
+
+User: "Surprise me"
+You: "Challenge accepted! 🎲 Here are 3 wild options - a magician, a sound healer, or a sushi chef. All can be at your place TODAY!"
+
+## Rules
+1. NEVER mention prices unprompted
+2. Keep it SHORT and impulsive
+3. Always offer quick options with emojis
+4. Create urgency ("available today!", "only 2 slots left!")
+5. Match user's language (English or Hebrew only, NO Russian)
+6. If packages found, reference them enthusiastically
+
+## Context
+[CONTEXT]`;
+
+// ===== GENERATE SUGGESTIONS =====
+function generateSuggestions(mood?: MoodTag, language: string = 'en'): string[] {
+    const lang = language as 'en' | 'he';
+    
+    const moodSuggestions: Record<MoodTag, Record<string, string[]>> = {
+        fun: {
+            en: ['More comedians', 'Magic show', 'Something crazier 🔥'],
+            he: ['עוד קומיקאים', 'מופע קסמים', 'משהו יותר מטורף 🔥'],
+        },
+        chill: {
+            en: ['Acoustic vibes', 'Sound healing', 'Something romantic 💕'],
+            he: ['וייבס אקוסטי', 'ריפוי בצלילים', 'משהו רומנטי 💕'],
+        },
+        romantic: {
+            en: ['Private concert', 'Sunset guitarist', 'Candlelight chef 🕯️'],
+            he: ['קונצרט פרטי', 'גיטריסט לשקיעה', 'שף לאור נרות 🕯️'],
+        },
+        wow: {
+            en: ['Street art', 'Close-up magic', 'Fire show 🔥'],
+            he: ['סטריט ארט', 'קסמים מקרוב', 'מופע אש 🔥'],
+        },
+        artsy: {
+            en: ['Live mural', 'Pottery session', 'Face painting 🎨'],
+            he: ['ציור קיר לייב', 'סדנת קדרות', 'ציור פנים 🎨'],
+        },
+    };
+
+    if (mood && moodSuggestions[mood]) {
+        return moodSuggestions[mood][lang] || moodSuggestions[mood].en;
+    }
+
+    const defaults = {
+        en: ['Make me laugh 😂', 'Chill vibes 🎸', 'Surprise me! 🎁'],
+        he: ['תצחיק אותי 😂', 'וייבס רגועים 🎸', 'הפתע אותי! 🎁'],
+    };
+    return defaults[lang] || defaults.en;
+}
+
+// ===== AI RESPONSE =====
 async function generateAIResponse(
     message: string,
     conversationHistory: { role: 'user' | 'assistant'; content: string }[],
-    extracted: ReturnType<typeof extractFromMessage>,
+    packages: GigPackage[],
     vendors: Vendor[],
+    mood: MoodTag | undefined,
     language: string
 ): Promise<string> {
     const client = getOpenAI();
-    if (!client) return generateFallbackResponse(extracted, vendors, language);
+    if (!client) return generateFallbackResponse(packages, vendors, mood, language);
 
     try {
-        let vendorContext = vendors.length > 0 
-            ? `\n[SYSTEM INFO: Found ${vendors.length} professionals. Highlight the selection below.]`
-            : `\n[SYSTEM INFO: No vendors found. Suggest broadening the search.]`;
+        const pkgNames = packages.map(p => p.title[language as 'en' | 'he'] || p.title.en).join(', ');
+        let context = '';
+        if (packages.length > 0) {
+            context = `[Found packages: ${pkgNames}]`;
+        }
+        if (vendors.length > 0) {
+            context += `\n[Found ${vendors.length} artists ready to book]`;
+        }
+        if (mood) {
+            context += `\n[Detected mood: ${mood}]`;
+        }
 
-        const systemPrompt = SYSTEM_PROMPT.replace('[VENDOR_CONTEXT]', vendorContext);
+        const systemPrompt = SYSTEM_PROMPT.replace('[CONTEXT]', context || '[No specific context]');
 
         const completion = await client.chat.completions.create({
             model: 'gpt-4o-mini',
             messages: [
                 { role: 'system', content: systemPrompt },
-                ...conversationHistory.slice(-5).map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content })),
+                ...conversationHistory.slice(-4).map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content })),
                 { role: 'user', content: message }
             ],
-            max_tokens: 200,
-            temperature: 0.6,
+            max_tokens: 150,
+            temperature: 0.8,
         });
 
-        return completion.choices[0]?.message?.content || generateFallbackResponse(extracted, vendors, language);
+        return completion.choices[0]?.message?.content || generateFallbackResponse(packages, vendors, mood, language);
     } catch (error) {
         console.error('OpenAI API error:', error);
-        return generateFallbackResponse(extracted, vendors, language);
+        return generateFallbackResponse(packages, vendors, mood, language);
     }
 }
 
-function generateFallbackResponse(extracted: any, vendors: Vendor[], language: string = 'en'): string {
+function generateFallbackResponse(packages: GigPackage[], vendors: Vendor[], mood: MoodTag | undefined, language: string): string {
     const r = {
         en: {
-            found: (count: number) => `I found ${count} elite professionals for you. ✨`,
-            notFound: () => `I couldn't find exact matches. Which city are you looking in?`,
-            askEvent: () => `What kind of event are you planning? 🎉`,
+            hasPackages: "Check these out! 🔥 Perfect for your vibe.",
+            hasVendors: `Found ${vendors.length} amazing artists ready to go! 🚀`,
+            askMood: "What's the vibe? Pick an emoji: 😂 🎸 ✨ 🧘 🎨",
+            surprise: "Here's something wild! 🎲",
         },
         he: {
-            found: (count: number) => `מצאתי ${count} אנשי מקצוע מעולים עבורך. ✨`,
-            notFound: () => `לא מצאתי התאמות מדויקות. באיזו עיר אתם מחפשים?`,
-            askEvent: () => `איזה סוג אירוע אתם מתכננים? 🎉`,
-        }
+            hasPackages: "תבדוק את אלה! 🔥 מושלם לוייב שלך.",
+            hasVendors: `מצאתי ${vendors.length} אמנים מדהימים מוכנים! 🚀`,
+            askMood: "מה הוייב? בחר אימוג'י: 😂 🎸 ✨ 🧘 🎨",
+            surprise: "הנה משהו מטורף! 🎲",
+        },
     }[language as 'en' | 'he'] || {
-        en: { found: (count: number) => `Found ${count} pros.`, notFound: () => `No matches.`, askEvent: () => `What event?` }
+        hasPackages: "Check these!", hasVendors: "Found artists!", askMood: "What vibe?", surprise: "Surprise!"
     };
 
-    if (vendors.length > 0) return r.found(vendors.length);
-    return extracted.eventType ? r.notFound() : r.askEvent();
+    if (packages.length > 0) return r.hasPackages;
+    if (vendors.length > 0) return r.hasVendors;
+    if (mood) return r.surprise;
+    return r.askMood;
 }
 
+// ===== MAIN HANDLER =====
 export async function POST(request: NextRequest) {
     try {
         const clientIP = getClientIP(request);
         const rateLimitResult = rateLimit(clientIP, RATE_LIMITS.chat);
-        if (!rateLimitResult.success) return NextResponse.json({ error: 'Rate limit' }, { status: 429 });
+        if (!rateLimitResult.success) {
+            return NextResponse.json({ 
+                error: 'Rate limit',
+                response: "Whoa, slow down! 😅 Try again in a sec.",
+                vendors: [],
+                packages: [],
+            }, { status: 429 });
+        }
 
         const body = await request.json();
         const validation = chatMessageSchema.safeParse({ message: body.message, language: body.language || 'en' });
-        if (!validation.success) return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+        if (!validation.success) {
+            return NextResponse.json({ error: 'Invalid input' }, { status: 400 });
+        }
 
         const { message, language } = validation.data;
         const conversationHistory = body.conversationHistory || [];
         const extracted = extractFromMessage(message);
-        const vendors = await findVendors(extracted.category, extracted.city, extracted.eventType);
-        const response = await generateAIResponse(message, conversationHistory, extracted, vendors, language);
-        const suggestions = generateSuggestions(extracted, language, vendors.length > 0);
+        
+        // Find packages by mood first
+        const packages = findPackagesByMood(extracted.mood, 4);
+        
+        // Find vendors if specific category detected
+        const vendors = extracted.category 
+            ? await findVendors(extracted.category, extracted.city, 3)
+            : [];
+        
+        // Generate AI response
+        const response = await generateAIResponse(
+            message, 
+            conversationHistory, 
+            packages, 
+            vendors, 
+            extracted.mood, 
+            language
+        );
+        
+        // Gamification
+        const surprise = generateSurprise(language);
+        
+        // Smart suggestions
+        const suggestions = generateSuggestions(extracted.mood, language);
 
-        return NextResponse.json({ response, vendors, extracted, suggestions: suggestions.slice(0, 3) });
+        return NextResponse.json({ 
+            response, 
+            vendors, 
+            packages,
+            extracted, 
+            suggestions: suggestions.slice(0, 3),
+            surprise,
+        });
     } catch (error) {
-        return NextResponse.json({ error: 'Internal error' }, { status: 500 });
+        console.error('Chat API error:', error);
+        return NextResponse.json({ 
+            error: 'Internal error',
+            response: "Oops! Something went wrong. Try again! 🙈",
+            vendors: [],
+            packages: [],
+        }, { status: 500 });
     }
 }
