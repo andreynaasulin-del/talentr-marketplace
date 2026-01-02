@@ -57,7 +57,6 @@ export default function JoinPage() {
         { id: 'Rishon LeZion', label: { en: 'Rishon', he: 'ראשון' } },
         { id: 'Netanya', label: { en: 'Netanya', he: 'נתניה' } },
         { id: 'Ashdod', label: { en: 'Ashdod', he: 'אשדוד' } },
-        { id: 'Beer Sheva', label: { en: 'Beer Sheva', he: 'באר שבע' } },
     ];
 
     const content = {
@@ -181,18 +180,15 @@ export default function JoinPage() {
             if (!authData.user) throw new Error('Failed to create user');
 
             const { error: vendorError } = await supabase.from('vendors').insert([{
-                id: authData.user.id,
-                full_name: formData.fullName,
+                user_id: authData.user.id,
+                name: formData.fullName,
                 email: formData.email,
                 category: formData.category,
                 city: formData.city,
                 phone: formData.phone.startsWith('972') ? formData.phone : `972${formData.phone.replace(/^0/, '')}`,
-                avatar_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+                image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
                 price_from: 1000,
-                rating: 0,
-                reviews_count: 0,
-                bio: '',
-                portfolio_gallery: [],
+                description: '',
             }]);
 
             if (vendorError) throw vendorError;
