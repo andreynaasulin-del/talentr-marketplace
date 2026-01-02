@@ -2,6 +2,7 @@
 
 import Link from 'next/link';
 import { User, LogOut, ChevronDown, Calendar, Heart, Sun, Moon } from 'lucide-react';
+import Logo from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
@@ -60,13 +61,7 @@ export default function Navbar() {
             <div className="max-w-7xl mx-auto px-4 py-3">
                 <div className="flex items-center justify-between">
                     {/* Logo */}
-                    <Link
-                        href="/"
-                        dir="ltr"
-                        className="text-xl font-black text-gray-900 dark:text-white"
-                    >
-                        talent<span className="text-[#009de0]">r</span>
-                    </Link>
+                    <Logo size="md" />
 
                     {/* Right Actions - Mobile optimized */}
                     <div className="flex items-center gap-1">

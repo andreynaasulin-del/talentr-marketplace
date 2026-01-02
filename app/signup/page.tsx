@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff, User, ChevronDown, ArrowRight, Check } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import Logo from '@/components/Logo';
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -139,9 +140,7 @@ export default function SignUpPage() {
                 <div className="w-full max-w-md">
                     {/* Mobile Header */}
                     <div className="flex items-center justify-between mb-8">
-                        <Link href="/" dir="ltr" className="text-2xl font-black text-gray-900 dark:text-white">
-                            talent<span className="text-[#009de0]">r</span>
-                        </Link>
+                        <Logo size="lg" />
 
                         {/* Language Switcher */}
                         <div className="relative">

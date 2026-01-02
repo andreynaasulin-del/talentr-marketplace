@@ -3,6 +3,7 @@
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import { Heart } from 'lucide-react';
+import Logo from '@/components/Logo';
 
 export default function Footer() {
     const { language } = useLanguage();
@@ -33,11 +34,7 @@ export default function Footer() {
             <div className="max-w-xl mx-auto px-4 py-6">
                 {/* Logo */}
                 <div className="text-center mb-4">
-                    <Link href="/" dir="ltr" className="inline-block">
-                        <span className="text-xl font-black text-gray-900 dark:text-white">
-                            talent<span className="text-[#009de0]">r</span>
-                        </span>
-                    </Link>
+                    <Logo size="md" />
                 </div>
 
                 {/* Links - horizontal, thumb-friendly */}
