@@ -1,40 +1,30 @@
 'use client';
 
 import { useState, useRef, useEffect } from 'react';
-import { ArrowUpRight, Star, ArrowRight, Bot } from 'lucide-react';
+import { ArrowUp, Sparkles, Star, ChevronRight } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
 import Link from 'next/link';
 import Image from 'next/image';
 import { Vendor } from '@/types';
-import { GigPackage } from '@/lib/gigs';
+import { gigPackages, GigPackage } from '@/lib/gigs';
 
 interface Message {
     id: string;
     role: 'user' | 'assistant';
     content: string;
     vendors?: Vendor[];
-    suggestions?: string[];
     packages?: GigPackage[];
-    surprise?: string;
-    mood?: string[];
+    suggestions?: string[];
 }
 
 interface ChatAPIResponse {
     response: string;
     vendors: Vendor[];
-    suggestions?: string[];
     packages?: GigPackage[];
-    surprise?: string;
-    mood?: string[];
+    suggestions?: string[];
 }
-
-// Animated words - micro-entertainment vibe (no weddings/corporate)
-const animatedWords = {
-    en: ['VIBES', 'LAUGHS', 'CHILL', 'WOW', 'ART'],
-    he: ['וייב', 'צחוק', "צ׳יל", 'וואו', 'ארט']
-};
 
 export default function HeroSection() {
     const { language } = useLanguage();
@@ -42,54 +32,39 @@ export default function HeroSection() {
     const [input, setInput] = useState('');
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
-    const [chatExpanded, setChatExpanded] = useState(false);
-    const [wordIndex, setWordIndex] = useState(0);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const lang = language as 'en' | 'he';
-    const words = animatedWords[lang];
 
-    // Rotate words
-    useEffect(() => {
-        const interval = setInterval(() => {
-            setWordIndex((prev) => (prev + 1) % words.length);
-        }, 2500);
-        return () => clearInterval(interval);
-    }, [words.length]);
-
-    // Initial greeting message
-    useEffect(() => {
-        if (messages.length === 0) {
-            setMessages([
-                {
-                    id: 'greet',
-                    role: 'assistant',
-                    content: lang === 'he'
-                        ? 'היי, אני הקייפ-בוט שלך! מה בא לך להרגיש היום? 😎'
-                        : 'Hey, I’m your vibe-bot! What do you want to feel today? 😎',
-                }
-            ]);
-            setChatExpanded(true);
-        }
-    }, [lang, messages.length]);
-
+    // Placeholders - Premium & Minimal
     const placeholders = {
-        en: "What do you want to feel today? 😎",
-        he: "מה בא לכם להרגיש היום? 😎"
+        en: "What experience are you looking for?",
+        he: "איזה חוויה אתם מחפשים?"
     };
 
+    // Welcome message on mount
     useEffect(() => {
-        if (messagesContainerRef.current && chatExpanded) {
+        const welcomeMsg: Message = {
+            id: 'welcome',
+            role: 'assistant',
+            content: lang === 'he' 
+                ? 'שלום, אני הקונסיירז׳ האישי שלך. ספר לי מה אתה מחפש ואמצא לך את הכישרון המושלם.'
+                : 'Hello, I\'m your personal concierge. Tell me what you\'re looking for and I\'ll find the perfect talent for you.',
+            packages: gigPackages.slice(0, 3),
+        };
+        setMessages([welcomeMsg]);
+    }, [lang]);
+
+    useEffect(() => {
+        if (messagesContainerRef.current) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
         }
-    }, [messages, chatExpanded]);
+    }, [messages]);
 
     const sendMessage = async (text?: string) => {
         const messageText = text || input.trim();
         if (!messageText) return;
-
-        if (!chatExpanded) setChatExpanded(true);
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -115,17 +90,15 @@ export default function HeroSection() {
                 role: 'assistant',
                 content: data.response,
                 vendors: data.vendors,
-                suggestions: data.suggestions,
                 packages: data.packages,
-                surprise: data.surprise,
-                mood: data.mood,
+                suggestions: data.suggestions,
             }]);
         } catch (error) {
             console.error('Chat error:', error);
             setMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',
-                content: lang === 'he' ? 'שגיאה, נסו שוב' : 'Error, try again',
+                content: lang === 'he' ? 'משהו השתבש. נסה שוב.' : 'Something went wrong. Please try again.',
             }]);
         } finally {
             setIsTyping(false);
@@ -133,207 +106,216 @@ export default function HeroSection() {
     };
 
     const renderVendorCards = (vendors: Vendor[]) => (
-        <div className="mt-3 space-y-2">
+        <div className="mt-4 space-y-3">
             {vendors.slice(0, 2).map((vendor) => (
                 <Link
                     key={vendor.id}
                     href={`/vendor/${vendor.id}`}
-                    className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-[#009de0]/10 rounded-xl transition-colors group"
+                    className="flex items-center gap-4 p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all duration-300 group"
                 >
-                    <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
+                    <div className="relative w-14 h-14 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/20">
                         <Image src={vendor.imageUrl || '/placeholder-vendor.jpg'} alt={vendor.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">{vendor.name}</p>
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
+                        <p className="font-semibold text-white truncate">{vendor.name}</p>
+                        <div className="flex items-center gap-2 text-sm text-white/60">
                             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                            {vendor.rating} · {vendor.city}
+                            <span>{vendor.rating}</span>
+                            <span>·</span>
+                            <span>{vendor.city}</span>
                         </div>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#009de0] transition-all" />
+                    <ChevronRight className="w-5 h-5 text-white/40 group-hover:text-white/80 transition-colors" />
                 </Link>
             ))}
         </div>
     );
 
-    return (
-        <section className="relative min-h-[80vh] flex items-center justify-center bg-[#009de0] overflow-hidden">
-            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-12 md:py-16">
-                {/* Wolt-style Headline - NO OVERFLOW ISSUES */}
-                <div className="text-center mb-10 md:mb-12">
-                    {/* Line 1 - Static */}
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight mb-2">
-                        {lang === 'he' ? 'כישרונות.' : 'TALENT.'}
-                    </h1>
-                    
-                    {/* Line 2 - Animated - FIXED HEIGHT */}
-                    <div className="relative" style={{ height: '1em' }}>
-                        <AnimatePresence mode="wait">
-                            <motion.h2
-                                key={wordIndex}
-                                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight absolute inset-0 flex items-center justify-center"
-                                initial={{ y: 50, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -50, opacity: 0 }}
-                                transition={{ 
-                                    duration: 0.5,
-                                    ease: [0.22, 1, 0.36, 1]
-                                }}
-                            >
-                                {words[wordIndex]}.
-                            </motion.h2>
-                        </AnimatePresence>
+    const renderPackages = (packages: GigPackage[]) => (
+        <div className="mt-4 grid gap-3">
+            {packages.map(pkg => (
+                <motion.button
+                    key={pkg.id}
+                    onClick={() => sendMessage(pkg.title[lang])}
+                    className="w-full text-left p-4 bg-white/5 hover:bg-white/10 rounded-2xl border border-white/10 transition-all duration-300 group"
+                    whileHover={{ scale: 1.01 }}
+                    whileTap={{ scale: 0.99 }}
+                >
+                    <div className="flex items-center gap-4">
+                        <div className="relative w-16 h-16 rounded-xl overflow-hidden flex-shrink-0 ring-1 ring-white/20">
+                            <Image src={pkg.image} alt={pkg.title[lang]} fill className="object-cover transition-transform duration-500 group-hover:scale-110" />
+                        </div>
+                        <div className="flex-1 min-w-0">
+                            <div className="flex items-center gap-2">
+                                <span className="text-lg">{pkg.emoji}</span>
+                                <span className="font-semibold text-white truncate">{pkg.title[lang]}</span>
+                            </div>
+                            <p className="text-sm text-white/50 line-clamp-1 mt-0.5">{pkg.subtitle[lang]}</p>
+                            <p className="text-xs text-white/40 mt-1">{pkg.duration}</p>
+                        </div>
+                        <div className="flex-shrink-0">
+                            <span className="text-xs font-medium text-white/60 group-hover:text-white transition-colors">Select →</span>
+                        </div>
                     </div>
-                </div>
+                </motion.button>
+            ))}
+        </div>
+    );
 
-                {/* Search Bar */}
-                <motion.div
+    return (
+        <section className="relative min-h-screen flex items-center justify-center bg-slate-950 overflow-hidden">
+            {/* Subtle gradient background */}
+            <div className="absolute inset-0">
+                <div className="absolute inset-0 bg-gradient-to-br from-slate-900 via-slate-950 to-black" />
+                <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-blue-500/5 rounded-full blur-3xl" />
+                <div className="absolute bottom-0 right-0 w-[600px] h-[400px] bg-purple-500/5 rounded-full blur-3xl" />
+            </div>
+
+            <div className="relative z-10 w-full max-w-lg mx-auto px-4 py-12">
+                {/* Premium Badge */}
+                <motion.div 
+                    className="text-center mb-8"
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.5, delay: 0.3 }}
+                    transition={{ duration: 0.6 }}
                 >
-                    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 backdrop-blur-sm border border-white/10 rounded-full mb-6">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span className="text-xs font-medium text-white/80 uppercase tracking-wider">
+                            {lang === 'he' ? 'קונסיירז׳ פרימיום' : 'Premium Concierge'}
+                        </span>
+                    </div>
+                    <h1 className="text-4xl md:text-5xl font-bold text-white tracking-tight leading-tight">
+                        {lang === 'he' ? 'מצא את הכישרון המושלם' : 'Find Your Perfect Talent'}
+                    </h1>
+                    <p className="mt-4 text-white/50 text-lg">
+                        {lang === 'he' ? 'חוויות בלעדיות, בהתאמה אישית' : 'Exclusive experiences, personally curated'}
+                    </p>
+                </motion.div>
+
+                {/* Chat Container - Luxury Glass */}
+                <motion.div
+                    className="bg-white/[0.03] backdrop-blur-xl rounded-3xl border border-white/10 overflow-hidden shadow-2xl"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ duration: 0.6, delay: 0.2 }}
+                >
+                    {/* Messages */}
+                    <div
+                        ref={messagesContainerRef}
+                        className="max-h-[400px] overflow-y-auto p-6 space-y-6 scrollbar-hide"
+                    >
                         <AnimatePresence>
-                            {chatExpanded && (
+                            {messages.map((msg) => (
                                 <motion.div
-                                    ref={messagesContainerRef}
-                                    className="max-h-[260px] overflow-y-auto p-4 space-y-3 bg-gray-50 border-b border-gray-100"
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
+                                    key={msg.id}
+                                    className={cn(
+                                        "max-w-[90%]",
+                                        msg.role === 'user' ? 'ms-auto' : 'me-auto'
+                                    )}
+                                    initial={{ opacity: 0, y: 10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    transition={{ duration: 0.3 }}
                                 >
-                                    {messages.map((msg) => (
-                                        <motion.div
-                                            key={msg.id}
-                                            className={cn("max-w-[85%]", msg.role === 'user' ? 'ms-auto' : 'me-auto')}
-                                            initial={{ opacity: 0, y: 8 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                        >
-                                            {msg.role === 'assistant' ? (
-                                                <div className="flex items-start gap-2">
-                                                    <div className="w-7 h-7 rounded-lg bg-[#009de0] flex items-center justify-center flex-shrink-0">
-                                                        <Bot className="w-4 h-4 text-white" />
-                                                    </div>
-                                                    <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-gray-100">
-                                                        <p className="text-gray-800 text-sm">{msg.content}</p>
-                                                        {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
-                                                        {msg.suggestions && (
-                                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                                                {msg.suggestions.slice(0, 3).map((s, i) => (
-                                                                    <button key={i} onClick={() => sendMessage(s)} className="px-2.5 py-1 bg-[#009de0]/10 hover:bg-[#009de0]/20 text-[#009de0] rounded-full text-xs font-medium">
-                                                                        {s}
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                            {msg.packages && msg.packages.length > 0 && (
-                                                <div className="mt-3 grid grid-cols-1 gap-3">
-                                                    {msg.packages.map(pkg => (
+                                    {msg.role === 'assistant' ? (
+                                        <div>
+                                            <p className="text-white/90 text-base leading-relaxed">{msg.content}</p>
+                                            {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
+                                            {msg.packages && msg.packages.length > 0 && renderPackages(msg.packages)}
+                                            {msg.suggestions && msg.suggestions.length > 0 && (
+                                                <div className="flex flex-wrap gap-2 mt-4">
+                                                    {msg.suggestions.slice(0, 3).map((s, i) => (
                                                         <button
-                                                            key={pkg.id}
-                                                            onClick={() => sendMessage(pkg.title[lang])}
-                                                            className="w-full text-left bg-gray-50 hover:bg-gray-100 rounded-xl border border-gray-100 p-3 flex gap-3 items-center transition-colors"
+                                                            key={i}
+                                                            onClick={() => sendMessage(s)}
+                                                            className="px-4 py-2 bg-white/5 hover:bg-white/10 text-white/70 hover:text-white rounded-full text-sm font-medium border border-white/10 transition-all duration-200"
                                                         >
-                                                            <div className="relative w-16 h-16 rounded-lg overflow-hidden flex-shrink-0">
-                                                                <Image src={pkg.image} alt={pkg.title[lang]} fill className="object-cover" />
-                                                            </div>
-                                                            <div className="min-w-0">
-                                                                <div className="flex items-center gap-2 text-sm font-semibold text-gray-900">
-                                                                    <span>{pkg.emoji}</span>
-                                                                    <span className="truncate">{pkg.title[lang]}</span>
-                                                                </div>
-                                                                <p className="text-xs text-gray-600 line-clamp-2">{pkg.subtitle[lang]}</p>
-                                                                <div className="text-[11px] text-gray-500 mt-1">
-                                                                    {pkg.duration}
-                                                                </div>
-                                                            </div>
-                                                            <span className="text-[#009de0] text-sm font-semibold flex-shrink-0">OK</span>
+                                                            {s}
                                                         </button>
                                                     ))}
-                                                    {msg.surprise && (
-                                                        <div className="text-xs text-gray-600 bg-[#009de0]/5 border border-[#009de0]/10 rounded-lg p-2">
-                                                            {msg.surprise}
-                                                        </div>
-                                                    )}
                                                 </div>
                                             )}
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="bg-[#009de0] text-white rounded-xl rounded-br-sm px-3 py-2">
-                                                    <p className="text-sm">{msg.content}</p>
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    ))}
-                                    {isTyping && (
-                                        <div className="flex items-start gap-2">
-                                            <div className="w-7 h-7 rounded-lg bg-[#009de0] flex items-center justify-center">
-                                                <Bot className="w-4 h-4 text-white" />
-                                            </div>
-                                            <div className="bg-white rounded-xl px-4 py-3 border border-gray-100">
-                                                <div className="flex gap-1">
-                                                    {[0, 1, 2].map((i) => (
-                                                        <motion.span key={i} className="w-2 h-2 bg-[#009de0] rounded-full" animate={{ y: [0, -5, 0] }} transition={{ duration: 0.4, delay: i * 0.1, repeat: Infinity }} />
-                                                    ))}
-                                                </div>
-                                            </div>
+                                        </div>
+                                    ) : (
+                                        <div className="bg-white text-slate-900 rounded-2xl rounded-br-md px-5 py-3">
+                                            <p className="text-base">{msg.content}</p>
                                         </div>
                                     )}
                                 </motion.div>
-                            )}
+                            ))}
                         </AnimatePresence>
 
-                        <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-3 space-y-2">
-                            {/* Quick emoji CTAs */}
-                            <div className="flex items-center gap-2 overflow-x-auto scrollbar-hide pb-1">
-                                {['😂', '🎩', '🎸', '🧘‍♂️', '🎁'].map((emoji) => (
-                                    <button
-                                        key={emoji}
-                                        type="button"
-                                        onClick={() => sendMessage(emoji)}
-                                        className="px-3 py-2 bg-[#009de0]/10 text-[#009de0] rounded-full text-sm font-semibold hover:bg-[#009de0]/20 transition"
-                                    >
-                                        {emoji}
-                                    </button>
+                        {isTyping && (
+                            <motion.div
+                                className="flex items-center gap-1.5"
+                                initial={{ opacity: 0 }}
+                                animate={{ opacity: 1 }}
+                            >
+                                {[0, 1, 2].map((i) => (
+                                    <motion.span
+                                        key={i}
+                                        className="w-2 h-2 bg-white/40 rounded-full"
+                                        animate={{ opacity: [0.3, 1, 0.3] }}
+                                        transition={{ duration: 1, delay: i * 0.2, repeat: Infinity }}
+                                    />
                                 ))}
-                            </div>
-                            <div className={cn(
-                                "flex items-center gap-3 px-4 py-4 rounded-xl border-2 transition-all",
-                                isFocused ? "border-[#009de0] bg-[#009de0]/5" : "border-gray-200 bg-gray-50"
-                            )}>
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onFocus={() => setIsFocused(true)}
-                                    onBlur={() => setIsFocused(false)}
-                                    placeholder={placeholders[lang]}
-                                    className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-base"
-                                    style={{ fontSize: '16px' }}
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!input.trim()}
-                                    className={cn(
-                                        "p-3 rounded-xl transition-all",
-                                        input.trim() ? 'bg-[#009de0] text-white active:scale-95' : 'bg-gray-200 text-gray-400'
-                                    )}
-                                >
-                                    <ArrowUpRight className="w-5 h-5" />
-                                </button>
-                            </div>
-                        </form>
+                            </motion.div>
+                        )}
                     </div>
-                </motion.div>
-            </div>
 
-            {/* Wave */}
-            <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 50" fill="none" className="w-full" preserveAspectRatio="none">
-                    <path d="M0 50L1440 50V25C1200 35 960 40 720 38C480 36 240 30 0 32V50Z" className="fill-white dark:fill-slate-900" />
-                </svg>
+                    {/* Input Area */}
+                    <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-4 border-t border-white/10">
+                        <div className={cn(
+                            "flex items-center gap-3 px-5 py-4 rounded-2xl transition-all duration-300",
+                            isFocused 
+                                ? "bg-white/10 ring-1 ring-white/20" 
+                                : "bg-white/5"
+                        )}>
+                            <input
+                                ref={inputRef}
+                                type="text"
+                                value={input}
+                                onChange={(e) => setInput(e.target.value)}
+                                onFocus={() => setIsFocused(true)}
+                                onBlur={() => setIsFocused(false)}
+                                placeholder={placeholders[lang]}
+                                className="flex-1 bg-transparent text-white placeholder:text-white/40 focus:outline-none text-base"
+                                style={{ fontSize: '16px' }}
+                            />
+                            <motion.button
+                                type="submit"
+                                disabled={!input.trim()}
+                                className={cn(
+                                    "p-3 rounded-xl transition-all duration-200",
+                                    input.trim() 
+                                        ? 'bg-white text-slate-900 hover:bg-white/90' 
+                                        : 'bg-white/10 text-white/30'
+                                )}
+                                whileHover={input.trim() ? { scale: 1.05 } : {}}
+                                whileTap={input.trim() ? { scale: 0.95 } : {}}
+                            >
+                                <ArrowUp className="w-5 h-5" />
+                            </motion.button>
+                        </div>
+                    </form>
+                </motion.div>
+
+                {/* Trust indicators */}
+                <motion.div 
+                    className="flex items-center justify-center gap-6 mt-8 text-white/40 text-xs"
+                    initial={{ opacity: 0 }}
+                    animate={{ opacity: 1 }}
+                    transition={{ delay: 0.5 }}
+                >
+                    <span className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                        {lang === 'he' ? 'כישרונות מאומתים' : 'Verified talents'}
+                    </span>
+                    <span className="flex items-center gap-1.5">
+                        <span className="w-1.5 h-1.5 bg-emerald-400 rounded-full" />
+                        {lang === 'he' ? 'תשלום מאובטח' : 'Secure payment'}
+                    </span>
+                </motion.div>
             </div>
         </section>
     );
