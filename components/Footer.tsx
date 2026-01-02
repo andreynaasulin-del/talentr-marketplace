@@ -2,7 +2,6 @@
 
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
-import { Heart, Zap } from 'lucide-react';
 
 export default function Footer() {
     const { language } = useLanguage();
@@ -11,63 +10,65 @@ export default function Footer() {
 
     const content = {
         en: {
+            tagline: 'The highest standard of entertainment.',
+            findTalent: 'Find Talent',
+            forVendors: 'For Vendors',
             terms: 'Terms',
             privacy: 'Privacy',
-            partner: 'For Artists',
-            made: 'Made with',
-            in: 'Israel'
+            rights: 'All rights reserved.',
         },
         he: {
+            tagline: 'הסטנדרט הגבוה ביותר של בידור.',
+            findTalent: 'מצא כישרון',
+            forVendors: 'לספקים',
             terms: 'תנאים',
             privacy: 'פרטיות',
-            partner: 'לאמנים',
-            made: 'נוצר עם',
-            in: 'ישראל'
-        }
+            rights: 'כל הזכויות שמורות.',
+        },
     };
 
-    const t = content[lang] || content.en;
+    const t = content[lang];
 
     return (
         <footer className="bg-slate-950 border-t border-white/5">
-            <div className="max-w-xl mx-auto px-4 py-8">
-                {/* Logo */}
-                <div className="text-center mb-4">
-                    <span className="text-xl font-bold text-white tracking-tight">
-                        talent<span className="text-cyan-400">r</span>
-                    </span>
-                    <p className="text-white/30 text-xs mt-1 flex items-center justify-center gap-1">
-                        <Zap className="w-3 h-3 text-yellow-400" />
-                        {lang === 'he' ? 'הזמנת אמנים בקליק' : 'Book artists in 1 click'}
-                    </p>
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+                    {/* Logo & Tagline */}
+                    <div>
+                        <div className="flex items-center gap-2 mb-3">
+                            <div className="w-8 h-8 bg-white rounded-lg flex items-center justify-center">
+                                <span className="text-slate-900 font-black text-sm">T</span>
+                            </div>
+                            <span className="text-xl font-bold text-white tracking-tight">
+                                Talentr
+                            </span>
+                        </div>
+                        <p className="text-white/40 text-sm max-w-xs">
+                            {t.tagline}
+                        </p>
+                    </div>
+
+                    {/* Links */}
+                    <div className="flex flex-wrap gap-6 md:gap-8">
+                        <Link href="#packages" className="text-sm text-white/60 hover:text-white transition-colors">
+                            {t.findTalent}
+                        </Link>
+                        <Link href="/join" className="text-sm text-white/60 hover:text-white transition-colors">
+                            {t.forVendors}
+                        </Link>
+                        <Link href="/terms" className="text-sm text-white/60 hover:text-white transition-colors">
+                            {t.terms}
+                        </Link>
+                        <Link href="/privacy" className="text-sm text-white/60 hover:text-white transition-colors">
+                            {t.privacy}
+                        </Link>
+                    </div>
                 </div>
 
-                {/* Links */}
-                <nav className="flex items-center justify-center gap-6 mb-4">
-                    <Link
-                        href="/terms"
-                        className="text-sm text-white/40 hover:text-white transition-colors py-1"
-                    >
-                        {t.terms}
-                    </Link>
-                    <Link
-                        href="/privacy"
-                        className="text-sm text-white/40 hover:text-white transition-colors py-1"
-                    >
-                        {t.privacy}
-                    </Link>
-                    <Link
-                        href="/join"
-                        className="text-sm text-cyan-400/80 hover:text-cyan-400 transition-colors py-1 font-medium"
-                    >
-                        {t.partner}
-                    </Link>
-                </nav>
-
                 {/* Copyright */}
-                <div className="text-center">
-                    <p className="text-[11px] text-white/20 flex items-center justify-center gap-1">
-                        © {currentYear} Talentr · {t.made} <Heart className="w-3 h-3 text-red-500 fill-red-500" /> {t.in}
+                <div className="mt-12 pt-8 border-t border-white/5">
+                    <p className="text-white/30 text-xs">
+                        © {currentYear} Talentr. {t.rights}
                     </p>
                 </div>
             </div>

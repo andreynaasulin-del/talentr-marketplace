@@ -4,7 +4,7 @@ import { filterVendors } from '@/lib/vendors';
 import { Vendor, VendorCategory, City } from '@/types';
 import { rateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 import { chatMessageSchema } from '@/lib/validations';
-import { gigPackages, GigPackage, MoodTag } from '@/lib/gigs';
+import { packages, Package } from '@/lib/gigs';
 
 // ===== OPENAI INITIALIZATION =====
 let openai: OpenAI | null = null;
@@ -20,34 +20,8 @@ function getOpenAI(): OpenAI | null {
 interface ChatResponse {
     response: string;
     vendors: Vendor[];
-    packages: GigPackage[];
-    extracted: {
-        category?: VendorCategory;
-        city?: City;
-        eventType?: string;
-        mood?: MoodTag;
-    };
+    packages: Package[];
     suggestions?: string[];
-    surprise?: string;
-}
-
-// ===== MOOD DETECTION =====
-const moodKeywords: Record<MoodTag, string[]> = {
-    fun: ['laugh', 'funny', 'comedy', 'fun', 'party', 'צחוק', 'מצחיק', 'כיף', 'מסיבה', 'standup', '😂', '🎉'],
-    chill: ['relax', 'chill', 'acoustic', 'calm', 'vibes', 'רגוע', 'נינוח', 'וייבס', 'אקוסטי', '🧘', '🎸'],
-    romantic: ['romantic', 'love', 'date', 'anniversary', 'רומנטי', 'אהבה', 'דייט', 'יום נישואין', '❤️', '💕'],
-    wow: ['amazing', 'magic', 'wow', 'surprise', 'cool', 'מדהים', 'קסם', 'וואו', 'הפתעה', 'מגניב', '✨', '🎩'],
-    artsy: ['art', 'creative', 'painting', 'mural', 'אמנות', 'יצירתי', 'ציור', '🎨'],
-};
-
-function detectMood(message: string): MoodTag | undefined {
-    const lower = message.toLowerCase();
-    for (const [mood, keywords] of Object.entries(moodKeywords)) {
-        if (keywords.some(kw => lower.includes(kw))) {
-            return mood as MoodTag;
-        }
-    }
-    return undefined;
 }
 
 // ===== CATEGORY KEYWORDS (EN/HE ONLY) =====
@@ -56,12 +30,13 @@ const categoryKeywords: Record<string, VendorCategory> = {
     'dj': 'DJ', 'music': 'DJ', "דיג'יי": 'DJ', 'מוזיקה': 'DJ',
     'magician': 'Magician', 'magic': 'Magician', 'קוסם': 'Magician',
     'singer': 'Singer', 'vocalist': 'Singer', 'זמר': 'Singer',
-    'musician': 'Musician', 'band': 'Musician', 'guitar': 'Musician', 'גיטרה': 'Musician',
+    'musician': 'Musician', 'band': 'Musician', 'guitar': 'Musician', 'גיטרה': 'Musician', 'acoustic': 'Musician',
     'comedian': 'Comedian', 'comedy': 'Comedian', 'standup': 'Comedian', 'סטנדאפ': 'Comedian',
     'dancer': 'Dancer', 'dance': 'Dancer', 'רקדן': 'Dancer',
     'bartender': 'Bartender', 'cocktail': 'Bartender', 'ברמן': 'Bartender',
     'chef': 'Chef', 'sushi': 'Chef', 'cooking': 'Chef', 'שף': 'Chef', 'סושי': 'Chef',
-    'kids': 'Kids Animator', 'children': 'Kids Animator', 'ילדים': 'Kids Animator',
+    'fire': 'Performer', 'אש': 'Performer',
+    'artist': 'Face Painter', 'portrait': 'Face Painter', 'אמן': 'Face Painter',
 };
 
 const cityKeywords: Record<string, City> = {
@@ -77,35 +52,51 @@ const cityKeywords: Record<string, City> = {
 function extractFromMessage(message: string): {
     category?: VendorCategory;
     city?: City;
-    mood?: MoodTag;
+    keywords: string[];
 } {
     const lower = message.toLowerCase();
     let category: VendorCategory | undefined;
     let city: City | undefined;
+    const keywords: string[] = [];
 
     for (const [kw, cat] of Object.entries(categoryKeywords)) {
-        if (lower.includes(kw)) { category = cat; break; }
+        if (lower.includes(kw)) { 
+            category = cat; 
+            keywords.push(kw);
+            break; 
+        }
     }
     for (const [kw, c] of Object.entries(cityKeywords)) {
-        if (lower.includes(kw)) { city = c; break; }
+        if (lower.includes(kw)) { 
+            city = c; 
+            break; 
+        }
     }
 
-    const mood = detectMood(message);
-    return { category, city, mood };
+    return { category, city, keywords };
 }
 
-// ===== FIND PACKAGES BY MOOD =====
-function findPackagesByMood(mood?: MoodTag, limit: number = 4): GigPackage[] {
-    if (!mood) {
-        // Return random mix
-        const shuffled = [...gigPackages].sort(() => Math.random() - 0.5);
-        return shuffled.slice(0, limit);
+// ===== FIND PACKAGES BY KEYWORDS =====
+function findPackagesByKeywords(keywords: string[], category?: VendorCategory): Package[] {
+    if (keywords.length === 0 && !category) {
+        // Return featured packages
+        return packages.slice(0, 4);
     }
-    const matched = gigPackages.filter(pkg => pkg.moodTags.includes(mood));
-    if (matched.length >= limit) return matched.slice(0, limit);
-    // Fill with others
-    const others = gigPackages.filter(pkg => !pkg.moodTags.includes(mood));
-    return [...matched, ...others].slice(0, limit);
+
+    const matched = packages.filter(pkg => {
+        if (category && pkg.category.toLowerCase().includes(category.toLowerCase())) {
+            return true;
+        }
+        return keywords.some(kw => 
+            pkg.title.en.toLowerCase().includes(kw) ||
+            pkg.title.he.includes(kw) ||
+            pkg.description.en.toLowerCase().includes(kw) ||
+            pkg.description.he.includes(kw) ||
+            pkg.category.toLowerCase().includes(kw)
+        );
+    });
+
+    return matched.length > 0 ? matched.slice(0, 4) : packages.slice(0, 4);
 }
 
 // ===== FIND VENDORS =====
@@ -125,105 +116,69 @@ async function findVendors(
     }
 }
 
-// ===== GAMIFICATION: RANDOM SURPRISE =====
-function generateSurprise(language: string): string | undefined {
-    const shouldSurprise = Math.random() < 0.25; // 25% chance
-    if (!shouldSurprise) return undefined;
-
-    const surprises = {
-        en: [
-            "🎁 Secret bonus: First booking gets a free 10-min extension!",
-            "⚡ Flash deal: Book now and skip the queue!",
-            "🌟 VIP tip: This artist performed at Google's office party!",
-            "🎲 Lucky you! Ask for the 'sunset special' package",
-        ],
-        he: [
-            "🎁 בונוס סודי: הזמנה ראשונה מקבלת 10 דקות נוספות בחינם!",
-            "⚡ דיל בזק: הזמן עכשיו ודלג על התור!",
-            "🌟 טיפ VIP: האמן הזה הופיע במסיבה של גוגל!",
-            "🎲 מזל! בקש את חבילת ה-'sunset special'",
-        ],
-    };
-
-    const list = surprises[language as 'en' | 'he'] || surprises.en;
-    return list[Math.floor(Math.random() * list.length)];
-}
-
-// ===== AI SYSTEM PROMPT - IMPULSE VIBE-BOT =====
-const SYSTEM_PROMPT = `You are the Talentr Vibe-Bot - a fun, energetic assistant that helps people book micro-entertainment experiences in Israel.
+// ===== AI SYSTEM PROMPT - ELITE CONCIERGE =====
+const SYSTEM_PROMPT = `You are the Talentr Concierge - a professional, concise assistant that helps clients find premium entertainment packages in Israel.
 
 ## Your Personality
-- Playful, spontaneous, and enthusiastic 😎
-- Like a friend who knows all the best artists
-- Uses 2-3 emojis naturally
-- Short, punchy responses (2-3 sentences MAX)
-- Creates excitement and FOMO
+- Professional, confident, and direct
+- No fluff, no excessive emojis
+- Like a high-end hotel concierge: efficient and knowledgeable
+- Maximum 2-3 sentences per response
 
-## What You Help With
-NOT boring corporate events. You help with:
-- Surprise experiences for friends
-- Date night entertainment  
-- Balcony concerts
-- Private comedy shows
-- Art sessions
-- Chill acoustic vibes
-- Food experiences (sushi, cocktails)
+## What You Do
+Help clients choose from our curated premium packages:
+- Romantic Acoustic (guitar & vocals)
+- Magic performances
+- DJ sets
+- Private stand-up comedy
+- Sushi masterclasses
+- Live portrait sessions
+- Cocktail shows
+- Fire performances
 
-## Response Style Examples
-User: "I'm bored"
-You: "Let's fix that! 🔥 How about a comedian for your living room in 30 min? Or a guitar guy for sunset vibes? Pick: 😂 or 🎸"
+## Response Style
+Client: "I need entertainment for a date"
+You: "I recommend our Romantic Acoustic package - 45 minutes of intimate live guitar and vocals. Perfect for special moments. Fixed price: ₪850."
 
-User: "Something for a date"
-You: "Ooh romantic! 💕 I've got the perfect acoustic guitarist - imagine private concert on your balcony. She's amazing!"
-
-User: "Surprise me"
-You: "Challenge accepted! 🎲 Here are 3 wild options - a magician, a sound healer, or a sushi chef. All can be at your place TODAY!"
+Client: "What do you have for parties?"
+You: "For parties, I suggest our DJ Set TLV 2026 or the Cocktail Show. Both are crowd favorites. Which vibe fits your event?"
 
 ## Rules
-1. NEVER mention prices unprompted
-2. Keep it SHORT and impulsive
-3. Always offer quick options with emojis
-4. Create urgency ("available today!", "only 2 slots left!")
-5. Match user's language (English or Hebrew only, NO Russian)
-6. If packages found, reference them enthusiastically
+1. Always mention fixed pricing when relevant
+2. Keep responses SHORT (2-3 sentences)
+3. Be helpful but not pushy
+4. Match language (English or Hebrew only)
+5. Reference our packages by name when relevant
 
 ## Context
 [CONTEXT]`;
 
 // ===== GENERATE SUGGESTIONS =====
-function generateSuggestions(mood?: MoodTag, language: string = 'en'): string[] {
+function generateSuggestions(category?: VendorCategory, language: string = 'en'): string[] {
     const lang = language as 'en' | 'he';
     
-    const moodSuggestions: Record<MoodTag, Record<string, string[]>> = {
-        fun: {
-            en: ['More comedians', 'Magic show', 'Something crazier 🔥'],
-            he: ['עוד קומיקאים', 'מופע קסמים', 'משהו יותר מטורף 🔥'],
+    const suggestions: Record<string, Record<string, string[]>> = {
+        'Musician': {
+            en: ['Romantic acoustic?', 'DJ for a party?', 'Live jazz?'],
+            he: ['אקוסטי רומנטי?', 'DJ למסיבה?', 'ג׳אז לייב?'],
         },
-        chill: {
-            en: ['Acoustic vibes', 'Sound healing', 'Something romantic 💕'],
-            he: ['וייבס אקוסטי', 'ריפוי בצלילים', 'משהו רומנטי 💕'],
+        'Magician': {
+            en: ['Close-up magic?', 'Stage show?', 'Kids party?'],
+            he: ['קסמים מקרוב?', 'מופע במה?', 'מסיבת ילדים?'],
         },
-        romantic: {
-            en: ['Private concert', 'Sunset guitarist', 'Candlelight chef 🕯️'],
-            he: ['קונצרט פרטי', 'גיטריסט לשקיעה', 'שף לאור נרות 🕯️'],
-        },
-        wow: {
-            en: ['Street art', 'Close-up magic', 'Fire show 🔥'],
-            he: ['סטריט ארט', 'קסמים מקרוב', 'מופע אש 🔥'],
-        },
-        artsy: {
-            en: ['Live mural', 'Pottery session', 'Face painting 🎨'],
-            he: ['ציור קיר לייב', 'סדנת קדרות', 'ציור פנים 🎨'],
+        'Chef': {
+            en: ['Sushi workshop?', 'Private chef?', 'Cocktails?'],
+            he: ['סדנת סושי?', 'שף פרטי?', 'קוקטיילים?'],
         },
     };
 
-    if (mood && moodSuggestions[mood]) {
-        return moodSuggestions[mood][lang] || moodSuggestions[mood].en;
+    if (category && suggestions[category]) {
+        return suggestions[category][lang] || suggestions[category].en;
     }
 
     const defaults = {
-        en: ['Make me laugh 😂', 'Chill vibes 🎸', 'Surprise me! 🎁'],
-        he: ['תצחיק אותי 😂', 'וייבס רגועים 🎸', 'הפתע אותי! 🎁'],
+        en: ['Entertainment for a party', 'Romantic surprise', 'Corporate event'],
+        he: ['בידור למסיבה', 'הפתעה רומנטית', 'אירוע עסקי'],
     };
     return defaults[lang] || defaults.en;
 }
@@ -232,28 +187,24 @@ function generateSuggestions(mood?: MoodTag, language: string = 'en'): string[] 
 async function generateAIResponse(
     message: string,
     conversationHistory: { role: 'user' | 'assistant'; content: string }[],
-    packages: GigPackage[],
+    pkgs: Package[],
     vendors: Vendor[],
-    mood: MoodTag | undefined,
     language: string
 ): Promise<string> {
     const client = getOpenAI();
-    if (!client) return generateFallbackResponse(packages, vendors, mood, language);
+    if (!client) return generateFallbackResponse(pkgs, language);
 
     try {
-        const pkgNames = packages.map(p => p.title[language as 'en' | 'he'] || p.title.en).join(', ');
+        const pkgNames = pkgs.map(p => `${p.title[language as 'en' | 'he']} (₪${p.fixedPrice})`).join(', ');
         let context = '';
-        if (packages.length > 0) {
-            context = `[Found packages: ${pkgNames}]`;
+        if (pkgs.length > 0) {
+            context = `[Matching packages: ${pkgNames}]`;
         }
         if (vendors.length > 0) {
-            context += `\n[Found ${vendors.length} artists ready to book]`;
-        }
-        if (mood) {
-            context += `\n[Detected mood: ${mood}]`;
+            context += `\n[Found ${vendors.length} verified professionals]`;
         }
 
-        const systemPrompt = SYSTEM_PROMPT.replace('[CONTEXT]', context || '[No specific context]');
+        const systemPrompt = SYSTEM_PROMPT.replace('[CONTEXT]', context || '[No specific match]');
 
         const completion = await client.chat.completions.create({
             model: 'gpt-4o-mini',
@@ -263,38 +214,29 @@ async function generateAIResponse(
                 { role: 'user', content: message }
             ],
             max_tokens: 150,
-            temperature: 0.8,
+            temperature: 0.6,
         });
 
-        return completion.choices[0]?.message?.content || generateFallbackResponse(packages, vendors, mood, language);
+        return completion.choices[0]?.message?.content || generateFallbackResponse(pkgs, language);
     } catch (error) {
         console.error('OpenAI API error:', error);
-        return generateFallbackResponse(packages, vendors, mood, language);
+        return generateFallbackResponse(pkgs, language);
     }
 }
 
-function generateFallbackResponse(packages: GigPackage[], vendors: Vendor[], mood: MoodTag | undefined, language: string): string {
+function generateFallbackResponse(pkgs: Package[], language: string): string {
     const r = {
         en: {
-            hasPackages: "Check these out! 🔥 Perfect for your vibe.",
-            hasVendors: `Found ${vendors.length} amazing artists ready to go! 🚀`,
-            askMood: "What's the vibe? Pick an emoji: 😂 🎸 ✨ 🧘 🎨",
-            surprise: "Here's something wild! 🎲",
+            hasPackages: `I found ${pkgs.length} packages that match your request. Take a look below.`,
+            noMatch: "I'd recommend browsing our premium packages. What type of entertainment interests you?",
         },
         he: {
-            hasPackages: "תבדוק את אלה! 🔥 מושלם לוייב שלך.",
-            hasVendors: `מצאתי ${vendors.length} אמנים מדהימים מוכנים! 🚀`,
-            askMood: "מה הוייב? בחר אימוג'י: 😂 🎸 ✨ 🧘 🎨",
-            surprise: "הנה משהו מטורף! 🎲",
+            hasPackages: `מצאתי ${pkgs.length} חבילות שמתאימות לבקשה שלך. הנה למטה.`,
+            noMatch: "אני ממליץ לעיין בחבילות הפרימיום שלנו. איזה סוג בידור מעניין אותך?",
         },
-    }[language as 'en' | 'he'] || {
-        hasPackages: "Check these!", hasVendors: "Found artists!", askMood: "What vibe?", surprise: "Surprise!"
-    };
+    }[language as 'en' | 'he'] || { hasPackages: "Found packages.", noMatch: "Browse our packages." };
 
-    if (packages.length > 0) return r.hasPackages;
-    if (vendors.length > 0) return r.hasVendors;
-    if (mood) return r.surprise;
-    return r.askMood;
+    return pkgs.length > 0 ? r.hasPackages : r.noMatch;
 }
 
 // ===== MAIN HANDLER =====
@@ -305,7 +247,7 @@ export async function POST(request: NextRequest) {
         if (!rateLimitResult.success) {
             return NextResponse.json({ 
                 error: 'Rate limit',
-                response: "Whoa, slow down! 😅 Try again in a sec.",
+                response: "Please wait a moment before sending another message.",
                 vendors: [],
                 packages: [],
             }, { status: 429 });
@@ -321,8 +263,8 @@ export async function POST(request: NextRequest) {
         const conversationHistory = body.conversationHistory || [];
         const extracted = extractFromMessage(message);
         
-        // Find packages by mood first
-        const packages = findPackagesByMood(extracted.mood, 4);
+        // Find matching packages
+        const matchedPackages = findPackagesByKeywords(extracted.keywords, extracted.category);
         
         // Find vendors if specific category detected
         const vendors = extracted.category 
@@ -333,31 +275,25 @@ export async function POST(request: NextRequest) {
         const response = await generateAIResponse(
             message, 
             conversationHistory, 
-            packages, 
+            matchedPackages, 
             vendors, 
-            extracted.mood, 
             language
         );
         
-        // Gamification
-        const surprise = generateSurprise(language);
-        
         // Smart suggestions
-        const suggestions = generateSuggestions(extracted.mood, language);
+        const suggestions = generateSuggestions(extracted.category, language);
 
         return NextResponse.json({ 
             response, 
             vendors, 
-            packages,
-            extracted, 
+            packages: matchedPackages,
             suggestions: suggestions.slice(0, 3),
-            surprise,
         });
     } catch (error) {
         console.error('Chat API error:', error);
         return NextResponse.json({ 
             error: 'Internal error',
-            response: "Oops! Something went wrong. Try again! 🙈",
+            response: "Something went wrong. Please try again.",
             vendors: [],
             packages: [],
         }, { status: 500 });

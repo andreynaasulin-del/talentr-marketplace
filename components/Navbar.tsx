@@ -1,32 +1,18 @@
 'use client';
 
 import Link from 'next/link';
-import { User, LogOut, ChevronDown, Calendar, Heart } from 'lucide-react';
-import Logo from '@/components/Logo';
+import { ChevronDown } from 'lucide-react';
 import { useEffect, useState } from 'react';
-import { supabase } from '@/lib/supabase';
-import { useRouter } from 'next/navigation';
 import { useLanguage } from '@/context/LanguageContext';
-import { useFavorites } from '@/context/FavoritesContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { cn } from '@/lib/utils';
-import { toast } from 'sonner';
 
 export default function Navbar() {
-    const router = useRouter();
-    const [isAuthenticated, setIsAuthenticated] = useState(false);
     const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
-    const { language, setLanguage, t } = useLanguage();
-    const { favoritesCount } = useFavorites();
+    const { language, setLanguage } = useLanguage();
 
     useEffect(() => {
-        const checkAuth = async () => {
-            const { data: { user } } = await supabase.auth.getUser();
-            setIsAuthenticated(!!user);
-        };
-        checkAuth();
-
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
@@ -34,46 +20,65 @@ export default function Navbar() {
         return () => window.removeEventListener('scroll', handleScroll);
     }, []);
 
-    const handleSignOut = async () => {
-        await supabase.auth.signOut();
-        toast.success(language === 'he' ? 'התנתקת בהצלחה' : 'Signed out');
-        router.push('/');
-    };
-
     const languages = [
         { code: 'en' as const, label: 'EN', flag: '🇺🇸' },
         { code: 'he' as const, label: 'עב', flag: '🇮🇱' },
     ];
 
     const currentLang = languages.find((l) => l.code === language) || languages[0];
+    const lang = language as 'en' | 'he';
+
+    const content = {
+        en: {
+            findTalent: 'Find Talent',
+            becomeVendor: 'Become a Vendor',
+        },
+        he: {
+            findTalent: 'מצא כישרון',
+            becomeVendor: 'הפוך לספק',
+        },
+    };
+
+    const t = content[lang];
 
     return (
         <nav
             className={cn(
-                "sticky top-0 z-50 transition-all duration-300",
+                "fixed top-0 left-0 right-0 z-50 transition-all duration-300",
                 isScrolled
-                    ? 'bg-slate-950/90 backdrop-blur-xl border-b border-white/5'
+                    ? 'bg-white/95 backdrop-blur-xl border-b border-gray-100 shadow-sm'
                     : 'bg-transparent'
             )}
         >
-            <div className="max-w-7xl mx-auto px-4 py-3">
+            <div className="max-w-7xl mx-auto px-4 md:px-8 py-4">
                 <div className="flex items-center justify-between">
-                    {/* Logo - white for dark bg */}
+                    {/* Logo - Minimalist */}
                     <Link href="/" className="flex items-center gap-2">
-                        <span className="text-xl font-bold text-white tracking-tight">
-                            talent<span className="text-cyan-400">r</span>
+                        <div className="w-8 h-8 bg-slate-900 rounded-lg flex items-center justify-center">
+                            <span className="text-white font-black text-sm">T</span>
+                        </div>
+                        <span className={cn(
+                            "text-xl font-bold tracking-tight transition-colors",
+                            isScrolled ? "text-slate-900" : "text-white"
+                        )}>
+                            Talentr
                         </span>
                     </Link>
 
-                    {/* Right Actions */}
-                    <div className="flex items-center gap-1">
-                        {/* Language Switcher */}
+                    {/* Right: CTAs + Lang */}
+                    <div className="flex items-center gap-2 md:gap-3">
+                        {/* Language Switcher - Compact */}
                         <div className="relative">
                             <button
                                 onClick={() => setShowLangDropdown(!showLangDropdown)}
-                                className="flex items-center gap-1 px-2.5 py-2 text-sm font-bold rounded-xl text-white/70 hover:text-white hover:bg-white/5 transition-colors"
+                                className={cn(
+                                    "flex items-center gap-1 px-2 py-1.5 text-sm font-medium rounded-lg transition-colors",
+                                    isScrolled 
+                                        ? "text-slate-600 hover:bg-slate-100" 
+                                        : "text-white/80 hover:bg-white/10"
+                                )}
                             >
-                                <span className="text-lg">{currentLang.flag}</span>
+                                <span>{currentLang.flag}</span>
                                 <ChevronDown className={cn("w-3 h-3 transition-transform", showLangDropdown && 'rotate-180')} />
                             </button>
 
@@ -85,27 +90,26 @@ export default function Navbar() {
                                             onClick={() => setShowLangDropdown(false)}
                                         />
                                         <motion.div
-                                            className="absolute end-0 mt-2 w-32 py-1 z-50 bg-slate-900 rounded-xl shadow-xl border border-white/10"
+                                            className="absolute end-0 mt-2 w-28 py-1 z-50 bg-white rounded-xl shadow-xl border border-gray-100"
                                             initial={{ opacity: 0, y: -8 }}
                                             animate={{ opacity: 1, y: 0 }}
                                             exit={{ opacity: 0, y: -8 }}
                                             transition={{ duration: 0.15 }}
                                         >
-                                            {languages.map((lang) => (
+                                            {languages.map((l) => (
                                                 <button
-                                                    key={lang.code}
+                                                    key={l.code}
                                                     onClick={() => {
-                                                        setLanguage(lang.code);
+                                                        setLanguage(l.code);
                                                         setShowLangDropdown(false);
                                                     }}
                                                     className={cn(
-                                                        "w-full px-3 py-2.5 text-start flex items-center gap-2 transition-colors",
-                                                        "hover:bg-white/5",
-                                                        language === lang.code ? 'text-cyan-400' : 'text-white/70'
+                                                        "w-full px-3 py-2 text-start flex items-center gap-2 transition-colors hover:bg-slate-50",
+                                                        language === l.code ? 'text-slate-900 font-semibold' : 'text-slate-600'
                                                     )}
                                                 >
-                                                    <span className="text-lg">{lang.flag}</span>
-                                                    <span className="font-medium">{lang.label}</span>
+                                                    <span>{l.flag}</span>
+                                                    <span className="text-sm">{l.label}</span>
                                                 </button>
                                             ))}
                                         </motion.div>
@@ -114,51 +118,26 @@ export default function Navbar() {
                             </AnimatePresence>
                         </div>
 
-                        {/* Auth / User */}
-                        {isAuthenticated ? (
-                            <div className="flex items-center gap-1">
-                                {/* Favorites */}
-                                <Link
-                                    href="/favorites"
-                                    className="relative p-2.5 text-white/50 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
-                                >
-                                    <Heart className="w-5 h-5" />
-                                    {favoritesCount > 0 && (
-                                        <span className="absolute -top-0.5 -end-0.5 w-4 h-4 flex items-center justify-center text-[10px] font-bold text-white bg-red-500 rounded-full">
-                                            {favoritesCount > 9 ? '9+' : favoritesCount}
-                                        </span>
-                                    )}
-                                </Link>
+                        {/* Secondary CTA: Become a Vendor */}
+                        <Link
+                            href="/join"
+                            className={cn(
+                                "hidden md:block px-4 py-2 text-sm font-semibold rounded-lg transition-colors",
+                                isScrolled 
+                                    ? "text-slate-600 hover:text-slate-900 hover:bg-slate-100" 
+                                    : "text-white/80 hover:text-white hover:bg-white/10"
+                            )}
+                        >
+                            {t.becomeVendor}
+                        </Link>
 
-                                {/* Bookings */}
-                                <Link
-                                    href="/bookings"
-                                    className="p-2.5 text-white/50 hover:text-cyan-400 hover:bg-cyan-500/10 rounded-xl transition-colors"
-                                >
-                                    <Calendar className="w-5 h-5" />
-                                </Link>
-
-                                {/* Sign out */}
-                                <button
-                                    onClick={handleSignOut}
-                                    className="p-2.5 text-white/30 hover:text-red-400 hover:bg-red-500/10 rounded-xl transition-colors"
-                                >
-                                    <LogOut className="w-5 h-5" />
-                                </button>
-
-                                {/* Avatar */}
-                                <div className="w-8 h-8 rounded-full bg-gradient-to-tr from-cyan-500 to-purple-500 flex items-center justify-center">
-                                    <User className="w-4 h-4 text-white" />
-                                </div>
-                            </div>
-                        ) : (
-                            <Link
-                                href="/signin"
-                                className="px-4 py-2 rounded-xl font-bold text-slate-950 bg-white text-sm transition-all hover:bg-cyan-400"
-                            >
-                                {t('Sign In')}
-                            </Link>
-                        )}
+                        {/* Primary CTA: Find Talent */}
+                        <Link
+                            href="#packages"
+                            className="px-4 md:px-5 py-2 md:py-2.5 bg-slate-900 text-white text-sm font-bold rounded-lg hover:bg-slate-800 transition-colors"
+                        >
+                            {t.findTalent}
+                        </Link>
                     </div>
                 </div>
             </div>

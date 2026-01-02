@@ -7,7 +7,6 @@ import HeroSection from '@/components/HeroSection';
 import GigCarousel from '@/components/GigCarousel';
 import { supabase } from '@/lib/supabase';
 
-// Dynamic imports for below-fold components
 const Footer = dynamic(() => import('@/components/Footer'));
 
 export default function Home() {
@@ -34,13 +33,13 @@ export default function Home() {
     if (isLoading) {
         return (
             <div className="min-h-screen flex items-center justify-center bg-slate-950">
-                <div className="w-10 h-10 border-3 border-cyan-500 border-t-transparent rounded-full animate-spin" />
+                <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen bg-slate-950">
+        <main className="min-h-screen">
             <Navbar />
             <HeroSection />
             <GigCarousel />
