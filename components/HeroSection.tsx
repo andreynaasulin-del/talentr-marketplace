@@ -2,7 +2,7 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
-import { MessageCircle } from 'lucide-react';
+import { MessageCircle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
 
 export default function HeroSection() {
@@ -14,9 +14,7 @@ export default function HeroSection() {
             headline: 'The Highest Standard of Entertainment.',
             subheadline: 'No Compromises.',
             description: 'The only ecosystem in Israel where verified industry leaders are gathered. Your search ends here.',
-            cta: 'Choose Package',
-            chat: 'Chat with AI Assistant',
-            chatDesc: 'Tell us what you need and we\'ll find the perfect talent',
+            chat: 'Tell us what you need...',
             forMasters: 'For Masters',
             forMastersDesc: 'Focus on what you do best. We ensure your talent earns what it deserves.',
             forMastersCta: 'Apply Now',
@@ -25,9 +23,7 @@ export default function HeroSection() {
             headline: 'הסטנדרט הגבוה ביותר של בידור.',
             subheadline: 'ללא פשרות.',
             description: 'המערכת היחידה בישראל בה מרוכזים מובילי התעשייה המאומתים. החיפוש שלכם נגמר כאן.',
-            cta: 'בחר חבילה',
-            chat: 'שוחח עם העוזר החכם',
-            chatDesc: 'ספר לנו מה אתה צריך ונמצא את הכישרון המושלם',
+            chat: 'ספרו לנו מה אתם צריכים...',
             forMasters: 'לאמנים',
             forMastersDesc: 'התמקדו במה שאתם עושים הכי טוב. אנחנו נדאג שהכישרון שלכם ירוויח את מה שמגיע לו.',
             forMastersCta: 'הגש מועמדות',
@@ -65,22 +61,19 @@ export default function HeroSection() {
                         {t.description}
                     </p>
 
-                    <div className="flex flex-col sm:flex-row gap-4 justify-center mt-10">
-                        <a
-                            href="#packages"
-                            className="inline-block px-8 py-4 bg-white text-slate-950 font-bold text-lg rounded-xl hover:bg-amber-400 transition-colors shadow-2xl shadow-white/10"
-                        >
-                            {t.cta}
-                        </a>
-                        
-                        <Link
-                            href="#chat"
-                            className="inline-flex items-center justify-center gap-3 px-8 py-4 bg-gradient-to-r from-blue-600 to-blue-500 text-white font-bold text-lg rounded-xl hover:from-blue-500 hover:to-blue-400 transition-all shadow-2xl shadow-blue-500/20"
-                        >
-                            <MessageCircle className="w-5 h-5" />
+                    {/* Wolt-style Chat Input */}
+                    <Link
+                        href="#chat"
+                        className="group flex items-center gap-4 w-full max-w-xl mx-auto mt-10 px-6 py-4 bg-white rounded-2xl shadow-2xl shadow-white/10 hover:shadow-white/20 transition-all cursor-pointer"
+                    >
+                        <MessageCircle className="w-6 h-6 text-slate-400 group-hover:text-blue-500 transition-colors" />
+                        <span className="flex-1 text-slate-400 text-lg text-start">
                             {t.chat}
-                        </Link>
-                    </div>
+                        </span>
+                        <div className="w-10 h-10 bg-blue-500 rounded-xl flex items-center justify-center group-hover:bg-blue-600 transition-colors">
+                            <Sparkles className="w-5 h-5 text-white" />
+                        </div>
+                    </Link>
                 </motion.div>
 
                 {/* For Masters Block */}
