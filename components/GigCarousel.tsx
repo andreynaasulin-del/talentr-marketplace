@@ -15,7 +15,7 @@ interface GigCard {
 const gigs: GigCard[] = [
     { id: '1', title: { en: 'Magic Night', he: 'לילה קסום' }, hint: { en: 'wow for your friends', he: 'וואו לחברים' }, image: 'https://images.unsplash.com/photo-1503095396549-807759245b35?w=500&h=500&fit=crop&q=80' },
     { id: '2', title: { en: 'Beat Drop', he: 'הביט שלך' }, hint: { en: 'turn on the mood', he: 'מדליק את הווייב' }, image: 'https://images.unsplash.com/photo-1493225457124-a3eb161ffa5f?w=500&h=500&fit=crop&q=80' },
-    { id: '3', title: { en: 'Chef's Table', he: 'שולחן השף' }, hint: { en: 'tiny bites, big smiles', he: 'ביסים קטנים, חיוכים גדולים' }, image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=500&h=500&fit=crop&q=80' },
+    { id: '3', title: { en: "Chef's Table", he: 'שולחן השף' }, hint: { en: 'tiny bites, big smiles', he: 'ביסים קטנים, חיוכים גדולים' }, image: 'https://images.unsplash.com/photo-1577219491135-ce391730fb2c?w=500&h=500&fit=crop&q=80' },
     { id: '4', title: { en: 'Your Story', he: 'הסיפור שלכם' }, hint: { en: 'make it feel cinematic', he: 'להפוך את זה לקולנועי' }, image: 'https://images.unsplash.com/photo-1542038784456-1ea8e935640e?w=500&h=500&fit=crop&q=80' },
     { id: '5', title: { en: 'Poker Night', he: 'ערב פוקר' }, hint: { en: 'instant game energy', he: 'אנרגיית משחק מיידית' }, image: 'https://images.unsplash.com/photo-1511193311914-0346f16efe90?w=500&h=500&fit=crop&q=80' },
     { id: '6', title: { en: 'Stage Master', he: 'אדון הבמה' }, hint: { en: 'host the vibe', he: 'מנחה את הווייב' }, image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=500&h=500&fit=crop&q=80' },
@@ -25,7 +25,7 @@ const gigs: GigCard[] = [
     { id: '10', title: { en: 'Cinematic', he: 'קולנוע חי' }, hint: { en: 'make it a moment', he: 'לעשות מזה רגע' }, image: 'https://images.unsplash.com/photo-1574717024653-61fd2cf4d44d?w=500&h=500&fit=crop&q=80' },
     { id: '11', title: { en: 'Sound Healer', he: 'מרפא בצלילים' }, hint: { en: 'deep chill reset', he: 'ריסט צ׳יל עמוק' }, image: 'https://images.unsplash.com/photo-1506905925346-21bda4d32df4?w=500&h=500&fit=crop&q=80' },
     { id: '12', title: { en: 'Samba Queen', he: 'מלכת הסמבה' }, hint: { en: 'energy spike', he: 'בוסט אנרגיה' }, image: 'https://images.unsplash.com/photo-1504609773096-104ff2c73ba4?w=500&h=500&fit=crop&q=80' },
-    { id: '13', title: { en: 'Sushi Chef', he: 'שף סושי' }, hint: { en: 'so everyone's happy', he: 'כדי שכולם יהיו מרוצים' }, image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500&h=500&fit=crop&q=80' },
+    { id: '13', title: { en: 'Sushi Chef', he: 'שף סושי' }, hint: { en: "so everyone's happy", he: 'כדי שכולם יהיו מרוצים' }, image: 'https://images.unsplash.com/photo-1579584425555-c3ce17fd4351?w=500&h=500&fit=crop&q=80' },
     { id: '14', title: { en: 'Fire Show', he: 'מופע אש' }, hint: { en: 'tiny wow explosion', he: 'פיצוץ וואו קטן' }, image: 'https://images.unsplash.com/photo-1533174072545-7a4b6ad7a6c3?w=500&h=500&fit=crop&q=80' },
     { id: '15', title: { en: 'Aerial Silk', he: 'משי אווירי' }, hint: { en: 'art in the air', he: 'אמנות באוויר' }, image: 'https://images.unsplash.com/photo-1518611012118-696072aa579a?w=500&h=500&fit=crop&q=80' },
     { id: '16', title: { en: 'Sax Sunset', he: 'סקסופון שקיעה' }, hint: { en: 'romance button', he: 'כפתור רומנטיקה' }, image: 'https://images.unsplash.com/photo-1511379938547-c1f69419868d?w=500&h=500&fit=crop&q=80' },
