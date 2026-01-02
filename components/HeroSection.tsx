@@ -23,10 +23,10 @@ interface ChatAPIResponse {
     suggestions?: string[];
 }
 
-// Animated words like Wolt
+// Animated words - Wolt style
 const animatedWords = {
-    en: ['WEDDINGS', 'BIRTHDAYS', 'PARTIES', 'CORPORATE', 'BAR MITZVAHS'],
-    he: ['חתונות', 'ימי הולדת', 'מסיבות', 'אירועים', 'בר מצוות']
+    en: ['WEDDINGS', 'BIRTHDAYS', 'PARTIES', 'EVENTS', 'DREAMS'],
+    he: ['חתונות', 'ימי הולדת', 'מסיבות', 'אירועים', 'חלומות']
 };
 
 export default function HeroSection() {
@@ -43,7 +43,7 @@ export default function HeroSection() {
     const lang = language as 'en' | 'he';
     const words = animatedWords[lang];
 
-    // Rotate words every 2.5 seconds
+    // Rotate words
     useEffect(() => {
         const interval = setInterval(() => {
             setWordIndex((prev) => (prev + 1) % words.length);
@@ -56,7 +56,6 @@ export default function HeroSection() {
         he: "מה אתם חוגגים? ✨"
     };
 
-    // Scroll to bottom of messages
     useEffect(() => {
         if (messagesContainerRef.current && chatExpanded) {
             messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
@@ -67,9 +66,7 @@ export default function HeroSection() {
         const messageText = text || input.trim();
         if (!messageText) return;
 
-        if (!chatExpanded) {
-            setChatExpanded(true);
-        }
+        if (!chatExpanded) setChatExpanded(true);
 
         const userMessage: Message = {
             id: Date.now().toString(),
@@ -88,7 +85,6 @@ export default function HeroSection() {
             });
 
             if (!response.ok) throw new Error('API error');
-
             const data: ChatAPIResponse = await response.json();
 
             setMessages(prev => [...prev, {
@@ -119,51 +115,43 @@ export default function HeroSection() {
                     className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-[#009de0]/10 rounded-xl transition-colors group"
                 >
                     <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
-                        <Image
-                            src={vendor.imageUrl || '/placeholder-vendor.jpg'}
-                            alt={vendor.name}
-                            fill
-                            className="object-cover"
-                        />
+                        <Image src={vendor.imageUrl || '/placeholder-vendor.jpg'} alt={vendor.name} fill className="object-cover" />
                     </div>
                     <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">
-                            {vendor.name}
-                        </p>
+                        <p className="font-semibold text-gray-900 truncate">{vendor.name}</p>
                         <div className="flex items-center gap-1.5 text-sm text-gray-500">
                             <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
                             {vendor.rating} · {vendor.city}
                         </div>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#009de0] group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#009de0] transition-all" />
                 </Link>
             ))}
         </div>
     );
 
     return (
-        <section className="relative min-h-[75vh] md:min-h-[80vh] flex items-center justify-center bg-[#009de0]">
-            {/* Content */}
-            <div className="relative z-10 w-full max-w-xl mx-auto px-4 py-8 md:py-12">
-                {/* Wolt-style Headline - BIG & ANIMATED */}
-                <div className="text-center mb-8 md:mb-10">
-                    {/* Static line */}
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight">
+        <section className="relative min-h-[80vh] flex items-center justify-center bg-[#009de0]">
+            <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-12 md:py-16">
+                {/* Wolt-style Headline */}
+                <div className="text-center mb-10">
+                    {/* Line 1 - Static */}
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tight">
                         {lang === 'he' ? 'כישרונות.' : 'TALENT.'}
                     </h1>
                     
-                    {/* Animated rotating word */}
-                    <div className="h-[1.2em] overflow-hidden mt-1">
+                    {/* Line 2 - Animated with proper container */}
+                    <div className="h-[1.1em] relative overflow-hidden">
                         <AnimatePresence mode="wait">
                             <motion.h2
                                 key={wordIndex}
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight"
-                                initial={{ y: 60, opacity: 0 }}
-                                animate={{ y: 0, opacity: 1 }}
-                                exit={{ y: -60, opacity: 0 }}
+                                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tight absolute inset-x-0"
+                                initial={{ y: '100%', opacity: 0 }}
+                                animate={{ y: '0%', opacity: 1 }}
+                                exit={{ y: '-100%', opacity: 0 }}
                                 transition={{ 
-                                    duration: 0.4,
-                                    ease: [0.25, 0.46, 0.45, 0.94]
+                                    duration: 0.5,
+                                    ease: [0.22, 1, 0.36, 1]
                                 }}
                             >
                                 {words[wordIndex]}.
@@ -172,31 +160,26 @@ export default function HeroSection() {
                     </div>
                 </div>
 
-                {/* AI Search Bar - Wolt style */}
+                {/* Search Bar */}
                 <motion.div
                     initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.2 }}
+                    transition={{ duration: 0.5, delay: 0.3 }}
                 >
-                    <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
-                        {/* Expanded Chat Area */}
+                    <div className="bg-white rounded-2xl shadow-2xl overflow-hidden">
                         <AnimatePresence>
                             {chatExpanded && (
                                 <motion.div
                                     ref={messagesContainerRef}
-                                    className="max-h-[280px] overflow-y-auto p-4 space-y-3 bg-gray-50 border-b border-gray-100"
+                                    className="max-h-[260px] overflow-y-auto p-4 space-y-3 bg-gray-50 border-b border-gray-100"
                                     initial={{ height: 0, opacity: 0 }}
                                     animate={{ height: 'auto', opacity: 1 }}
                                     exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.2 }}
                                 >
                                     {messages.map((msg) => (
                                         <motion.div
                                             key={msg.id}
-                                            className={cn(
-                                                "max-w-[85%]",
-                                                msg.role === 'user' ? 'ms-auto' : 'me-auto'
-                                            )}
+                                            className={cn("max-w-[85%]", msg.role === 'user' ? 'ms-auto' : 'me-auto')}
                                             initial={{ opacity: 0, y: 8 }}
                                             animate={{ opacity: 1, y: 0 }}
                                         >
@@ -206,16 +189,12 @@ export default function HeroSection() {
                                                         <Bot className="w-4 h-4 text-white" />
                                                     </div>
                                                     <div className="bg-white rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-gray-100">
-                                                        <p className="text-gray-800 text-sm leading-relaxed">{msg.content}</p>
+                                                        <p className="text-gray-800 text-sm">{msg.content}</p>
                                                         {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
-                                                        {msg.suggestions && msg.suggestions.length > 0 && (
+                                                        {msg.suggestions && (
                                                             <div className="flex flex-wrap gap-1.5 mt-2">
                                                                 {msg.suggestions.slice(0, 3).map((s, i) => (
-                                                                    <button
-                                                                        key={i}
-                                                                        onClick={() => sendMessage(s)}
-                                                                        className="px-2.5 py-1 bg-[#009de0]/10 hover:bg-[#009de0]/20 text-[#009de0] rounded-full text-xs font-medium transition-colors"
-                                                                    >
+                                                                    <button key={i} onClick={() => sendMessage(s)} className="px-2.5 py-1 bg-[#009de0]/10 hover:bg-[#009de0]/20 text-[#009de0] rounded-full text-xs font-medium">
                                                                         {s}
                                                                     </button>
                                                                 ))}
@@ -224,27 +203,21 @@ export default function HeroSection() {
                                                     </div>
                                                 </div>
                                             ) : (
-                                                <div className="bg-[#009de0] text-white rounded-xl rounded-br-sm px-3 py-2 shadow-sm">
+                                                <div className="bg-[#009de0] text-white rounded-xl rounded-br-sm px-3 py-2">
                                                     <p className="text-sm">{msg.content}</p>
                                                 </div>
                                             )}
                                         </motion.div>
                                     ))}
-
                                     {isTyping && (
                                         <div className="flex items-start gap-2">
                                             <div className="w-7 h-7 rounded-lg bg-[#009de0] flex items-center justify-center">
                                                 <Bot className="w-4 h-4 text-white" />
                                             </div>
-                                            <div className="bg-white rounded-xl px-4 py-3 shadow-sm border border-gray-100">
+                                            <div className="bg-white rounded-xl px-4 py-3 border border-gray-100">
                                                 <div className="flex gap-1">
                                                     {[0, 1, 2].map((i) => (
-                                                        <motion.span
-                                                            key={i}
-                                                            className="w-2 h-2 bg-[#009de0] rounded-full"
-                                                            animate={{ y: [0, -5, 0] }}
-                                                            transition={{ duration: 0.4, delay: i * 0.1, repeat: Infinity }}
-                                                        />
+                                                        <motion.span key={i} className="w-2 h-2 bg-[#009de0] rounded-full" animate={{ y: [0, -5, 0] }} transition={{ duration: 0.4, delay: i * 0.1, repeat: Infinity }} />
                                                     ))}
                                                 </div>
                                             </div>
@@ -254,16 +227,10 @@ export default function HeroSection() {
                             )}
                         </AnimatePresence>
 
-                        {/* Input Area - Clean, thumb-friendly */}
-                        <form
-                            onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                            className="p-3"
-                        >
+                        <form onSubmit={(e) => { e.preventDefault(); sendMessage(); }} className="p-3">
                             <div className={cn(
-                                "flex items-center gap-3 px-4 py-3.5 rounded-xl border-2 transition-all",
-                                isFocused
-                                    ? "border-[#009de0] bg-[#009de0]/5"
-                                    : "border-gray-200 bg-gray-50"
+                                "flex items-center gap-3 px-4 py-4 rounded-xl border-2 transition-all",
+                                isFocused ? "border-[#009de0] bg-[#009de0]/5" : "border-gray-200 bg-gray-50"
                             )}>
                                 <input
                                     ref={inputRef}
@@ -272,7 +239,7 @@ export default function HeroSection() {
                                     onChange={(e) => setInput(e.target.value)}
                                     onFocus={() => setIsFocused(true)}
                                     onBlur={() => setIsFocused(false)}
-                                    placeholder={placeholders[lang] || placeholders.en}
+                                    placeholder={placeholders[lang]}
                                     className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-base"
                                     style={{ fontSize: '16px' }}
                                 />
@@ -280,10 +247,8 @@ export default function HeroSection() {
                                     type="submit"
                                     disabled={!input.trim()}
                                     className={cn(
-                                        "p-2.5 rounded-xl transition-all",
-                                        input.trim()
-                                            ? 'bg-[#009de0] text-white active:scale-95'
-                                            : 'bg-gray-200 text-gray-400'
+                                        "p-3 rounded-xl transition-all",
+                                        input.trim() ? 'bg-[#009de0] text-white active:scale-95' : 'bg-gray-200 text-gray-400'
                                     )}
                                 >
                                     <Send className="w-5 h-5" />
@@ -294,10 +259,10 @@ export default function HeroSection() {
                 </motion.div>
             </div>
 
-            {/* Clean wave transition */}
+            {/* Wave */}
             <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 40" fill="none" className="w-full" preserveAspectRatio="none">
-                    <path d="M0 40L1440 40V20C1200 30 960 35 720 32C480 29 240 25 0 28V40Z" className="fill-white dark:fill-slate-900" />
+                <svg viewBox="0 0 1440 50" fill="none" className="w-full" preserveAspectRatio="none">
+                    <path d="M0 50L1440 50V25C1200 35 960 40 720 38C480 36 240 30 0 32V50Z" className="fill-white dark:fill-slate-900" />
                 </svg>
             </div>
         </section>
