@@ -23,6 +23,12 @@ interface ChatAPIResponse {
     suggestions?: string[];
 }
 
+// Animated words like Wolt
+const animatedWords = {
+    en: ['WEDDINGS', 'BIRTHDAYS', 'PARTIES', 'CORPORATE', 'BAR MITZVAHS'],
+    he: ['חתונות', 'ימי הולדת', 'מסיבות', 'אירועים', 'בר מצוות']
+};
+
 export default function HeroSection() {
     const { language } = useLanguage();
     const [messages, setMessages] = useState<Message[]>([]);
@@ -30,10 +36,20 @@ export default function HeroSection() {
     const [isTyping, setIsTyping] = useState(false);
     const [isFocused, setIsFocused] = useState(false);
     const [chatExpanded, setChatExpanded] = useState(false);
+    const [wordIndex, setWordIndex] = useState(0);
     const messagesContainerRef = useRef<HTMLDivElement>(null);
     const inputRef = useRef<HTMLInputElement>(null);
 
     const lang = language as 'en' | 'he';
+    const words = animatedWords[lang];
+
+    // Rotate words every 2.5 seconds
+    useEffect(() => {
+        const interval = setInterval(() => {
+            setWordIndex((prev) => (prev + 1) % words.length);
+        }, 2500);
+        return () => clearInterval(interval);
+    }, [words.length]);
 
     const placeholders = {
         en: "What are you celebrating? ✨",
@@ -100,7 +116,7 @@ export default function HeroSection() {
                 <Link
                     key={vendor.id}
                     href={`/vendor/${vendor.id}`}
-                    className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 rounded-xl transition-colors group"
+                    className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-[#009de0]/10 rounded-xl transition-colors group"
                 >
                     <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
                         <Image
@@ -119,38 +135,48 @@ export default function HeroSection() {
                             {vendor.rating} · {vendor.city}
                         </div>
                     </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
+                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-[#009de0] group-hover:translate-x-1 transition-all" />
                 </Link>
             ))}
         </div>
     );
 
     return (
-        <section className="relative min-h-[70vh] md:min-h-[75vh] flex items-center justify-center bg-[#009de0]">
-            {/* Wolt-style solid color - no gradients */}
-            
+        <section className="relative min-h-[75vh] md:min-h-[80vh] flex items-center justify-center bg-[#009de0]">
             {/* Content */}
             <div className="relative z-10 w-full max-w-xl mx-auto px-4 py-8 md:py-12">
-                {/* Headline - Minimal like Wolt */}
-                <motion.div
-                    className="text-center mb-6 md:mb-8"
-                    initial={{ opacity: 0, y: 15 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3 }}
-                >
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mb-2 leading-tight">
-                        {lang === 'he' ? 'מצאו כישרונות.' : 'Find talent.'}
+                {/* Wolt-style Headline - BIG & ANIMATED */}
+                <div className="text-center mb-8 md:mb-10">
+                    {/* Static line */}
+                    <h1 className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight">
+                        {lang === 'he' ? 'כישרונות.' : 'TALENT.'}
                     </h1>
-                    <p className="text-lg md:text-xl text-white/90 font-medium">
-                        {lang === 'he' ? 'לכל אירוע.' : 'For any event.'}
-                    </p>
-                </motion.div>
+                    
+                    {/* Animated rotating word */}
+                    <div className="h-[1.2em] overflow-hidden mt-1">
+                        <AnimatePresence mode="wait">
+                            <motion.h2
+                                key={wordIndex}
+                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-none tracking-tight"
+                                initial={{ y: 60, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -60, opacity: 0 }}
+                                transition={{ 
+                                    duration: 0.4,
+                                    ease: [0.25, 0.46, 0.45, 0.94]
+                                }}
+                            >
+                                {words[wordIndex]}.
+                            </motion.h2>
+                        </AnimatePresence>
+                    </div>
+                </div>
 
                 {/* AI Search Bar - Wolt style */}
                 <motion.div
-                    initial={{ opacity: 0, y: 15 }}
+                    initial={{ opacity: 0, y: 20 }}
                     animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.3, delay: 0.1 }}
+                    transition={{ duration: 0.4, delay: 0.2 }}
                 >
                     <div className="bg-white rounded-2xl shadow-xl overflow-hidden">
                         {/* Expanded Chat Area */}
@@ -248,7 +274,7 @@ export default function HeroSection() {
                                     onBlur={() => setIsFocused(false)}
                                     placeholder={placeholders[lang] || placeholders.en}
                                     className="flex-1 bg-transparent text-gray-900 placeholder:text-gray-400 focus:outline-none text-base"
-                                    style={{ fontSize: '16px' }} // Prevents iOS zoom
+                                    style={{ fontSize: '16px' }}
                                 />
                                 <button
                                     type="submit"
