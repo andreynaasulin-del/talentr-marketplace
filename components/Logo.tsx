@@ -10,52 +10,37 @@ interface LogoProps {
 }
 
 const sizeClasses = {
-    sm: 'text-lg',
-    md: 'text-xl',
-    lg: 'text-2xl',
-    xl: 'text-3xl',
-};
-
-const svgSizes = {
-    sm: { width: 6, height: 8, top: -1 },
-    md: { width: 8, height: 10, top: -2 },
-    lg: { width: 10, height: 12, top: -2 },
-    xl: { width: 12, height: 14, top: -3 },
+    sm: 'text-[18px]',
+    md: 'text-[22px]',
+    lg: 'text-[28px]',
+    xl: 'text-[42px]',
 };
 
 export default function Logo({ size = 'md', asLink = true, className }: LogoProps) {
     const textClass = sizeClasses[size];
-    const svg = svgSizes[size];
     
     const content = (
         <span 
             dir="ltr" 
             className={cn(
-                "font-black text-gray-900 dark:text-white flex items-baseline",
+                "font-bold text-slate-900 dark:text-white flex items-baseline tracking-[-0.04em]",
                 textClass,
                 className
             )}
         >
             <span>talent</span>
-            <span className="relative">
+            <span className="relative inline-flex">
                 <span>r</span>
-                {/* Blue accent - only the top curve of "r" */}
+                {/* Precisely integrated blue accent */}
                 <svg 
-                    className="absolute right-0 pointer-events-none" 
-                    style={{ 
-                        top: svg.top,
-                        width: svg.width,
-                        height: svg.height,
-                    }}
-                    viewBox="0 0 10 12" 
+                    className="absolute -top-[0.1em] -right-[0.05em] w-[0.55em] h-[0.55em] pointer-events-none"
+                    viewBox="0 0 24 24" 
                     fill="none"
+                    xmlns="http://www.w3.org/2000/svg"
                 >
                     <path 
-                        d="M2 12V6C2 3 4 1 8 1" 
-                        stroke="#009de0" 
-                        strokeWidth="3" 
-                        strokeLinecap="round"
-                        fill="none"
+                        d="M4 16C4 16 6 6 16 5C20 4.5 22 8 22 8C22 8 18 9 14 12C10 15 4 16 4 16Z" 
+                        fill="#009de0"
                     />
                 </svg>
             </span>
@@ -64,7 +49,7 @@ export default function Logo({ size = 'md', asLink = true, className }: LogoProp
 
     if (asLink) {
         return (
-            <Link href="/" className="focus:outline-none">
+            <Link href="/" className="focus:outline-none group inline-block">
                 {content}
             </Link>
         );
@@ -72,4 +57,3 @@ export default function Logo({ size = 'md', asLink = true, className }: LogoProp
 
     return content;
 }
-
