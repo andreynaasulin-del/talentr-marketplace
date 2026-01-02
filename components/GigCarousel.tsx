@@ -32,10 +32,10 @@ export default function GigCarousel() {
 
     const t = content[lang];
 
-    // Split packages for two rows - ensure we show all packages
-    const halfLength = Math.ceil(packages.length / 2);
-    const firstRow = packages.slice(0, halfLength);
-    const secondRow = packages.slice(halfLength);
+    // Split packages for two rows - ensure we always have two rows
+    const allPackages = [...packages, ...packages]; // Double to ensure enough for 2 rows
+    const firstRow = allPackages.slice(0, 10);
+    const secondRow = allPackages.slice(10, 20);
 
     return (
         <section id="packages" className="py-20 md:py-28 bg-slate-950 overflow-visible">
@@ -55,14 +55,14 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            <div className="space-y-8">
+            <div className="flex flex-col gap-8" style={{ direction: 'ltr' }}>
                 {/* Marquee Row 1 - Right to Left */}
-                <div className="flex w-full">
+                <div className="block w-full">
                     <MarqueeRow items={firstRow} direction="left" lang={lang} t={t} />
                 </div>
 
                 {/* Marquee Row 2 - Left to Right */}
-                <div className="flex w-full">
+                <div className="block w-full">
                     <MarqueeRow items={secondRow} direction="right" lang={lang} t={t} />
                 </div>
             </div>
