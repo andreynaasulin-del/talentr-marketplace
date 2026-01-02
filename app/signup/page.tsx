@@ -4,7 +4,7 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, Eye, EyeOff, User, Globe, ChevronDown, Sparkles, ArrowRight, Check } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, User, ChevronDown, ArrowRight, Check } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 
 export default function SignUpPage() {
@@ -41,10 +41,11 @@ export default function SignUpPage() {
             if (error) throw error;
 
             if (data.user) {
-                router.push('/profile');
+                router.push('/');
             }
-        } catch (err: any) {
-            setError(err.message || 'Failed to create account');
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to create account';
+            setError(errorMessage);
         } finally {
             setLoading(false);
         }
@@ -56,15 +57,12 @@ export default function SignUpPage() {
                 provider: 'google',
                 options: {
                     redirectTo: `${window.location.origin}/auth/callback`,
-                    queryParams: {
-                        access_type: 'offline',
-                        prompt: 'consent',
-                    },
                 },
             });
             if (error) throw error;
-        } catch (err: any) {
-            setError(err.message || 'Failed to sign up with Google');
+        } catch (err: unknown) {
+            const errorMessage = err instanceof Error ? err.message : 'Failed to sign up with Google';
+            setError(errorMessage);
         }
     };
 
@@ -77,52 +75,43 @@ export default function SignUpPage() {
     };
 
     const languages = [
-        { code: 'en' as const, label: 'English', flag: '🇺🇸' },
-        { code: 'he' as const, label: 'עברית', flag: '🇮🇱' },
+        { code: 'en' as const, label: 'EN', flag: '🇺🇸' },
+        { code: 'he' as const, label: 'עב', flag: '🇮🇱' },
     ];
 
     const currentLang = languages.find((l) => l.code === language) || languages[0];
 
-    const benefits = [
-        'Access to 500+ verified professionals',
-        'Secure payments with money-back guarantee',
+    const benefits = language === 'he' ? [
+        'גישה ל-500+ מקצוענים מאומתים',
+        'תשלום מאובטח עם ערבות',
+        'אישור הזמנה מיידי',
+    ] : [
+        'Access to 500+ verified pros',
+        'Secure payments',
         'Instant booking confirmation',
-        'Dedicated customer support',
     ];
 
     return (
         <div className="min-h-screen flex" dir={language === 'he' ? 'rtl' : 'ltr'}>
-            {/* Left Side - Benefits */}
-            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden">
-                {/* Background */}
-                <div className="absolute inset-0 bg-blue-600" />
-
-                {/* Gradient Overlay */}
-                <div className="absolute inset-0 bg-gradient-to-br from-blue-500/50 to-blue-700/50" />
-
-                {/* Subtle Orbs */}
-                <div className="absolute top-32 right-20 w-80 h-80 bg-white/10 rounded-full blur-3xl" />
-                <div className="absolute bottom-20 left-20 w-64 h-64 bg-white/5 rounded-full blur-3xl" />
-
+            {/* Left Side - Wolt Blue */}
+            <div className="hidden lg:flex lg:w-1/2 relative overflow-hidden bg-[#009de0]">
                 {/* Content */}
                 <div className="relative z-10 flex flex-col justify-between p-12 text-white w-full">
                     {/* Logo */}
-                    <Link href="/" className="text-3xl font-bold">
+                    <Link href="/" dir="ltr" className="text-3xl font-black">
                         talent<span className="text-white/80">r</span>
                     </Link>
 
                     {/* Main Content */}
                     <div className="max-w-md">
-                        <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/20 rounded-full text-sm font-medium mb-6">
-                            <Sparkles className="w-4 h-4" />
-                            Join 10,000+ Happy Clients
-                        </div>
-
-                        <h2 className="text-5xl font-bold leading-tight mb-6">
-                            Find your perfect event professional
+                        <h2 className="text-5xl font-black leading-tight mb-6">
+                            {language === 'he' ? 'הצטרפו אלינו' : 'Join us today'}
                         </h2>
                         <p className="text-xl text-white/80 mb-10">
-                            Create a free account and start booking the best talent for your events.
+                            {language === 'he' 
+                                ? 'צרו חשבון בחינם והתחילו להזמין כישרונות'
+                                : 'Create a free account and start booking talent'
+                            }
                         </p>
 
                         {/* Benefits */}
@@ -140,34 +129,34 @@ export default function SignUpPage() {
 
                     {/* Footer */}
                     <p className="text-white/60 text-sm">
-                        © 2024 Talentr. All rights reserved.
+                        © 2024 Talentr
                     </p>
                 </div>
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex items-center justify-center p-8 bg-white">
+            <div className="w-full lg:w-1/2 flex items-center justify-center p-6 bg-white dark:bg-slate-900">
                 <div className="w-full max-w-md">
-                    {/* Mobile Logo */}
-                    <div className="lg:hidden flex items-center justify-between mb-8">
-                        <Link href="/" className="text-2xl font-bold">
-                            talent<span className="text-gradient">r</span>
+                    {/* Mobile Header */}
+                    <div className="flex items-center justify-between mb-8">
+                        <Link href="/" dir="ltr" className="text-2xl font-black text-gray-900 dark:text-white">
+                            talent<span className="text-[#009de0]">r</span>
                         </Link>
 
                         {/* Language Switcher */}
                         <div className="relative">
                             <button
                                 onClick={() => setShowLangDropdown(!showLangDropdown)}
-                                className="flex items-center gap-2 px-3 py-2 text-sm font-medium text-gray-700 hover:bg-gray-100 rounded-full transition-colors"
+                                className="flex items-center gap-1 px-3 py-2 text-sm font-bold text-gray-700 dark:text-gray-300 hover:bg-gray-100 dark:hover:bg-slate-800 rounded-xl transition-colors"
                             >
-                                <Globe className="w-4 h-4" />
+                                <span className="text-lg">{currentLang.flag}</span>
                                 <ChevronDown className={`w-3 h-3 transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
                             </button>
 
                             {showLangDropdown && (
                                 <>
                                     <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
-                                    <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 animate-scale-in">
+                                    <div className="absolute end-0 mt-2 w-32 bg-white dark:bg-slate-800 rounded-xl shadow-lg border border-gray-100 dark:border-slate-700 py-1 z-50">
                                         {languages.map((lang) => (
                                             <button
                                                 key={lang.code}
@@ -175,44 +164,9 @@ export default function SignUpPage() {
                                                     setLanguage(lang.code);
                                                     setShowLangDropdown(false);
                                                 }}
-                                                className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-3 ${language === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
+                                                className={`w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 ${language === lang.code ? 'text-[#009de0]' : 'text-gray-700 dark:text-gray-300'}`}
                                             >
-                                                <span>{lang.flag}</span>
-                                                <span className="font-medium">{lang.label}</span>
-                                            </button>
-                                        ))}
-                                    </div>
-                                </>
-                            )}
-                        </div>
-                    </div>
-
-                    {/* Desktop Language Switcher */}
-                    <div className="hidden lg:flex justify-end mb-8">
-                        <div className="relative">
-                            <button
-                                onClick={() => setShowLangDropdown(!showLangDropdown)}
-                                className="flex items-center gap-2 px-4 py-2 text-sm font-medium text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-full transition-colors"
-                            >
-                                <span>{currentLang.flag}</span>
-                                <span>{currentLang.label}</span>
-                                <ChevronDown className={`w-3 h-3 transition-transform ${showLangDropdown ? 'rotate-180' : ''}`} />
-                            </button>
-
-                            {showLangDropdown && (
-                                <>
-                                    <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
-                                    <div className="absolute right-0 mt-2 w-44 bg-white rounded-xl shadow-lg border border-gray-100 py-2 z-50 animate-scale-in">
-                                        {languages.map((lang) => (
-                                            <button
-                                                key={lang.code}
-                                                onClick={() => {
-                                                    setLanguage(lang.code);
-                                                    setShowLangDropdown(false);
-                                                }}
-                                                className={`w-full px-4 py-2.5 text-left hover:bg-gray-50 flex items-center gap-3 ${language === lang.code ? 'bg-blue-50 text-blue-600' : 'text-gray-700'}`}
-                                            >
-                                                <span>{lang.flag}</span>
+                                                <span className="text-lg">{lang.flag}</span>
                                                 <span className="font-medium">{lang.label}</span>
                                             </button>
                                         ))}
@@ -224,7 +178,7 @@ export default function SignUpPage() {
 
                     {/* Header */}
                     <div className="mb-8">
-                        <h1 className="text-3xl md:text-4xl font-bold text-gray-900 mb-2">
+                        <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-2">
                             {t('createAccountTitle')}
                         </h1>
                         <p className="text-gray-500">
@@ -234,7 +188,7 @@ export default function SignUpPage() {
 
                     {/* Error Message */}
                     {error && (
-                        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm animate-scale-in">
+                        <div className="mb-6 p-4 bg-red-50 border border-red-100 rounded-xl text-red-600 text-sm">
                             {error}
                         </div>
                     )}
@@ -243,7 +197,7 @@ export default function SignUpPage() {
                     <button
                         type="button"
                         onClick={handleGoogleSignUp}
-                        className="w-full h-14 bg-white border-2 border-gray-200 rounded-xl font-semibold text-gray-700 hover:border-gray-300 hover:bg-gray-50 transition-all flex items-center justify-center gap-3 mb-6"
+                        className="w-full h-14 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-xl font-semibold text-gray-700 dark:text-gray-200 hover:border-gray-300 dark:hover:border-slate-500 transition-all flex items-center justify-center gap-3 mb-6"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path fill="#4285F4" d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" />
@@ -257,21 +211,21 @@ export default function SignUpPage() {
                     {/* Divider */}
                     <div className="relative my-6">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-gray-200"></div>
+                            <div className="w-full border-t border-gray-200 dark:border-slate-700"></div>
                         </div>
                         <div className="relative flex justify-center text-sm">
-                            <span className="px-4 bg-white text-gray-400">{t('orDivider')}</span>
+                            <span className="px-4 bg-white dark:bg-slate-900 text-gray-400">{t('orDivider')}</span>
                         </div>
                     </div>
 
                     {/* Form */}
                     <form onSubmit={handleSubmit} className="space-y-5">
                         <div>
-                            <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label htmlFor="fullName" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 {t('fullNameLabel')}
                             </label>
                             <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <User className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
                                     type="text"
                                     id="fullName"
@@ -279,18 +233,18 @@ export default function SignUpPage() {
                                     value={formData.fullName}
                                     onChange={handleChange}
                                     required
-                                    className="w-full h-14 pl-12 pr-4 bg-gray-50 border-2 border-transparent rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                                    className="w-full h-14 ps-12 pe-4 bg-gray-50 dark:bg-slate-800 border-2 border-transparent rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] focus:bg-white dark:focus:bg-slate-700 transition-all"
                                     placeholder="John Doe"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label htmlFor="email" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 {t('emailLabel')}
                             </label>
                             <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
                                     type="email"
                                     id="email"
@@ -298,18 +252,18 @@ export default function SignUpPage() {
                                     value={formData.email}
                                     onChange={handleChange}
                                     required
-                                    className="w-full h-14 pl-12 pr-4 bg-gray-50 border-2 border-transparent rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                                    className="w-full h-14 ps-12 pe-4 bg-gray-50 dark:bg-slate-800 border-2 border-transparent rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] focus:bg-white dark:focus:bg-slate-700 transition-all"
                                     placeholder="john@example.com"
                                 />
                             </div>
                         </div>
 
                         <div>
-                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 mb-2">
+                            <label htmlFor="password" className="block text-sm font-semibold text-gray-700 dark:text-gray-300 mb-2">
                                 {t('passwordLabel')}
                             </label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     id="password"
@@ -318,13 +272,13 @@ export default function SignUpPage() {
                                     onChange={handleChange}
                                     required
                                     minLength={6}
-                                    className="w-full h-14 pl-12 pr-12 bg-gray-50 border-2 border-transparent rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-blue-500 focus:bg-white transition-all"
+                                    className="w-full h-14 ps-12 pe-12 bg-gray-50 dark:bg-slate-800 border-2 border-transparent rounded-xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] focus:bg-white dark:focus:bg-slate-700 transition-all"
                                     placeholder="Minimum 6 characters"
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
+                                    className="absolute end-4 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600 transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
@@ -334,7 +288,7 @@ export default function SignUpPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full h-14 bg-blue-500 hover:bg-blue-600 text-white font-bold text-lg rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
+                            className="w-full h-14 bg-[#009de0] hover:bg-[#008acc] text-white font-bold text-lg rounded-xl transition-colors flex items-center justify-center gap-2 disabled:opacity-50 disabled:cursor-not-allowed"
                         >
                             {loading ? t('creatingAccount') : t('createAccountBtn')}
                             {!loading && <ArrowRight className="w-5 h-5" />}
@@ -345,13 +299,13 @@ export default function SignUpPage() {
                     <div className="mt-8 text-center space-y-3">
                         <p className="text-gray-500">
                             {t('alreadyHaveAccount')}{' '}
-                            <Link href="/signin" className="text-blue-600 font-semibold hover:underline">
+                            <Link href="/signin" className="text-[#009de0] font-semibold hover:underline">
                                 {t('signInLink')}
                             </Link>
                         </p>
                         <p className="text-sm text-gray-400">
                             {t('vendorLinkText')}{' '}
-                            <Link href="/join" className="text-gray-600 font-medium hover:text-gray-900">
+                            <Link href="/join" className="text-gray-600 dark:text-gray-300 font-medium hover:text-[#009de0]">
                                 {t('joinVendorLink')}
                             </Link>
                         </p>
