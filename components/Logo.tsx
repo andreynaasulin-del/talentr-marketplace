@@ -23,7 +23,7 @@ export default function Logo({ size = 'md', asLink = true, className }: LogoProp
     const content = (
         <div className={cn("relative flex items-center", className)}>
             <Image
-                src="/logo.jpg"
+                src="/logo.png"
                 alt="Talentr"
                 width={width}
                 height={height}
