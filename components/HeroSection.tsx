@@ -2,7 +2,6 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
-import { Shield, Banknote, Zap } from 'lucide-react';
 
 export default function HeroSection() {
     const { language } = useLanguage();
@@ -15,12 +14,12 @@ export default function HeroSection() {
             description: 'The only ecosystem in Israel where verified industry leaders are gathered. Your search ends here.',
             cta: 'Choose Package',
             rules: 'Our Standards',
-            rule1Title: 'Premium Selection',
-            rule1Desc: 'No amateurs allowed. Only verified professionals.',
-            rule2Title: 'Fixed Price',
-            rule2Desc: 'Transparent pricing. No negotiations.',
-            rule3Title: 'Instant Booking',
-            rule3Desc: 'Ready-made packages. Book in 5 minutes.',
+            rule1Title: 'VERIFIED.',
+            rule1Desc: 'ELITE.',
+            rule2Title: 'FIXED.',
+            rule2Desc: 'FAIR.',
+            rule3Title: 'FAST.',
+            rule3Desc: 'SIMPLE.',
             forMasters: 'For Masters',
             forMastersDesc: 'Focus on what you do best. We ensure your talent earns what it deserves.',
             forMastersCta: 'Apply Now',
@@ -31,12 +30,12 @@ export default function HeroSection() {
             description: 'המערכת היחידה בישראל בה מרוכזים מובילי התעשייה המאומתים. החיפוש שלכם נגמר כאן.',
             cta: 'בחר חבילה',
             rules: 'הסטנדרטים שלנו',
-            rule1Title: 'סלקציה פרימיום',
-            rule1Desc: 'אין כניסה לחובבנים. רק מקצוענים מאומתים.',
-            rule2Title: 'מחיר קבוע',
-            rule2Desc: 'תמחור שקוף. ללא מיקוח.',
-            rule3Title: 'הזמנה מיידית',
-            rule3Desc: 'חבילות מוכנות. הזמנה ב-5 דקות.',
+            rule1Title: 'מאומת.',
+            rule1Desc: 'עילית.',
+            rule2Title: 'קבוע.',
+            rule2Desc: 'הוגן.',
+            rule3Title: 'מהיר.',
+            rule3Desc: 'פשוט.',
             forMasters: 'לאמנים',
             forMastersDesc: 'התמקדו במה שאתם עושים הכי טוב. אנחנו נדאג שהכישרון שלכם ירוויח את מה שמגיע לו.',
             forMastersCta: 'הגש מועמדות',
@@ -82,43 +81,30 @@ export default function HeroSection() {
                     </a>
                 </motion.div>
 
-                {/* Our Standards */}
+                {/* Our Standards - Wolt Style */}
                 <motion.div 
                     className="mb-20"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ duration: 0.8, delay: 0.2, ease: [0.22, 1, 0.36, 1] }}
                 >
-                    <h2 className="text-center text-sm font-bold text-white/30 uppercase tracking-[0.2em] mb-8">
-                        {t.rules}
-                    </h2>
-
                     <div className="grid md:grid-cols-3 gap-4 md:gap-6">
                         {/* Rule 1 */}
-                        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/5 rounded-2xl">
-                            <div className="w-10 h-10 bg-amber-500/10 rounded-xl flex items-center justify-center mb-4">
-                                <Shield className="w-5 h-5 text-amber-500" />
-                            </div>
-                            <h3 className="text-white font-bold text-lg mb-2">{t.rule1Title}</h3>
-                            <p className="text-white/40 text-sm leading-relaxed">{t.rule1Desc}</p>
+                        <div className="p-8 md:p-10 bg-gradient-to-br from-amber-500/10 to-amber-600/5 border border-amber-500/20 rounded-3xl text-center">
+                            <h3 className="text-3xl md:text-4xl font-black text-white mb-1">{t.rule1Title}</h3>
+                            <p className="text-2xl md:text-3xl font-black text-amber-400">{t.rule1Desc}</p>
                         </div>
 
                         {/* Rule 2 */}
-                        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/5 rounded-2xl">
-                            <div className="w-10 h-10 bg-emerald-500/10 rounded-xl flex items-center justify-center mb-4">
-                                <Banknote className="w-5 h-5 text-emerald-500" />
-                            </div>
-                            <h3 className="text-white font-bold text-lg mb-2">{t.rule2Title}</h3>
-                            <p className="text-white/40 text-sm leading-relaxed">{t.rule2Desc}</p>
+                        <div className="p-8 md:p-10 bg-gradient-to-br from-emerald-500/10 to-emerald-600/5 border border-emerald-500/20 rounded-3xl text-center">
+                            <h3 className="text-3xl md:text-4xl font-black text-white mb-1">{t.rule2Title}</h3>
+                            <p className="text-2xl md:text-3xl font-black text-emerald-400">{t.rule2Desc}</p>
                         </div>
 
                         {/* Rule 3 */}
-                        <div className="p-6 md:p-8 bg-white/[0.03] border border-white/5 rounded-2xl">
-                            <div className="w-10 h-10 bg-blue-500/10 rounded-xl flex items-center justify-center mb-4">
-                                <Zap className="w-5 h-5 text-blue-500" />
-                            </div>
-                            <h3 className="text-white font-bold text-lg mb-2">{t.rule3Title}</h3>
-                            <p className="text-white/40 text-sm leading-relaxed">{t.rule3Desc}</p>
+                        <div className="p-8 md:p-10 bg-gradient-to-br from-blue-500/10 to-blue-600/5 border border-blue-500/20 rounded-3xl text-center">
+                            <h3 className="text-3xl md:text-4xl font-black text-white mb-1">{t.rule3Title}</h3>
+                            <p className="text-2xl md:text-3xl font-black text-blue-400">{t.rule3Desc}</p>
                         </div>
                     </div>
                 </motion.div>
