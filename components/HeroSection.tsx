@@ -131,24 +131,24 @@ export default function HeroSection() {
     );
 
     return (
-        <section className="relative min-h-[80vh] flex items-center justify-center bg-[#009de0]">
+        <section className="relative min-h-[80vh] flex items-center justify-center bg-[#009de0] overflow-hidden">
             <div className="relative z-10 w-full max-w-2xl mx-auto px-4 py-12 md:py-16">
-                {/* Wolt-style Headline */}
-                <div className="text-center mb-10">
+                {/* Wolt-style Headline - NO OVERFLOW ISSUES */}
+                <div className="text-center mb-10 md:mb-12">
                     {/* Line 1 - Static */}
-                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tight">
+                    <h1 className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight mb-2">
                         {lang === 'he' ? 'כישרונות.' : 'TALENT.'}
                     </h1>
                     
-                    {/* Line 2 - Animated with proper container */}
-                    <div className="h-[1.1em] relative overflow-hidden">
+                    {/* Line 2 - Animated - FIXED HEIGHT */}
+                    <div className="relative" style={{ height: '1em' }}>
                         <AnimatePresence mode="wait">
                             <motion.h2
                                 key={wordIndex}
-                                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-[0.9] tracking-tight absolute inset-x-0"
-                                initial={{ y: '100%', opacity: 0 }}
-                                animate={{ y: '0%', opacity: 1 }}
-                                exit={{ y: '-100%', opacity: 0 }}
+                                className="text-5xl sm:text-6xl md:text-7xl lg:text-8xl font-black text-white leading-none tracking-tight absolute inset-0 flex items-center justify-center"
+                                initial={{ y: 50, opacity: 0 }}
+                                animate={{ y: 0, opacity: 1 }}
+                                exit={{ y: -50, opacity: 0 }}
                                 transition={{ 
                                     duration: 0.5,
                                     ease: [0.22, 1, 0.36, 1]
