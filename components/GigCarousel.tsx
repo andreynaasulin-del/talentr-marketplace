@@ -9,7 +9,6 @@ import Link from 'next/link';
 
 export default function GigCarousel() {
     const { language } = useLanguage();
-    // Support en, he, and fallback for ru
     const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
 
     const content = {
@@ -25,364 +24,360 @@ export default function GigCarousel() {
 
     const t = content[lang];
 
-    // Filter: no alcohol
+    // Filter out alcohol-related packages
     const filtered = packages.filter(
         (p) =>
             !['Bartender', 'Sommelier'].includes(p.category) &&
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + (p.title.he || ''))
     );
 
-    // Guaranteed two rows rebalancing
+    // Split into two rows
     const mid = Math.ceil(filtered.length / 2);
-    const topRowItems = filtered.slice(0, mid);
-    const bottomRowItems = filtered.slice(mid);
+    let topRow = filtered.slice(0, mid);
+    let bottomRow = filtered.slice(mid);
 
-    // Final safety: if one row is somehow empty but we have items, split them
-    let finalTop = topRowItems;
-    let finalBottom = bottomRowItems;
-    if (finalBottom.length === 0 && finalTop.length > 1) {
-        const split = Math.ceil(finalTop.length / 2);
-        finalBottom = finalTop.slice(split);
-        finalTop = finalTop.slice(0, split);
+    // Safety: ensure both rows have items
+    if (bottomRow.length === 0 && topRow.length > 1) {
+        const split = Math.ceil(topRow.length / 2);
+        bottomRow = topRow.slice(split);
+        topRow = topRow.slice(0, split);
     }
 
     return (
-        <section id="packages" className="gig-section">
-            {/* Ambient Background */}
-            <div className="ambient-bg">
-                <div className="ambient-gradient" />
-                <div className="ambient-orb ambient-orb-1" />
-                <div className="ambient-orb ambient-orb-2" />
+        <section className="gig-carousel-section">
+            {/* Background */}
+            <div className="gig-bg">
+                <div className="gig-bg-gradient" />
+                <div className="gig-bg-orb gig-bg-orb-1" />
+                <div className="gig-bg-orb gig-bg-orb-2" />
             </div>
 
             {/* Header */}
-            <div className="section-header">
+            <div className="gig-header">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
-                    <span className="exclusive-tag">Exclusive</span>
-                    <h2 className="section-title">{t.title}</h2>
-                    <p className="section-subtitle">{t.subtitle}</p>
+                    <span className="gig-label">Exclusive</span>
+                    <h2 className="gig-title">{t.title}</h2>
+                    <p className="gig-subtitle">{t.subtitle}</p>
                 </motion.div>
             </div>
 
-            {/* TWO ROWS - Force LTR container for technical movement consistency */}
-            <div className="marquee-rows-container">
-                {/* TOP ROW: Moves Left */}
-                <div className="marquee-row-outer">
-                    <MarqueeRow items={finalTop} direction="left" speed={75} lang={lang} />
+            {/* Two Row Marquee */}
+            <div className="gig-marquee-container">
+                {/* Row 1: Left */}
+                <div className="gig-marquee-row">
+                    <div className="gig-marquee-track gig-marquee-left">
+                        {[...topRow, ...topRow, ...topRow].map((pkg, i) => (
+                            <GigCard key={`top-${pkg.id}-${i}`} pkg={pkg} lang={lang} idx={i} />
+                        ))}
+                    </div>
                 </div>
-                
-                {/* BOTTOM ROW: Moves Right */}
-                <div className="marquee-row-outer">
-                    <MarqueeRow items={finalBottom.length > 0 ? finalBottom : finalTop} direction="right" speed={85} lang={lang} />
+
+                {/* Row 2: Right */}
+                <div className="gig-marquee-row">
+                    <div className="gig-marquee-track gig-marquee-right">
+                        {[...bottomRow, ...bottomRow, ...bottomRow].map((pkg, i) => (
+                            <GigCard key={`bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} idx={i} />
+                        ))}
+                    </div>
                 </div>
             </div>
 
             <style jsx global>{`
                 /* ===== SECTION ===== */
-                .gig-section {
+                .gig-carousel-section {
                     position: relative;
-                    padding: 120px 0;
+                    padding: 100px 0 120px;
                     background: #020617;
                     overflow: hidden;
                 }
 
-                /* ===== AMBIENT BACKGROUND ===== */
-                .ambient-bg {
+                /* ===== BACKGROUND ===== */
+                .gig-bg {
                     position: absolute;
                     inset: 0;
                     pointer-events: none;
+                    z-index: 0;
                 }
-                .ambient-gradient {
+                .gig-bg-gradient {
                     position: absolute;
                     inset: 0;
-                    background: radial-gradient(ellipse 100% 80% at 50% 30%, rgba(15, 30, 55, 1) 0%, rgba(2, 6, 23, 1) 100%);
+                    background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(15, 30, 60, 1) 0%, rgba(2, 6, 23, 1) 100%);
                 }
-                .ambient-orb {
+                .gig-bg-orb {
                     position: absolute;
                     border-radius: 50%;
-                    filter: blur(120px);
-                    opacity: 0.25;
-                    animation: float-orb 20s ease-in-out infinite alternate;
+                    filter: blur(100px);
+                    opacity: 0.3;
                 }
-                .ambient-orb-1 {
+                .gig-bg-orb-1 {
                     top: 10%;
                     left: 5%;
-                    width: 700px;
-                    height: 700px;
-                    background: rgba(59, 130, 246, 0.15);
-                }
-                .ambient-orb-2 {
-                    bottom: 5%;
-                    right: 0%;
                     width: 600px;
                     height: 600px;
-                    background: rgba(212, 175, 55, 0.1);
-                    animation-delay: -7s;
+                    background: rgba(59, 130, 246, 0.2);
                 }
-                @keyframes float-orb {
-                    0% { transform: translate(0, 0) scale(1); }
-                    100% { transform: translate(60px, 50px) scale(1.1); }
+                .gig-bg-orb-2 {
+                    bottom: 10%;
+                    right: 5%;
+                    width: 500px;
+                    height: 500px;
+                    background: rgba(212, 175, 55, 0.15);
                 }
 
                 /* ===== HEADER ===== */
-                .section-header {
+                .gig-header {
                     position: relative;
-                    z-index: 30;
+                    z-index: 10;
                     max-width: 1280px;
-                    margin: 0 auto 100px;
+                    margin: 0 auto 80px;
                     padding: 0 24px;
                 }
-                .exclusive-tag {
+                .gig-label {
                     display: inline-block;
                     font-size: 11px;
-                    font-weight: 900;
+                    font-weight: 800;
                     color: #d4af37;
                     text-transform: uppercase;
-                    letter-spacing: 0.8em;
-                    margin-bottom: 24px;
-                    font-style: italic;
+                    letter-spacing: 0.6em;
+                    margin-bottom: 20px;
                 }
-                .section-title {
-                    font-size: clamp(3.5rem, 12vw, 10rem);
+                .gig-title {
+                    font-size: clamp(3rem, 10vw, 8rem);
                     font-weight: 900;
                     color: white;
-                    letter-spacing: -0.05em;
-                    line-height: 0.85;
-                    margin-bottom: 24px;
-                    text-transform: uppercase;
+                    letter-spacing: -0.04em;
+                    line-height: 0.9;
+                    margin-bottom: 20px;
                 }
-                .section-subtitle {
-                    color: rgba(255, 255, 255, 0.3);
-                    font-size: clamp(1rem, 2.5vw, 1.5rem);
-                    max-width: 600px;
+                .gig-subtitle {
+                    color: rgba(255, 255, 255, 0.25);
+                    font-size: clamp(1rem, 2vw, 1.3rem);
+                    max-width: 500px;
                     margin: 0 auto;
                     font-style: italic;
-                    line-height: 1.6;
                 }
 
-                /* ===== MARQUEE SYSTEM ===== */
-                .marquee-rows-container {
+                /* ===== MARQUEE ===== */
+                .gig-marquee-container {
                     position: relative;
-                    z-index: 20;
+                    z-index: 10;
                     display: flex;
                     flex-direction: column;
-                    gap: 50px; /* Distinct gap between rows */
-                    direction: ltr !important; /* Force LTR for movement logic */
+                    gap: 40px;
+                    direction: ltr !important;
                 }
 
-                .marquee-row-outer {
+                .gig-marquee-row {
                     width: 100%;
                     overflow: hidden;
-                    mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
-                    -webkit-mask-image: linear-gradient(to right, transparent, black 15%, black 85%, transparent);
+                    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+                    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
                 }
 
-                .marquee-track {
+                .gig-marquee-track {
                     display: flex;
-                    gap: 40px;
+                    gap: 32px;
                     width: max-content;
-                    padding: 30px 0;
-                    will-change: transform;
+                    padding: 20px 0;
                 }
 
-                .marquee-track.direction-left {
-                    animation: marquee-move-left var(--duration) linear infinite;
+                .gig-marquee-left {
+                    animation: gig-scroll-left 80s linear infinite;
                 }
 
-                .marquee-track.direction-right {
-                    animation: marquee-move-right var(--duration) linear infinite;
+                .gig-marquee-right {
+                    animation: gig-scroll-right 90s linear infinite;
                 }
 
-                .marquee-row-outer:hover .marquee-track {
+                .gig-marquee-row:hover .gig-marquee-track {
                     animation-play-state: paused;
                 }
 
-                @keyframes marquee-move-left {
-                    0% { transform: translate3d(0, 0, 0); }
-                    100% { transform: translate3d(-33.3333%, 0, 0); }
+                @keyframes gig-scroll-left {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-33.3333%); }
                 }
 
-                @keyframes marquee-move-right {
-                    0% { transform: translate3d(-33.3333%, 0, 0); }
-                    100% { transform: translate3d(0, 0, 0); }
+                @keyframes gig-scroll-right {
+                    0% { transform: translateX(-33.3333%); }
+                    100% { transform: translateX(0); }
                 }
 
-                /* ===== CUBE CARD WRAPPER ===== */
-                .cube-wrapper {
+                /* ===== GIG CARD ===== */
+                .gig-card-wrap {
                     flex-shrink: 0;
-                    width: 350px;
-                    aspect-ratio: 1 / 1;
-                    perspective: 2000px;
-                    animation: swim var(--swim-speed) ease-in-out infinite alternate;
+                    width: 320px;
+                    height: 320px;
+                    display: block;
                 }
 
-                @keyframes swim {
-                    0% { transform: translateY(0) rotate(0deg); }
-                    100% { transform: translateY(-15px) rotate(1deg); }
-                }
-
-                /* ===== CUBE CARD CORE ===== */
-                .cube-card {
+                .gig-card {
+                    display: block;
                     position: relative;
                     width: 100%;
                     height: 100%;
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    border-radius: 32px;
+                    border-radius: 24px;
                     overflow: hidden;
-                    transform-style: preserve-3d;
-                    transition: all 0.6s cubic-bezier(0.2, 1, 0.2, 1);
-                    box-shadow: 0 30px 70px rgba(0, 0, 0, 0.6);
+                    background: rgba(20, 30, 50, 0.8);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
+                    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
                 }
 
-                .cube-card:hover {
-                    transform: scale(1.04) rotateY(10deg) rotateX(5deg);
+                .gig-card:hover {
+                    transform: scale(1.04) translateY(-8px);
                     border-color: rgba(212, 175, 55, 0.4);
                     box-shadow: 
-                        0 50px 100px rgba(0, 0, 0, 0.8),
-                        0 0 50px rgba(212, 175, 55, 0.2);
+                        0 35px 70px rgba(0, 0, 0, 0.6),
+                        0 0 40px rgba(212, 175, 55, 0.15);
                 }
 
-                /* Image Layer (Base) */
-                .cube-img {
+                /* Image */
+                .gig-card-image {
                     position: absolute;
                     inset: 0;
                     z-index: 1;
-                    transform: translateZ(0);
                 }
-                .cube-img img {
+
+                .gig-card-image img {
+                    width: 100%;
+                    height: 100%;
                     object-fit: cover;
-                    opacity: 0.75;
-                    transition: transform 1.2s ease, opacity 0.8s ease;
+                    opacity: 0.8;
+                    transition: transform 0.8s ease, opacity 0.5s ease;
                 }
-                .cube-card:hover .cube-img img {
-                    transform: scale(1.15);
+
+                .gig-card:hover .gig-card-image img {
+                    transform: scale(1.1);
                     opacity: 1;
                 }
 
-                /* Glass Layer (Middle) */
-                .cube-glass {
+                /* Overlay */
+                .gig-card-overlay {
                     position: absolute;
                     inset: 0;
                     z-index: 2;
-                    background: linear-gradient(180deg, transparent 40%, rgba(0, 0, 0, 0.9) 100%);
+                    background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
                     pointer-events: none;
-                    transform: translateZ(20px);
                 }
 
-                /* Gold Frame (Top) */
-                .cube-border {
+                /* Gold Frame */
+                .gig-card-frame {
                     position: absolute;
                     inset: 0;
                     z-index: 3;
-                    border: 1.5px solid transparent;
-                    border-radius: 32px;
-                    background: linear-gradient(135deg, rgba(212, 175, 55, 0.6), transparent, rgba(212, 175, 55, 0.6)) border-box;
-                    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
-                    mask-composite: exclude;
-                    opacity: 0.2;
-                    transition: opacity 0.6s ease;
-                    transform: translateZ(40px);
+                    border-radius: 24px;
+                    border: 1.5px solid rgba(212, 175, 55, 0.2);
+                    opacity: 0.5;
+                    transition: opacity 0.5s ease, border-color 0.5s ease;
+                    pointer-events: none;
                 }
-                .cube-card:hover .cube-border {
+
+                .gig-card:hover .gig-card-frame {
+                    border-color: rgba(212, 175, 55, 0.6);
                     opacity: 1;
                 }
 
-                /* Content Layer (Topmost) */
-                .cube-info {
+                /* Content */
+                .gig-card-content {
                     position: absolute;
-                    bottom: 30px;
-                    left: 30px;
-                    right: 30px;
+                    bottom: 24px;
+                    left: 24px;
+                    right: 24px;
                     z-index: 4;
-                    transform: translateZ(60px);
-                    direction: var(--text-dir);
-                }
-                .cube-tag {
-                    font-size: 11px;
-                    font-weight: 900;
-                    color: #d4af37;
-                    text-transform: uppercase;
-                    letter-spacing: 0.4em;
-                    margin-bottom: 10px;
-                    display: block;
-                }
-                .cube-name {
-                    font-family: var(--font-serif), Georgia, serif;
-                    font-size: 28px;
-                    font-weight: 400;
-                    color: white;
-                    letter-spacing: 0.05em;
-                    line-height: 1.2;
-                    text-shadow: 0 5px 20px rgba(0, 0, 0, 0.8);
                 }
 
-                /* Interaction Elements */
-                .cube-link {
+                .gig-card-category {
+                    display: block;
+                    font-size: 10px;
+                    font-weight: 800;
+                    color: #d4af37;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3em;
+                    margin-bottom: 8px;
+                }
+
+                .gig-card-name {
+                    font-family: var(--font-serif), Georgia, serif;
+                    font-size: 24px;
+                    font-weight: 400;
+                    color: white;
+                    letter-spacing: 0.03em;
+                    line-height: 1.2;
+                    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+                }
+
+                /* Arrow */
+                .gig-card-arrow {
                     position: absolute;
-                    top: 30px;
-                    right: 30px;
+                    top: 20px;
+                    right: 20px;
                     z-index: 5;
-                    width: 48px;
-                    height: 48px;
+                    width: 40px;
+                    height: 40px;
                     border-radius: 50%;
                     background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(12px);
+                    backdrop-filter: blur(8px);
                     border: 1px solid rgba(255, 255, 255, 0.2);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: white;
                     opacity: 0;
-                    transform: translateZ(80px) translate(15px, -15px);
-                    transition: all 0.5s ease;
-                }
-                .cube-card:hover .cube-link {
-                    opacity: 1;
-                    transform: translateZ(80px) translate(0, 0);
+                    transform: translate(10px, -10px);
+                    transition: all 0.4s ease;
                 }
 
-                /* Shine Sweep */
-                .cube-glare {
+                .gig-card:hover .gig-card-arrow {
+                    opacity: 1;
+                    transform: translate(0, 0);
+                }
+
+                /* Shine */
+                .gig-card-shine {
                     position: absolute;
                     inset: 0;
                     z-index: 6;
-                    background: linear-gradient(110deg, transparent 40%, rgba(255, 255, 255, 0.2) 50%, transparent 60%);
+                    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%);
                     opacity: 0;
                     transform: translateX(-100%);
                     pointer-events: none;
+                    border-radius: 24px;
                 }
-                .cube-card:hover .cube-glare {
-                    animation: glare-sweep 1.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+
+                .gig-card:hover .gig-card-shine {
+                    animation: gig-shine 1.2s ease forwards;
                 }
-                @keyframes glare-sweep {
+
+                @keyframes gig-shine {
                     0% { transform: translateX(-100%); opacity: 0; }
-                    40% { opacity: 1; }
+                    50% { opacity: 1; }
                     100% { transform: translateX(100%); opacity: 0; }
                 }
 
                 /* Mobile */
                 @media (max-width: 768px) {
-                    .cube-wrapper {
-                        width: 280px;
+                    .gig-card-wrap {
+                        width: 260px;
+                        height: 260px;
                     }
-                    .marquee-track {
+                    .gig-marquee-track {
+                        gap: 20px;
+                    }
+                    .gig-marquee-container {
                         gap: 24px;
                     }
-                    .marquee-rows-container {
-                        gap: 30px;
+                    .gig-header {
+                        margin-bottom: 50px;
                     }
-                    .section-header {
-                        margin-bottom: 60px;
-                    }
-                    .gig-section {
-                        padding: 80px 0;
+                    .gig-carousel-section {
+                        padding: 70px 0 90px;
                     }
                 }
             `}</style>
@@ -390,65 +385,39 @@ export default function GigCarousel() {
     );
 }
 
-function MarqueeRow({
-    items,
-    direction,
-    speed,
-    lang
-}: {
-    items: Package[];
-    direction: 'left' | 'right';
-    speed: number;
-    lang: 'en' | 'he';
-}) {
-    // 3 duplicates for ultra-wide screens and smooth looping
-    const loopItems = [...items, ...items, ...items];
-
+function GigCard({ pkg, lang, idx }: { pkg: Package; lang: 'en' | 'he'; idx: number }) {
     return (
-        <div className="marquee-track-container">
-            <div
-                className={`marquee-track direction-${direction}`}
-                style={{ '--duration': `${speed}s` } as React.CSSProperties}
-            >
-                {loopItems.map((pkg, idx) => (
-                    <CubeCard key={`${pkg.id}-${idx}`} pkg={pkg} lang={lang} index={idx} />
-                ))}
-            </div>
-        </div>
-    );
-}
-
-function CubeCard({ pkg, lang, index }: { pkg: Package; lang: 'en' | 'he', index: number }) {
-    // Natural floating variation
-    const swimSpeed = 4 + (index % 4) * 0.8;
-    const textDir = lang === 'he' ? 'rtl' : 'ltr';
-
-    return (
-        <div 
-            className="cube-wrapper" 
-            style={{ 
-                '--swim-speed': `${swimSpeed}s`,
-                '--text-dir': textDir
-            } as React.CSSProperties}
-        >
-            <Link href={`/package/${pkg.id}`} className="cube-card">
-                <div className="cube-img">
+        <div className="gig-card-wrap">
+            <Link href={`/package/${pkg.id}`} className="gig-card">
+                {/* Image */}
+                <div className="gig-card-image">
                     <Image
                         src={pkg.image}
                         alt={pkg.title[lang]}
                         fill
-                        sizes="350px"
+                        sizes="320px"
+                        style={{ objectFit: 'cover' }}
                     />
                 </div>
-                <div className="cube-glass" />
-                <div className="cube-border" />
-                <div className="cube-glare" />
-                <div className="cube-link">
-                    <ArrowUpRight className="w-6 h-6" />
+
+                {/* Overlay */}
+                <div className="gig-card-overlay" />
+
+                {/* Frame */}
+                <div className="gig-card-frame" />
+
+                {/* Shine */}
+                <div className="gig-card-shine" />
+
+                {/* Arrow */}
+                <div className="gig-card-arrow">
+                    <ArrowUpRight className="w-5 h-5" />
                 </div>
-                <div className="cube-info">
-                    <span className="cube-tag">{pkg.category}</span>
-                    <h3 className="cube-name">{pkg.title[lang]}</h3>
+
+                {/* Content */}
+                <div className="gig-card-content">
+                    <span className="gig-card-category">{pkg.category}</span>
+                    <h3 className="gig-card-name">{pkg.title[lang]}</h3>
                 </div>
             </Link>
         </div>
