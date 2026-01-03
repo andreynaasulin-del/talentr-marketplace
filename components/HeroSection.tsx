@@ -57,23 +57,18 @@ export default function HeroSection() {
     const typeSpeed = 80;
     const deleteSpeed = 40;
     const pauseBeforeDelete = 2000;
-    const pauseBeforeNext = 300;
 
     const tick = useCallback(() => {
         if (!isDeleting) {
-            // Typing
             if (displayText.length < currentPhrase.length) {
                 setDisplayText(currentPhrase.slice(0, displayText.length + 1));
             } else {
-                // Finished typing, wait then start deleting
                 setTimeout(() => setIsDeleting(true), pauseBeforeDelete);
             }
         } else {
-            // Deleting
             if (displayText.length > 0) {
                 setDisplayText(displayText.slice(0, -1));
             } else {
-                // Finished deleting, move to next phrase
                 setIsDeleting(false);
                 setPhraseIndex((prev) => (prev + 1) % t.phrases.length);
             }
@@ -86,7 +81,6 @@ export default function HeroSection() {
         return () => clearTimeout(timer);
     }, [tick, isDeleting]);
 
-    // Reset when language changes
     useEffect(() => {
         setDisplayText('');
         setPhraseIndex(0);
@@ -94,20 +88,195 @@ export default function HeroSection() {
     }, [lang]);
 
     return (
-        <section className="relative min-h-screen bg-[#009de0] overflow-hidden">
-            {/* Simple gradient background */}
-            <div className="absolute inset-0 bg-gradient-to-b from-[#00b4d8] via-[#009de0] to-[#0077b6]" />
+        <section className="relative min-h-screen overflow-hidden">
             
-            {/* Subtle radial glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[800px] h-[600px] bg-gradient-radial from-white/10 to-transparent rounded-full blur-3xl" />
+            {/* === LAYER 1: ANIMATED MESH GRADIENT === */}
+            <div className="absolute inset-0">
+                <div 
+                    className="absolute inset-0 opacity-100"
+                    style={{
+                        background: `
+                            radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
+                            radial-gradient(at 97% 21%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
+                            radial-gradient(at 52% 99%, hsla(196, 100%, 57%, 1) 0px, transparent 50%),
+                            radial-gradient(at 10% 29%, hsla(195, 100%, 39%, 1) 0px, transparent 50%),
+                            radial-gradient(at 97% 96%, hsla(195, 84%, 45%, 1) 0px, transparent 50%),
+                            radial-gradient(at 33% 50%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
+                            radial-gradient(at 79% 53%, hsla(196, 100%, 48%, 1) 0px, transparent 50%)
+                        `,
+                        animation: 'meshMove 20s ease-in-out infinite',
+                    }}
+                />
+            </div>
 
-            {/* Content */}
+            {/* === LAYER 2: CAUSTIC LIGHT BLOBS === */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Blob 1 */}
+                <motion.div
+                    className="absolute w-[600px] h-[600px] rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
+                        filter: 'blur(60px)',
+                        top: '10%',
+                        left: '15%',
+                    }}
+                    animate={{
+                        x: [0, 50, -30, 0],
+                        y: [0, -40, 30, 0],
+                        scale: [1, 1.1, 0.95, 1],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
+                />
+                
+                {/* Blob 2 */}
+                <motion.div
+                    className="absolute w-[500px] h-[500px] rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(255,213,128,0.06) 0%, transparent 70%)',
+                        filter: 'blur(80px)',
+                        top: '50%',
+                        right: '10%',
+                    }}
+                    animate={{
+                        x: [0, -60, 40, 0],
+                        y: [0, 50, -30, 0],
+                        scale: [1, 0.9, 1.05, 1],
+                    }}
+                    transition={{
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 2,
+                    }}
+                />
+
+                {/* Blob 3 */}
+                <motion.div
+                    className="absolute w-[400px] h-[400px] rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(72,202,228,0.07) 0%, transparent 70%)',
+                        filter: 'blur(70px)',
+                        bottom: '20%',
+                        left: '40%',
+                    }}
+                    animate={{
+                        x: [0, 30, -20, 0],
+                        y: [0, -25, 35, 0],
+                        scale: [1, 1.08, 0.97, 1],
+                    }}
+                    transition={{
+                        duration: 18,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 5,
+                    }}
+                />
+            </div>
+
+            {/* === LAYER 3: FLOATING GLASS ORBS === */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Orb 1 */}
+                <motion.div
+                    className="absolute w-32 h-32 rounded-full backdrop-blur-md border border-white/10"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(255,255,255,0.02))',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        top: '20%',
+                        left: '10%',
+                    }}
+                    animate={{
+                        y: [0, -30, 0],
+                        x: [0, 15, 0],
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
+                />
+
+                {/* Orb 2 */}
+                <motion.div
+                    className="absolute w-24 h-24 rounded-full backdrop-blur-md border border-white/10"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), rgba(255,255,255,0.02))',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        top: '60%',
+                        right: '15%',
+                    }}
+                    animate={{
+                        y: [0, -40, 0],
+                        x: [0, -20, 0],
+                    }}
+                    transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 1,
+                    }}
+                />
+
+                {/* Orb 3 */}
+                <motion.div
+                    className="absolute w-20 h-20 rounded-full backdrop-blur-md border border-white/10"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(255,255,255,0.02))',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        top: '35%',
+                        right: '25%',
+                    }}
+                    animate={{
+                        y: [0, -25, 0],
+                        x: [0, 10, 0],
+                        rotate: [0, 180, 360],
+                    }}
+                    transition={{
+                        duration: 12,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 3,
+                    }}
+                />
+
+                {/* Orb 4 - Small accent */}
+                <motion.div
+                    className="absolute w-16 h-16 rounded-full backdrop-blur-md border border-amber-400/20"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(251,191,36,0.15), rgba(251,191,36,0.02))',
+                        boxShadow: '0 8px 32px rgba(251,191,36,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        bottom: '30%',
+                        left: '20%',
+                    }}
+                    animate={{
+                        y: [0, -35, 0],
+                        scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                        duration: 9,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 2,
+                    }}
+                />
+            </div>
+
+            {/* === LAYER 4: SUBTLE NOISE TEXTURE === */}
+            <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay pointer-events-none"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                }}
+            />
+
+            {/* === CONTENT === */}
             <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-8 pt-32 md:pt-40 pb-20">
                 
                 {/* Main Headline with Typewriter */}
                 <div className="text-center mb-16 md:mb-20">
                     
-                    {/* Static start + Typewriter */}
                     <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.2] tracking-tight mb-6">
                         <span className="block mb-2">{t.staticStart}</span>
                         <span className="block text-white/90 min-h-[1.2em]">
@@ -116,7 +285,6 @@ export default function HeroSection() {
                         </span>
                     </h1>
 
-                    {/* Static Tagline */}
                     <motion.p 
                         className="text-2xl sm:text-3xl md:text-4xl font-black text-amber-400 mb-6"
                         initial={{ opacity: 0 }}
@@ -126,7 +294,6 @@ export default function HeroSection() {
                         {t.tagline}
                     </motion.p>
                     
-                    {/* Description */}
                     <motion.p 
                         className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed"
                         initial={{ opacity: 0 }}
@@ -144,13 +311,13 @@ export default function HeroSection() {
                     >
                         <Link
                             href="#chat"
-                            className="group flex items-center gap-4 w-full max-w-xl mx-auto mt-10 px-6 py-4 bg-white rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 transition-all cursor-pointer"
+                            className="group flex items-center gap-4 w-full max-w-xl mx-auto mt-10 px-6 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
                         >
                             <MessageCircle className="w-6 h-6 text-[#009de0]/50 group-hover:text-[#009de0] transition-colors" />
                             <span className="flex-1 text-[#009de0]/50 text-lg text-start">
                                 {t.chat}
                             </span>
-                            <div className="w-10 h-10 bg-[#009de0] rounded-xl flex items-center justify-center group-hover:bg-[#0077b6] transition-colors">
+                            <div className="w-10 h-10 bg-gradient-to-br from-[#009de0] to-[#0077b6] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
                                 <Sparkles className="w-5 h-5 text-white" />
                             </div>
                         </Link>
@@ -159,28 +326,49 @@ export default function HeroSection() {
 
                 {/* For Masters Block */}
                 <motion.div 
-                    className="p-8 md:p-12 bg-white/10 backdrop-blur-sm border border-white/20 rounded-3xl text-center"
+                    className="relative group"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                 >
-                    <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] mb-4">
-                        {t.forMasters}
-                    </h3>
-                    <p className="text-white/80 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-6">
-                        {t.forMastersDesc}
-                    </p>
-                    <a
-                        href="/join"
-                        className="inline-block px-6 py-3 bg-white text-[#009de0] font-bold rounded-xl hover:bg-white/90 transition-colors"
-                    >
-                        {t.forMastersCta}
-                    </a>
+                    {/* Glass card with subtle glow */}
+                    <div className="p-8 md:p-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl text-center shadow-2xl">
+                        <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] mb-4">
+                            {t.forMasters}
+                        </h3>
+                        <p className="text-white/80 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-6">
+                            {t.forMastersDesc}
+                        </p>
+                        <a
+                            href="/join"
+                            className="inline-block px-8 py-4 bg-white text-[#009de0] font-bold rounded-xl hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
+                        >
+                            {t.forMastersCta}
+                        </a>
+                    </div>
                 </motion.div>
             </div>
 
             {/* Bottom gradient fade */}
-            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent" />
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent pointer-events-none" />
+
+            {/* Mesh animation keyframes */}
+            <style jsx>{`
+                @keyframes meshMove {
+                    0%, 100% { 
+                        background-position: 0% 0%, 100% 100%, 50% 0%, 0% 100%, 100% 0%, 33% 50%, 79% 53%;
+                    }
+                    25% {
+                        background-position: 50% 50%, 80% 20%, 40% 90%, 10% 80%, 90% 10%, 45% 60%, 85% 45%;
+                    }
+                    50% {
+                        background-position: 100% 100%, 0% 0%, 50% 100%, 100% 0%, 0% 100%, 66% 50%, 21% 47%;
+                    }
+                    75% {
+                        background-position: 50% 50%, 20% 80%, 60% 10%, 90% 20%, 10% 90%, 55% 40%, 15% 55%;
+                    }
+                }
+            `}</style>
         </section>
     );
 }
