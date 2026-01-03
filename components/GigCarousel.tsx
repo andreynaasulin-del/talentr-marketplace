@@ -24,8 +24,16 @@ export default function GigCarousel() {
     };
 
     const t = content[lang];
-    const allPackages = [...packages];
-    const marqueeItems = [...packages, ...packages];
+    // Убираем алкоголь: исключаем категории/титулы, связанные с баром и алкоголем
+    const filtered = packages.filter(
+        (p) =>
+            !['Bartender', 'Sommelier'].includes(p.category) &&
+            !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + p.title.he)
+    );
+
+    // Без повторов: разбиваем на два ряда (четные/нечетные)
+    const topRow = filtered.filter((_, i) => i % 2 === 0);
+    const bottomRow = filtered.filter((_, i) => i % 2 === 1);
 
     return (
         <section id="packages" className="py-12 md:py-16 bg-[#020617] overflow-hidden relative">
@@ -53,26 +61,38 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* Infinite horizontal slider */}
+            {/* Infinite horizontal slider: верхний вправо, нижний влево */}
             <div className="relative z-10 max-w-7xl mx-auto px-2 md:px-4">
                 <div className="overflow-hidden perspective-[1500px]">
-                    <div className="flex gap-6 md:gap-8 animate-marquee items-stretch">
-                        {marqueeItems.map((pkg, idx) => (
-                            <div key={`m1-${pkg.id}-${idx}`} className="w-[260px] md:w-[320px] flex-shrink-0">
-                                <GlassCube pkg={pkg} lang={lang} />
-                            </div>
-                        ))}
-                    </div>
-                    <div className="flex gap-6 md:gap-8 animate-marquee" aria-hidden="true">
-                        {marqueeItems.map((pkg, idx) => (
-                            <div key={`m2-${pkg.id}-${idx}`} className="w-[260px] md:w-[320px] flex-shrink-0">
-                                <GlassCube pkg={pkg} lang={lang} />
-                            </div>
-                        ))}
-                    </div>
+                    <MarqueeRow items={topRow} direction="right" lang={lang} speed={55} />
+                    <MarqueeRow items={bottomRow} direction="left" lang={lang} speed={65} />
                 </div>
             </div>
         </section>
+    );
+}
+
+function MarqueeRow({ items, direction, lang, speed = 55 }: { items: Package[]; direction: 'left' | 'right'; lang: 'en' | 'he'; speed?: number }) {
+    // дублируем, чтобы луп был бесшовным
+    const loopItems = [...items, ...items];
+    return (
+        <div className="w-full overflow-hidden">
+            <div className="flex gap-6 md:gap-8 items-stretch">
+                <div
+                    className={cn(
+                        "flex gap-6 md:gap-8 animate-marquee",
+                        direction === 'right' ? 'marquee-right' : 'marquee-left'
+                    )}
+                    style={{ animationDuration: `${speed}s` }}
+                >
+                    {loopItems.map((pkg, idx) => (
+                        <div key={`${direction}-${pkg.id}-${idx}`} className="w-[260px] md:w-[320px] flex-shrink-0">
+                            <GlassCube pkg={pkg} lang={lang} />
+                        </div>
+                    ))}
+                </div>
+            </div>
+        </div>
     );
 }
 
@@ -320,11 +340,18 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 /* Marquee animation */
                 @keyframes marquee-left {
                     0% { transform: translateX(0); }
-                    100% { transform: translateX(50%); }
+                    100% { transform: translateX(-50%); }
+                }
+                @keyframes marquee-right {
+                    0% { transform: translateX(-50%); }
+                    100% { transform: translateX(0); }
                 }
                 .animate-marquee {
                     animation: marquee-left 45s linear infinite;
                     will-change: transform;
+                }
+                .animate-marquee.marquee-right {
+                    animation-name: marquee-right;
                 }
 
                 /* Gentle sway on cubes while moving */
