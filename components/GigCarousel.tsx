@@ -110,7 +110,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     };
 
     return (
-        <div className="luxury-card-wrapper group">
+        <div className="luxury-card-wrapper group card-perspective-container">
             {/* CAUSTICS: Refraction light under the cube */}
             <motion.div 
                 className="luxury-caustic"
@@ -124,7 +124,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
             <motion.a
                 ref={cardRef}
                 href={`/package/${pkg.id}`}
-                className="gig-cube"
+                className="gig-cube-card"
                 style={{
                     rotateX,
                     rotateY,
@@ -139,7 +139,8 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 }}
             >
                 <div className="cube-content">
-                    <div className="cube-image-wrapper">
+                    {/* Layer: Background image (base) */}
+                    <div className="layer-bg cube-image-wrapper">
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
@@ -149,16 +150,16 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         />
                     </div>
 
-                    <div className="glass-overlay" />
+                    {/* Layer: Glass */} 
+                    <div className="layer-glass glass-overlay gold-frame" />
 
-                    <div className="cube-info">
+                    {/* Layer: Content */}
+                    <div className="layer-content cube-info">
                         <span className="category-tag">{pkg.category.toUpperCase()}</span>
                         <h3 className="cube-title">
                             {pkg.title[lang]}
                         </h3>
                     </div>
-
-                    <div className="gold-frame" />
                 </div>
             </motion.a>
 
@@ -168,7 +169,8 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     --glass-bg: rgba(255, 255, 255, 0.03);
                 }
 
-                .luxury-card-wrapper {
+                .luxury-card-wrapper,
+                .card-perspective-container {
                     position: relative;
                     perspective: 1200px;
                     width: 100%;
@@ -185,7 +187,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     z-index: 0;
                 }
 
-                .gig-cube {
+                .gig-cube-card {
                     position: relative;
                     width: 100%;
                     height: 100%;
@@ -193,6 +195,11 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     cursor: pointer;
                     transition: transform 0.15s ease-out, box-shadow 0.6s ease, border 0.6s ease;
                     z-index: 1;
+                }
+
+                /* Hover tilt baseline */
+                .card-perspective-container:hover .gig-cube-card {
+                    transform: rotateY(10deg) rotateX(8deg);
                 }
 
                 .cube-content {
@@ -232,6 +239,12 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     pointer-events: none;
                 }
 
+                /* Dedicated glass layer with depth */
+                .layer-glass {
+                    transform: translateZ(20px);
+                    backdrop-filter: blur(5px);
+                }
+
                 .gold-frame {
                     position: absolute;
                     inset: 0;
@@ -253,6 +266,9 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     text-align: left;
                     max-width: 80%;
                 }
+
+                .layer-bg { transform: translateZ(0); }
+                .layer-content { transform: translateZ(50px); }
 
                 .cube-title {
                     font-family: var(--font-serif), serif;
