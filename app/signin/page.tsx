@@ -4,10 +4,11 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, Eye, EyeOff, ChevronDown, ArrowRight, Shield, Zap, Sparkles } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ChevronDown, Shield, Zap } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
+import { motion, AnimatePresence } from 'framer-motion';
 
 export default function SignInPage() {
     const router = useRouter();
