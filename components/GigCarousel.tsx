@@ -64,7 +64,7 @@ export default function GigCarousel() {
 
             {/* Два ряда: верх вправо, низ влево; без повторов (loop только для бесшовности) */}
             <div className="relative z-10 max-w-7xl mx-auto px-2 md:px-4">
-                <div className="overflow-hidden perspective-[1500px] flex flex-col gap-10">
+                <div className="overflow-hidden perspective-[1500px] flex flex-col gap-6 md:gap-8">
                     <MarqueeRow items={topRow} direction="right" lang={lang} speed={55} />
                     <MarqueeRow items={bottomRow} direction="left" lang={lang} speed={60} />
                 </div>
@@ -74,20 +74,20 @@ export default function GigCarousel() {
 }
 
 function MarqueeRow({ items, direction, lang, speed = 55 }: { items: Package[]; direction: 'left' | 'right'; lang: 'en' | 'he'; speed?: number }) {
-    // дублируем, чтобы луп был бесшовным
-    const loopItems = [...items, ...items];
+    // дублируем, чтобы луп был бесшовным и без пустот
+    const loopItems = [...items, ...items, ...items];
     return (
         <div className="w-full overflow-hidden">
-            <div className="flex gap-6 md:gap-8 items-stretch">
+            <div className="flex gap-4 md:gap-6 items-stretch">
                 <div
                     className={cn(
-                        "flex gap-6 md:gap-8 animate-marquee",
+                        "flex gap-4 md:gap-6 animate-marquee",
                         direction === 'right' ? 'marquee-right' : 'marquee-left'
                     )}
                     style={{ animationDuration: `${speed}s` }}
                 >
                     {loopItems.map((pkg, idx) => (
-                        <div key={`${direction}-${pkg.id}-${idx}`} className="w-[260px] md:w-[320px] flex-shrink-0">
+                        <div key={`${direction}-${pkg.id}-${idx}`} className="w-[240px] md:w-[300px] flex-shrink-0">
                             <GlassCube pkg={pkg} lang={lang} />
                         </div>
                     ))}
@@ -341,14 +341,14 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 /* Marquee animation */
                 @keyframes marquee-left {
                     0% { transform: translateX(0); }
-                    100% { transform: translateX(-50%); }
+                    100% { transform: translateX(-33.333%); }
                 }
                 @keyframes marquee-right {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(50%); }
+                    0% { transform: translateX(-33.333%); }
+                    100% { transform: translateX(0); }
                 }
                 .animate-marquee {
-                    animation: marquee-left 50s linear infinite;
+                    animation: marquee-left 40s linear infinite;
                     will-change: transform;
                 }
                 .animate-marquee.marquee-right {
