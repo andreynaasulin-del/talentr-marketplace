@@ -3,6 +3,7 @@
 import { useState } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
+import Logo from '@/components/Logo';
 import { motion, AnimatePresence } from 'framer-motion';
 import { Check, ArrowRight, ArrowLeft, Loader2, ChevronDown, User, Mail, Lock, Phone, MapPin, Sparkles } from 'lucide-react';
 import { supabase } from '@/lib/supabase';
@@ -382,9 +383,7 @@ export default function JoinPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
                 <div className="absolute inset-0 flex flex-col justify-between p-12 text-white">
-                    <Link href="/" dir="ltr" className="text-3xl font-black">
-                        talent<span className="text-white/80">r</span>
-                    </Link>
+                    <Logo size="lg" className="brightness-0 invert" />
 
                     <div className="max-w-lg">
                         <h2 className="text-5xl font-black leading-tight mb-4">
@@ -403,9 +402,7 @@ export default function JoinPage() {
             <div className="w-full lg:w-1/2 flex flex-col bg-[#009de0] dark:bg-slate-900">
                 {/* Header */}
                 <div className="flex items-center justify-between p-4">
-                    <Link href="/" dir="ltr" className="text-xl font-black text-white">
-                        talent<span className="text-white/80">r</span>
-                    </Link>
+                    <Logo size="md" className="brightness-0 invert" />
 
                     {/* Language Switcher */}
                     <div className="relative">
