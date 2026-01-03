@@ -54,7 +54,7 @@ export default function Footer() {
                     >
                         <Link href="/" dir="ltr" className="inline-block mb-2">
                             <span className="text-2xl md:text-3xl font-black">
-                                talent<span className="text-blue-500">r</span>
+                                talent<span className="relative text-blue-500">r<span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 bg-blue-500 rounded-full" /></span>
                             </span>
                         </Link>
                         <p className="text-gray-400 text-sm md:text-base max-w-xs">

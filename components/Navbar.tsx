@@ -70,7 +70,10 @@ export default function Navbar() {
                             className="text-xl md:text-2xl font-bold hover:opacity-80 transition-all duration-300 flex items-center gap-0"
                         >
                             <span className="text-gray-900 dark:text-white">talent</span>
-                            <span className="text-gradient">r</span>
+                            <span className="relative">
+                                <span className="text-blue-500">r</span>
+                                <span className="absolute -top-0.5 -right-1 w-1.5 h-1.5 bg-blue-500 rounded-full" />
+                            </span>
                         </Link>
                     </motion.div>
 
