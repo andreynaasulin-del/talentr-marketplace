@@ -25,16 +25,17 @@ export default function GigCarousel() {
 
     const t = content[lang];
     const allPackages = [...packages];
+    const marqueeItems = [...packages, ...packages];
 
     return (
-        <section id="packages" className="py-16 md:py-24 bg-[#020617] overflow-visible relative">
+        <section id="packages" className="py-12 md:py-16 bg-[#020617] overflow-hidden relative">
             {/* Dynamic Ambient Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(10,25,47,1)_0%,_rgba(2,6,23,1)_100%)]" />
                 <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] animate-pulse" />
             </div>
             
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-12 md:mb-16">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-8 md:mb-12">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -52,12 +53,23 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* Compact Grid with perspective */}
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
-                <div className="grid gap-6 md:gap-8 perspective-[2000px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                    {allPackages.map((pkg, idx) => (
-                        <GlassCube key={`${pkg.id}-${idx}`} pkg={pkg} lang={lang} />
-                    ))}
+            {/* Infinite horizontal slider */}
+            <div className="relative z-10 max-w-7xl mx-auto px-2 md:px-4">
+                <div className="overflow-hidden perspective-[1500px]">
+                    <div className="flex gap-6 md:gap-8 animate-marquee items-stretch">
+                        {marqueeItems.map((pkg, idx) => (
+                            <div key={`m1-${pkg.id}-${idx}`} className="w-[260px] md:w-[320px] flex-shrink-0">
+                                <GlassCube pkg={pkg} lang={lang} />
+                            </div>
+                        ))}
+                    </div>
+                    <div className="flex gap-6 md:gap-8 animate-marquee" aria-hidden="true">
+                        {marqueeItems.map((pkg, idx) => (
+                            <div key={`m2-${pkg.id}-${idx}`} className="w-[260px] md:w-[320px] flex-shrink-0">
+                                <GlassCube pkg={pkg} lang={lang} />
+                            </div>
+                        ))}
+                    </div>
                 </div>
             </div>
         </section>
@@ -73,9 +85,9 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     
     // Physics for 3D Tilt
     const springConfig = { stiffness: 50, damping: 18, mass: 1.2 };
-    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [12, -12]), springConfig);
-    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-12, 12]), springConfig);
-    const scale = useSpring(isHovered ? 1.04 : 1, springConfig);
+    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), springConfig);
+    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), springConfig);
+    const scale = useSpring(isHovered ? 1.03 : 1, springConfig);
     
     const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
         if (!cardRef.current) return;
@@ -173,7 +185,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                 /* Hover tilt baseline */
                 .card-perspective-container:hover .gig-cube-card {
-                    transform: rotateY(10deg) rotateX(8deg);
+                    transform: rotateY(8deg) rotateX(6deg);
                 }
 
                 .cube-content {
@@ -243,7 +255,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 }
 
                 .layer-bg { transform: translateZ(0); }
-                .layer-content { transform: translateZ(50px); }
+                .layer-content { transform: translateZ(60px); }
 
                 .cube-title {
                     font-family: var(--font-serif), serif;
@@ -303,6 +315,25 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                 .gig-cube-card:hover .glossy-glow::after {
                     opacity: 1;
+                }
+
+                /* Marquee animation */
+                @keyframes marquee-left {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(50%); }
+                }
+                .animate-marquee {
+                    animation: marquee-left 45s linear infinite;
+                    will-change: transform;
+                }
+
+                /* Gentle sway on cubes while moving */
+                @keyframes sway {
+                    0%, 100% { transform: translateZ(0) rotateY(0deg); }
+                    50% { transform: translateZ(0) rotateY(1.5deg); }
+                }
+                .sway {
+                    animation: sway 4s ease-in-out infinite;
                 }
             `}</style>
         </div>
