@@ -6,6 +6,40 @@ import Image from 'next/image';
 import { packages, Package } from '@/lib/gigs';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
+import type { CSSProperties } from 'react';
+
+type GigMood = {
+    moodA: string; // "r,g,b"
+    moodB: string; // "r,g,b"
+};
+
+function getGigMood(pkg: Package): GigMood {
+    const text = `${pkg.title.en} ${pkg.description.en} ${pkg.category}`.toLowerCase();
+
+    // Romantic / dinner / intimate → warm, muted
+    if (
+        /romantic|proposal|anniversary|date|serenity|harp|acoustic|sushi|chef/.test(text) ||
+        pkg.category === 'Chef'
+    ) {
+        return { moodA: '255,210,160', moodB: '200,179,122' };
+    }
+
+    // Party / DJ / nightlife → cold crystal
+    if (
+        pkg.category === 'DJ' ||
+        /party|beats|club|rooftop|dance|techno|house/.test(text)
+    ) {
+        return { moodA: '150,220,255', moodB: '90,160,255' };
+    }
+
+    // Magic / surreal → refined violet
+    if (pkg.category === 'Magician' || /magic|illusion/.test(text)) {
+        return { moodA: '205,185,255', moodB: '150,140,255' };
+    }
+
+    // Default: neutral champagne brass
+    return { moodA: '200,179,122', moodB: '255,255,255' };
+}
 
 export default function GigCarousel() {
     const { language } = useLanguage();
@@ -92,8 +126,8 @@ export default function GigCarousel() {
                 /* ===== SECTION ===== */
                 .gig-carousel-section {
                     position: relative;
-                    padding: 100px 0 120px;
-                    background: #020617;
+                    padding: 82px 0 96px;
+                    background: #05070a;
                     overflow: hidden;
                 }
 
@@ -107,7 +141,8 @@ export default function GigCarousel() {
                 .gig-bg-gradient {
                     position: absolute;
                     inset: 0;
-                    background: radial-gradient(ellipse 120% 80% at 50% 20%, rgba(15, 30, 60, 1) 0%, rgba(2, 6, 23, 1) 100%);
+                    background:
+                        radial-gradient(ellipse 120% 85% at 50% 15%, rgba(10, 16, 24, 1) 0%, rgba(5, 7, 10, 1) 55%, rgba(0, 0, 0, 1) 100%);
                 }
                 .gig-bg-orb {
                     position: absolute;
@@ -120,14 +155,14 @@ export default function GigCarousel() {
                     left: 5%;
                     width: 600px;
                     height: 600px;
-                    background: rgba(59, 130, 246, 0.2);
+                    background: rgba(120, 200, 255, 0.12);
                 }
                 .gig-bg-orb-2 {
                     bottom: 10%;
                     right: 5%;
                     width: 500px;
                     height: 500px;
-                    background: rgba(212, 175, 55, 0.15);
+                    background: rgba(200, 179, 122, 0.10);
                 }
 
                 /* ===== HEADER ===== */
@@ -142,14 +177,14 @@ export default function GigCarousel() {
                     display: inline-block;
                     font-size: 11px;
                     font-weight: 800;
-                    color: #d4af37;
+                    color: rgba(200, 179, 122, 0.9);
                     text-transform: uppercase;
-                    letter-spacing: 0.6em;
+                    letter-spacing: 0.75em;
                     margin-bottom: 20px;
                 }
                 .gig-title {
                     font-size: clamp(3rem, 10vw, 8rem);
-                    font-weight: 900;
+                    font-weight: 800;
                     color: white;
                     letter-spacing: -0.04em;
                     line-height: 0.9;
@@ -169,7 +204,7 @@ export default function GigCarousel() {
                     z-index: 10;
                     display: flex;
                     flex-direction: column;
-                    gap: 40px;
+                    gap: 26px;
                     direction: ltr !important;
                 }
 
@@ -182,17 +217,20 @@ export default function GigCarousel() {
 
                 .gig-marquee-track {
                     display: flex;
-                    gap: 32px;
+                    gap: 22px;
                     width: max-content;
                     padding: 20px 0;
+                    will-change: transform;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
                 }
 
                 .gig-marquee-left {
-                    animation: gig-scroll-left 80s linear infinite;
+                    animation: gig-scroll-left 78s linear infinite;
                 }
 
                 .gig-marquee-right {
-                    animation: gig-scroll-right 90s linear infinite;
+                    animation: gig-scroll-right 86s linear infinite;
                 }
 
                 .gig-marquee-row:hover .gig-marquee-track {
@@ -200,184 +238,320 @@ export default function GigCarousel() {
                 }
 
                 @keyframes gig-scroll-left {
-                    0% { transform: translateX(0); }
-                    100% { transform: translateX(-33.3333%); }
+                    0% { transform: translate3d(0, 0, 0); }
+                    100% { transform: translate3d(-33.3333%, 0, 0); }
                 }
 
                 @keyframes gig-scroll-right {
-                    0% { transform: translateX(-33.3333%); }
-                    100% { transform: translateX(0); }
+                    0% { transform: translate3d(-33.3333%, 0, 0); }
+                    100% { transform: translate3d(0, 0, 0); }
                 }
 
-                /* ===== GIG CARD ===== */
-                .gig-card-wrap {
+                /* ===== CRYSTAL CUBE ===== */
+                .gig-carousel-section {
+                    --brass-rgb: 200, 179, 122; /* champagne brass */
+                    --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                .crystal-wrap {
                     flex-shrink: 0;
-                    width: 320px;
-                    height: 320px;
-                    display: block;
+                    width: 300px;
+                    aspect-ratio: 1 / 1;
+                    position: relative;
+                    perspective: 2000px;
+                    transform: translate3d(0, 0, 0);
                 }
 
-                .gig-card {
+                /* Caustics behind cube (emotional lighting) */
+                .crystal-caustic {
+                    position: absolute;
+                    inset: -90px;
+                    border-radius: 999px;
+                    filter: blur(30px);
+                    opacity: 0;
+                    transform: translate3d(0, 0, 0);
+                    transition: opacity 900ms var(--ease-lux);
+                    background:
+                        radial-gradient(circle at 35% 35%, rgba(var(--mood-a), 0.16), transparent 60%),
+                        radial-gradient(circle at 65% 55%, rgba(var(--mood-b), 0.12), transparent 62%);
+                    mix-blend-mode: screen;
+                    pointer-events: none;
+                }
+
+                .crystal-wrap:hover .crystal-caustic {
+                    opacity: 1;
+                }
+
+                /* Float / sway while scrolling */
+                .crystal-float {
+                    width: 100%;
+                    height: 100%;
+                    animation: crystal-float var(--float-dur) ease-in-out infinite;
+                    animation-delay: var(--float-delay);
+                    transform-style: preserve-3d;
+                    will-change: transform;
+                }
+
+                @keyframes crystal-float {
+                    0% { transform: translate3d(0, 0, 0) rotateZ(calc(var(--sway-sign) * -0.8deg)); }
+                    100% { transform: translate3d(0, -10px, 0) rotateZ(calc(var(--sway-sign) * 0.8deg)); }
+                }
+
+                .crystal-cube {
                     display: block;
                     position: relative;
                     width: 100%;
                     height: 100%;
                     border-radius: 24px;
                     overflow: hidden;
-                    background: rgba(20, 30, 50, 0.8);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
-                    box-shadow: 0 25px 50px rgba(0, 0, 0, 0.5);
-                    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
+                    transform-style: preserve-3d;
+                    background: rgba(255, 255, 255, 0.03);
+                    border: 1px solid rgba(255, 255, 255, 0.10);
+                    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
+                    transition:
+                        transform 850ms var(--ease-lux),
+                        box-shadow 1000ms var(--ease-lux),
+                        border-color 900ms var(--ease-lux);
+                    will-change: transform;
                 }
 
-                .gig-card:hover {
-                    transform: scale(1.04) translateY(-8px);
-                    border-color: rgba(212, 175, 55, 0.4);
-                    box-shadow: 
-                        0 35px 70px rgba(0, 0, 0, 0.6),
-                        0 0 40px rgba(212, 175, 55, 0.15);
+                .crystal-cube:hover {
+                    transform: translate3d(0, -3px, 0) scale(1.02) rotateX(5deg) rotateY(-6deg);
+                    border-color: rgba(var(--brass-rgb), 0.22);
+                    box-shadow:
+                        0 55px 160px rgba(0, 0, 0, 0.72),
+                        0 0 120px rgba(var(--brass-rgb), 0.05);
                 }
 
-                /* Image */
-                .gig-card-image {
+                /* Layers */
+                .crystal-layer {
                     position: absolute;
                     inset: 0;
                     z-index: 1;
+                    transform-style: preserve-3d;
+                    border-radius: 24px;
                 }
 
-                .gig-card-image img {
+                .crystal-image {
+                    transform: translateZ(0px);
+                }
+
+                .crystal-image img {
                     width: 100%;
                     height: 100%;
                     object-fit: cover;
-                    opacity: 0.8;
-                    transition: transform 0.8s ease, opacity 0.5s ease;
+                    opacity: 0.86;
+                    filter: saturate(1.05) contrast(1.05);
+                    transition: transform 1200ms var(--ease-lux), opacity 900ms var(--ease-lux);
                 }
 
-                .gig-card:hover .gig-card-image img {
-                    transform: scale(1.1);
+                .crystal-cube:hover .crystal-image img {
+                    transform: scale(1.08);
                     opacity: 1;
                 }
 
-                /* Overlay */
-                .gig-card-overlay {
+                /* Glass / thickness */
+                .crystal-glass {
                     position: absolute;
                     inset: 0;
                     z-index: 2;
-                    background: linear-gradient(to bottom, transparent 40%, rgba(0, 0, 0, 0.85) 100%);
                     pointer-events: none;
+                    transform: translateZ(34px);
+                    background: rgba(255, 255, 255, 0.035);
+                    backdrop-filter: blur(18px) saturate(160%) contrast(110%);
+                    -webkit-backdrop-filter: blur(18px) saturate(160%) contrast(110%);
+                    box-shadow:
+                        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
+                        inset 0 18px 40px rgba(0, 0, 0, 0.55),
+                        inset 0 -14px 28px rgba(255, 255, 255, 0.06);
                 }
 
-                /* Gold Frame */
-                .gig-card-frame {
+                /* Depth gradient / refraction */
+                .crystal-glass::before {
+                    content: '';
                     position: absolute;
                     inset: 0;
-                    z-index: 3;
                     border-radius: 24px;
-                    border: 1.5px solid rgba(212, 175, 55, 0.2);
-                    opacity: 0.5;
-                    transition: opacity 0.5s ease, border-color 0.5s ease;
+                    background:
+                        radial-gradient(700px circle at 20% 10%, rgba(var(--mood-a), 0.10), transparent 55%),
+                        radial-gradient(700px circle at 80% 65%, rgba(var(--mood-b), 0.08), transparent 60%),
+                        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 40%, rgba(0, 0, 0, 0.55) 100%);
+                    opacity: 0.9;
+                    mix-blend-mode: screen;
                     pointer-events: none;
                 }
 
-                .gig-card:hover .gig-card-frame {
-                    border-color: rgba(212, 175, 55, 0.6);
+                /* Bevel pulse (quiet, boutique) */
+                .crystal-bevel {
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 24px;
+                    padding: 1px;
+                    background: conic-gradient(
+                        from 0deg,
+                        rgba(var(--brass-rgb), 0.00),
+                        rgba(var(--brass-rgb), 0.22),
+                        rgba(255, 255, 255, 0.10),
+                        rgba(var(--brass-rgb), 0.16),
+                        rgba(var(--brass-rgb), 0.00)
+                    );
+                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                    -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+                    opacity: 0.22;
+                    filter: drop-shadow(0 0 16px rgba(var(--brass-rgb), 0.08));
+                    animation: bevel-pulse 5200ms var(--ease-lux) infinite;
+                    pointer-events: none;
+                }
+
+                @keyframes bevel-pulse {
+                    0%, 100% {
+                        opacity: 0.18;
+                        filter: drop-shadow(0 0 14px rgba(var(--brass-rgb), 0.06));
+                    }
+                    50% {
+                        opacity: 0.34;
+                        filter: drop-shadow(0 0 18px rgba(var(--brass-rgb), 0.10));
+                    }
+                }
+
+                /* Glare sweep */
+                .crystal-glare {
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 24px;
+                    background: linear-gradient(
+                        115deg,
+                        transparent 42%,
+                        rgba(255, 255, 255, 0.16) 50%,
+                        transparent 58%
+                    );
+                    opacity: 0;
+                    transform: translateX(-120%) skewX(-20deg);
+                    pointer-events: none;
+                }
+
+                .crystal-cube:hover .crystal-glare {
                     opacity: 1;
+                    animation: glare-sweep 1200ms var(--ease-lux) forwards;
                 }
 
-                /* Content */
-                .gig-card-content {
+                @keyframes glare-sweep {
+                    0% { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
+                    40% { opacity: 0.9; }
+                    100% { transform: translateX(120%) skewX(-20deg); opacity: 0; }
+                }
+
+                /* Top content layer */
+                .crystal-content {
                     position: absolute;
-                    bottom: 24px;
-                    left: 24px;
-                    right: 24px;
+                    inset: 0;
                     z-index: 4;
+                    transform: translateZ(70px);
+                    padding: 18px;
+                    display: flex;
+                    flex-direction: column;
+                    justify-content: flex-end;
+                    gap: 8px;
+                    pointer-events: none;
                 }
 
-                .gig-card-category {
-                    display: block;
-                    font-size: 10px;
-                    font-weight: 800;
-                    color: #d4af37;
+                .crystal-tag {
+                    display: inline-block;
+                    font-size: 9px;
+                    letter-spacing: 0.42em;
                     text-transform: uppercase;
-                    letter-spacing: 0.3em;
-                    margin-bottom: 8px;
+                    font-weight: 700;
+                    color: rgba(var(--brass-rgb), 0.85);
                 }
 
-                .gig-card-name {
-                    font-family: var(--font-serif), Georgia, serif;
-                    font-size: 24px;
+                .crystal-title {
+                    font-family: var(--font-serif), serif;
+                    font-size: 22px;
                     font-weight: 400;
-                    color: white;
-                    letter-spacing: 0.03em;
-                    line-height: 1.2;
-                    text-shadow: 0 4px 12px rgba(0, 0, 0, 0.7);
+                    letter-spacing: 0.12em;
+                    text-transform: uppercase;
+                    line-height: 1.18;
+                    color: rgba(255, 255, 255, 0.92);
+                    text-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
                 }
 
-                /* Arrow */
-                .gig-card-arrow {
+                .crystal-desc {
+                    font-size: 12px;
+                    line-height: 1.45;
+                    color: rgba(255, 255, 255, 0.60);
+                    display: -webkit-box;
+                    -webkit-line-clamp: 2;
+                    -webkit-box-orient: vertical;
+                    overflow: hidden;
+                }
+
+                /* Action button */
+                .crystal-action {
                     position: absolute;
-                    top: 20px;
-                    right: 20px;
-                    z-index: 5;
-                    width: 40px;
-                    height: 40px;
-                    border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.1);
-                    backdrop-filter: blur(8px);
-                    border: 1px solid rgba(255, 255, 255, 0.2);
+                    top: 16px;
+                    right: 16px;
+                    width: 38px;
+                    height: 38px;
+                    border-radius: 999px;
+                    background: rgba(255, 255, 255, 0.06);
+                    backdrop-filter: blur(14px);
+                    -webkit-backdrop-filter: blur(14px);
+                    border: 1px solid rgba(255, 255, 255, 0.10);
                     display: flex;
                     align-items: center;
                     justify-content: center;
-                    color: white;
+                    color: rgba(255, 255, 255, 0.88);
                     opacity: 0;
-                    transform: translate(10px, -10px);
-                    transition: all 0.4s ease;
+                    transform: translateZ(84px) translate(10px, -10px);
+                    transition: opacity 600ms var(--ease-lux), transform 700ms var(--ease-lux), background-color 700ms var(--ease-lux), border-color 700ms var(--ease-lux);
                 }
 
-                .gig-card:hover .gig-card-arrow {
+                .crystal-cube:hover .crystal-action {
                     opacity: 1;
-                    transform: translate(0, 0);
-                }
-
-                /* Shine */
-                .gig-card-shine {
-                    position: absolute;
-                    inset: 0;
-                    z-index: 6;
-                    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%);
-                    opacity: 0;
-                    transform: translateX(-100%);
-                    pointer-events: none;
-                    border-radius: 24px;
-                }
-
-                .gig-card:hover .gig-card-shine {
-                    animation: gig-shine 1.2s ease forwards;
-                }
-
-                @keyframes gig-shine {
-                    0% { transform: translateX(-100%); opacity: 0; }
-                    50% { opacity: 1; }
-                    100% { transform: translateX(100%); opacity: 0; }
+                    transform: translateZ(84px) translate(0, 0);
+                    border-color: rgba(var(--brass-rgb), 0.22);
                 }
 
                 /* Mobile */
                 @media (max-width: 768px) {
-                    .gig-card-wrap {
-                        width: 260px;
-                        height: 260px;
+                    .crystal-wrap {
+                        width: 250px;
                     }
                     .gig-marquee-track {
-                        gap: 20px;
+                        gap: 18px;
                     }
                     .gig-marquee-container {
-                        gap: 24px;
+                        gap: 20px;
                     }
                     .gig-header {
-                        margin-bottom: 50px;
+                        margin-bottom: 56px;
                     }
                     .gig-carousel-section {
-                        padding: 70px 0 90px;
+                        padding: 68px 0 82px;
+                    }
+                    .crystal-title {
+                        font-size: 20px;
+                    }
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .crystal-float,
+                    .crystal-bevel,
+                    .crystal-glare,
+                    .gig-marquee-left,
+                    .gig-marquee-right {
+                        animation: none !important;
+                    }
+                    .crystal-cube,
+                    .crystal-image img,
+                    .crystal-action,
+                    .crystal-caustic {
+                        transition: none !important;
                     }
                 }
             `}</style>
@@ -386,40 +560,55 @@ export default function GigCarousel() {
 }
 
 function GigCard({ pkg, lang, idx }: { pkg: Package; lang: 'en' | 'he'; idx: number }) {
+    const mood = getGigMood(pkg);
+    const floatDur = 6.6 + (idx % 5) * 0.85;
+    const floatDelay = -((idx % 6) * 0.55);
+    const swaySign = idx % 2 === 0 ? 1 : -1;
+
+    const style = {
+        ['--mood-a' as any]: mood.moodA,
+        ['--mood-b' as any]: mood.moodB,
+        ['--float-dur' as any]: `${floatDur}s`,
+        ['--float-delay' as any]: `${floatDelay}s`,
+        ['--sway-sign' as any]: swaySign,
+    } as CSSProperties;
+
     return (
-        <div className="gig-card-wrap">
-            <Link href={`/package/${pkg.id}`} className="gig-card">
-                {/* Image */}
-                <div className="gig-card-image">
-                    <Image
-                        src={pkg.image}
-                        alt={pkg.title[lang]}
-                        fill
-                        sizes="320px"
-                        style={{ objectFit: 'cover' }}
-                    />
-                </div>
+        <div className="crystal-wrap" style={style}>
+            <div className="crystal-caustic" />
+            <div className="crystal-float">
+                <Link href={`/package/${pkg.id}`} className="crystal-cube">
+                    {/* Base image */}
+                    <div className="crystal-layer crystal-image">
+                        <Image
+                            src={pkg.image}
+                            alt={pkg.title[lang]}
+                            fill
+                            sizes="300px"
+                            style={{ objectFit: 'cover' }}
+                            priority={idx < 6}
+                        />
+                    </div>
 
-                {/* Overlay */}
-                <div className="gig-card-overlay" />
+                    {/* Glass + bevel + glare */}
+                    <div className="crystal-layer crystal-glass">
+                        <div className="crystal-bevel" />
+                        <div className="crystal-glare" />
+                    </div>
 
-                {/* Frame */}
-                <div className="gig-card-frame" />
+                    {/* Content */}
+                    <div className="crystal-layer crystal-content">
+                        <span className="crystal-tag">{pkg.category}</span>
+                        <h3 className="crystal-title">{pkg.title[lang]}</h3>
+                        <p className="crystal-desc">{pkg.description[lang]}</p>
+                    </div>
 
-                {/* Shine */}
-                <div className="gig-card-shine" />
-
-                {/* Arrow */}
-                <div className="gig-card-arrow">
-                    <ArrowUpRight className="w-5 h-5" />
-                </div>
-
-                {/* Content */}
-                <div className="gig-card-content">
-                    <span className="gig-card-category">{pkg.category}</span>
-                    <h3 className="gig-card-name">{pkg.title[lang]}</h3>
-                </div>
-            </Link>
+                    {/* Action */}
+                    <div className="crystal-action">
+                        <ArrowUpRight className="w-5 h-5" />
+                    </div>
+                </Link>
+            </div>
         </div>
     );
 }
