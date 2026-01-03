@@ -1,11 +1,11 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { packages, Package } from '@/lib/gigs';
 import { ArrowUpRight } from 'lucide-react';
-import { useRef, useState, MouseEvent } from 'react';
+import Link from 'next/link';
 
 export default function GigCarousel() {
     const { language } = useLanguage();
@@ -23,7 +23,7 @@ export default function GigCarousel() {
     };
 
     const t = content[lang];
-    
+
     // Filter: no alcohol
     const filtered = packages.filter(
         (p) =>
@@ -31,21 +31,27 @@ export default function GigCarousel() {
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + p.title.he)
     );
 
+    // Split into two rows - no repeats within visible area
+    const mid = Math.ceil(filtered.length / 2);
+    const topRowItems = filtered.slice(0, mid);
+    const bottomRowItems = filtered.slice(mid);
+
     return (
         <section id="packages" className="gig-section">
             {/* Ambient Background */}
             <div className="ambient-bg">
                 <div className="ambient-gradient" />
-                <div className="ambient-glow" />
+                <div className="ambient-orb ambient-orb-1" />
+                <div className="ambient-orb ambient-orb-2" />
             </div>
 
             {/* Header */}
             <div className="section-header">
                 <motion.div
-                    initial={{ opacity: 0, y: 40 }}
+                    initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
                     <span className="exclusive-tag">Exclusive</span>
@@ -54,21 +60,17 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* Infinite Horizontal Ribbon */}
-            <div className="ribbon-container">
-                <div className="ribbon-track">
-                    {/* Duplicate array for seamless loop */}
-                    {[...filtered, ...filtered].map((pkg, idx) => (
-                        <GlassCube key={`cube-${pkg.id}-${idx}`} pkg={pkg} lang={lang} />
-                    ))}
-                </div>
+            {/* Two-Row Marquee */}
+            <div className="marquee-wrapper">
+                <MarqueeRow items={topRowItems} direction="left" speed={70} lang={lang} />
+                <MarqueeRow items={bottomRowItems} direction="right" speed={80} lang={lang} />
             </div>
 
             <style jsx global>{`
                 /* ===== SECTION ===== */
                 .gig-section {
                     position: relative;
-                    padding: 80px 0 100px;
+                    padding: 60px 0 80px;
                     background: #020617;
                     overflow: hidden;
                 }
@@ -83,21 +85,27 @@ export default function GigCarousel() {
                 .ambient-gradient {
                     position: absolute;
                     inset: 0;
-                    background: radial-gradient(ellipse 80% 60% at 50% 40%, rgba(10, 25, 47, 1) 0%, rgba(2, 6, 23, 1) 100%);
+                    background: radial-gradient(ellipse 100% 80% at 50% 30%, rgba(15, 30, 55, 1) 0%, rgba(2, 6, 23, 1) 100%);
                 }
-                .ambient-glow {
+                .ambient-orb {
                     position: absolute;
-                    top: 20%;
-                    left: 30%;
-                    width: 800px;
-                    height: 800px;
-                    background: radial-gradient(circle, rgba(59, 130, 246, 0.08) 0%, transparent 70%);
-                    filter: blur(80px);
-                    animation: pulse-glow 8s ease-in-out infinite alternate;
+                    border-radius: 50%;
+                    filter: blur(100px);
+                    opacity: 0.4;
                 }
-                @keyframes pulse-glow {
-                    0% { opacity: 0.5; transform: scale(1); }
-                    100% { opacity: 0.8; transform: scale(1.1); }
+                .ambient-orb-1 {
+                    top: 10%;
+                    left: 20%;
+                    width: 500px;
+                    height: 500px;
+                    background: rgba(59, 130, 246, 0.15);
+                }
+                .ambient-orb-2 {
+                    bottom: 20%;
+                    right: 15%;
+                    width: 400px;
+                    height: 400px;
+                    background: rgba(212, 175, 55, 0.1);
                 }
 
                 /* ===== HEADER ===== */
@@ -105,335 +113,343 @@ export default function GigCarousel() {
                     position: relative;
                     z-index: 10;
                     max-width: 1280px;
-                    margin: 0 auto 60px;
+                    margin: 0 auto 50px;
                     padding: 0 24px;
                 }
                 .exclusive-tag {
                     display: inline-block;
                     font-size: 10px;
-                    font-weight: 900;
+                    font-weight: 800;
                     color: #d4af37;
                     text-transform: uppercase;
-                    letter-spacing: 0.8em;
-                    margin-bottom: 24px;
+                    letter-spacing: 0.7em;
+                    margin-bottom: 20px;
                     font-style: italic;
                 }
                 .section-title {
-                    font-size: clamp(3rem, 10vw, 8rem);
+                    font-size: clamp(2.5rem, 8vw, 6rem);
                     font-weight: 900;
                     color: white;
                     letter-spacing: -0.03em;
                     line-height: 1;
-                    margin-bottom: 24px;
+                    margin-bottom: 16px;
                 }
                 .section-subtitle {
-                    color: rgba(255, 255, 255, 0.2);
-                    font-size: clamp(1rem, 2vw, 1.5rem);
-                    max-width: 600px;
+                    color: rgba(255, 255, 255, 0.25);
+                    font-size: clamp(0.95rem, 1.8vw, 1.25rem);
+                    max-width: 500px;
                     margin: 0 auto;
                     font-style: italic;
-                    line-height: 1.6;
+                    line-height: 1.5;
                 }
 
-                /* ===== RIBBON CONTAINER (Soft Edges) ===== */
-                .ribbon-container {
+                /* ===== MARQUEE WRAPPER ===== */
+                .marquee-wrapper {
                     position: relative;
                     z-index: 10;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 20px;
+                }
+
+                /* ===== MARQUEE ROW (Soft Edges + Infinite) ===== */
+                .marquee-row {
                     width: 100%;
                     overflow: hidden;
                     /* Soft fade edges */
                     mask-image: linear-gradient(
                         to right,
                         transparent 0%,
-                        black 12%,
-                        black 88%,
+                        black 8%,
+                        black 92%,
                         transparent 100%
                     );
                     -webkit-mask-image: linear-gradient(
                         to right,
                         transparent 0%,
-                        black 12%,
-                        black 88%,
+                        black 8%,
+                        black 92%,
                         transparent 100%
                     );
                 }
 
-                /* ===== RIBBON TRACK (Infinite Motion) ===== */
-                .ribbon-track {
+                .marquee-track {
                     display: flex;
-                    gap: 24px;
-                    padding: 20px 0;
+                    gap: 20px;
                     width: max-content;
-                    animation: scroll-ribbon 45s linear infinite;
+                    /* GPU-accelerated animation */
                     will-change: transform;
+                    backface-visibility: hidden;
+                    -webkit-backface-visibility: hidden;
                 }
 
-                .ribbon-container:hover .ribbon-track {
+                .marquee-track.direction-left {
+                    animation: marquee-float-left var(--duration) linear infinite;
+                }
+                .marquee-track.direction-right {
+                    animation: marquee-float-right var(--duration) linear infinite;
+                }
+
+                /* Pause on hover */
+                .marquee-row:hover .marquee-track {
                     animation-play-state: paused;
                 }
 
-                @keyframes scroll-ribbon {
+                @keyframes marquee-float-left {
                     0% {
-                        transform: translateX(0);
+                        transform: translate3d(0, 0, 0);
                     }
                     100% {
-                        transform: translateX(-50%);
+                        transform: translate3d(-50%, 0, 0);
                     }
                 }
 
-                /* ===== GLASS CUBE CARD ===== */
-                .cube-wrapper {
-                    flex-shrink: 0;
-                    width: 300px;
-                    perspective: 1200px;
-                    position: relative;
+                @keyframes marquee-float-right {
+                    0% {
+                        transform: translate3d(-50%, 0, 0);
+                    }
+                    100% {
+                        transform: translate3d(0, 0, 0);
+                    }
                 }
 
-                .cube-caustic {
-                    position: absolute;
-                    inset: -40px;
-                    pointer-events: none;
-                    opacity: 0;
-                    transition: opacity 0.6s ease;
-                    z-index: 0;
-                }
-
+                /* ===== CUBE CARD (Optimized - no heavy filters during animation) ===== */
                 .cube-card {
-                    position: relative;
-                    width: 100%;
+                    flex-shrink: 0;
+                    width: 280px;
                     aspect-ratio: 1 / 1;
-                    transform-style: preserve-3d;
-                    cursor: pointer;
-                    transition: transform 0.2s ease-out;
-                    z-index: 1;
-                }
-
-                .cube-wrapper:hover .cube-card {
-                    transform: rotateY(6deg) rotateX(4deg) scale(1.02);
-                }
-
-                .cube-inner {
                     position: relative;
-                    width: 100%;
-                    height: 100%;
-                    background: rgba(255, 255, 255, 0.03);
                     border-radius: 20px;
+                    overflow: hidden;
+                    cursor: pointer;
+                    /* Simple background, no blur during movement */
+                    background: rgba(255, 255, 255, 0.03);
                     border: 1px solid rgba(255, 255, 255, 0.08);
-                    overflow: hidden;
-                    backdrop-filter: blur(20px) saturate(180%);
-                    box-shadow:
-                        0 25px 50px rgba(0, 0, 0, 0.5),
-                        inset 0 1px 0 rgba(255, 255, 255, 0.1);
-                }
-
-                /* Image Layer (Z = 0) */
-                .cube-image-layer {
-                    position: absolute;
-                    inset: 10px;
-                    border-radius: 12px;
-                    overflow: hidden;
+                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
+                    /* GPU optimization */
                     transform: translateZ(0);
+                    transition: transform 0.4s ease, box-shadow 0.4s ease;
                 }
 
-                .cube-image-layer img {
+                .cube-card:hover {
+                    transform: translateZ(0) scale(1.03) rotateY(3deg) rotateX(2deg);
+                    box-shadow: 
+                        0 30px 60px rgba(0, 0, 0, 0.5),
+                        0 0 30px rgba(212, 175, 55, 0.15);
+                }
+
+                /* Image */
+                .cube-image {
+                    position: absolute;
+                    inset: 8px;
+                    border-radius: 14px;
+                    overflow: hidden;
+                }
+
+                .cube-image img {
                     object-fit: cover;
-                    opacity: 0.9;
-                    transform: scale(1.05);
-                    transition: transform 0.8s ease, opacity 0.5s ease;
+                    transition: transform 0.6s ease, opacity 0.4s ease;
+                    opacity: 0.85;
                 }
 
-                .cube-wrapper:hover .cube-image-layer img {
-                    transform: scale(1.15);
+                .cube-card:hover .cube-image img {
+                    transform: scale(1.1);
                     opacity: 1;
                 }
 
-                /* Glass Layer (Z = 30px) */
-                .cube-glass-layer {
+                /* Glass overlay - simple gradient, no blur */
+                .cube-overlay {
                     position: absolute;
                     inset: 0;
-                    background: linear-gradient(145deg, rgba(255, 255, 255, 0.06), rgba(0, 0, 0, 0.2));
-                    mix-blend-mode: overlay;
+                    background: linear-gradient(
+                        180deg,
+                        transparent 40%,
+                        rgba(0, 0, 0, 0.7) 100%
+                    );
                     pointer-events: none;
-                    transform: translateZ(30px);
                 }
 
-                /* Gold Frame */
-                .cube-gold-frame {
+                /* Gold frame */
+                .cube-frame {
                     position: absolute;
                     inset: 0;
                     border-radius: 20px;
                     border: 1.5px solid transparent;
-                    background: linear-gradient(135deg, #d4af37 0%, transparent 50%, #d4af37 100%) border-box;
+                    background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), transparent 40%, transparent 60%, rgba(212, 175, 55, 0.4)) border-box;
                     mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
                     mask-composite: exclude;
-                    opacity: 0.2;
-                    transition: opacity 0.4s ease, box-shadow 0.4s ease;
-                    box-shadow: 0 0 15px rgba(212, 175, 55, 0.1);
+                    opacity: 0.3;
+                    transition: opacity 0.4s ease;
+                    pointer-events: none;
                 }
 
-                .cube-wrapper:hover .cube-gold-frame {
-                    opacity: 0.8;
-                    box-shadow: 0 0 25px rgba(212, 175, 55, 0.35);
+                .cube-card:hover .cube-frame {
+                    opacity: 1;
                 }
 
-                /* Text Layer (Z = 60px) */
-                .cube-text-layer {
+                /* Text content */
+                .cube-content {
                     position: absolute;
-                    bottom: 20px;
-                    left: 18px;
-                    right: 18px;
-                    transform: translateZ(60px);
-                    text-align: left;
+                    bottom: 16px;
+                    left: 16px;
+                    right: 16px;
+                    z-index: 5;
                 }
 
                 .cube-category {
                     font-size: 9px;
-                    font-weight: 800;
+                    font-weight: 700;
                     color: #d4af37;
                     text-transform: uppercase;
-                    letter-spacing: 0.35em;
+                    letter-spacing: 0.3em;
                 }
 
                 .cube-title {
                     font-family: var(--font-serif), Georgia, serif;
-                    font-size: 22px;
+                    font-size: 20px;
                     font-weight: 400;
                     color: white;
-                    margin-top: 6px;
-                    letter-spacing: 0.08em;
-                    line-height: 1.25;
-                    text-shadow: 0 4px 20px rgba(0, 0, 0, 0.6), 0 0 10px rgba(212, 175, 55, 0.2);
+                    margin-top: 4px;
+                    letter-spacing: 0.05em;
+                    line-height: 1.2;
+                    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
                 }
 
                 .cube-arrow {
-                    margin-top: 12px;
+                    position: absolute;
+                    top: 16px;
+                    right: 16px;
                     width: 32px;
                     height: 32px;
                     border-radius: 50%;
-                    background: rgba(255, 255, 255, 0.06);
-                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    background: rgba(255, 255, 255, 0.1);
+                    border: 1px solid rgba(255, 255, 255, 0.15);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: white;
-                    opacity: 0.6;
+                    opacity: 0;
+                    transform: translateY(-5px);
                     transition: all 0.3s ease;
                 }
 
-                .cube-wrapper:hover .cube-arrow {
+                .cube-card:hover .cube-arrow {
                     opacity: 1;
-                    background: rgba(212, 175, 55, 0.2);
-                    border-color: rgba(212, 175, 55, 0.4);
+                    transform: translateY(0);
                 }
 
-                /* Shine effect on hover */
+                /* Shine effect */
                 .cube-shine {
                     position: absolute;
                     inset: 0;
                     background: linear-gradient(
-                        115deg,
-                        transparent 20%,
-                        rgba(255, 255, 255, 0.1) 40%,
-                        rgba(255, 255, 255, 0.2) 50%,
-                        rgba(255, 255, 255, 0.1) 60%,
-                        transparent 80%
+                        105deg,
+                        transparent 30%,
+                        rgba(255, 255, 255, 0.08) 45%,
+                        rgba(255, 255, 255, 0.15) 50%,
+                        rgba(255, 255, 255, 0.08) 55%,
+                        transparent 70%
                     );
                     opacity: 0;
                     transform: translateX(-100%);
-                    transition: opacity 0.3s ease;
+                    transition: opacity 0.2s ease;
                     pointer-events: none;
                     border-radius: 20px;
                 }
 
-                .cube-wrapper:hover .cube-shine {
+                .cube-card:hover .cube-shine {
                     opacity: 1;
-                    animation: shine-sweep 1.5s ease forwards;
+                    animation: shine-pass 1s ease forwards;
                 }
 
-                @keyframes shine-sweep {
+                @keyframes shine-pass {
                     0% { transform: translateX(-100%); }
                     100% { transform: translateX(100%); }
+                }
+
+                /* Mobile adjustments */
+                @media (max-width: 768px) {
+                    .cube-card {
+                        width: 220px;
+                    }
+                    .marquee-track {
+                        gap: 16px;
+                    }
+                    .marquee-wrapper {
+                        gap: 16px;
+                    }
+                    .section-header {
+                        margin-bottom: 40px;
+                    }
+                    .gig-section {
+                        padding: 50px 0 60px;
+                    }
                 }
             `}</style>
         </section>
     );
 }
 
-function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
-    const cardRef = useRef<HTMLDivElement>(null);
-    const [isHovered, setIsHovered] = useState(false);
-
-    const mouseX = useMotionValue(0);
-    const mouseY = useMotionValue(0);
-
-    const springConfig = { stiffness: 80, damping: 20, mass: 1 };
-    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
-    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
-
-    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        mouseX.set((e.clientX - (rect.left + rect.width / 2)) / rect.width);
-        mouseY.set((e.clientY - (rect.top + rect.height / 2)) / rect.height);
-    };
+function MarqueeRow({
+    items,
+    direction,
+    speed,
+    lang
+}: {
+    items: Package[];
+    direction: 'left' | 'right';
+    speed: number;
+    lang: 'en' | 'he';
+}) {
+    // Duplicate items for seamless infinite loop
+    const loopItems = [...items, ...items];
 
     return (
-        <div
-            className="cube-wrapper"
-            ref={cardRef}
-            onMouseMove={handleMouseMove}
-            onMouseEnter={() => setIsHovered(true)}
-            onMouseLeave={() => {
-                setIsHovered(false);
-                mouseX.set(0);
-                mouseY.set(0);
-            }}
-        >
-            {/* Caustic glow under card */}
-            <motion.div
-                className="cube-caustic"
-                style={{
-                    background: `radial-gradient(circle at 50% 50%, rgba(212, 175, 55, 0.12) 0%, transparent 60%)`,
-                    filter: 'blur(50px)',
-                }}
-                animate={{ opacity: isHovered ? 1 : 0 }}
-                transition={{ duration: 0.5 }}
-            />
-
-            <motion.div
-                className="cube-card"
-                style={{ rotateX, rotateY }}
+        <div className="marquee-row">
+            <div
+                className={`marquee-track direction-${direction}`}
+                style={{ '--duration': `${speed}s` } as React.CSSProperties}
             >
-                <div className="cube-inner">
-                    {/* Layer 1: Image */}
-                    <div className="cube-image-layer">
-                        <Image
-                            src={pkg.image}
-                            alt={pkg.title[lang]}
-                            fill
-                            sizes="300px"
-                        />
-                    </div>
-
-                    {/* Layer 2: Glass overlay */}
-                    <div className="cube-glass-layer" />
-                    
-                    {/* Gold frame */}
-                    <div className="cube-gold-frame" />
-
-                    {/* Shine effect */}
-                    <div className="cube-shine" />
-
-                    {/* Layer 3: Text */}
-                    <div className="cube-text-layer">
-                        <span className="cube-category">{pkg.category}</span>
-                        <h3 className="cube-title">{pkg.title[lang]}</h3>
-                        <div className="cube-arrow">
-                            <ArrowUpRight className="w-4 h-4" />
-                        </div>
-                    </div>
-                </div>
-            </motion.div>
+                {loopItems.map((pkg, idx) => (
+                    <CubeCard key={`${pkg.id}-${idx}`} pkg={pkg} lang={lang} />
+                ))}
+            </div>
         </div>
+    );
+}
+
+function CubeCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
+    return (
+        <Link href={`/package/${pkg.id}`} className="cube-card">
+            {/* Image */}
+            <div className="cube-image">
+                <Image
+                    src={pkg.image}
+                    alt={pkg.title[lang]}
+                    fill
+                    sizes="280px"
+                />
+            </div>
+
+            {/* Dark gradient overlay */}
+            <div className="cube-overlay" />
+
+            {/* Gold frame */}
+            <div className="cube-frame" />
+
+            {/* Shine effect */}
+            <div className="cube-shine" />
+
+            {/* Arrow */}
+            <div className="cube-arrow">
+                <ArrowUpRight className="w-4 h-4" />
+            </div>
+
+            {/* Text */}
+            <div className="cube-content">
+                <span className="cube-category">{pkg.category}</span>
+                <h3 className="cube-title">{pkg.title[lang]}</h3>
+            </div>
+        </Link>
     );
 }
