@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import BlueAmbientBackground from '@/components/BlueAmbientBackground';
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -72,13 +73,10 @@ export default function SignUpPage() {
     const currentLang = languages.find(l => l.code === language) || languages[0];
 
     return (
-        <main className="min-h-screen bg-slate-950 flex flex-col md:flex-row overflow-hidden">
+        <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row">
+            <BlueAmbientBackground />
             {/* Left Side - Visual */}
-            <div className="hidden md:flex md:w-1/2 bg-slate-900 relative items-center justify-center p-12 overflow-hidden border-r border-white/5">
-                <div className="absolute top-0 left-0 w-full h-full">
-                    <div className="absolute top-1/4 -left-20 w-96 h-96 bg-purple-500/10 rounded-full blur-[120px]" />
-                    <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-cyan-600/10 rounded-full blur-[120px]" />
-                </div>
+            <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-white/10 bg-white/5 backdrop-blur-xl">
 
                 <div className="relative z-10 max-w-lg">
                     <motion.div
@@ -112,7 +110,7 @@ export default function SignUpPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full md:w-1/2 flex flex-col p-6 md:p-12 lg:p-20 items-center justify-center relative">
+            <div className="relative w-full md:w-1/2 flex flex-col p-6 md:p-12 lg:p-20 items-center justify-center">
                 <div className="w-full max-w-md">
                     <div className="flex items-center justify-between mb-12">
                         <Logo size="lg" className="md:hidden" />

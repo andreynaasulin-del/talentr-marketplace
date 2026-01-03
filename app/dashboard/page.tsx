@@ -25,6 +25,7 @@ import {
 } from 'lucide-react';
 
 import Navbar from '@/components/Navbar';
+import BlueAmbientBackground from '@/components/BlueAmbientBackground';
 import { useLanguage } from '@/context/LanguageContext';
 import { supabase } from '@/lib/supabase';
 import { getVendorBookings, updateBookingStatus } from '@/lib/vendors';
@@ -50,7 +51,6 @@ interface VendorProfile {
     city: string | null;
 }
 
-const OBSIDIAN = '#05070A';
 // Quiet luxury accent (champagne / brushed brass) — intentionally NOT saturated gold
 const ACCENT = '#C8B37A';
 const ACCENT_RGB = '200,179,122';
@@ -246,7 +246,8 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: OBSIDIAN }}>
+            <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                <BlueAmbientBackground />
                 <div className="text-center">
                     <div
                         className="w-14 h-14 border-2 rounded-full animate-spin mx-auto mb-4"
@@ -261,46 +262,9 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="obsidian-dashboard min-h-screen text-white relative" style={{ background: OBSIDIAN }}>
+        <div className="obsidian-dashboard min-h-screen text-white relative overflow-hidden">
             <Navbar />
-
-            {/* Ambient depth */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <motion.div
-                    className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-20"
-                    style={{
-                        background: `radial-gradient(circle at 30% 30%, rgba(${ACCENT_RGB},0.16), transparent 62%)`,
-                    }}
-                    animate={{ x: [0, -28, 0], y: [0, 18, 0], scale: [1, 1.05, 1] }}
-                    transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
-                />
-                <motion.div
-                    className="absolute top-16 -right-72 w-[1050px] h-[1050px] rounded-full blur-3xl opacity-30"
-                    style={{
-                        background: 'radial-gradient(circle at 35% 35%, rgba(0, 180, 255, 0.09), transparent 62%)',
-                    }}
-                    animate={{ x: [0, 24, 0], y: [0, -14, 0], scale: [1, 1.04, 1] }}
-                    transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
-                />
-
-                {/* Organic dust (no grid) */}
-                <motion.div
-                    className="absolute inset-0 opacity-[0.06] mix-blend-screen"
-                    style={{
-                        backgroundImage: `
-                            radial-gradient(1px 1px at 12% 22%, rgba(${ACCENT_RGB},0.30), transparent 60%),
-                            radial-gradient(1px 1px at 26% 78%, rgba(${ACCENT_RGB},0.18), transparent 60%),
-                            radial-gradient(1.5px 1.5px at 42% 40%, rgba(255,255,255,0.10), transparent 60%),
-                            radial-gradient(1px 1px at 63% 16%, rgba(${ACCENT_RGB},0.16), transparent 60%),
-                            radial-gradient(1px 1px at 78% 66%, rgba(255,255,255,0.08), transparent 60%),
-                            radial-gradient(1.5px 1.5px at 88% 84%, rgba(${ACCENT_RGB},0.14), transparent 60%),
-                            radial-gradient(1px 1px at 90% 30%, rgba(${ACCENT_RGB},0.10), transparent 60%)
-                        `,
-                    }}
-                    animate={{ x: [0, -10, 0], y: [0, 8, 0], opacity: [0.05, 0.07, 0.05] }}
-                    transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
-                />
-            </div>
+            <BlueAmbientBackground />
 
             <main className="relative max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 pt-28 pb-14">
                 {/* Header */}

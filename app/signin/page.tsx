@@ -9,6 +9,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
+import BlueAmbientBackground from '@/components/BlueAmbientBackground';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -66,15 +67,10 @@ export default function SignInPage() {
     const currentLang = languages.find(l => l.code === language) || languages[0];
 
     return (
-        <main className="min-h-screen bg-slate-950 flex flex-col md:flex-row overflow-hidden">
+        <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row">
+            <BlueAmbientBackground />
             {/* Left Side - Visual/Marketing (Desktop only) */}
-            <div className="hidden md:flex md:w-1/2 bg-slate-900 relative items-center justify-center p-12 overflow-hidden border-r border-white/5">
-                {/* Background Blobs */}
-                <div className="absolute top-0 left-0 w-full h-full">
-                    <div className="absolute top-1/4 -left-20 w-96 h-96 bg-cyan-500/10 rounded-full blur-[120px]" />
-                    <div className="absolute bottom-1/4 -right-20 w-96 h-96 bg-blue-600/10 rounded-full blur-[120px]" />
-                </div>
-
+            <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-white/10 bg-white/5 backdrop-blur-xl">
                 <div className="relative z-10 max-w-lg">
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
@@ -112,11 +108,7 @@ export default function SignInPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full md:w-1/2 flex flex-col p-6 md:p-12 lg:p-20 items-center justify-center relative">
-                {/* Mobile Background */}
-                <div className="md:hidden absolute inset-0 -z-10">
-                    <div className="absolute top-0 right-0 w-64 h-64 bg-cyan-500/5 rounded-full blur-[80px]" />
-                </div>
+            <div className="relative w-full md:w-1/2 flex flex-col p-6 md:p-12 lg:p-20 items-center justify-center">
 
                 <div className="w-full max-w-md">
                     {/* Header with Language Switcher */}

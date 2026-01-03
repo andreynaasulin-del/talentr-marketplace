@@ -15,7 +15,6 @@ export default function Navbar() {
     const { language, setLanguage } = useLanguage();
     const pathname = usePathname();
     const isHome = pathname === '/';
-    const isDashboard = pathname?.startsWith('/dashboard');
     const solidNav = !isHome || isScrolled;
     
     // Scroll-based opacity for navbar background
@@ -66,12 +65,7 @@ export default function Navbar() {
             >
                 {/* Glass background layer */}
                 <motion.div 
-                    className={cn(
-                        "absolute inset-0 backdrop-blur-xl border-b",
-                        isDashboard
-                            ? "bg-[#05070A]/72 border-white/10"
-                            : "bg-white/80 dark:bg-slate-900/80 border-gray-100/50 dark:border-slate-800/50"
-                    )}
+                    className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-100/50 dark:border-slate-800/50"
                     style={{ opacity: isHome ? navBgOpacity : 1 }}
                 />
                 
@@ -79,9 +73,7 @@ export default function Navbar() {
                 <motion.div 
                     className="absolute bottom-0 left-0 right-0 h-[1px]"
                     style={{
-                        background: isDashboard
-                            ? 'linear-gradient(90deg, transparent, rgba(200, 179, 122, 0.35), transparent)'
-                            : 'linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent)',
+                        background: 'linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent)',
                         opacity: solidNav ? 1 : 0,
                         transition: 'opacity 0.3s ease',
                     }}
@@ -106,9 +98,7 @@ export default function Navbar() {
                                     className={cn(
                                         "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-300",
                                         solidNav
-                                            ? (isDashboard
-                                                ? "text-white/80 hover:bg-white/10"
-                                                : "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800")
+                                            ? "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800"
                                             : "text-white/90 hover:bg-white/10 backdrop-blur-sm"
                                     )}
                                     whileHover={{ scale: 1.02 }}
@@ -139,14 +129,7 @@ export default function Navbar() {
                                                 transition={{ duration: 0.2, ease: [0.16, 1, 0.3, 1] }}
                                             >
                                                 {/* Glass dropdown background */}
-                                                <div
-                                                    className={cn(
-                                                        "absolute inset-0 backdrop-blur-xl rounded-xl border shadow-xl",
-                                                        isDashboard
-                                                            ? "bg-[#05070A]/90 border-white/10"
-                                                            : "bg-white/90 dark:bg-slate-900/90 border-gray-100 dark:border-slate-800"
-                                                    )}
-                                                />
+                                                <div className="absolute inset-0 bg-white/90 dark:bg-slate-900/90 backdrop-blur-xl rounded-xl border border-gray-100 dark:border-slate-800 shadow-xl" />
                                                 
                                                 <div className="relative">
                                                     {languages.map((l, index) => (
@@ -158,14 +141,10 @@ export default function Navbar() {
                                                             }}
                                                             className={cn(
                                                                 "w-full px-4 py-2.5 text-start flex items-center gap-3 transition-colors",
-                                                                isDashboard ? "hover:bg-white/5" : "hover:bg-cyan-500/10",
+                                                                "hover:bg-cyan-500/10",
                                                                 language === l.code
-                                                                    ? (isDashboard
-                                                                ? 'text-[#C8B37A] font-semibold'
-                                                                        : 'text-cyan-600 dark:text-cyan-400 font-semibold')
-                                                                    : (isDashboard
-                                                                        ? 'text-white/75'
-                                                                        : 'text-slate-600 dark:text-slate-300')
+                                                                    ? 'text-cyan-600 dark:text-cyan-400 font-semibold'
+                                                                    : 'text-slate-600 dark:text-slate-300'
                                                             )}
                                                             initial={{ opacity: 0, x: -10 }}
                                                             animate={{ opacity: 1, x: 0 }}
@@ -175,10 +154,7 @@ export default function Navbar() {
                                                             <span className="text-sm">{l.label}</span>
                                                             {language === l.code && (
                                                                 <motion.div 
-                                                                    className={cn(
-                                                                        "ml-auto w-1.5 h-1.5 rounded-full",
-                                                                        isDashboard ? "bg-[#C8B37A]" : "bg-cyan-500"
-                                                                    )}
+                                                                    className="ml-auto w-1.5 h-1.5 rounded-full bg-cyan-500"
                                                                     layoutId="activeLang"
                                                                 />
                                                             )}
@@ -202,9 +178,7 @@ export default function Navbar() {
                                     className={cn(
                                         "px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300",
                                         solidNav
-                                            ? (isDashboard
-                                                ? "text-white/70 hover:text-white hover:bg-white/10"
-                                                : "text-slate-600 hover:text-cyan-600 hover:bg-cyan-50 dark:text-slate-300 dark:hover:text-cyan-400 dark:hover:bg-cyan-900/20")
+                                            ? "text-slate-600 hover:text-cyan-600 hover:bg-cyan-50 dark:text-slate-300 dark:hover:text-cyan-400 dark:hover:bg-cyan-900/20"
                                             : "text-white/90 hover:text-white hover:bg-white/10 backdrop-blur-sm"
                                     )}
                                 >
@@ -215,12 +189,7 @@ export default function Navbar() {
                             {/* Primary CTA: Find Talent */}
                             <Link
                                 href={isHome ? "#packages" : "/#packages"}
-                                className={cn(
-                                    "px-5 py-2.5 md:px-6 md:py-3 text-sm font-bold rounded-xl transition-colors",
-                                    isDashboard
-                                        ? "border border-white/10 bg-white/5 text-white/85 hover:bg-white/10"
-                                        : "bg-[#0a1628] text-white hover:bg-[#0f2340]"
-                                )}
+                                className="px-5 py-2.5 md:px-6 md:py-3 bg-[#0a1628] text-white text-sm font-bold rounded-xl hover:bg-[#0f2340] transition-colors"
                             >
                                 {t.findTalent}
                             </Link>

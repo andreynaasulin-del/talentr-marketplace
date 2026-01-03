@@ -4,6 +4,7 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
+import BlueAmbientBackground from '@/components/BlueAmbientBackground';
 import { User } from '@supabase/supabase-js';
 import {
     ArrowLeft, Save, Loader2, Camera, User as UserIcon,
@@ -164,40 +165,17 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center" style={{ background: '#05070A' }}>
+            <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
+                <BlueAmbientBackground />
                 <Loader2 className="w-10 h-10 animate-spin" style={{ color: '#C8B37A' }} />
             </div>
         );
     }
 
     return (
-        <div className="obsidian-settings min-h-screen text-white relative" style={{ background: '#05070A' }}>
+        <div className="obsidian-settings min-h-screen text-white relative overflow-hidden">
             <Navbar />
-
-            {/* Ambient depth */}
-            <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div
-                    className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-20"
-                    style={{ background: 'radial-gradient(circle at 30% 30%, rgba(200,179,122,0.16), transparent 62%)' }}
-                />
-                <div
-                    className="absolute top-20 -right-64 w-[1000px] h-[1000px] rounded-full blur-3xl opacity-35"
-                    style={{ background: 'radial-gradient(circle at 35% 35%, rgba(0, 180, 255, 0.10), transparent 60%)' }}
-                />
-                <div
-                    className="absolute inset-0 opacity-[0.06] mix-blend-screen"
-                    style={{
-                        backgroundImage: `
-                            radial-gradient(1px 1px at 12% 22%, rgba(200,179,122,0.30), transparent 60%),
-                            radial-gradient(1px 1px at 26% 78%, rgba(200,179,122,0.18), transparent 60%),
-                            radial-gradient(1.5px 1.5px at 42% 40%, rgba(255,255,255,0.10), transparent 60%),
-                            radial-gradient(1px 1px at 63% 16%, rgba(200,179,122,0.16), transparent 60%),
-                            radial-gradient(1px 1px at 78% 66%, rgba(255,255,255,0.08), transparent 60%),
-                            radial-gradient(1.5px 1.5px at 88% 84%, rgba(200,179,122,0.14), transparent 60%)
-                        `,
-                    }}
-                />
-            </div>
+            <BlueAmbientBackground />
 
             <main className="relative max-w-3xl mx-auto px-4 md:px-6 pt-28 pb-14">
 
