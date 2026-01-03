@@ -31,10 +31,9 @@ export default function GigCarousel() {
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + p.title.he)
     );
 
-    // Split into two rows - no repeats within visible area
-    const mid = Math.ceil(filtered.length / 2);
-    const topRowItems = filtered.slice(0, mid);
-    const bottomRowItems = filtered.slice(mid);
+    // Split into two rows by even/odd index to always have both rows filled without repeats
+    const topRowItems = filtered.filter((_, idx) => idx % 2 === 0);
+    const bottomRowItems = filtered.filter((_, idx) => idx % 2 === 1);
 
     return (
         <section id="packages" className="gig-section">
