@@ -215,7 +215,7 @@ export default function DashboardPage() {
     return (
         <>
             <Navbar />
-            <div className="max-w-7xl mx-auto px-4 md:px-6 py-8">
+            <div className="max-w-7xl mx-auto px-4 md:px-6 pt-24 pb-12">
 
                 {/* Header with Edit Profile Button */}
                 <div className="flex flex-col md:flex-row md:items-center justify-between gap-4 mb-8">

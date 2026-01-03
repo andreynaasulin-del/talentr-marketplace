@@ -70,7 +70,7 @@ export default function BookingsPage() {
     return (
         <div className="min-h-screen bg-white dark:bg-slate-900">
             <Navbar />
-            <div className="max-w-4xl mx-auto px-6 py-12">
+            <div className="max-w-4xl mx-auto px-6 pt-24 pb-12">
                 <h1 className="text-4xl font-black text-gray-900 dark:text-white mb-8">{pageTitle}</h1>
                 {loading ? (
                     <div className="flex items-center justify-center py-20"><Loader2 className="w-10 h-10 text-blue-500 animate-spin" /></div>
