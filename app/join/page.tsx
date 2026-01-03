@@ -383,7 +383,7 @@ export default function JoinPage() {
                 <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/50 to-transparent" />
 
                 <div className="absolute inset-0 flex flex-col justify-between p-12 text-white">
-                    <Logo size="lg" className="brightness-0 invert" />
+                    <Logo size="lg" />
 
                     <div className="max-w-lg">
                         <h2 className="text-5xl font-black leading-tight mb-4">
@@ -401,9 +401,7 @@ export default function JoinPage() {
             {/* Right Side - Form */}
             <div className="w-full lg:w-1/2 flex flex-col bg-[#009de0] dark:bg-slate-900">
                 {/* Header */}
-                <div className="flex items-center justify-between p-4">
-                    <Logo size="md" className="brightness-0 invert" />
-
+                <div className="flex items-center justify-end p-4">
                     {/* Language Switcher */}
                     <div className="relative">
                         <button
