@@ -1,379 +1,374 @@
 'use client';
 
-import { useState, useRef, useEffect } from 'react';
-import { Send, Sparkles, Star, ArrowRight, Shield, CheckCircle2, Zap, Bot, Camera, Music, Mic } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, AnimatePresence } from 'framer-motion';
-import { cn } from '@/lib/utils';
+import { motion } from 'framer-motion';
+import { MessageCircle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import Image from 'next/image';
-import { Vendor } from '@/types';
-
-interface Message {
-    id: string;
-    role: 'user' | 'assistant';
-    content: string;
-    vendors?: Vendor[];
-    suggestions?: string[];
-}
-
-interface ChatAPIResponse {
-    response: string;
-    vendors: Vendor[];
-    suggestions?: string[];
-}
+import { useState, useEffect, useCallback } from 'react';
 
 export default function HeroSection() {
     const { language } = useLanguage();
-    const [messages, setMessages] = useState<Message[]>([]);
-    const [input, setInput] = useState('');
-    const [isTyping, setIsTyping] = useState(false);
-    const [isFocused, setIsFocused] = useState(false);
-    const [chatExpanded, setChatExpanded] = useState(false);
-    const messagesContainerRef = useRef<HTMLDivElement>(null);
-    const inputRef = useRef<HTMLInputElement>(null);
-
     const lang = language as 'en' | 'he';
-
-    // Animated words for headline
-    const headlineWords = {
-        en: ['perfect', 'ideal', 'right'],
-        he: ['המושלם', 'הטוב ביותר', 'המתאים']
+    
+    const content = {
+        en: {
+            staticStart: 'We help you',
+            phrases: [
+                'find the perfect DJ',
+                'book top artists',
+                'throw epic parties',
+                'create magic moments',
+                'make it unforgettable',
+            ],
+            tagline: 'No Compromises.',
+            description: 'The only ecosystem in Israel where verified industry leaders are gathered.',
+            chat: 'What are we celebrating? 🎉',
+            forMasters: 'For Masters',
+            forMastersDesc: 'Focus on what you do best. We ensure your talent earns what it deserves.',
+            forMastersCta: 'Apply Now',
+        },
+        he: {
+            staticStart: 'אנחנו עוזרים לך',
+            phrases: [
+                'למצוא את הדיג׳יי המושלם',
+                'להזמין אמנים מובילים',
+                'לעשות מסיבה אדירה',
+                'ליצור רגעים קסומים',
+                'להפוך את זה לבלתי נשכח',
+            ],
+            tagline: 'ללא פשרות.',
+            description: 'המערכת היחידה בישראל בה מרוכזים מובילי התעשייה המאומתים.',
+            chat: 'מה חוגגים ומתי? 🎉',
+            forMasters: 'לאמנים',
+            forMastersDesc: 'התמקדו במה שאתם עושים הכי טוב. אנחנו נדאג שהכישרון שלכם ירוויח את מה שמגיע לו.',
+            forMastersCta: 'הגש מועמדות',
+        },
     };
 
-    const [wordIndex, setWordIndex] = useState(0);
+    const t = content[lang];
+
+    // Typewriter state
+    const [phraseIndex, setPhraseIndex] = useState(0);
+    const [displayText, setDisplayText] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const currentPhrase = t.phrases[phraseIndex];
+
+    const typeSpeed = 80;
+    const deleteSpeed = 40;
+    const pauseBeforeDelete = 2000;
+
+    const tick = useCallback(() => {
+        if (!isDeleting) {
+            if (displayText.length < currentPhrase.length) {
+                setDisplayText(currentPhrase.slice(0, displayText.length + 1));
+            } else {
+                setTimeout(() => setIsDeleting(true), pauseBeforeDelete);
+            }
+        } else {
+            if (displayText.length > 0) {
+                setDisplayText(displayText.slice(0, -1));
+            } else {
+                setIsDeleting(false);
+                setPhraseIndex((prev) => (prev + 1) % t.phrases.length);
+            }
+        }
+    }, [displayText, isDeleting, currentPhrase, t.phrases.length]);
 
     useEffect(() => {
-        const interval = setInterval(() => {
-            setWordIndex((prev) => (prev + 1) % headlineWords[lang].length);
-        }, 3000);
-        return () => clearInterval(interval);
+        const speed = isDeleting ? deleteSpeed : typeSpeed;
+        const timer = setTimeout(tick, speed);
+        return () => clearTimeout(timer);
+    }, [tick, isDeleting]);
+
+    useEffect(() => {
+        setDisplayText('');
+        setPhraseIndex(0);
+        setIsDeleting(false);
     }, [lang]);
 
-    const placeholders = {
-        en: "What are you celebrating? I'll help you find the perfect pro ✨",
-        he: "מה אתם חוגגים? אמצא לכם את המקצוענים הכי טובים ✨"
-    };
-
-    const quickPrompts = {
-        en: [
-            { text: "Wedding photographer", icon: Camera },
-            { text: "DJ for party", icon: Music },
-            { text: "Event MC", icon: Mic },
-        ],
-        he: [
-            { text: "צלם לחתונה", icon: Camera },
-            { text: "DJ למסיבה", icon: Music },
-            { text: "מנחה לאירוע", icon: Mic },
-        ]
-    };
-
-    // Scroll to bottom of messages without moving the page
-    useEffect(() => {
-        if (messagesContainerRef.current && chatExpanded) {
-            messagesContainerRef.current.scrollTop = messagesContainerRef.current.scrollHeight;
-        }
-    }, [messages, chatExpanded]);
-
-    const sendMessage = async (text?: string) => {
-        const messageText = text || input.trim();
-        if (!messageText) return;
-
-        // Expand chat on first message
-        if (!chatExpanded) {
-            setChatExpanded(true);
-        }
-
-        const userMessage: Message = {
-            id: Date.now().toString(),
-            role: 'user',
-            content: messageText,
-        };
-        setMessages(prev => [...prev, userMessage]);
-        setInput('');
-        setIsTyping(true);
-
-        try {
-            const response = await fetch('/api/chat', {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ message: messageText, language: lang }),
-            });
-
-            if (!response.ok) throw new Error('API error');
-
-            const data: ChatAPIResponse = await response.json();
-
-            setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: data.response,
-                vendors: data.vendors,
-                suggestions: data.suggestions,
-            }]);
-        } catch (error) {
-            console.error('Chat error:', error);
-            setMessages(prev => [...prev, {
-                id: (Date.now() + 1).toString(),
-                role: 'assistant',
-                content: lang === 'he' ? 'סליחה, שגיאה. נסו שוב!' : 'Sorry, error. Try again!',
-            }]);
-        } finally {
-            setIsTyping(false);
-        }
-    };
-
-    const renderVendorCards = (vendors: Vendor[]) => (
-        <div className="mt-3 space-y-2">
-            {vendors.slice(0, 2).map((vendor) => (
-                <Link
-                    key={vendor.id}
-                    href={`/vendor/${vendor.id}`}
-                    className="flex items-center gap-3 p-3 bg-gray-50 hover:bg-blue-50 rounded-xl transition-colors group"
-                >
-                    <div className="relative w-11 h-11 rounded-xl overflow-hidden flex-shrink-0">
-                        <Image
-                            src={vendor.imageUrl || '/placeholder-vendor.jpg'}
-                            alt={vendor.name}
-                            fill
-                            className="object-cover"
-                        />
-                    </div>
-                    <div className="flex-1 min-w-0">
-                        <p className="font-semibold text-gray-900 truncate">
-                            {vendor.name}
-                        </p>
-                        <div className="flex items-center gap-1.5 text-sm text-gray-500">
-                            <Star className="w-3.5 h-3.5 text-amber-400 fill-amber-400" />
-                            {vendor.rating} · {vendor.city}
-                        </div>
-                    </div>
-                    <ArrowRight className="w-5 h-5 text-gray-400 group-hover:text-blue-600 group-hover:translate-x-1 transition-all" />
-                </Link>
-            ))}
-        </div>
-    );
-
     return (
-        <section className="relative min-h-[90vh] flex items-center justify-center bg-blue-600 dark:bg-slate-900">
-            {/* Gradient overlay */}
-            <div className="absolute inset-0 bg-gradient-to-b from-blue-500/30 to-blue-700/50 dark:from-slate-800/50 dark:to-slate-900" />
+        <section className="relative min-h-screen overflow-hidden">
+            
+            {/* === LAYER 1: ANIMATED MESH GRADIENT === */}
+            <div className="absolute inset-0">
+                <div 
+                    className="absolute inset-0 opacity-100"
+                    style={{
+                        background: `
+                            radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
+                            radial-gradient(at 97% 21%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
+                            radial-gradient(at 52% 99%, hsla(196, 100%, 57%, 1) 0px, transparent 50%),
+                            radial-gradient(at 10% 29%, hsla(195, 100%, 39%, 1) 0px, transparent 50%),
+                            radial-gradient(at 97% 96%, hsla(195, 84%, 45%, 1) 0px, transparent 50%),
+                            radial-gradient(at 33% 50%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
+                            radial-gradient(at 79% 53%, hsla(196, 100%, 48%, 1) 0px, transparent 50%)
+                        `,
+                        animation: 'meshMove 20s ease-in-out infinite',
+                    }}
+                />
+            </div>
 
-            {/* Content */}
-            <div className="relative z-10 w-full max-w-3xl mx-auto px-4 py-10 md:py-16">
-                {/* Headline */}
+            {/* === LAYER 2: CAUSTIC LIGHT BLOBS === */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Blob 1 */}
                 <motion.div
-                    className="text-center mb-8 md:mb-10"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4 }}
-                >
-                    <h1 className="text-4xl sm:text-5xl md:text-6xl font-black text-white mb-4 leading-tight">
-                        {lang === 'he' ? 'מצאו את הכישרון' : 'Find your'}
-                        <br />
-                        <span className="relative inline-block">
-                            <AnimatePresence mode="wait">
-                                <motion.span
-                                    key={wordIndex}
-                                    className="text-sky-400"
-                                    initial={{ opacity: 0, y: 10 }}
-                                    animate={{ opacity: 1, y: 0 }}
-                                    exit={{ opacity: 0, y: -10 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    {headlineWords[lang][wordIndex]}
-                                </motion.span>
-                            </AnimatePresence>
-                        </span>
-                        {' '}
-                        <span className="text-white">
-                            {lang === 'he' ? '' : 'talent'}
+                    className="absolute w-[600px] h-[600px] rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(255,255,255,0.08) 0%, transparent 70%)',
+                        filter: 'blur(60px)',
+                        top: '10%',
+                        left: '15%',
+                    }}
+                    animate={{
+                        x: [0, 50, -30, 0],
+                        y: [0, -40, 30, 0],
+                        scale: [1, 1.1, 0.95, 1],
+                    }}
+                    transition={{
+                        duration: 20,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
+                />
+                
+                {/* Blob 2 */}
+                <motion.div
+                    className="absolute w-[500px] h-[500px] rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(255,213,128,0.06) 0%, transparent 70%)',
+                        filter: 'blur(80px)',
+                        top: '50%',
+                        right: '10%',
+                    }}
+                    animate={{
+                        x: [0, -60, 40, 0],
+                        y: [0, 50, -30, 0],
+                        scale: [1, 0.9, 1.05, 1],
+                    }}
+                    transition={{
+                        duration: 25,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 2,
+                    }}
+                />
+
+                {/* Blob 3 */}
+                <motion.div
+                    className="absolute w-[400px] h-[400px] rounded-full"
+                    style={{
+                        background: 'radial-gradient(circle, rgba(72,202,228,0.07) 0%, transparent 70%)',
+                        filter: 'blur(70px)',
+                        bottom: '20%',
+                        left: '40%',
+                    }}
+                    animate={{
+                        x: [0, 30, -20, 0],
+                        y: [0, -25, 35, 0],
+                        scale: [1, 1.08, 0.97, 1],
+                    }}
+                    transition={{
+                        duration: 18,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 5,
+                    }}
+                />
+            </div>
+
+            {/* === LAYER 3: FLOATING GLASS ORBS === */}
+            <div className="absolute inset-0 overflow-hidden pointer-events-none">
+                {/* Orb 1 */}
+                <motion.div
+                    className="absolute w-32 h-32 rounded-full backdrop-blur-md border border-white/10"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.15), rgba(255,255,255,0.02))',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        top: '20%',
+                        left: '10%',
+                    }}
+                    animate={{
+                        y: [0, -30, 0],
+                        x: [0, 15, 0],
+                    }}
+                    transition={{
+                        duration: 8,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                    }}
+                />
+
+                {/* Orb 2 */}
+                <motion.div
+                    className="absolute w-24 h-24 rounded-full backdrop-blur-md border border-white/10"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.12), rgba(255,255,255,0.02))',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        top: '60%',
+                        right: '15%',
+                    }}
+                    animate={{
+                        y: [0, -40, 0],
+                        x: [0, -20, 0],
+                    }}
+                    transition={{
+                        duration: 10,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 1,
+                    }}
+                />
+
+                {/* Orb 3 */}
+                <motion.div
+                    className="absolute w-20 h-20 rounded-full backdrop-blur-md border border-white/10"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(255,255,255,0.1), rgba(255,255,255,0.02))',
+                        boxShadow: '0 8px 32px rgba(0,0,0,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        top: '35%',
+                        right: '25%',
+                    }}
+                    animate={{
+                        y: [0, -25, 0],
+                        x: [0, 10, 0],
+                        rotate: [0, 180, 360],
+                    }}
+                    transition={{
+                        duration: 12,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 3,
+                    }}
+                />
+
+                {/* Orb 4 - Small accent */}
+                <motion.div
+                    className="absolute w-16 h-16 rounded-full backdrop-blur-md border border-amber-400/20"
+                    style={{
+                        background: 'radial-gradient(circle at 30% 30%, rgba(251,191,36,0.15), rgba(251,191,36,0.02))',
+                        boxShadow: '0 8px 32px rgba(251,191,36,0.1), inset 0 1px 0 rgba(255,255,255,0.2)',
+                        bottom: '30%',
+                        left: '20%',
+                    }}
+                    animate={{
+                        y: [0, -35, 0],
+                        scale: [1, 1.1, 1],
+                    }}
+                    transition={{
+                        duration: 9,
+                        repeat: Infinity,
+                        ease: 'easeInOut',
+                        delay: 2,
+                    }}
+                />
+            </div>
+
+            {/* === LAYER 4: SUBTLE NOISE TEXTURE === */}
+            <div className="absolute inset-0 opacity-[0.015] mix-blend-overlay pointer-events-none"
+                style={{
+                    backgroundImage: `url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)'/%3E%3C/svg%3E")`,
+                }}
+            />
+
+            {/* === CONTENT === */}
+            <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-8 pt-32 md:pt-40 pb-20">
+                
+                {/* Main Headline with Typewriter */}
+                <div className="text-center mb-16 md:mb-20">
+                    
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.2] tracking-tight mb-6">
+                        <span className="block mb-2">{t.staticStart}</span>
+                        <span className="block text-white/90 min-h-[1.2em]">
+                            {displayText}
+                            <span className="inline-block w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
                         </span>
                     </h1>
-                    <p className="text-lg md:text-xl text-white/90 font-medium">
-                        {lang === 'he'
-                            ? 'צלמים, DJ, מנחים ועוד כישרונות לאירוע שלכם'
-                            : 'Photographers, DJs, MCs and more talents for your event'
-                        }
-                    </p>
-                </motion.div>
 
-                {/* Compact AI Search Bar */}
-                <motion.div
-                    className="max-w-xl mx-auto"
-                    initial={{ opacity: 0, y: 20 }}
-                    animate={{ opacity: 1, y: 0 }}
-                    transition={{ duration: 0.4, delay: 0.1 }}
-                >
-                    <div className="relative bg-white dark:bg-slate-800 rounded-2xl shadow-2xl overflow-hidden">
-                        {/* Expanded Chat Area */}
-                        <AnimatePresence>
-                            {chatExpanded && (
-                                <motion.div
-                                    ref={messagesContainerRef}
-                                    className="max-h-[300px] overflow-y-auto p-4 space-y-3 bg-gray-50 dark:bg-slate-900 border-b border-gray-100 dark:border-slate-700"
-                                    initial={{ height: 0, opacity: 0 }}
-                                    animate={{ height: 'auto', opacity: 1 }}
-                                    exit={{ height: 0, opacity: 0 }}
-                                    transition={{ duration: 0.3 }}
-                                >
-                                    {messages.map((msg) => (
-                                        <motion.div
-                                            key={msg.id}
-                                            className={cn(
-                                                "max-w-[85%]",
-                                                msg.role === 'user' ? 'ms-auto' : 'me-auto'
-                                            )}
-                                            initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
-                                        >
-                                            {msg.role === 'assistant' ? (
-                                                <div className="flex items-start gap-2">
-                                                    <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                                        <Bot className="w-4 h-4 text-white" />
-                                                    </div>
-                                                    <div className="bg-white dark:bg-slate-800 rounded-xl rounded-tl-sm px-3 py-2 shadow-sm border border-gray-100 dark:border-slate-700">
-                                                        <p className="text-gray-800 dark:text-gray-100 text-sm leading-relaxed">{msg.content}</p>
-                                                        {msg.vendors && msg.vendors.length > 0 && renderVendorCards(msg.vendors)}
-                                                        {msg.suggestions && msg.suggestions.length > 0 && (
-                                                            <div className="flex flex-wrap gap-1.5 mt-2">
-                                                                {msg.suggestions.slice(0, 3).map((s, i) => (
-                                                                    <button
-                                                                        key={i}
-                                                                        onClick={() => sendMessage(s)}
-                                                                        className="px-2.5 py-1 bg-blue-50 dark:bg-slate-700 hover:bg-blue-100 text-blue-700 dark:text-blue-300 rounded-full text-xs font-medium transition-colors"
-                                                                    >
-                                                                        {s}
-                                                                    </button>
-                                                                ))}
-                                                            </div>
-                                                        )}
-                                                    </div>
-                                                </div>
-                                            ) : (
-                                                <div className="bg-blue-600 text-white rounded-xl rounded-br-sm px-3 py-2 shadow-sm">
-                                                    <p className="text-sm">{msg.content}</p>
-                                                </div>
-                                            )}
-                                        </motion.div>
-                                    ))}
+                    <motion.p 
+                        className="text-2xl sm:text-3xl md:text-4xl font-black text-amber-400 mb-6"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.3 }}
+                    >
+                        {t.tagline}
+                    </motion.p>
+                    
+                    <motion.p 
+                        className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed"
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        transition={{ delay: 0.4 }}
+                    >
+                        {t.description}
+                    </motion.p>
 
-                                    {isTyping && (
-                                        <div className="flex items-start gap-2">
-                                            <div className="w-7 h-7 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center">
-                                                <Bot className="w-4 h-4 text-white" />
-                                            </div>
-                                            <div className="bg-white dark:bg-slate-800 rounded-xl px-4 py-3 shadow-sm border border-gray-100 dark:border-slate-700">
-                                                <div className="flex gap-1">
-                                                    {[0, 1, 2].map((i) => (
-                                                        <motion.span
-                                                            key={i}
-                                                            className="w-2 h-2 bg-blue-500 rounded-full"
-                                                            animate={{ y: [0, -6, 0] }}
-                                                            transition={{ duration: 0.5, delay: i * 0.1, repeat: Infinity }}
-                                                        />
-                                                    ))}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    )}
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-
-                        {/* Input Area */}
-                        <form
-                            onSubmit={(e) => { e.preventDefault(); sendMessage(); }}
-                            className="p-3"
+                    {/* Chat Input */}
+                    <motion.div
+                        initial={{ opacity: 0, y: 20 }}
+                        animate={{ opacity: 1, y: 0 }}
+                        transition={{ delay: 0.5 }}
+                    >
+                        <Link
+                            href="#chat"
+                            className="group flex items-center gap-4 w-full max-w-xl mx-auto mt-10 px-6 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
                         >
-                            <div className={cn(
-                                "flex items-center gap-3 px-4 py-3 rounded-xl border-2 transition-all",
-                                isFocused
-                                    ? "border-blue-500 bg-blue-50/50 dark:bg-blue-900/20"
-                                    : "border-gray-200 dark:border-slate-600 bg-gray-50 dark:bg-slate-900"
-                            )}>
-                                <div className="w-8 h-8 rounded-lg bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center flex-shrink-0">
-                                    <Bot className="w-4 h-4 text-white" />
-                                </div>
-                                <input
-                                    ref={inputRef}
-                                    type="text"
-                                    value={input}
-                                    onChange={(e) => setInput(e.target.value)}
-                                    onFocus={() => setIsFocused(true)}
-                                    onBlur={() => setIsFocused(false)}
-                                    placeholder={placeholders[lang] || placeholders.en}
-                                    className="flex-1 bg-transparent text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none text-base"
-                                    style={{ fontSize: '16px' }}
-                                />
-                                <button
-                                    type="submit"
-                                    disabled={!input.trim()}
-                                    className={cn(
-                                        "p-2.5 rounded-lg transition-all",
-                                        input.trim()
-                                            ? 'bg-blue-600 text-white hover:bg-blue-700'
-                                            : 'bg-gray-200 dark:bg-slate-700 text-gray-400'
-                                    )}
-                                >
-                                    <Send className="w-4 h-4" />
-                                </button>
+                            <MessageCircle className="w-6 h-6 text-[#009de0]/50 group-hover:text-[#009de0] transition-colors" />
+                            <span className="flex-1 text-[#009de0]/50 text-lg text-start">
+                                {t.chat}
+                            </span>
+                            <div className="w-10 h-10 bg-gradient-to-br from-[#009de0] to-[#0077b6] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
+                                <Sparkles className="w-5 h-5 text-white" />
                             </div>
-                        </form>
+                        </Link>
+                    </motion.div>
+                </div>
 
-                        {/* Quick Prompts - only when not expanded */}
-                        <AnimatePresence>
-                            {!chatExpanded && (
-                                <motion.div
-                                    className="px-3 pb-3"
-                                    initial={{ opacity: 1 }}
-                                    exit={{ opacity: 0, height: 0 }}
-                                >
-                                    <div className="flex gap-2 flex-wrap justify-center">
-                                        {(quickPrompts[lang] || quickPrompts.en).map((prompt, i) => {
-                                            const IconComponent = prompt.icon;
-                                            return (
-                                                <button
-                                                    key={i}
-                                                    onClick={() => sendMessage(prompt.text)}
-                                                    className="flex items-center gap-1.5 px-3 py-1.5 bg-gray-100 dark:bg-slate-700 hover:bg-blue-100 dark:hover:bg-blue-900/30 rounded-full text-sm font-medium text-gray-600 dark:text-gray-300 transition-colors"
-                                                >
-                                                    <IconComponent className="w-3.5 h-3.5 text-blue-500" />
-                                                    {prompt.text}
-                                                </button>
-                                            );
-                                        })}
-                                    </div>
-                                </motion.div>
-                            )}
-                        </AnimatePresence>
-                    </div>
-
-                    {/* Trust Badges */}
-                    <div className="flex items-center justify-center gap-4 sm:gap-6 mt-6 flex-wrap">
-                        {[
-                            { icon: Shield, text: { en: 'Secure', he: 'מאובטח' } },
-                            { icon: CheckCircle2, text: { en: 'Verified pros', he: 'מקצוענים מאומתים' } },
-                            { icon: Zap, text: { en: 'Instant reply', he: 'תגובה מיידית' } },
-                        ].map((badge, i) => (
-                            <div
-                                key={i}
-                                className="flex items-center gap-1.5 text-white/80"
-                            >
-                                <badge.icon className="w-4 h-4" />
-                                <span className="text-sm font-medium">{badge.text[lang]}</span>
-                            </div>
-                        ))}
+                {/* For Masters Block */}
+                <motion.div 
+                    className="relative group"
+                    initial={{ opacity: 0, y: 30 }}
+                    animate={{ opacity: 1, y: 0 }}
+                    transition={{ delay: 0.6 }}
+                >
+                    {/* Glass card with subtle glow */}
+                    <div className="p-8 md:p-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl text-center shadow-2xl">
+                        <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] mb-4">
+                            {t.forMasters}
+                        </h3>
+                        <p className="text-white/80 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-6">
+                            {t.forMastersDesc}
+                        </p>
+                        <a
+                            href="/join"
+                            className="inline-block px-8 py-4 bg-white text-[#009de0] font-bold rounded-xl hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
+                        >
+                            {t.forMastersCta}
+                        </a>
                     </div>
                 </motion.div>
             </div>
 
-            {/* Wave */}
-            <div className="absolute bottom-0 left-0 right-0">
-                <svg viewBox="0 0 1440 60" fill="none" className="w-full" preserveAspectRatio="none">
-                    <path d="M0 60L1440 60V30C1200 45 960 55 720 50C480 45 240 35 0 40V60Z" className="fill-white dark:fill-slate-900" />
-                </svg>
-            </div>
+            {/* Bottom gradient fade */}
+            <div className="absolute bottom-0 left-0 right-0 h-32 bg-gradient-to-t from-[#0a1628] to-transparent pointer-events-none" />
+
+            {/* Mesh animation keyframes */}
+            <style jsx>{`
+                @keyframes meshMove {
+                    0%, 100% { 
+                        background-position: 0% 0%, 100% 100%, 50% 0%, 0% 100%, 100% 0%, 33% 50%, 79% 53%;
+                    }
+                    25% {
+                        background-position: 50% 50%, 80% 20%, 40% 90%, 10% 80%, 90% 10%, 45% 60%, 85% 45%;
+                    }
+                    50% {
+                        background-position: 100% 100%, 0% 0%, 50% 100%, 100% 0%, 0% 100%, 66% 50%, 21% 47%;
+                    }
+                    75% {
+                        background-position: 50% 50%, 20% 80%, 60% 10%, 90% 20%, 10% 90%, 55% 40%, 15% 55%;
+                    }
+                }
+            `}</style>
         </section>
     );
 }
