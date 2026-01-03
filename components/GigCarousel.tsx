@@ -1,7 +1,7 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { packages, Package } from '@/lib/gigs';
@@ -18,100 +18,73 @@ export default function GigCarousel() {
             title: 'Thematic Experiences',
             subtitle: 'Curated sets designed for specific vibes and moments.',
             explore: 'Explore',
-            min: 'min',
-            guests: 'guests',
         },
         he: {
             title: 'חוויות נושאיות',
             subtitle: 'סטים שנבחרו בקפידה לאווירה ורגעים ספציפיים.',
             explore: 'גלה',
-            min: 'דק׳',
-            guests: 'אורחים',
         },
     };
 
     const t = content[lang];
-
-    // Split packages for two rows
     const allPackages = [...packages, ...packages];
     const firstRow = allPackages.slice(0, 10);
     const secondRow = allPackages.slice(10, 20);
 
     return (
-        <section id="packages" className="py-20 md:py-28 bg-[#0a1628] overflow-visible relative">
-            {/* Background mesh gradient */}
-            <div className="absolute inset-0 bg-mesh-gradient opacity-50" />
+        <section id="packages" className="py-24 md:py-32 bg-[#0a1628] overflow-visible relative">
+            {/* Ambient Background - Silent Luxury */}
+            <div className="absolute inset-0 bg-mesh-gradient opacity-30 pointer-events-none" />
             
-            {/* Subtle grid pattern */}
-            <div className="absolute inset-0 bg-grid-pattern opacity-30" />
-            
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-12">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-16">
                 <motion.div
-                    initial={{ opacity: 0, y: 20 }}
-                    whileInView={{ opacity: 1, y: 0 }}
+                    initial={{ opacity: 0, filter: 'blur(20px)', scale: 0.9 }}
+                    whileInView={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
                     viewport={{ once: true }}
+                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9 }}
-                        whileInView={{ opacity: 1, scale: 1 }}
-                        viewport={{ once: true }}
-                        className="inline-flex items-center gap-2 px-4 py-2 bg-cyan-500/10 border border-cyan-500/20 rounded-full mb-6"
-                    >
-                        <Sparkles className="w-4 h-4 text-cyan-400" />
-                        <span className="text-sm font-semibold text-cyan-400">Premium Collection</span>
-                    </motion.div>
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-white/5 border border-white/10 rounded-full mb-8 backdrop-blur-md">
+                        <Sparkles className="w-4 h-4 text-amber-400" />
+                        <span className="text-xs font-bold text-white/70 uppercase tracking-[0.2em]">Curated Selection</span>
+                    </div>
                     
-                    <h2 className="text-3xl md:text-5xl font-black text-white mb-4 tracking-tight">
+                    <h2 className="text-4xl md:text-6xl font-black text-white mb-6 tracking-tighter">
                         <span className="text-gradient-luxury">{t.title}</span>
                     </h2>
-                    <p className="text-slate-400 text-lg max-w-2xl mx-auto font-medium">
+                    <p className="text-white/40 text-lg max-w-2xl mx-auto font-medium leading-relaxed">
                         {t.subtitle}
                     </p>
                 </motion.div>
             </div>
 
-            <div className="relative z-10 flex flex-col gap-8" style={{ direction: 'ltr' }}>
-                {/* Marquee Row 1 - Right to Left */}
-                <div className="block w-full">
-                    <MarqueeRow items={firstRow} direction="left" lang={lang} t={t} />
-                </div>
-
-                {/* Marquee Row 2 - Left to Right */}
-                <div className="block w-full">
-                    <MarqueeRow items={secondRow} direction="right" lang={lang} t={t} />
-                </div>
+            <div className="relative z-10 flex flex-col gap-12" style={{ direction: 'ltr' }}>
+                <MarqueeRow items={firstRow} direction="left" lang={lang} t={t} />
+                <MarqueeRow items={secondRow} direction="right" lang={lang} t={t} />
             </div>
         </section>
     );
 }
 
-interface MarqueeRowProps {
-    items: Package[];
-    direction: 'left' | 'right';
-    lang: 'en' | 'he';
-    t: any;
-}
-
-function MarqueeRow({ items, direction, lang, t }: MarqueeRowProps) {
+function MarqueeRow({ items, direction, lang, t }: { items: Package[]; direction: 'left' | 'right'; lang: 'en' | 'he'; t: any }) {
     const doubledItems = [...items, ...items, ...items];
 
     return (
         <div className="flex w-full overflow-hidden select-none">
             <motion.div
-                className="flex gap-4 md:gap-6"
+                className="flex gap-8"
                 animate={{
-                    x: direction === 'left' ? [0, -280 * items.length] : [-280 * items.length, 0],
+                    x: direction === 'left' ? [0, -320 * items.length] : [-320 * items.length, 0],
                 }}
                 transition={{
-                    duration: 40,
+                    duration: 50,
                     repeat: Infinity,
                     ease: "linear",
                 }}
             >
                 {doubledItems.map((pkg, idx) => (
-                    <div key={`${pkg.id}-${idx}`} className="flex-shrink-0 w-[240px] md:w-[280px]">
-                        <PackageCube3D pkg={pkg} lang={lang} t={t} />
+                    <div key={`${pkg.id}-${idx}`} className="flex-shrink-0 w-[280px] md:w-[320px]">
+                        <PackageCubeLuxury pkg={pkg} lang={lang} t={t} />
                     </div>
                 ))}
             </motion.div>
@@ -119,74 +92,52 @@ function MarqueeRow({ items, direction, lang, t }: MarqueeRowProps) {
     );
 }
 
-interface PackageCube3DProps {
-    pkg: Package;
-    lang: 'en' | 'he';
-    t: any;
-}
-
-function PackageCube3D({ pkg, lang, t }: PackageCube3DProps) {
+function PackageCubeLuxury({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; t: any }) {
     const cardRef = useRef<HTMLAnchorElement>(null);
     const [isHovered, setIsHovered] = useState(false);
+    const [isPressed, setIsPressed] = useState(false);
     
-    // Mouse position for 3D tilt
+    // Physics-based motion
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     
-    // Smooth spring physics
-    const springConfig = { stiffness: 150, damping: 20 };
-    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [8, -8]), springConfig);
-    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-8, 8]), springConfig);
-    const scale = useSpring(isHovered ? 1.05 : 1, springConfig);
-    
-    // Glare effect position
-    const glareX = useTransform(mouseX, [-0.5, 0.5], [0, 100]);
-    const glareY = useTransform(mouseY, [-0.5, 0.5], [0, 100]);
+    const springConfig = { stiffness: 100, damping: 20, mass: 1 };
+    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [10, -10]), springConfig);
+    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-10, 10]), springConfig);
+    const scale = useSpring(isPressed ? 0.95 : isHovered ? 1.05 : 1, springConfig);
+    const blurEffect = useSpring(isHovered ? 0 : 2, springConfig);
     
     const handleMouseMove = (e: MouseEvent<HTMLAnchorElement>) => {
         if (!cardRef.current) return;
-        
         const rect = cardRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        
-        const x = (e.clientX - centerX) / rect.width;
-        const y = (e.clientY - centerY) / rect.height;
-        
-        mouseX.set(x);
-        mouseY.set(y);
-    };
-    
-    const handleMouseLeave = () => {
-        setIsHovered(false);
-        mouseX.set(0);
-        mouseY.set(0);
+        mouseX.set((e.clientX - (rect.left + rect.width / 2)) / rect.width);
+        mouseY.set((e.clientY - (rect.top + rect.height / 2)) / rect.height);
     };
 
     return (
         <motion.div
-            className="relative group perspective-[1000px]"
-            style={{ transformStyle: 'preserve-3d' }}
+            className="relative perspective-[1500px]"
+            initial={{ opacity: 0, scale: 0.8, filter: 'blur(20px)' }}
+            whileInView={{ opacity: 1, scale: 1, filter: 'blur(0px)' }}
+            viewport={{ once: true }}
+            transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
         >
-            {/* Glow effect under card */}
+            {/* Holographic Aura behind card */}
             <motion.div 
-                className="absolute -inset-2 rounded-[40px] bg-gradient-to-r from-cyan-500/30 via-blue-500/30 to-cyan-500/30 blur-xl transition-opacity duration-500"
-                style={{ 
-                    opacity: isHovered ? 1 : 0,
-                    transform: 'translateZ(-20px)',
+                className="absolute -inset-4 rounded-[48px] opacity-0 group-hover:opacity-100 transition-opacity duration-700 blur-2xl"
+                style={{
+                    background: `conic-gradient(from 0deg, transparent, rgba(0, 212, 255, 0.1), rgba(251, 191, 36, 0.1), transparent)`,
+                    rotate: isHovered ? 360 : 0,
+                    opacity: isHovered ? 0.4 : 0,
                 }}
+                animate={isHovered ? { rotate: 360 } : {}}
+                transition={{ duration: 10, repeat: Infinity, ease: "linear" }}
             />
-            
-            {/* Reflection under card */}
-            <motion.div 
-                className="absolute inset-x-4 -bottom-4 h-16 rounded-[32px] bg-gradient-to-t from-cyan-500/20 to-transparent blur-xl transition-opacity duration-500"
-                style={{ opacity: isHovered ? 0.6 : 0 }}
-            />
-            
+
             <motion.a
                 ref={cardRef}
                 href={`/package/${pkg.id}`}
-                className="block relative aspect-square overflow-hidden rounded-[32px] md:rounded-[40px] bg-[#0f2340] border border-cyan-500/10 cursor-pointer"
+                className="group block relative aspect-[4/5] overflow-hidden rounded-[40px] bg-[#0f2340] border border-white/5 cursor-pointer"
                 style={{
                     rotateX,
                     rotateY,
@@ -195,106 +146,120 @@ function PackageCube3D({ pkg, lang, t }: PackageCube3DProps) {
                 }}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => setIsHovered(true)}
-                onMouseLeave={handleMouseLeave}
-                whileTap={{ scale: 0.98 }}
+                onMouseLeave={() => {
+                    setIsHovered(false);
+                    setIsPressed(false);
+                    mouseX.set(0);
+                    mouseY.set(0);
+                }}
+                onMouseDown={() => setIsPressed(true)}
+                onMouseUp={() => setIsPressed(false)}
             >
-                {/* Image */}
-                <Image
-                    src={pkg.image}
-                    alt={pkg.title[lang]}
-                    fill
-                    className="object-cover transition-transform duration-700"
-                    style={{ 
-                        transform: isHovered ? 'scale(1.1)' : 'scale(1)',
-                    }}
-                    sizes="(max-width: 768px) 240px, 280px"
-                />
-                
-                {/* Gradient Overlay */}
-                <div 
-                    className="absolute inset-0 transition-opacity duration-500"
-                    style={{
-                        background: `linear-gradient(to top, 
-                            rgba(10, 22, 40, 0.95) 0%, 
-                            rgba(10, 22, 40, ${isHovered ? '0.4' : '0.2'}) 50%, 
-                            transparent 100%
-                        )`,
-                    }}
-                />
-                
-                {/* Glare Effect */}
+                {/* Image with assembled focus */}
                 <motion.div 
-                    className="absolute inset-0 pointer-events-none transition-opacity duration-300"
+                    className="absolute inset-0 w-full h-full"
+                    style={{ filter: `blur(${blurEffect.get()}px)` }}
+                >
+                    <Image
+                        src={pkg.image}
+                        alt={pkg.title[lang]}
+                        fill
+                        className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                        sizes="320px"
+                    />
+                </motion.div>
+                
+                {/* Safe Internal Light (Caustics) */}
+                <motion.div 
+                    className="absolute inset-0 pointer-events-none transition-opacity duration-500"
                     style={{
-                        background: `radial-gradient(
-                            circle at ${glareX.get()}% ${glareY.get()}%,
-                            rgba(255, 255, 255, 0.15) 0%,
-                            transparent 50%
-                        )`,
+                        background: `radial-gradient(circle at ${50 + mouseX.get() * 100}% ${50 + mouseY.get() * 100}%, rgba(255,255,255,0.1) 0%, transparent 60%)`,
                         opacity: isHovered ? 1 : 0,
                     }}
                 />
-                
-                {/* Border glow on hover */}
-                <div 
-                    className={cn(
-                        "absolute inset-0 rounded-[32px] md:rounded-[40px] border-2 transition-all duration-500",
-                        isHovered 
-                            ? "border-cyan-400/50 shadow-[inset_0_0_30px_rgba(0,212,255,0.1)]" 
-                            : "border-transparent"
-                    )}
-                />
 
-                {/* Content Bottom - 3D lifted */}
-                <motion.div 
-                    className="absolute inset-x-0 bottom-0 p-5 md:p-6"
-                    style={{
-                        transform: 'translateZ(30px)',
-                        transformStyle: 'preserve-3d',
-                    }}
-                >
-                    <div className="flex items-start justify-between gap-2">
-                        <div>
-                            <motion.span 
-                                className="inline-block text-[10px] font-bold text-cyan-400/80 uppercase tracking-widest mb-1.5"
-                                style={{ transform: 'translateZ(10px)' }}
-                            >
-                                {pkg.category}
-                            </motion.span>
-                            <motion.h3 
-                                className="text-lg md:text-xl font-black text-white leading-snug mb-2 drop-shadow-lg min-h-[3rem]"
-                                style={{ transform: 'translateZ(20px)' }}
-                            >
-                                {pkg.title[lang]}
-                            </motion.h3>
-                        </div>
+                {/* Dark Vignette - Material Weight */}
+                <div className="absolute inset-0 bg-gradient-to-t from-[#0a1628] via-transparent to-black/20" />
+
+                {/* Golden Dust Particles (CSS Animation) */}
+                <AnimatePresence>
+                    {isHovered && (
                         <motion.div 
-                            className={cn(
-                                "backdrop-blur-md p-2.5 rounded-xl transition-all duration-300",
-                                isHovered 
-                                    ? "bg-gradient-to-br from-cyan-400 to-blue-500 text-white shadow-lg shadow-cyan-500/30 scale-110" 
-                                    : "bg-white/10 text-white"
-                            )}
-                            style={{ transform: 'translateZ(40px)' }}
+                            className="absolute inset-0 pointer-events-none"
+                            initial={{ opacity: 0 }}
+                            animate={{ opacity: 1 }}
+                            exit={{ opacity: 0 }}
                         >
-                            <ArrowUpRight className="w-5 h-5" />
+                            {[...Array(6)].map((_, i) => (
+                                <motion.div
+                                    key={i}
+                                    className="absolute w-1 h-1 bg-amber-400/40 rounded-full blur-[1px]"
+                                    initial={{ 
+                                        x: Math.random() * 300, 
+                                        y: 400,
+                                        opacity: 0 
+                                    }}
+                                    animate={{ 
+                                        y: -20,
+                                        opacity: [0, 1, 0],
+                                        scale: [0, 1.5, 0]
+                                    }}
+                                    transition={{ 
+                                        duration: 2 + Math.random() * 2,
+                                        repeat: Infinity,
+                                        delay: Math.random() * 2
+                                    }}
+                                />
+                            ))}
                         </motion.div>
-                    </div>
+                    )}
+                </AnimatePresence>
 
-                    {/* Description - reveals on hover */}
-                    <motion.p 
-                        className="text-white/60 text-xs font-medium line-clamp-2"
-                        initial={{ opacity: 0, y: 10 }}
-                        animate={{ 
-                            opacity: isHovered ? 1 : 0, 
-                            y: isHovered ? 0 : 10,
-                        }}
-                        transition={{ duration: 0.3, delay: isHovered ? 0.1 : 0 }}
-                        style={{ transform: 'translateZ(15px)' }}
+                {/* Magnetic Interaction Content */}
+                <motion.div 
+                    className="absolute inset-0 p-8 flex flex-col justify-end"
+                    style={{ transform: 'translateZ(50px)' }}
+                >
+                    <motion.div 
+                        className="flex items-start justify-between gap-4"
+                        animate={isPressed ? { x: [-1, 1, -1] } : {}}
+                        transition={{ repeat: Infinity, duration: 0.1 }}
                     >
-                        {pkg.description[lang]}
-                    </motion.p>
+                        <div className="flex-1">
+                            <span className="inline-block text-[10px] font-black text-amber-400/80 uppercase tracking-[0.3em] mb-3">
+                                {pkg.category}
+                            </span>
+                            <h3 className="text-xl md:text-2xl font-black text-white leading-tight mb-4 drop-shadow-2xl">
+                                {pkg.title[lang]}
+                            </h3>
+                        </div>
+                        
+                        <div className={cn(
+                            "w-12 h-12 rounded-2xl flex items-center justify-center transition-all duration-500 border border-white/10",
+                            isHovered ? "bg-white text-[#0a1628] scale-110 shadow-[0_0_30px_rgba(255,255,255,0.3)]" : "bg-white/10 text-white"
+                        )}>
+                            <ArrowUpRight className="w-6 h-6" />
+                        </div>
+                    </motion.div>
+
+                    {/* Luxury Reveal Info */}
+                    <motion.div
+                        initial={{ opacity: 0, height: 0 }}
+                        animate={isHovered ? { opacity: 1, height: 'auto' } : { opacity: 0, height: 0 }}
+                        transition={{ duration: 0.5, ease: [0.16, 1, 0.3, 1] }}
+                        className="overflow-hidden"
+                    >
+                        <p className="text-white/50 text-xs font-medium leading-relaxed mt-2 border-t border-white/10 pt-4">
+                            {pkg.description[lang]}
+                        </p>
+                    </motion.div>
                 </motion.div>
+
+                {/* Border Glow - "Safe" Rim Light */}
+                <div className={cn(
+                    "absolute inset-0 rounded-[40px] border-2 transition-all duration-700",
+                    isHovered ? "border-white/20" : "border-transparent"
+                )} />
             </motion.a>
         </motion.div>
     );
