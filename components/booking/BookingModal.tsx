@@ -71,6 +71,14 @@ export default function BookingModal({
     // Check authentication
     useEffect(() => {
         const checkUser = async () => {
+            if (!supabase) {
+                toast.error(t('loginRequired'), {
+                    description: language === 'he'
+                        ? 'שירות ההזמנות אינו זמין כרגע'
+                        : 'Booking service is unavailable right now'
+                });
+                return;
+            }
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
                 toast.error(t('loginRequired'), {
@@ -135,6 +143,10 @@ export default function BookingModal({
         setError(null);
 
         try {
+            if (!supabase) {
+                setError(language === 'he' ? 'שירות ההזמנות אינו זמין כרגע.' : 'Booking service is unavailable right now.');
+                return;
+            }
             // Fetch user data for email
             const { data: { user } } = await supabase.auth.getUser();
             const userName = user?.user_metadata?.full_name || user?.email?.split('@')[0] || 'Client';

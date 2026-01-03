@@ -61,6 +61,7 @@ export default function SettingsPage() {
 
     useEffect(() => {
         const checkUser = async () => {
+            if (!supabase) { router.push('/signin'); return; }
             const { data: { user } } = await supabase.auth.getUser();
 
             if (!user) {
@@ -99,6 +100,7 @@ export default function SettingsPage() {
 
     const handleSave = async () => {
         if (!vendorId) return;
+        if (!supabase) return;
 
         setSaving(true);
         try {

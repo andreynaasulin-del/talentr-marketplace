@@ -15,6 +15,9 @@ export async function POST(request: NextRequest) {
         if (!query) {
             return NextResponse.json({ error: 'Query is required' }, { status: 400 });
         }
+        if (!supabase) {
+            return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+        }
 
         // Step 1: Use AI to understand the search intent
         const systemPrompt = `You are a search assistant for an event marketplace in Israel. 

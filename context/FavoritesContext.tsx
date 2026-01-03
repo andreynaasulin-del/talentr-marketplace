@@ -24,6 +24,12 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
     // Load favorites on mount
     useEffect(() => {
         const loadFavorites = async () => {
+            if (!supabase) {
+                const stored = localStorage.getItem('favorites');
+                setFavorites(stored ? JSON.parse(stored) : []);
+                setIsLoading(false);
+                return;
+            }
             // Check real auth
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) {
@@ -95,6 +101,7 @@ export function FavoritesProvider({ children }: { children: ReactNode }) {
         // Sync to Supabase if authenticated
         if (userId) {
             try {
+                if (!supabase) return;
                 if (isCurrentlyFavorite) {
                     await supabase
                         .from('favorites')

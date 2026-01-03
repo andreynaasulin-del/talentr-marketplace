@@ -42,6 +42,7 @@ const toVendor = (row: VendorRow): Vendor => ({
  * Get all active vendors
  */
 export async function getVendors(): Promise<Vendor[]> {
+    if (!supabase) return [];
     try {
         const { data, error } = await supabase
             .from('vendors')
@@ -64,6 +65,7 @@ export async function getVendors(): Promise<Vendor[]> {
  * Get vendors by category
  */
 export async function getVendorsByCategory(category: VendorCategory): Promise<Vendor[]> {
+    if (!supabase) return [];
     try {
         const { data, error } = await supabase
             .from('vendors')
@@ -86,6 +88,7 @@ export async function getVendorsByCategory(category: VendorCategory): Promise<Ve
  * Get vendors by city
  */
 export async function getVendorsByCity(city: City): Promise<Vendor[]> {
+    if (!supabase) return [];
     const { data, error } = await supabase
         .from('vendors')
         .select('*')
@@ -104,6 +107,7 @@ export async function getVendorsByCity(city: City): Promise<Vendor[]> {
  * Get single vendor by ID - falls back to mock data
  */
 export async function getVendorById(id: string): Promise<Vendor | null> {
+    if (!supabase) return null;
     const { data, error } = await supabase
         .from('vendors')
         .select('*')
@@ -121,6 +125,7 @@ export async function getVendorById(id: string): Promise<Vendor | null> {
  * Get featured vendors (for homepage) - falls back to mock data
  */
 export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
+    if (!supabase) return [];
     const { data, error } = await supabase
         .from('vendors')
         .select('*')
@@ -140,6 +145,7 @@ export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
  * Search vendors by query (name, description, tags)
  */
 export async function searchVendors(query: string): Promise<Vendor[]> {
+    if (!supabase) return [];
     const searchTerm = query.toLowerCase().trim();
 
     const { data, error } = await supabase
@@ -171,6 +177,7 @@ export interface VendorFilters {
 }
 
 export async function filterVendors(filters: VendorFilters): Promise<Vendor[]> {
+    if (!supabase) return [];
     try {
         let query = supabase
             .from('vendors')
@@ -220,6 +227,7 @@ export interface CreateBookingData {
 }
 
 export async function createBooking(data: CreateBookingData) {
+    if (!supabase) throw new Error('Supabase is not configured');
     const { data: booking, error } = await supabase
         .from('bookings')
         .insert({
@@ -242,6 +250,7 @@ export async function createBooking(data: CreateBookingData) {
 }
 
 export async function getClientBookings(clientId: string) {
+    if (!supabase) return [];
     const { data, error } = await supabase
         .from('bookings')
         .select(`
@@ -260,6 +269,7 @@ export async function getClientBookings(clientId: string) {
 }
 
 export async function getVendorBookings(vendorId: string) {
+    if (!supabase) return [];
     const { data, error } = await supabase
         .from('bookings')
         .select('*')
@@ -275,6 +285,7 @@ export async function getVendorBookings(vendorId: string) {
 }
 
 export async function updateBookingStatus(bookingId: string, status: 'confirmed' | 'declined' | 'completed' | 'cancelled') {
+    if (!supabase) throw new Error('Supabase is not configured');
     const { error } = await supabase
         .from('bookings')
         .update({ status })

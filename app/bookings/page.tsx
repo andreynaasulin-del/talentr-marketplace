@@ -28,6 +28,7 @@ export default function BookingsPage() {
 
     useEffect(() => {
         const checkAuthAndFetchBookings = async () => {
+            if (!supabase) { router.push('/signin'); return; }
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) { router.push('/signin'); return; }
 

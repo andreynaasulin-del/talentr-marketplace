@@ -35,7 +35,7 @@ const categoryKeywords: Record<string, VendorCategory> = {
     'dancer': 'Dancer', 'dance': 'Dancer', 'רקדן': 'Dancer',
     'bartender': 'Bartender', 'cocktail': 'Bartender', 'ברמן': 'Bartender',
     'chef': 'Chef', 'sushi': 'Chef', 'cooking': 'Chef', 'שף': 'Chef', 'סושי': 'Chef',
-    'fire': 'Performer', 'אש': 'Performer',
+    'fire': 'Dancer', 'אש': 'Dancer',
     'artist': 'Face Painter', 'portrait': 'Face Painter', 'אמן': 'Face Painter',
 };
 

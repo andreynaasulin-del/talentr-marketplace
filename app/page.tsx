@@ -15,6 +15,7 @@ export default function Home() {
     useEffect(() => {
         const checkAuth = async () => {
             try {
+                if (!supabase) return;
                 await supabase.auth.getUser();
             } catch (error) {
                 console.error('Auth check failed:', error);
