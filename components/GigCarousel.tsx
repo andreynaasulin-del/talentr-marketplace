@@ -3,7 +3,6 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
-import Link from 'next/link';
 import { packages, Package } from '@/lib/gigs';
 import { ArrowUpRight } from 'lucide-react';
 import { useRef, useState, MouseEvent } from 'react';
@@ -25,19 +24,17 @@ export default function GigCarousel() {
     };
 
     const t = content[lang];
-    const allPackages = [...packages, ...packages];
-    const firstRow = allPackages.slice(0, 10);
-    const secondRow = allPackages.slice(10, 20);
+    const allPackages = [...packages];
 
     return (
-        <section id="packages" className="py-32 md:py-56 bg-[#020617] overflow-visible relative">
+        <section id="packages" className="py-16 md:py-24 bg-[#020617] overflow-visible relative">
             {/* Dynamic Ambient Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(10,25,47,1)_0%,_rgba(2,6,23,1)_100%)]" />
                 <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] animate-pulse" />
             </div>
             
-            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-24 md:mb-40">
+            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-12 md:mb-16">
                 <motion.div
                     initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -55,54 +52,32 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            <div className="relative z-10 flex flex-col gap-24 md:gap-40" style={{ direction: 'ltr' }}>
-                <MarqueeRow items={firstRow} direction="left" lang={lang} />
-                <MarqueeRow items={secondRow} direction="right" lang={lang} />
+            {/* Compact Grid with perspective */}
+            <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8">
+                <div className="grid gap-6 md:gap-8 perspective-[2000px] grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
+                    {allPackages.map((pkg, idx) => (
+                        <GlassCube key={`${pkg.id}-${idx}`} pkg={pkg} lang={lang} />
+                    ))}
+                </div>
             </div>
         </section>
     );
 }
 
-function MarqueeRow({ items, direction, lang }: { items: Package[]; direction: 'left' | 'right'; lang: 'en' | 'he' }) {
-    const doubledItems = [...items, ...items];
-
-    return (
-        <div className="flex w-full overflow-hidden select-none py-20">
-            <motion.div
-                className="flex gap-16 md:gap-28 items-center"
-                animate={{
-                    x: direction === 'left' ? [0, -450 * items.length] : [-450 * items.length, 0],
-                }}
-                transition={{
-                    duration: 80,
-                    repeat: Infinity,
-                    ease: "linear",
-                }}
-            >
-                {doubledItems.map((pkg, idx) => (
-                    <div key={`${pkg.id}-${idx}`} className="flex-shrink-0 w-[320px] md:w-[420px]">
-                        <GlassCube pkg={pkg} lang={lang} />
-                    </div>
-                ))}
-            </motion.div>
-        </div>
-    );
-}
-
 function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
-    const cardRef = useRef<HTMLAnchorElement>(null);
+    const cardRef = useRef<HTMLDivElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     
     // Physics for 3D Tilt
-    const springConfig = { stiffness: 40, damping: 20, mass: 1.5 };
-    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [15, -15]), springConfig);
-    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-15, 15]), springConfig);
-    const scale = useSpring(isHovered ? 1.05 : 1, springConfig);
+    const springConfig = { stiffness: 50, damping: 18, mass: 1.2 };
+    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [12, -12]), springConfig);
+    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-12, 12]), springConfig);
+    const scale = useSpring(isHovered ? 1.04 : 1, springConfig);
     
-    const handleMouseMove = (e: MouseEvent<HTMLAnchorElement>) => {
+    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
         if (!cardRef.current) return;
         const rect = cardRef.current.getBoundingClientRect();
         mouseX.set((e.clientX - (rect.left + rect.width / 2)) / rect.width);
@@ -111,19 +86,19 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
     return (
         <div className="luxury-card-wrapper group card-perspective-container">
-            {/* CAUSTICS: Refraction light under the cube */}
+            {/* CAUSTICS */}
             <motion.div 
                 className="luxury-caustic"
                 style={{
                     background: `radial-gradient(circle at ${50 + mouseX.get() * 50}% ${50 + mouseY.get() * 50}%, rgba(212, 175, 55, 0.15) 0%, transparent 70%)`,
+                    filter: 'blur(40px)',
                 }}
                 animate={{ opacity: isHovered ? 1 : 0 }}
                 transition={{ duration: 0.8 }}
             />
 
-            <motion.a
+            <motion.div
                 ref={cardRef}
-                href={`/package/${pkg.id}`}
                 className="gig-cube-card"
                 style={{
                     rotateX,
@@ -138,8 +113,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     mouseY.set(0);
                 }}
             >
-                <div className="cube-content">
-                    {/* Layer: Background image (base) */}
+                <div className="cube-content aspect-square">
                     <div className="layer-bg cube-image-wrapper">
                         <Image
                             src={pkg.image}
@@ -150,18 +124,19 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         />
                     </div>
 
-                    {/* Layer: Glass */} 
-                    <div className="layer-glass glass-overlay gold-frame" />
+                    <div className="layer-glass glass-overlay gold-frame glossy-glow" />
 
-                    {/* Layer: Content */}
                     <div className="layer-content cube-info">
                         <span className="category-tag">{pkg.category.toUpperCase()}</span>
                         <h3 className="cube-title">
                             {pkg.title[lang]}
                         </h3>
+                        <div className="floating-icon">
+                            <ArrowUpRight className="w-5 h-5" />
+                        </div>
                     </div>
                 </div>
-            </motion.a>
+            </motion.div>
 
             <style jsx global>{`
                 :root {
@@ -174,14 +149,13 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     position: relative;
                     perspective: 1200px;
                     width: 100%;
-                    height: 420px;
+                    height: auto;
                 }
 
                 .luxury-caustic {
                     position: absolute;
                     inset: -60px;
                     pointer-events: none;
-                    filter: blur(40px);
                     opacity: 0;
                     transition: opacity 0.8s ease;
                     z-index: 0;
@@ -222,6 +196,7 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     overflow: hidden;
                     transform: translateZ(-20px);
                     border-radius: 6px;
+                    aspect-ratio: 1 / 1;
                 }
 
                 .cube-image {
@@ -241,8 +216,8 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                 /* Dedicated glass layer with depth */
                 .layer-glass {
-                    transform: translateZ(20px);
-                    backdrop-filter: blur(5px);
+                    transform: translateZ(25px);
+                    backdrop-filter: blur(10px);
                 }
 
                 .gold-frame {
@@ -260,8 +235,8 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                 .cube-info {
                     position: absolute;
-                    bottom: 28px;
-                    left: 24px;
+                    bottom: 24px;
+                    left: 20px;
                     transform: translateZ(50px);
                     text-align: left;
                     max-width: 80%;
@@ -298,6 +273,36 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 .gig-cube:hover .gold-frame {
                     opacity: 1;
                     box-shadow: 0 0 20px var(--gold-glow);
+                }
+
+                .floating-icon {
+                    margin-top: 14px;
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 9999px;
+                    background: rgba(255,255,255,0.08);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    display: flex;
+                    align-items: center;
+                    justify-content: center;
+                    transform: translateZ(50px);
+                    transition: all 0.4s ease;
+                }
+
+                /* Glossy glow following cursor */
+                .glossy-glow::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    background: radial-gradient(ellipse at var(--mx, 50%) var(--my, 50%), rgba(255,255,255,0.18), transparent 40%);
+                    mix-blend-mode: screen;
+                    opacity: 0;
+                    transition: opacity 0.4s ease;
+                    pointer-events: none;
+                }
+
+                .gig-cube-card:hover .glossy-glow::after {
+                    opacity: 1;
                 }
             `}</style>
         </div>
