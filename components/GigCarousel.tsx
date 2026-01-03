@@ -31,14 +31,10 @@ export default function GigCarousel() {
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + p.title.he)
     );
 
-    // Split into two rows by even/odd index; if bottom ends up empty, rebalance so both rows always render
-    const topRowItems = filtered.filter((_, idx) => idx % 2 === 0);
-    let bottomRowItems = filtered.filter((_, idx) => idx % 2 === 1);
-
-    if (bottomRowItems.length === 0 && topRowItems.length > 1) {
-        const half = Math.floor(topRowItems.length / 2);
-        bottomRowItems = topRowItems.splice(half);
-    }
+    // Split into two distinct rows to ensure they are visible
+    const mid = Math.ceil(filtered.length / 2);
+    const topRowItems = filtered.slice(0, mid);
+    const bottomRowItems = filtered.slice(mid);
 
     return (
         <section id="packages" className="gig-section">
@@ -55,7 +51,7 @@ export default function GigCarousel() {
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
                     <span className="exclusive-tag">Exclusive</span>
@@ -64,17 +60,28 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* Two-Row Marquee */}
-            <div className="marquee-wrapper">
-                <MarqueeRow items={topRowItems} direction="left" speed={70} lang={lang} />
-                <MarqueeRow items={bottomRowItems} direction="right" speed={80} lang={lang} />
+            {/* TWO ROWS - Wolt Style */}
+            <div className="marquee-container">
+                {/* TOP ROW: Moves Left */}
+                {topRowItems.length > 0 && (
+                    <div className="marquee-row-wrapper">
+                        <MarqueeRow items={topRowItems} direction="left" speed={60} lang={lang} />
+                    </div>
+                )}
+                
+                {/* BOTTOM ROW: Moves Right */}
+                {bottomRowItems.length > 0 && (
+                    <div className="marquee-row-wrapper">
+                        <MarqueeRow items={bottomRowItems} direction="right" speed={70} lang={lang} />
+                    </div>
+                )}
             </div>
 
             <style jsx global>{`
                 /* ===== SECTION ===== */
                 .gig-section {
                     position: relative;
-                    padding: 60px 0 80px;
+                    padding: 100px 0 120px;
                     background: #020617;
                     overflow: hidden;
                 }
@@ -84,7 +91,6 @@ export default function GigCarousel() {
                     position: absolute;
                     inset: 0;
                     pointer-events: none;
-                    overflow: hidden;
                 }
                 .ambient-gradient {
                     position: absolute;
@@ -94,299 +100,278 @@ export default function GigCarousel() {
                 .ambient-orb {
                     position: absolute;
                     border-radius: 50%;
-                    filter: blur(100px);
-                    opacity: 0.4;
+                    filter: blur(120px);
+                    opacity: 0.3;
+                    animation: float-orb 15s ease-in-out infinite alternate;
                 }
                 .ambient-orb-1 {
-                    top: 10%;
-                    left: 20%;
-                    width: 500px;
-                    height: 500px;
-                    background: rgba(59, 130, 246, 0.15);
+                    top: 15%;
+                    left: 10%;
+                    width: 600px;
+                    height: 600px;
+                    background: rgba(59, 130, 246, 0.2);
                 }
                 .ambient-orb-2 {
-                    bottom: 20%;
-                    right: 15%;
-                    width: 400px;
-                    height: 400px;
-                    background: rgba(212, 175, 55, 0.1);
+                    bottom: 10%;
+                    right: 5%;
+                    width: 500px;
+                    height: 500px;
+                    background: rgba(212, 175, 55, 0.15);
+                    animation-delay: -5s;
+                }
+                @keyframes float-orb {
+                    0% { transform: translate(0, 0); }
+                    100% { transform: translate(50px, 40px); }
                 }
 
                 /* ===== HEADER ===== */
                 .section-header {
                     position: relative;
-                    z-index: 10;
+                    z-index: 20;
                     max-width: 1280px;
-                    margin: 0 auto 50px;
+                    margin: 0 auto 80px;
                     padding: 0 24px;
                 }
                 .exclusive-tag {
                     display: inline-block;
-                    font-size: 10px;
-                    font-weight: 800;
+                    font-size: 11px;
+                    font-weight: 900;
                     color: #d4af37;
                     text-transform: uppercase;
-                    letter-spacing: 0.7em;
-                    margin-bottom: 20px;
+                    letter-spacing: 0.8em;
+                    margin-bottom: 24px;
                     font-style: italic;
                 }
                 .section-title {
-                    font-size: clamp(2.5rem, 8vw, 6rem);
+                    font-size: clamp(3rem, 10vw, 9rem);
                     font-weight: 900;
                     color: white;
-                    letter-spacing: -0.03em;
-                    line-height: 1;
-                    margin-bottom: 16px;
+                    letter-spacing: -0.04em;
+                    line-height: 0.9;
+                    margin-bottom: 20px;
                 }
                 .section-subtitle {
-                    color: rgba(255, 255, 255, 0.25);
-                    font-size: clamp(0.95rem, 1.8vw, 1.25rem);
-                    max-width: 500px;
+                    color: rgba(255, 255, 255, 0.2);
+                    font-size: clamp(1rem, 2vw, 1.4rem);
+                    max-width: 550px;
                     margin: 0 auto;
                     font-style: italic;
-                    line-height: 1.5;
+                    line-height: 1.6;
                 }
 
-                /* ===== MARQUEE WRAPPER ===== */
-                .marquee-wrapper {
+                /* ===== MARQUEE CONTAINER ===== */
+                .marquee-container {
                     position: relative;
                     z-index: 10;
                     display: flex;
                     flex-direction: column;
-                    gap: 20px;
+                    gap: 30px; /* Strong gap between rows */
                 }
 
-                /* ===== MARQUEE ROW (Soft Edges + Infinite) ===== */
-                .marquee-row {
+                .marquee-row-wrapper {
+                    position: relative;
                     width: 100%;
                     overflow: hidden;
                     /* Soft fade edges */
                     mask-image: linear-gradient(
                         to right,
                         transparent 0%,
-                        black 8%,
-                        black 92%,
+                        black 10%,
+                        black 90%,
                         transparent 100%
                     );
                     -webkit-mask-image: linear-gradient(
                         to right,
                         transparent 0%,
-                        black 8%,
-                        black 92%,
+                        black 10%,
+                        black 90%,
                         transparent 100%
                     );
                 }
 
                 .marquee-track {
                     display: flex;
-                    gap: 20px;
+                    gap: 30px;
                     width: max-content;
-                    /* GPU-accelerated animation */
+                    padding: 20px 0;
                     will-change: transform;
-                    backface-visibility: hidden;
-                    -webkit-backface-visibility: hidden;
                 }
 
                 .marquee-track.direction-left {
-                    animation: marquee-float-left var(--duration) linear infinite;
+                    animation: marquee-scroll-left var(--duration) linear infinite;
                 }
                 .marquee-track.direction-right {
-                    animation: marquee-float-right var(--duration) linear infinite;
+                    animation: marquee-scroll-right var(--duration) linear infinite;
                 }
 
-                /* Pause on hover */
-                .marquee-row:hover .marquee-track {
+                .marquee-row-wrapper:hover .marquee-track {
                     animation-play-state: paused;
                 }
 
-                @keyframes marquee-float-left {
-                    0% {
-                        transform: translate3d(0, 0, 0);
-                    }
-                    100% {
-                        transform: translate3d(-50%, 0, 0);
-                    }
+                @keyframes marquee-scroll-left {
+                    0% { transform: translate3d(0, 0, 0); }
+                    100% { transform: translate3d(-33.3333%, 0, 0); }
                 }
 
-                @keyframes marquee-float-right {
-                    0% {
-                        transform: translate3d(-50%, 0, 0);
-                    }
-                    100% {
-                        transform: translate3d(0, 0, 0);
-                    }
+                @keyframes marquee-scroll-right {
+                    0% { transform: translate3d(-33.3333%, 0, 0); }
+                    100% { transform: translate3d(0, 0, 0); }
                 }
 
-                /* ===== CUBE CARD (Optimized - no heavy filters during animation) ===== */
-                .cube-card {
+                /* ===== CUBE CARD (Floaty Luxury) ===== */
+                .cube-card-wrapper {
                     flex-shrink: 0;
-                    width: 280px;
+                    width: 320px;
                     aspect-ratio: 1 / 1;
+                    animation: levitate var(--levitate-duration) ease-in-out infinite alternate;
+                }
+
+                @keyframes levitate {
+                    0% { transform: translateY(0); }
+                    100% { transform: translateY(-10px); }
+                }
+
+                .cube-card {
                     position: relative;
-                    border-radius: 20px;
+                    width: 100%;
+                    height: 100%;
+                    border-radius: 24px;
+                    background: rgba(255, 255, 255, 0.04);
+                    border: 1px solid rgba(255, 255, 255, 0.1);
                     overflow: hidden;
-                    cursor: pointer;
-                    /* Simple background, no blur during movement */
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.08);
-                    box-shadow: 0 20px 50px rgba(0, 0, 0, 0.4);
-                    /* GPU optimization */
-                    transform: translateZ(0);
-                    transition: transform 0.4s ease, box-shadow 0.4s ease;
+                    box-shadow: 0 25px 60px rgba(0, 0, 0, 0.5);
+                    transition: all 0.5s cubic-bezier(0.2, 0.8, 0.2, 1);
                 }
 
                 .cube-card:hover {
-                    transform: translateZ(0) scale(1.03) rotateY(3deg) rotateX(2deg);
+                    transform: scale(1.05) rotateY(5deg) rotateX(3deg);
+                    border-color: rgba(212, 175, 55, 0.3);
                     box-shadow: 
-                        0 30px 60px rgba(0, 0, 0, 0.5),
-                        0 0 30px rgba(212, 175, 55, 0.15);
+                        0 40px 80px rgba(0, 0, 0, 0.6),
+                        0 0 40px rgba(212, 175, 55, 0.2);
                 }
 
                 /* Image */
                 .cube-image {
                     position: absolute;
-                    inset: 8px;
-                    border-radius: 14px;
-                    overflow: hidden;
+                    inset: 0;
                 }
-
                 .cube-image img {
                     object-fit: cover;
-                    transition: transform 0.6s ease, opacity 0.4s ease;
-                    opacity: 0.85;
+                    opacity: 0.8;
+                    transition: transform 1s ease, opacity 0.6s ease;
                 }
-
                 .cube-card:hover .cube-image img {
-                    transform: scale(1.1);
+                    transform: scale(1.15);
                     opacity: 1;
                 }
 
-                /* Glass overlay - simple gradient, no blur */
+                /* Overlay */
                 .cube-overlay {
                     position: absolute;
                     inset: 0;
-                    background: linear-gradient(
-                        180deg,
-                        transparent 40%,
-                        rgba(0, 0, 0, 0.7) 100%
-                    );
+                    background: linear-gradient(to bottom, transparent 30%, rgba(0, 0, 0, 0.8) 100%);
                     pointer-events: none;
                 }
 
-                /* Gold frame */
+                /* Frame */
                 .cube-frame {
                     position: absolute;
                     inset: 0;
-                    border-radius: 20px;
+                    border-radius: 24px;
                     border: 1.5px solid transparent;
-                    background: linear-gradient(135deg, rgba(212, 175, 55, 0.4), transparent 40%, transparent 60%, rgba(212, 175, 55, 0.4)) border-box;
+                    background: linear-gradient(135deg, rgba(212, 175, 55, 0.5), transparent, rgba(212, 175, 55, 0.5)) border-box;
                     mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
                     mask-composite: exclude;
-                    opacity: 0.3;
-                    transition: opacity 0.4s ease;
-                    pointer-events: none;
+                    opacity: 0.2;
+                    transition: opacity 0.5s ease;
                 }
-
                 .cube-card:hover .cube-frame {
                     opacity: 1;
                 }
 
-                /* Text content */
+                /* Content */
                 .cube-content {
                     position: absolute;
-                    bottom: 16px;
-                    left: 16px;
-                    right: 16px;
+                    bottom: 24px;
+                    left: 24px;
+                    right: 24px;
                     z-index: 5;
                 }
-
                 .cube-category {
-                    font-size: 9px;
-                    font-weight: 700;
+                    font-size: 10px;
+                    font-weight: 800;
                     color: #d4af37;
                     text-transform: uppercase;
-                    letter-spacing: 0.3em;
+                    letter-spacing: 0.4em;
+                    margin-bottom: 8px;
+                    display: block;
                 }
-
                 .cube-title {
                     font-family: var(--font-serif), Georgia, serif;
-                    font-size: 20px;
+                    font-size: 26px;
                     font-weight: 400;
                     color: white;
-                    margin-top: 4px;
                     letter-spacing: 0.05em;
                     line-height: 1.2;
-                    text-shadow: 0 2px 10px rgba(0, 0, 0, 0.5);
+                    text-shadow: 0 4px 15px rgba(0, 0, 0, 0.7);
                 }
 
+                /* Arrow Icon */
                 .cube-arrow {
                     position: absolute;
-                    top: 16px;
-                    right: 16px;
-                    width: 32px;
-                    height: 32px;
+                    top: 24px;
+                    right: 24px;
+                    width: 40px;
+                    height: 40px;
                     border-radius: 50%;
                     background: rgba(255, 255, 255, 0.1);
-                    border: 1px solid rgba(255, 255, 255, 0.15);
+                    backdrop-filter: blur(10px);
+                    border: 1px solid rgba(255, 255, 255, 0.2);
                     display: flex;
                     align-items: center;
                     justify-content: center;
                     color: white;
                     opacity: 0;
-                    transform: translateY(-5px);
-                    transition: all 0.3s ease;
+                    transform: translate(10px, -10px);
+                    transition: all 0.4s ease;
                 }
-
                 .cube-card:hover .cube-arrow {
                     opacity: 1;
-                    transform: translateY(0);
+                    transform: translate(0, 0);
                 }
 
-                /* Shine effect */
+                /* Shine */
                 .cube-shine {
                     position: absolute;
                     inset: 0;
-                    background: linear-gradient(
-                        105deg,
-                        transparent 30%,
-                        rgba(255, 255, 255, 0.08) 45%,
-                        rgba(255, 255, 255, 0.15) 50%,
-                        rgba(255, 255, 255, 0.08) 55%,
-                        transparent 70%
-                    );
+                    background: linear-gradient(115deg, transparent 40%, rgba(255, 255, 255, 0.15) 50%, transparent 60%);
                     opacity: 0;
                     transform: translateX(-100%);
-                    transition: opacity 0.2s ease;
                     pointer-events: none;
-                    border-radius: 20px;
                 }
-
                 .cube-card:hover .cube-shine {
-                    opacity: 1;
-                    animation: shine-pass 1s ease forwards;
+                    animation: shine-sweep 1.2s ease forwards;
+                }
+                @keyframes shine-sweep {
+                    0% { transform: translateX(-100%); opacity: 0; }
+                    50% { opacity: 1; }
+                    100% { transform: translateX(100%); opacity: 0; }
                 }
 
-                @keyframes shine-pass {
-                    0% { transform: translateX(-100%); }
-                    100% { transform: translateX(100%); }
-                }
-
-                /* Mobile adjustments */
+                /* Mobile */
                 @media (max-width: 768px) {
-                    .cube-card {
-                        width: 220px;
+                    .cube-card-wrapper {
+                        width: 250px;
                     }
                     .marquee-track {
-                        gap: 16px;
+                        gap: 20px;
                     }
-                    .marquee-wrapper {
-                        gap: 16px;
+                    .marquee-container {
+                        gap: 20px;
                     }
                     .section-header {
-                        margin-bottom: 40px;
-                    }
-                    .gig-section {
-                        padding: 50px 0 60px;
+                        margin-bottom: 50px;
                     }
                 }
             `}</style>
@@ -405,8 +390,8 @@ function MarqueeRow({
     speed: number;
     lang: 'en' | 'he';
 }) {
-    // Duplicate items for seamless infinite loop
-    const loopItems = [...items, ...items];
+    // 3 duplicates for ultra-wide screens
+    const loopItems = [...items, ...items, ...items];
 
     return (
         <div className="marquee-row">
@@ -415,45 +400,39 @@ function MarqueeRow({
                 style={{ '--duration': `${speed}s` } as React.CSSProperties}
             >
                 {loopItems.map((pkg, idx) => (
-                    <CubeCard key={`${pkg.id}-${idx}`} pkg={pkg} lang={lang} />
+                    <CubeCard key={`${pkg.id}-${idx}`} pkg={pkg} lang={lang} index={idx} />
                 ))}
             </div>
         </div>
     );
 }
 
-function CubeCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
+function CubeCard({ pkg, lang, index }: { pkg: Package; lang: 'en' | 'he', index: number }) {
+    // Variation in levitation duration for "natural" look
+    const levDuration = 3 + (index % 3) * 0.7;
+
     return (
-        <Link href={`/package/${pkg.id}`} className="cube-card">
-            {/* Image */}
-            <div className="cube-image">
-                <Image
-                    src={pkg.image}
-                    alt={pkg.title[lang]}
-                    fill
-                    sizes="280px"
-                />
-            </div>
-
-            {/* Dark gradient overlay */}
-            <div className="cube-overlay" />
-
-            {/* Gold frame */}
-            <div className="cube-frame" />
-
-            {/* Shine effect */}
-            <div className="cube-shine" />
-
-            {/* Arrow */}
-            <div className="cube-arrow">
-                <ArrowUpRight className="w-4 h-4" />
-            </div>
-
-            {/* Text */}
-            <div className="cube-content">
-                <span className="cube-category">{pkg.category}</span>
-                <h3 className="cube-title">{pkg.title[lang]}</h3>
-            </div>
-        </Link>
+        <div className="cube-card-wrapper" style={{ '--levitate-duration': `${levDuration}s` } as React.CSSProperties}>
+            <Link href={`/package/${pkg.id}`} className="cube-card">
+                <div className="cube-image">
+                    <Image
+                        src={pkg.image}
+                        alt={pkg.title[lang]}
+                        fill
+                        sizes="320px"
+                    />
+                </div>
+                <div className="cube-overlay" />
+                <div className="cube-frame" />
+                <div className="cube-shine" />
+                <div className="cube-arrow">
+                    <ArrowUpRight className="w-5 h-5" />
+                </div>
+                <div className="cube-content">
+                    <span className="cube-category">{pkg.category}</span>
+                    <h3 className="cube-title">{pkg.title[lang]}</h3>
+                </div>
+            </Link>
+        </div>
     );
 }
