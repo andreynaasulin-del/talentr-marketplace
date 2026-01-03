@@ -7,11 +7,15 @@ import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence, useScroll, useTransform } from 'framer-motion';
 import { cn } from '@/lib/utils';
+import { usePathname } from 'next/navigation';
 
 export default function Navbar() {
     const [showLangDropdown, setShowLangDropdown] = useState(false);
     const [isScrolled, setIsScrolled] = useState(false);
     const { language, setLanguage } = useLanguage();
+    const pathname = usePathname();
+    const isHome = pathname === '/';
+    const solidNav = !isHome || isScrolled;
     
     // Scroll-based opacity for navbar background
     const { scrollY } = useScroll();
@@ -21,9 +25,13 @@ export default function Navbar() {
         const handleScroll = () => {
             setIsScrolled(window.scrollY > 10);
         };
+        // On non-home pages we want solid navbar immediately (no white-on-light)
+        if (!isHome) {
+            setIsScrolled(true);
+        }
         window.addEventListener('scroll', handleScroll);
         return () => window.removeEventListener('scroll', handleScroll);
-    }, []);
+    }, [isHome]);
 
     const languages = [
         { code: 'en' as const, label: 'EN', flag: '🇺🇸' },
@@ -58,7 +66,7 @@ export default function Navbar() {
                 {/* Glass background layer */}
                 <motion.div 
                     className="absolute inset-0 bg-white/80 dark:bg-slate-900/80 backdrop-blur-xl border-b border-gray-100/50 dark:border-slate-800/50"
-                    style={{ opacity: navBgOpacity }}
+                    style={{ opacity: isHome ? navBgOpacity : 1 }}
                 />
                 
                 {/* Animated gradient line at bottom */}
@@ -66,7 +74,7 @@ export default function Navbar() {
                     className="absolute bottom-0 left-0 right-0 h-[1px]"
                     style={{
                         background: 'linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent)',
-                        opacity: isScrolled ? 1 : 0,
+                        opacity: solidNav ? 1 : 0,
                         transition: 'opacity 0.3s ease',
                     }}
                 />
@@ -89,7 +97,7 @@ export default function Navbar() {
                                     onClick={() => setShowLangDropdown(!showLangDropdown)}
                                     className={cn(
                                         "flex items-center gap-1.5 px-3 py-2 text-sm font-medium rounded-xl transition-all duration-300",
-                                        isScrolled 
+                                        solidNav
                                             ? "text-slate-600 hover:bg-slate-100 dark:text-slate-300 dark:hover:bg-slate-800" 
                                             : "text-white/90 hover:bg-white/10 backdrop-blur-sm"
                                     )}
@@ -169,7 +177,7 @@ export default function Navbar() {
                                     href="/join"
                                     className={cn(
                                         "px-4 py-2.5 text-sm font-semibold rounded-xl transition-all duration-300",
-                                        isScrolled 
+                                        solidNav
                                             ? "text-slate-600 hover:text-cyan-600 hover:bg-cyan-50 dark:text-slate-300 dark:hover:text-cyan-400 dark:hover:bg-cyan-900/20" 
                                             : "text-white/90 hover:text-white hover:bg-white/10 backdrop-blur-sm"
                                     )}
@@ -180,7 +188,7 @@ export default function Navbar() {
 
                             {/* Primary CTA: Find Talent */}
                             <Link
-                                href="#packages"
+                                href={isHome ? "#packages" : "/#packages"}
                                 className="px-5 py-2.5 md:px-6 md:py-3 bg-[#0a1628] text-white text-sm font-bold rounded-xl hover:bg-[#0f2340] transition-colors"
                             >
                                 {t.findTalent}
