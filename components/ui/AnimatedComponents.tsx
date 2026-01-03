@@ -1,12 +1,13 @@
 'use client';
 
-import { motion, useScroll, useTransform, useSpring, useInView } from 'framer-motion';
-import { useRef, ReactNode } from 'react';
+import { motion, useScroll, useTransform, useSpring, useInView, useMotionValue } from 'framer-motion';
+import { useRef, ReactNode, useState, MouseEvent } from 'react';
 import {
     staggerContainer,
     staggerItem,
     springs,
 } from '@/lib/animations';
+import { cn } from '@/lib/utils';
 
 // ===== ANIMATED CONTAINER (Stagger Children) =====
 interface AnimatedContainerProps {
@@ -400,6 +401,347 @@ export function CursorFollow({ children, className = '' }: CursorFollowProps) {
             style={{
                 transition: 'transform 0.3s ease-out',
                 transformStyle: 'preserve-3d',
+            }}
+        >
+            {children}
+        </motion.div>
+    );
+}
+
+// ===== LUXURY GLASS CARD =====
+interface GlassCardLuxuryProps {
+    children: ReactNode;
+    className?: string;
+    glowOnHover?: boolean;
+    tilt?: boolean;
+}
+
+export function GlassCardLuxury({ 
+    children, 
+    className = '', 
+    glowOnHover = true,
+    tilt = false,
+}: GlassCardLuxuryProps) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [isHovered, setIsHovered] = useState(false);
+    
+    const mouseX = useMotionValue(0);
+    const mouseY = useMotionValue(0);
+    
+    const springConfig = { stiffness: 150, damping: 20 };
+    const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [5, -5]), springConfig);
+    const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-5, 5]), springConfig);
+    
+    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+        if (!ref.current || !tilt) return;
+        
+        const rect = ref.current.getBoundingClientRect();
+        const x = (e.clientX - rect.left - rect.width / 2) / rect.width;
+        const y = (e.clientY - rect.top - rect.height / 2) / rect.height;
+        
+        mouseX.set(x);
+        mouseY.set(y);
+    };
+    
+    const handleMouseLeave = () => {
+        setIsHovered(false);
+        mouseX.set(0);
+        mouseY.set(0);
+    };
+
+    return (
+        <motion.div
+            ref={ref}
+            className={cn(
+                "relative overflow-hidden rounded-3xl",
+                "bg-white/10 dark:bg-slate-900/30",
+                "backdrop-blur-xl",
+                "border border-white/20 dark:border-white/10",
+                "shadow-xl",
+                className
+            )}
+            style={tilt ? {
+                rotateX,
+                rotateY,
+                transformStyle: 'preserve-3d',
+            } : undefined}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={handleMouseLeave}
+            whileHover={glowOnHover ? { 
+                boxShadow: '0 0 40px rgba(0, 212, 255, 0.2), 0 0 80px rgba(0, 157, 224, 0.1)',
+            } : undefined}
+            transition={{ duration: 0.5 }}
+        >
+            {/* Animated gradient border on hover */}
+            {glowOnHover && (
+                <motion.div 
+                    className="absolute inset-0 rounded-3xl"
+                    style={{
+                        background: 'linear-gradient(135deg, rgba(0, 212, 255, 0.3), transparent, rgba(0, 157, 224, 0.3))',
+                        opacity: isHovered ? 1 : 0,
+                        transition: 'opacity 0.5s ease',
+                    }}
+                />
+            )}
+            
+            {/* Shine effect */}
+            <div className="absolute inset-0 overflow-hidden rounded-3xl pointer-events-none">
+                <motion.div 
+                    className="absolute top-0 -left-full w-1/2 h-full bg-gradient-to-r from-transparent via-white/20 to-transparent skew-x-[-25deg]"
+                    animate={isHovered ? { left: '200%' } : { left: '-100%' }}
+                    transition={{ duration: 0.8, ease: 'easeOut' }}
+                />
+            </div>
+            
+            {/* Content */}
+            <div className="relative z-10">
+                {children}
+            </div>
+        </motion.div>
+    );
+}
+
+// ===== GLOW BUTTON =====
+interface GlowButtonProps {
+    children: ReactNode;
+    className?: string;
+    onClick?: () => void;
+    variant?: 'primary' | 'secondary' | 'ghost';
+    size?: 'sm' | 'md' | 'lg';
+    disabled?: boolean;
+}
+
+export function GlowButton({ 
+    children, 
+    className = '', 
+    onClick,
+    variant = 'primary',
+    size = 'md',
+    disabled = false,
+}: GlowButtonProps) {
+    const [isHovered, setIsHovered] = useState(false);
+    
+    const sizeClasses = {
+        sm: 'px-4 py-2 text-sm',
+        md: 'px-6 py-3 text-base',
+        lg: 'px-8 py-4 text-lg',
+    };
+    
+    const variantClasses = {
+        primary: 'bg-gradient-to-r from-cyan-500 to-blue-600 text-white',
+        secondary: 'bg-white/10 backdrop-blur-md text-white border border-white/20',
+        ghost: 'bg-transparent text-cyan-400 hover:bg-cyan-500/10',
+    };
+
+    return (
+        <motion.button
+            className={cn(
+                "relative overflow-hidden rounded-xl font-semibold",
+                "transition-all duration-300",
+                sizeClasses[size],
+                variantClasses[variant],
+                disabled && "opacity-50 cursor-not-allowed",
+                className
+            )}
+            onClick={onClick}
+            disabled={disabled}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+            whileHover={{ scale: 1.02 }}
+            whileTap={{ scale: 0.98 }}
+        >
+            {/* Glow effect */}
+            {variant === 'primary' && (
+                <motion.div 
+                    className="absolute inset-0 rounded-xl"
+                    style={{
+                        boxShadow: isHovered 
+                            ? '0 0 30px rgba(0, 212, 255, 0.5), 0 0 60px rgba(0, 157, 224, 0.3)' 
+                            : '0 0 15px rgba(0, 212, 255, 0.3)',
+                        transition: 'box-shadow 0.3s ease',
+                    }}
+                />
+            )}
+            
+            {/* Animated gradient */}
+            {variant === 'primary' && (
+                <motion.div 
+                    className="absolute inset-0 bg-gradient-to-r from-cyan-400 via-blue-500 to-cyan-400"
+                    style={{ backgroundSize: '200% 100%' }}
+                    animate={{ backgroundPosition: isHovered ? ['0% 50%', '100% 50%'] : '0% 50%' }}
+                    transition={{ duration: 1, repeat: isHovered ? Infinity : 0, repeatType: 'reverse' }}
+                />
+            )}
+            
+            {/* Ripple effect container */}
+            <div className="absolute inset-0 overflow-hidden rounded-xl">
+                <motion.div 
+                    className="absolute top-0 -left-full w-1/3 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-25deg]"
+                    animate={isHovered ? { left: '200%' } : { left: '-100%' }}
+                    transition={{ duration: 0.6, ease: 'easeOut' }}
+                />
+            </div>
+            
+            {/* Content */}
+            <span className="relative z-10 flex items-center justify-center gap-2">
+                {children}
+            </span>
+        </motion.button>
+    );
+}
+
+// ===== ANIMATED BORDER =====
+interface AnimatedBorderProps {
+    children: ReactNode;
+    className?: string;
+    borderWidth?: number;
+    duration?: number;
+}
+
+export function AnimatedBorder({ 
+    children, 
+    className = '',
+    borderWidth = 2,
+    duration = 4,
+}: AnimatedBorderProps) {
+    return (
+        <div className={cn("relative", className)}>
+            {/* Animated gradient border */}
+            <motion.div 
+                className="absolute inset-0 rounded-[inherit]"
+                style={{
+                    padding: borderWidth,
+                    background: 'conic-gradient(from 0deg, #00d4ff, #009de0, #0077b6, #00d4ff)',
+                    WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                    WebkitMaskComposite: 'xor',
+                    maskComposite: 'exclude',
+                }}
+                animate={{ rotate: 360 }}
+                transition={{ duration, repeat: Infinity, ease: 'linear' }}
+            />
+            
+            {/* Content container */}
+            <div className="relative bg-inherit rounded-[inherit]">
+                {children}
+            </div>
+        </div>
+    );
+}
+
+// ===== SPOTLIGHT CARD =====
+interface SpotlightCardProps {
+    children: ReactNode;
+    className?: string;
+}
+
+export function SpotlightCard({ children, className = '' }: SpotlightCardProps) {
+    const ref = useRef<HTMLDivElement>(null);
+    const [mousePosition, setMousePosition] = useState({ x: 0, y: 0 });
+    const [isHovered, setIsHovered] = useState(false);
+
+    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+        if (!ref.current) return;
+        const rect = ref.current.getBoundingClientRect();
+        setMousePosition({
+            x: e.clientX - rect.left,
+            y: e.clientY - rect.top,
+        });
+    };
+
+    return (
+        <motion.div
+            ref={ref}
+            className={cn(
+                "relative overflow-hidden rounded-2xl bg-slate-900 border border-slate-800",
+                className
+            )}
+            onMouseMove={handleMouseMove}
+            onMouseEnter={() => setIsHovered(true)}
+            onMouseLeave={() => setIsHovered(false)}
+        >
+            {/* Spotlight effect */}
+            <motion.div
+                className="pointer-events-none absolute inset-0 z-0"
+                style={{
+                    background: `radial-gradient(
+                        400px circle at ${mousePosition.x}px ${mousePosition.y}px,
+                        rgba(0, 212, 255, 0.15),
+                        transparent 60%
+                    )`,
+                    opacity: isHovered ? 1 : 0,
+                    transition: 'opacity 0.3s ease',
+                }}
+            />
+            
+            {/* Content */}
+            <div className="relative z-10">
+                {children}
+            </div>
+        </motion.div>
+    );
+}
+
+// ===== FLOATING ELEMENT =====
+interface FloatingElementProps {
+    children: ReactNode;
+    className?: string;
+    amplitude?: number;
+    duration?: number;
+    delay?: number;
+}
+
+export function FloatingElement({ 
+    children, 
+    className = '', 
+    amplitude = 20,
+    duration = 6,
+    delay = 0,
+}: FloatingElementProps) {
+    return (
+        <motion.div
+            className={className}
+            animate={{
+                y: [0, -amplitude, 0],
+                rotate: [0, 2, -2, 0],
+            }}
+            transition={{
+                duration,
+                delay,
+                repeat: Infinity,
+                ease: 'easeInOut',
+            }}
+        >
+            {children}
+        </motion.div>
+    );
+}
+
+// ===== REVEAL CONTAINER =====
+interface RevealContainerProps {
+    children: ReactNode;
+    className?: string;
+    delay?: number;
+}
+
+export function RevealContainer({ children, className = '', delay = 0 }: RevealContainerProps) {
+    const ref = useRef(null);
+    const isInView = useInView(ref, { once: true, margin: '-100px' });
+
+    return (
+        <motion.div
+            ref={ref}
+            className={className}
+            initial={{ opacity: 0, y: 50, filter: 'blur(10px)' }}
+            animate={isInView ? { 
+                opacity: 1, 
+                y: 0, 
+                filter: 'blur(0px)',
+            } : {}}
+            transition={{
+                duration: 0.8,
+                delay,
+                ease: [0.16, 1, 0.3, 1],
             }}
         >
             {children}
