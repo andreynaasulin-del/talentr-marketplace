@@ -166,6 +166,7 @@ export default function JoinPage() {
         setLoading(true);
         setError('');
         try {
+            if (!supabase) throw new Error(language === 'he' ? 'שירות האימות לא זמין כרגע' : 'Auth service unavailable right now');
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,

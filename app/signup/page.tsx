@@ -30,6 +30,7 @@ export default function SignUpPage() {
         setError(null);
 
         try {
+            if (!supabase) throw new Error('Auth service unavailable. Please try again later.');
             const { error } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
@@ -51,6 +52,7 @@ export default function SignUpPage() {
 
     const handleGoogleSignUp = async () => {
         try {
+            if (!supabase) throw new Error('Auth service unavailable. Please try again later.');
             await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {

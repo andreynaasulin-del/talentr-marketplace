@@ -28,6 +28,7 @@ export default function SignInPage() {
         setError(null);
 
         try {
+            if (!supabase) throw new Error('Auth service unavailable. Please try again later.');
             const { error } = await supabase.auth.signInWithPassword({
                 email: formData.email,
                 password: formData.password,
@@ -44,6 +45,7 @@ export default function SignInPage() {
 
     const handleGoogleSignIn = async () => {
         try {
+            if (!supabase) throw new Error('Auth service unavailable. Please try again later.');
             await supabase.auth.signInWithOAuth({
                 provider: 'google',
                 options: {
