@@ -31,9 +31,14 @@ export default function GigCarousel() {
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + p.title.he)
     );
 
-    // Split into two rows by even/odd index to always have both rows filled without repeats
+    // Split into two rows by even/odd index; if bottom ends up empty, rebalance so both rows always render
     const topRowItems = filtered.filter((_, idx) => idx % 2 === 0);
-    const bottomRowItems = filtered.filter((_, idx) => idx % 2 === 1);
+    let bottomRowItems = filtered.filter((_, idx) => idx % 2 === 1);
+
+    if (bottomRowItems.length === 0 && topRowItems.length > 1) {
+        const half = Math.floor(topRowItems.length / 2);
+        bottomRowItems = topRowItems.splice(half);
+    }
 
     return (
         <section id="packages" className="gig-section">
