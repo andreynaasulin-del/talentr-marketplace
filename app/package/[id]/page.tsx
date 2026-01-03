@@ -169,10 +169,6 @@ export default function PackageDetailPage() {
                                         <p className="text-white/40 text-xs">{t.guests}</p>
                                     </div>
                                 )}
-                                <div className="p-4 bg-amber-500/10 rounded-xl text-center">
-                                    <p className="text-amber-500 font-black text-2xl">{t.nis}{pkg.fixedPrice.toLocaleString()}</p>
-                                    <p className="text-amber-500/60 text-xs">{t.price}</p>
-                                </div>
                             </div>
 
                             {/* Includes */}
@@ -312,13 +308,6 @@ export default function PackageDetailPage() {
                                         )}
                                     </button>
                                 </form>
-
-                                {/* Price reminder */}
-                                <div className="mt-6 pt-4 border-t border-slate-100 text-center">
-                                    <p className="text-slate-500 text-xs">
-                                        {t.price}: <span className="font-bold text-slate-900">{t.nis}{pkg.fixedPrice.toLocaleString()}</span>
-                                    </p>
-                                </div>
                             </div>
                         </motion.div>
                     </div>

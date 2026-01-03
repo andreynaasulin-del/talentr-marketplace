@@ -284,15 +284,6 @@ export default function VendorPage() {
                                 {/* Accent Gradient */}
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[40px] rounded-full -mr-10 -mt-10" />
 
-                                {/* Price Focus */}
-                                <div className="mb-8 p-6 rounded-2xl bg-gray-50 border border-gray-100">
-                                    <p className="text-xs font-black text-gray-400 uppercase tracking-widest mb-2">{t('Starting from')}</p>
-                                    <div className="flex items-baseline gap-2">
-                                        <span className="text-5xl font-black text-gray-900 tracking-tighter">{convertPrice(vendor.priceFrom)}</span>
-                                        <span className="text-gray-400 font-bold">/ {t('event')}</span>
-                                    </div>
-                                </div>
-
                                 <div className="space-y-4">
                                     {/* Action Buttons */}
                                     <button
@@ -375,14 +366,10 @@ export default function VendorPage() {
 
             {/* Mobile Sticky CTA Glassmorphism Footer */}
             <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 md:p-4 z-50 bg-white/90 backdrop-blur-2xl border-t border-gray-100 safe-area-bottom shadow-2xl">
-                <div className="max-w-xl mx-auto flex items-center justify-between gap-3 md:gap-6">
-                    <div className="flex-shrink-0">
-                        <p className="text-[9px] md:text-[10px] font-black text-gray-400 uppercase tracking-widest mb-0.5">{t('Starting from')}</p>
-                        <p className="text-xl md:text-3xl font-black text-gray-900 leading-none">{convertPrice(vendor.priceFrom)}</p>
-                    </div>
+                <div className="max-w-xl mx-auto flex items-center justify-center gap-3 md:gap-6">
                     <button
                         onClick={() => setIsModalOpen(true)}
-                        className="flex-1 h-12 md:h-16 bg-blue-600 hover:bg-blue-700 text-white font-black text-base md:text-lg rounded-xl md:rounded-[20px] transition-all shadow-xl shadow-blue-600/20 active:scale-95"
+                        className="w-full h-12 md:h-16 bg-blue-600 hover:bg-blue-700 text-white font-black text-base md:text-lg rounded-xl md:rounded-[20px] transition-all shadow-xl shadow-blue-600/20 active:scale-95"
                     >
                         {t('Book Now')}
                     </button>

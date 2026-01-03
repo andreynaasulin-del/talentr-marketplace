@@ -394,7 +394,7 @@ export default function JoinPage() {
                         </p>
                     </div>
 
-                    <p className="text-white/60 text-sm">© 2024 Talentr</p>
+                    <div />
                 </div>
             </div>
 

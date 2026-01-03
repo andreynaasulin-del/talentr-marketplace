@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from 'next';
-import { Inter } from 'next/font/google';
+import { Inter, Playfair_Display } from 'next/font/google';
 import './globals.css';
 import { LanguageProvider } from '@/context/LanguageContext';
 import { FavoritesProvider } from '@/context/FavoritesContext';
@@ -15,6 +15,12 @@ const inter = Inter({
     subsets: ['latin', 'cyrillic'],
     display: 'swap',
     variable: '--font-inter',
+});
+
+const playfair = Playfair_Display({
+    subsets: ['latin'],
+    display: 'swap',
+    variable: '--font-serif',
 });
 
 export const metadata: Metadata = {
@@ -98,7 +104,7 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={inter.variable} suppressHydrationWarning>
+        <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
             <head>
                 {/* Preconnect to external domains for performance */}
                 <link rel="preconnect" href="https://images.unsplash.com" />

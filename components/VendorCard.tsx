@@ -241,11 +241,11 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                 <span>{vendor.reviewsCount} {t('reviews')}</span>
                             </div>
 
-                            {/* Footer - Price Section */}
+                            {/* Footer - Tags Section */}
                             <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-700">
                                 {/* Tags */}
                                 <div className="flex gap-2 overflow-hidden">
-                                    {vendor.tags.slice(0, 2).map((tag) => (
+                                    {vendor.tags.slice(0, 3).map((tag) => (
                                         <span
                                             key={tag}
                                             className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-2.5 py-1 rounded-lg whitespace-nowrap font-medium"
@@ -253,11 +253,6 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                             {t(tag)}
                                         </span>
                                     ))}
-                                </div>
-
-                                {/* Premium Price Tag */}
-                                <div className="flex items-center gap-1 px-4 py-2 bg-gradient-to-r from-blue-600 to-indigo-600 text-white rounded-xl shadow-lg shadow-blue-500/20 font-bold text-sm">
-                                    {t('fromPrice')} {convertPrice(vendor.priceFrom)}
                                 </div>
                             </div>
                         </div>

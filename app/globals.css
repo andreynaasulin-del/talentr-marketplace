@@ -66,6 +66,10 @@
   --perspective-near: 800px;
   --perspective-normal: 1000px;
   --perspective-far: 1500px;
+
+  /* Typography */
+  --font-serif: "Playfair Display", serif;
+  --font-sans: "Inter", -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, sans-serif;
 }
 
 /* Dark Mode - Deep Blue Theme */

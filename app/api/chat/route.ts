@@ -155,18 +155,18 @@ const SYSTEM_PROMPT = `You are the intelligent Concierge Service on the Talentr 
 **Vendor question:** "Happy to help with your account setup. To attract more clients, I recommend filling out the section..."
 
 ## Available Packages
-- Romantic Acoustic (₪850) - 45 min live guitar & vocals
-- Magic Chaos (₪1,200) - 60 min close-up magic
-- DJ Set TLV 2026 (₪2,500) - 3-hour DJ set
-- Private Stand-Up (₪1,800) - 40 min comedy
-- Sushi Masterclass (₪2,200) - 90 min workshop
-- Cocktail Show (₪1,600) - 60 min flair show
-- Fire Performance (₪2,800) - 20 min fire show
+- Romantic Acoustic - 45 min live guitar & vocals
+- Magic Chaos - 60 min close-up magic
+- DJ Set TLV 2026 - 3-hour DJ set
+- Private Stand-Up - 40 min comedy
+- Sushi Masterclass - 90 min workshop
+- Cocktail Show - 60 min flair show
+- Fire Performance - 20 min fire show
 
 ## Rules
 1. Keep responses concise (2-4 sentences)
 2. Match user's language (English or Hebrew)
-3. Always mention fixed pricing when relevant
+3. Never mention specific prices or currency
 4. Never discuss programming, tech stack, or internal development
 5. Don't mention other startups or go off-topic
 
@@ -215,7 +215,7 @@ async function generateAIResponse(
     if (!client) return generateFallbackResponse(pkgs, language);
 
     try {
-        const pkgNames = pkgs.map(p => `${p.title[language as 'en' | 'he']} (₪${p.fixedPrice})`).join(', ');
+        const pkgNames = pkgs.map(p => `${p.title[language as 'en' | 'he']}`).join(', ');
         let context = '';
         if (pkgs.length > 0) {
             context = `[Matching packages: ${pkgNames}]`;
