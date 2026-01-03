@@ -80,7 +80,7 @@ export default function Navbar() {
                     className="absolute bottom-0 left-0 right-0 h-[1px]"
                     style={{
                         background: isDashboard
-                            ? 'linear-gradient(90deg, transparent, rgba(212, 175, 55, 0.45), transparent)'
+                            ? 'linear-gradient(90deg, transparent, rgba(200, 179, 122, 0.35), transparent)'
                             : 'linear-gradient(90deg, transparent, rgba(0, 212, 255, 0.5), transparent)',
                         opacity: solidNav ? 1 : 0,
                         transition: 'opacity 0.3s ease',
@@ -161,7 +161,7 @@ export default function Navbar() {
                                                                 isDashboard ? "hover:bg-white/5" : "hover:bg-cyan-500/10",
                                                                 language === l.code
                                                                     ? (isDashboard
-                                                                        ? 'text-[#D4AF37] font-semibold'
+                                                                ? 'text-[#C8B37A] font-semibold'
                                                                         : 'text-cyan-600 dark:text-cyan-400 font-semibold')
                                                                     : (isDashboard
                                                                         ? 'text-white/75'
@@ -177,7 +177,7 @@ export default function Navbar() {
                                                                 <motion.div 
                                                                     className={cn(
                                                                         "ml-auto w-1.5 h-1.5 rounded-full",
-                                                                        isDashboard ? "bg-[#D4AF37]" : "bg-cyan-500"
+                                                                        isDashboard ? "bg-[#C8B37A]" : "bg-cyan-500"
                                                                     )}
                                                                     layoutId="activeLang"
                                                                 />
@@ -215,7 +215,12 @@ export default function Navbar() {
                             {/* Primary CTA: Find Talent */}
                             <Link
                                 href={isHome ? "#packages" : "/#packages"}
-                                className="px-5 py-2.5 md:px-6 md:py-3 bg-[#0a1628] text-white text-sm font-bold rounded-xl hover:bg-[#0f2340] transition-colors"
+                                className={cn(
+                                    "px-5 py-2.5 md:px-6 md:py-3 text-sm font-bold rounded-xl transition-colors",
+                                    isDashboard
+                                        ? "border border-white/10 bg-white/5 text-white/85 hover:bg-white/10"
+                                        : "bg-[#0a1628] text-white hover:bg-[#0f2340]"
+                                )}
                             >
                                 {t.findTalent}
                             </Link>

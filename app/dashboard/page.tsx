@@ -51,7 +51,9 @@ interface VendorProfile {
 }
 
 const OBSIDIAN = '#05070A';
-const GOLD = '#D4AF37';
+// Quiet luxury accent (champagne / brushed brass) — intentionally NOT saturated gold
+const ACCENT = '#C8B37A';
+const ACCENT_RGB = '200,179,122';
 
 export default function DashboardPage() {
     const router = useRouter();
@@ -86,22 +88,22 @@ export default function DashboardPage() {
         return bookings
             .filter((b) => b.status === 'pending')
             .map((b) => ({
-                id: b.id,
+            id: b.id,
                 date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
                     day: 'numeric',
                     month: 'short',
                 }),
-                eventType: b.event_type,
+            eventType: b.event_type,
                 clientName: language === 'he' ? 'לקוח' : 'Client',
-            }));
+        }));
     }, [bookings, language]);
 
     const recentActivity = useMemo(() => {
         return bookings
             .filter((b) => b.status !== 'pending')
-            .slice(0, 3)
+        .slice(0, 3)
             .map((b) => ({
-                id: b.id,
+            id: b.id,
                 date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
                     day: 'numeric',
                     month: 'short',
@@ -126,27 +128,27 @@ export default function DashboardPage() {
                 const authUser = data.user;
 
                 if (!authUser) {
-                    router.push('/signin');
-                    return;
-                }
+                router.push('/signin');
+                return;
+            }
 
-                const { data: vendorData } = await supabase
-                    .from('vendors')
-                    .select('id, full_name, bio, avatar_url, portfolio_gallery, price_from, category, city')
+            const { data: vendorData } = await supabase
+                .from('vendors')
+                .select('id, full_name, bio, avatar_url, portfolio_gallery, price_from, category, city')
                     .eq('user_id', authUser.id)
-                    .single();
+                .single();
 
-                if (vendorData) {
-                    setVendorId(vendorData.id);
-                    setVendorProfile(vendorData as VendorProfile);
-                }
+            if (vendorData) {
+                setVendorId(vendorData.id);
+                setVendorProfile(vendorData as VendorProfile);
+            }
 
                 setUser(authUser);
             } catch (err) {
                 console.error('Dashboard auth check failed:', err);
                 router.push('/signin');
             } finally {
-                setLoading(false);
+            setLoading(false);
             }
         };
 
@@ -248,7 +250,7 @@ export default function DashboardPage() {
                 <div className="text-center">
                     <div
                         className="w-14 h-14 border-2 rounded-full animate-spin mx-auto mb-4"
-                        style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: GOLD }}
+                        style={{ borderColor: 'rgba(255,255,255,0.12)', borderTopColor: ACCENT }}
                     />
                     <p className="text-white/60 text-sm tracking-[0.2em] uppercase">
                         {language === 'he' ? 'טוען' : 'Loading'}
@@ -259,24 +261,44 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen text-white relative" style={{ background: OBSIDIAN }}>
+        <div className="obsidian-dashboard min-h-screen text-white relative" style={{ background: OBSIDIAN }}>
             <Navbar />
 
             {/* Ambient depth */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
-                <div className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-25"
-                    style={{ background: 'radial-gradient(circle at 30% 30%, rgba(212,175,55,0.22), transparent 60%)' }}
-                />
-                <div className="absolute top-20 -right-64 w-[1000px] h-[1000px] rounded-full blur-3xl opacity-35"
-                    style={{ background: 'radial-gradient(circle at 35% 35%, rgba(0, 180, 255, 0.10), transparent 60%)' }}
-                />
-                <div
-                    className="absolute inset-0 opacity-[0.08]"
+                <motion.div
+                    className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-20"
                     style={{
-                        backgroundImage: 'radial-gradient(rgba(212,175,55,0.9) 1px, transparent 1px)',
-                        backgroundSize: '140px 140px',
-                        backgroundPosition: '10px 10px',
+                        background: `radial-gradient(circle at 30% 30%, rgba(${ACCENT_RGB},0.16), transparent 62%)`,
                     }}
+                    animate={{ x: [0, -28, 0], y: [0, 18, 0], scale: [1, 1.05, 1] }}
+                    transition={{ duration: 22, repeat: Infinity, ease: 'easeInOut' }}
+                />
+                <motion.div
+                    className="absolute top-16 -right-72 w-[1050px] h-[1050px] rounded-full blur-3xl opacity-30"
+                    style={{
+                        background: 'radial-gradient(circle at 35% 35%, rgba(0, 180, 255, 0.09), transparent 62%)',
+                    }}
+                    animate={{ x: [0, 24, 0], y: [0, -14, 0], scale: [1, 1.04, 1] }}
+                    transition={{ duration: 26, repeat: Infinity, ease: 'easeInOut' }}
+                />
+
+                {/* Organic dust (no grid) */}
+                <motion.div
+                    className="absolute inset-0 opacity-[0.06] mix-blend-screen"
+                    style={{
+                        backgroundImage: `
+                            radial-gradient(1px 1px at 12% 22%, rgba(${ACCENT_RGB},0.30), transparent 60%),
+                            radial-gradient(1px 1px at 26% 78%, rgba(${ACCENT_RGB},0.18), transparent 60%),
+                            radial-gradient(1.5px 1.5px at 42% 40%, rgba(255,255,255,0.10), transparent 60%),
+                            radial-gradient(1px 1px at 63% 16%, rgba(${ACCENT_RGB},0.16), transparent 60%),
+                            radial-gradient(1px 1px at 78% 66%, rgba(255,255,255,0.08), transparent 60%),
+                            radial-gradient(1.5px 1.5px at 88% 84%, rgba(${ACCENT_RGB},0.14), transparent 60%),
+                            radial-gradient(1px 1px at 90% 30%, rgba(${ACCENT_RGB},0.10), transparent 60%)
+                        `,
+                    }}
+                    animate={{ x: [0, -10, 0], y: [0, 8, 0], opacity: [0.05, 0.07, 0.05] }}
+                    transition={{ duration: 18, repeat: Infinity, ease: 'easeInOut' }}
                 />
             </div>
 
@@ -321,31 +343,33 @@ export default function DashboardPage() {
                 {isNewUser && (
                     <motion.section initial={{ opacity: 0, y: 14 }} animate={{ opacity: 1, y: 0 }} className="mb-7">
                         <div
-                            className="relative overflow-hidden rounded-3xl p-5 sm:p-6"
+                            className="lux-card lux-hero relative overflow-hidden rounded-3xl p-5 sm:p-6"
                             style={{
-                                background: 'rgba(255,255,255,0.04)',
-                                border: '0.5px solid rgba(212,175,55,0.30)',
-                                boxShadow: '0 40px 120px rgba(0,0,0,0.65), 0 0 80px rgba(212,175,55,0.08)',
+                                background: 'rgba(255,255,255,0.035)',
+                                border: `0.5px solid rgba(${ACCENT_RGB},0.18)`,
+                                boxShadow: `0 45px 140px rgba(0,0,0,0.72), 0 0 90px rgba(${ACCENT_RGB},0.045)`,
                                 backdropFilter: 'blur(18px)',
                             }}
                         >
                             {/* inner ambient */}
-                            <div
+                    <motion.div
                                 className="pointer-events-none absolute inset-0 opacity-70"
                                 style={{
                                     background:
-                                        'radial-gradient(900px circle at 10% 0%, rgba(212,175,55,0.12), transparent 55%), radial-gradient(700px circle at 90% 50%, rgba(255,255,255,0.06), transparent 60%)',
+                                        `radial-gradient(900px circle at 10% 0%, rgba(${ACCENT_RGB},0.08), transparent 56%), radial-gradient(700px circle at 90% 50%, rgba(255,255,255,0.05), transparent 62%)`,
                                 }}
+                                animate={{ x: [0, 12, 0], y: [0, -8, 0], opacity: [0.6, 0.8, 0.6] }}
+                                transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
                             />
 
-                            <div className="relative z-10">
+                        <div className="relative z-10">
                                 <div className={cn('flex items-start justify-between gap-4 mb-4', isRTL && 'flex-row-reverse')}>
                                     <div className={cn('flex items-start gap-3', isRTL && 'flex-row-reverse')}>
                                         <div
                                             className="w-11 h-11 rounded-2xl flex items-center justify-center border border-white/10 bg-black/30"
-                                            style={{ boxShadow: 'inset 0 0 0 1px rgba(212,175,55,0.18)' }}
+                                            style={{ boxShadow: `inset 0 0 0 1px rgba(${ACCENT_RGB},0.10)` }}
                                         >
-                                            <Sparkles className="w-5 h-5" style={{ color: GOLD }} />
+                                            <Sparkles className="w-5 h-5" style={{ color: `rgba(${ACCENT_RGB},0.85)` }} />
                                         </div>
                                         <div className={cn(isRTL && 'text-right')}>
                                             <div
@@ -353,60 +377,52 @@ export default function DashboardPage() {
                                                 style={{ fontFamily: 'var(--font-serif), serif' }}
                                             >
                                                 {language === 'he' ? 'פאנל ספק פרטי' : 'Private Vendor Panel'}
-                                            </div>
+                                </div>
                                             <h2
                                                 className="mt-1 text-xl sm:text-2xl tracking-[0.14em]"
                                                 style={{ fontFamily: 'var(--font-serif), serif' }}
                                             >
                                                 {language === 'he' ? 'ברוכים הבאים' : 'Welcome'} {language === 'he' ? 'ל‑Talentr' : 'to Talentr'}
-                                            </h2>
+                                    </h2>
                                             <p className="mt-1 text-white/60 text-sm">
                                                 {language === 'he'
                                                     ? 'השלם את הפרופיל כדי להתחיל לקבל הזמנות.'
                                                     : 'Complete your profile to start receiving bookings.'}
-                                            </p>
-                                        </div>
-                                    </div>
+                                    </p>
+                                </div>
+                            </div>
 
                                     <div className="flex-shrink-0">
                                         <RingProgress value={profileCompletion} />
-                                    </div>
                                 </div>
+                            </div>
 
                                 {/* Action bricks */}
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     {onboardingActions.map((action, idx) => (
-                                        <motion.div
-                                            key={action.id}
+                                    <motion.div
+                                        key={action.id}
                                             initial={{ opacity: 0, y: 10 }}
-                                            animate={{ opacity: 1, y: 0 }}
+                                        animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.05 * idx }}
-                                        >
-                                            <Link
-                                                href={action.href}
-                                                className={cn(
-                                                    'group relative block rounded-2xl p-4',
-                                                    'bg-white/5 border border-white/10 backdrop-blur-xl',
-                                                    'transition-colors hover:bg-white/10',
+                                    >
+                                        <Link
+                                            href={action.href}
+                                            className={cn(
+                                                    'lux-card group relative block rounded-2xl p-4',
+                                                    'bg-white/4 border border-white/10 backdrop-blur-xl',
+                                                    'transition-colors',
                                                     action.completed && 'opacity-80'
                                                 )}
                                                 style={{ boxShadow: '0 18px 55px rgba(0,0,0,0.45)' }}
                                             >
-                                                <div
-                                                    className="pointer-events-none absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition-opacity"
-                                                    style={{
-                                                        background:
-                                                            'linear-gradient(135deg, rgba(212,175,55,0.10), transparent 40%, transparent 60%, rgba(255,255,255,0.06))',
-                                                    }}
-                                                />
-
                                                 {/* critical dot (replaces badge) */}
                                                 {action.critical && !action.completed && (
                                                     <div
                                                         className="absolute top-4 right-4 w-2 h-2 rounded-full animate-pulse"
                                                         style={{
-                                                            background: GOLD,
-                                                            boxShadow: '0 0 14px rgba(212,175,55,0.75)',
+                                                            background: ACCENT,
+                                                            boxShadow: `0 0 10px rgba(${ACCENT_RGB},0.30)`,
                                                         }}
                                                     />
                                                 )}
@@ -418,14 +434,14 @@ export default function DashboardPage() {
                                                             <div className="text-sm font-bold text-white/90">{action.title}</div>
                                                             <div className="mt-1 text-xs text-white/55">{action.description}</div>
                                                         </div>
-                                                    </div>
+                                            </div>
 
                                                     {action.completed ? (
                                                         <CheckCircle className="w-5 h-5 text-white/50" />
                                                     ) : null}
                                                 </div>
 
-                                                {!action.completed && (
+                                            {!action.completed && (
                                                     <div
                                                         className={cn(
                                                             'mt-3 flex items-center gap-2 text-xs uppercase tracking-[0.32em] text-white/55',
@@ -436,13 +452,13 @@ export default function DashboardPage() {
                                                         <ArrowRight
                                                             className={cn('w-4 h-4 transition-transform group-hover:translate-x-0.5', isRTL && 'rotate-180 group-hover:-translate-x-0.5')}
                                                         />
-                                                    </div>
-                                                )}
-                                            </Link>
-                                        </motion.div>
-                                    ))}
-                                </div>
+                                                </div>
+                                            )}
+                                        </Link>
+                                    </motion.div>
+                                ))}
                             </div>
+                        </div>
                         </div>
                     </motion.section>
                 )}
@@ -476,7 +492,7 @@ export default function DashboardPage() {
 
                 {/* Incoming Inquiries */}
                 <section
-                    className="rounded-3xl p-5 sm:p-6 border border-white/10 bg-white/4 backdrop-blur-xl mb-7"
+                    className="lux-card rounded-3xl p-5 sm:p-6 border border-white/10 bg-white/4 backdrop-blur-xl mb-7"
                     style={{ boxShadow: '0 30px 120px rgba(0,0,0,0.60)' }}
                 >
                     <div className={cn('flex items-center justify-between mb-4', isRTL && 'flex-row-reverse')}>
@@ -487,14 +503,15 @@ export default function DashboardPage() {
                             {language === 'he' ? 'פניות נכנסות' : 'Incoming Inquiries'}
                         </h2>
 
-                        <div className="h-[1px] flex-1 mx-4 opacity-20"
-                            style={{ background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.6), transparent)' }}
+                        <div
+                            className="h-[1px] flex-1 mx-4 opacity-20"
+                            style={{ background: `linear-gradient(90deg, transparent, rgba(${ACCENT_RGB},0.55), transparent)` }}
                         />
                     </div>
 
                     {bookingsLoading ? (
                         <div className="flex items-center justify-center py-10">
-                            <Loader2 className="w-7 h-7 animate-spin" style={{ color: GOLD }} />
+                            <Loader2 className="w-7 h-7 animate-spin" style={{ color: ACCENT }} />
                         </div>
                     ) : incomingRequests.length === 0 ? (
                         <div className="text-center py-10">
@@ -517,15 +534,15 @@ export default function DashboardPage() {
                                     'border border-white/10 bg-white/5 hover:bg-white/10 transition-colors',
                                     isRTL && 'flex-row-reverse'
                                 )}
-                                style={{ boxShadow: '0 0 35px rgba(212,175,55,0.10)' }}
+                                style={{ boxShadow: `0 0 35px rgba(${ACCENT_RGB},0.08)` }}
                             >
                                 {copied ? (
-                                    <CheckCircle className="w-5 h-5" style={{ color: GOLD }} />
+                                    <CheckCircle className="w-5 h-5" style={{ color: ACCENT }} />
                                 ) : (
                                     <Copy className="w-5 h-5 text-white/70" />
                                 )}
-                                <span style={{ color: copied ? GOLD : 'rgba(255,255,255,0.85)' }}>
-                                    {copied
+                                <span style={{ color: copied ? ACCENT : 'rgba(255,255,255,0.85)' }}>
+                                {copied
                                         ? language === 'he'
                                             ? 'הועתק!'
                                             : 'Copied!'
@@ -569,32 +586,32 @@ export default function DashboardPage() {
                                             <div className="text-sm font-semibold text-white/80">{request.clientName}</div>
                                             <div className="text-xs text-white/45">
                                                 {language === 'he' ? 'לקוח' : 'Client'}
-                                            </div>
                                         </div>
+                                    </div>
 
                                         <div className={cn('flex items-center gap-2', isRTL && 'flex-row-reverse')}>
-                                            <button
-                                                onClick={() => handleBookingAction(request.id, 'confirmed')}
+                                        <button
+                                            onClick={() => handleBookingAction(request.id, 'confirmed')}
                                                 className={cn(
                                                     'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold',
-                                                    'bg-[#D4AF37] text-[#05070A] hover:opacity-90 transition-opacity',
+                                                    `border border-[rgba(${ACCENT_RGB},0.35)] bg-[rgba(${ACCENT_RGB},0.12)] text-[rgba(${ACCENT_RGB},0.95)] hover:bg-[rgba(${ACCENT_RGB},0.18)] transition-colors`,
                                                     isRTL && 'flex-row-reverse'
                                                 )}
-                                            >
-                                                <Check className="w-4 h-4" />
+                                        >
+                                            <Check className="w-4 h-4" />
                                                 <span>{language === 'he' ? 'אשר' : 'Accept'}</span>
-                                            </button>
-                                            <button
-                                                onClick={() => handleBookingAction(request.id, 'declined')}
+                                        </button>
+                                        <button
+                                            onClick={() => handleBookingAction(request.id, 'declined')}
                                                 className={cn(
                                                     'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold',
                                                     'border border-white/10 bg-white/5 hover:bg-white/10 transition-colors text-white/80',
                                                     isRTL && 'flex-row-reverse'
                                                 )}
-                                            >
-                                                <X className="w-4 h-4" />
+                                        >
+                                            <X className="w-4 h-4" />
                                                 <span>{language === 'he' ? 'דחה' : 'Decline'}</span>
-                                            </button>
+                                        </button>
                                         </div>
                                     </div>
                                 </div>
@@ -605,7 +622,7 @@ export default function DashboardPage() {
 
                 {/* Recent Activity */}
                 <section
-                    className="rounded-3xl p-5 sm:p-6 border border-white/10 bg-white/4 backdrop-blur-xl"
+                    className="lux-card rounded-3xl p-5 sm:p-6 border border-white/10 bg-white/4 backdrop-blur-xl"
                     style={{ boxShadow: '0 30px 120px rgba(0,0,0,0.60)' }}
                 >
                     <div className={cn('flex items-center justify-between mb-4', isRTL && 'flex-row-reverse')}>
@@ -615,8 +632,9 @@ export default function DashboardPage() {
                         >
                             {language === 'he' ? 'פעילות אחרונה' : 'Recent Activity'}
                         </h2>
-                        <div className="h-[1px] flex-1 mx-4 opacity-20"
-                            style={{ background: 'linear-gradient(90deg, transparent, rgba(212,175,55,0.6), transparent)' }}
+                        <div
+                            className="h-[1px] flex-1 mx-4 opacity-20"
+                            style={{ background: `linear-gradient(90deg, transparent, rgba(${ACCENT_RGB},0.55), transparent)` }}
                         />
                     </div>
 
@@ -633,7 +651,7 @@ export default function DashboardPage() {
                                 <div
                                     key={activity.id}
                                     className={cn(
-                                        'rounded-2xl p-4 border border-white/10 bg-black/20',
+                                        'lux-card rounded-2xl p-4 border border-white/10 bg-black/20',
                                         'flex items-center justify-between gap-4',
                                         isRTL && 'flex-row-reverse'
                                     )}
@@ -662,6 +680,111 @@ export default function DashboardPage() {
                     )}
                 </section>
             </main>
+
+            {/* Quiet luxury motion + materials (scoped) */}
+            <style jsx global>{`
+                .obsidian-dashboard {
+                    --accent-rgb: ${ACCENT_RGB};
+                    --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
+                }
+
+                /* Card material */
+                .obsidian-dashboard .lux-card {
+                    transform: translate3d(0, 0, 0);
+                    transition:
+                        transform 700ms var(--ease-lux),
+                        box-shadow 900ms var(--ease-lux),
+                        border-color 900ms var(--ease-lux),
+                        background-color 900ms var(--ease-lux),
+                        opacity 900ms var(--ease-lux);
+                    will-change: transform;
+                }
+
+                .obsidian-dashboard .lux-card::before {
+                    content: '';
+                    position: absolute;
+                    inset: -1px;
+                    border-radius: inherit;
+                    pointer-events: none;
+                    opacity: 0;
+                    transition: opacity 600ms var(--ease-lux);
+                    background: linear-gradient(
+                        135deg,
+                        rgba(var(--accent-rgb), 0.12),
+                        transparent 42%,
+                        transparent 60%,
+                        rgba(255, 255, 255, 0.06)
+                    );
+                }
+
+                .obsidian-dashboard .lux-card::after {
+                    content: '';
+                    position: absolute;
+                    inset: 0;
+                    border-radius: inherit;
+                    pointer-events: none;
+                    opacity: 0;
+                    transform: translateX(-120%) skewX(-20deg);
+                    background: linear-gradient(
+                        110deg,
+                        transparent 42%,
+                        rgba(255, 255, 255, 0.10) 50%,
+                        transparent 58%
+                    );
+                }
+
+                .obsidian-dashboard .lux-card:hover {
+                    transform: translate3d(0, -2px, 0);
+                    border-color: rgba(var(--accent-rgb), 0.22);
+                    box-shadow:
+                        0 45px 150px rgba(0, 0, 0, 0.68),
+                        0 0 90px rgba(var(--accent-rgb), 0.05);
+                }
+
+                .obsidian-dashboard .lux-card:hover::before {
+                    opacity: 1;
+                }
+
+                .obsidian-dashboard .lux-card:hover::after {
+                    opacity: 1;
+                    animation: lux-sheen 1200ms var(--ease-lux) forwards;
+                }
+
+                @keyframes lux-sheen {
+                    0% {
+                        transform: translateX(-120%) skewX(-20deg);
+                        opacity: 0;
+                    }
+                    40% {
+                        opacity: 0.9;
+                    }
+                    100% {
+                        transform: translateX(120%) skewX(-20deg);
+                        opacity: 0;
+                    }
+                }
+
+                /* Icons: neutral by default, brass on hover */
+                .obsidian-dashboard .dial-icon :global(svg) {
+                    color: rgba(255, 255, 255, 0.62);
+                    transition: color 450ms var(--ease-lux), filter 650ms var(--ease-lux);
+                }
+
+                .obsidian-dashboard .lux-card:hover .dial-icon :global(svg) {
+                    color: rgba(var(--accent-rgb), 0.90);
+                    filter: drop-shadow(0 0 10px rgba(var(--accent-rgb), 0.16));
+                }
+
+                @media (prefers-reduced-motion: reduce) {
+                    .obsidian-dashboard .lux-card,
+                    .obsidian-dashboard .lux-card::before,
+                    .obsidian-dashboard .lux-card::after,
+                    .obsidian-dashboard .dial-icon :global(svg) {
+                        transition: none !important;
+                        animation: none !important;
+                    }
+                }
+            `}</style>
         </div>
     );
 }
@@ -676,12 +799,19 @@ function RingProgress({ value }: { value: number }) {
 
     return (
         <div className="relative" style={{ width: size, height: size }}>
-            <svg width={size} height={size} className="rotate-[-90deg]">
+            <svg width={size} height={size} className="rotate-[-90deg] lux-ring">
+                <defs>
+                    <linearGradient id="lux-ring-gradient" x1="0" y1="0" x2="1" y2="1">
+                        <stop offset="0%" stopColor={`rgba(${ACCENT_RGB},0.95)`} />
+                        <stop offset="55%" stopColor="rgba(255,255,255,0.45)" />
+                        <stop offset="100%" stopColor={`rgba(${ACCENT_RGB},0.70)`} />
+                    </linearGradient>
+                </defs>
                 <circle
                     cx={size / 2}
                     cy={size / 2}
                     r={r}
-                    stroke="rgba(255,255,255,0.12)"
+                    stroke="rgba(255,255,255,0.10)"
                     strokeWidth={stroke}
                     fill="transparent"
                 />
@@ -689,13 +819,13 @@ function RingProgress({ value }: { value: number }) {
                     cx={size / 2}
                     cy={size / 2}
                     r={r}
-                    stroke={GOLD}
+                    stroke="url(#lux-ring-gradient)"
                     strokeWidth={stroke}
                     fill="transparent"
                     strokeLinecap="round"
                     strokeDasharray={c}
                     strokeDashoffset={offset}
-                    style={{ filter: 'drop-shadow(0 0 10px rgba(212,175,55,0.35))' }}
+                    style={{ filter: `drop-shadow(0 0 10px rgba(${ACCENT_RGB},0.18))` }}
                 />
             </svg>
             <div
@@ -710,17 +840,11 @@ function RingProgress({ value }: { value: number }) {
 
 function DialIcon({ icon: Icon }: { icon: React.ComponentType<{ className?: string }> }) {
     return (
-        <div className="relative w-11 h-11 flex items-center justify-center">
-            <div className="absolute inset-0 rounded-full border border-white/12 bg-black/30" />
-            <div className="absolute inset-[3px] rounded-full border" style={{ borderColor: 'rgba(212,175,55,0.22)' }} />
+        <div className="dial-icon relative w-11 h-11 flex items-center justify-center">
+            <div className="absolute inset-0 rounded-full border border-white/10 bg-black/30" />
+            <div className="absolute inset-[3px] rounded-full border" style={{ borderColor: `rgba(${ACCENT_RGB},0.16)` }} />
             <div className="absolute inset-[8px] rounded-full bg-black/30 border border-white/10" />
             <Icon className="relative z-10 w-5 h-5" />
-            <style jsx>{`
-                div :global(svg) {
-                    color: ${GOLD};
-                    filter: drop-shadow(0 0 10px rgba(212, 175, 55, 0.22));
-                }
-            `}</style>
         </div>
     );
 }
@@ -741,7 +865,7 @@ function StatDial({
     return (
         <div
             className={cn(
-                'relative rounded-3xl p-5 border border-white/10 bg-white/4 backdrop-blur-xl',
+                'lux-card group relative rounded-3xl p-5 border border-white/10 bg-white/4 backdrop-blur-xl',
                 'shadow-[0_25px_90px_rgba(0,0,0,0.60)]'
             )}
         >
@@ -749,7 +873,7 @@ function StatDial({
                 className="pointer-events-none absolute inset-0 rounded-3xl opacity-70"
                 style={{
                     background:
-                        'radial-gradient(600px circle at 25% 15%, rgba(212,175,55,0.10), transparent 55%), radial-gradient(500px circle at 90% 85%, rgba(255,255,255,0.05), transparent 60%)',
+                        `radial-gradient(600px circle at 25% 15%, rgba(${ACCENT_RGB},0.07), transparent 56%), radial-gradient(500px circle at 90% 85%, rgba(255,255,255,0.05), transparent 62%)`,
                 }}
             />
 
@@ -770,7 +894,7 @@ function StatDial({
                     style={{
                         fontFamily: 'var(--font-serif), serif',
                         letterSpacing: '0.06em',
-                        textShadow: '0 0 22px rgba(212,175,55,0.10)',
+                        textShadow: `0 0 22px rgba(${ACCENT_RGB},0.06)`,
                     }}
                 >
                     {value}

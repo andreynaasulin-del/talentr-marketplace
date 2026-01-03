@@ -165,7 +165,7 @@ export default function SettingsPage() {
     if (loading) {
         return (
             <div className="min-h-screen flex items-center justify-center" style={{ background: '#05070A' }}>
-                <Loader2 className="w-10 h-10 animate-spin" style={{ color: '#D4AF37' }} />
+                <Loader2 className="w-10 h-10 animate-spin" style={{ color: '#C8B37A' }} />
             </div>
         );
     }
@@ -177,19 +177,24 @@ export default function SettingsPage() {
             {/* Ambient depth */}
             <div className="pointer-events-none absolute inset-0 overflow-hidden">
                 <div
-                    className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-25"
-                    style={{ background: 'radial-gradient(circle at 30% 30%, rgba(212,175,55,0.22), transparent 60%)' }}
+                    className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-20"
+                    style={{ background: 'radial-gradient(circle at 30% 30%, rgba(200,179,122,0.16), transparent 62%)' }}
                 />
                 <div
                     className="absolute top-20 -right-64 w-[1000px] h-[1000px] rounded-full blur-3xl opacity-35"
                     style={{ background: 'radial-gradient(circle at 35% 35%, rgba(0, 180, 255, 0.10), transparent 60%)' }}
                 />
                 <div
-                    className="absolute inset-0 opacity-[0.08]"
+                    className="absolute inset-0 opacity-[0.06] mix-blend-screen"
                     style={{
-                        backgroundImage: 'radial-gradient(rgba(212,175,55,0.9) 1px, transparent 1px)',
-                        backgroundSize: '140px 140px',
-                        backgroundPosition: '10px 10px',
+                        backgroundImage: `
+                            radial-gradient(1px 1px at 12% 22%, rgba(200,179,122,0.30), transparent 60%),
+                            radial-gradient(1px 1px at 26% 78%, rgba(200,179,122,0.18), transparent 60%),
+                            radial-gradient(1.5px 1.5px at 42% 40%, rgba(255,255,255,0.10), transparent 60%),
+                            radial-gradient(1px 1px at 63% 16%, rgba(200,179,122,0.16), transparent 60%),
+                            radial-gradient(1px 1px at 78% 66%, rgba(255,255,255,0.08), transparent 60%),
+                            radial-gradient(1.5px 1.5px at 88% 84%, rgba(200,179,122,0.14), transparent 60%)
+                        `,
                     }}
                 />
             </div>
@@ -220,7 +225,7 @@ export default function SettingsPage() {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-[#D4AF37] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#C8B37A] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
                     >
                         {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                         {language === 'he' ? 'שמור' : 'Save'}
@@ -235,7 +240,7 @@ export default function SettingsPage() {
                         </span>
                         <span
                             className="text-lg font-semibold tracking-[0.12em]"
-                            style={{ fontFamily: 'var(--font-serif), serif', color: '#D4AF37' }}
+                            style={{ fontFamily: 'var(--font-serif), serif', color: '#C8B37A' }}
                         >
                             {Math.round(progressPercent)}%
                         </span>
@@ -246,8 +251,8 @@ export default function SettingsPage() {
                             animate={{ width: `${progressPercent}%` }}
                             className="h-full rounded-full"
                             style={{
-                                background: 'linear-gradient(90deg, rgba(212,175,55,0.9), rgba(212,175,55,0.55))',
-                                boxShadow: '0 0 18px rgba(212,175,55,0.22)',
+                                background: 'linear-gradient(90deg, rgba(200,179,122,0.85), rgba(200,179,122,0.55))',
+                                boxShadow: '0 0 18px rgba(200,179,122,0.14)',
                             }}
                         />
                     </div>
@@ -266,7 +271,7 @@ export default function SettingsPage() {
                             className="text-sm uppercase tracking-[0.35em] text-white/70 mb-5 flex items-center gap-2"
                             style={{ fontFamily: 'var(--font-serif), serif' }}
                         >
-                            <UserIcon className="w-5 h-5" style={{ color: '#D4AF37' }} />
+                            <UserIcon className="w-5 h-5" style={{ color: '#C8B37A' }} />
                             {language === 'he' ? 'מידע בסיסי' : 'Basic Information'}
                         </h2>
 
@@ -491,7 +496,7 @@ export default function SettingsPage() {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 px-7 py-3 bg-[#D4AF37] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50 shadow-[0_0_40px_rgba(212,175,55,0.18)]"
+                            className="flex items-center gap-2 px-7 py-3 bg-[#C8B37A] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50 shadow-[0_0_40px_rgba(200,179,122,0.12)]"
                         >
                             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                             {language === 'he' ? 'שמור שינויים' : 'Save Changes'}
