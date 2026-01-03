@@ -1,7 +1,7 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronDown, Sparkles } from 'lucide-react';
+import { ChevronDown } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
@@ -178,42 +178,13 @@ export default function Navbar() {
                                 </Link>
                             </motion.div>
 
-                            {/* Primary CTA: Find Talent - Glow Button */}
-                            <motion.div
-                                whileHover={{ scale: 1.02 }}
-                                whileTap={{ scale: 0.98 }}
+                            {/* Primary CTA: Find Talent */}
+                            <Link
+                                href="#packages"
+                                className="px-5 py-2.5 md:px-6 md:py-3 bg-[#0a1628] text-white text-sm font-bold rounded-xl hover:bg-[#0f2340] transition-colors"
                             >
-                                <Link
-                                    href="#packages"
-                                    className={cn(
-                                        "group relative overflow-hidden",
-                                        "px-5 py-2.5 md:px-6 md:py-3",
-                                        "text-sm font-bold rounded-xl",
-                                        "transition-all duration-300"
-                                    )}
-                                >
-                                    {/* Gradient background */}
-                                    <div className="absolute inset-0 bg-gradient-to-r from-cyan-500 to-blue-600 rounded-xl" />
-                                    
-                                    {/* Glow effect */}
-                                    <div className="absolute inset-0 rounded-xl opacity-0 group-hover:opacity-100 transition-opacity duration-300"
-                                        style={{
-                                            boxShadow: '0 0 20px rgba(0, 212, 255, 0.5), 0 0 40px rgba(0, 157, 224, 0.3)',
-                                        }}
-                                    />
-                                    
-                                    {/* Shine effect */}
-                                    <div className="absolute inset-0 overflow-hidden rounded-xl">
-                                        <div className="absolute top-0 -left-full w-1/2 h-full bg-gradient-to-r from-transparent via-white/30 to-transparent skew-x-[-25deg] group-hover:left-[200%] transition-all duration-700 ease-out" />
-                                    </div>
-                                    
-                                    {/* Content */}
-                                    <span className="relative flex items-center gap-2 text-white">
-                                        <Sparkles className="w-4 h-4" />
-                                        {t.findTalent}
-                                    </span>
-                                </Link>
-                            </motion.div>
+                                {t.findTalent}
+                            </Link>
                         </div>
                     </div>
                 </div>
