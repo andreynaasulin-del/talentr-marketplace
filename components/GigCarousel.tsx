@@ -1,11 +1,11 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, useMotionValue, useSpring, useTransform, AnimatePresence } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { packages, Package } from '@/lib/gigs';
-import { ArrowUpRight, Sparkles } from 'lucide-react';
+import { ArrowUpRight } from 'lucide-react';
 import { useRef, useState, MouseEvent } from 'react';
 import { cn } from '@/lib/utils';
 
@@ -110,29 +110,25 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     };
 
     return (
-        <div className="relative group perspective-[1200px]">
+        <div className="luxury-card-wrapper group">
             {/* CAUSTICS: Refraction light under the cube */}
             <motion.div 
-                className="absolute -inset-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-0"
+                className="luxury-caustic"
                 style={{
                     background: `radial-gradient(circle at ${50 + mouseX.get() * 50}% ${50 + mouseY.get() * 50}%, rgba(212, 175, 55, 0.15) 0%, transparent 70%)`,
-                    filter: 'blur(40px)',
                 }}
+                animate={{ opacity: isHovered ? 1 : 0 }}
+                transition={{ duration: 0.8 }}
             />
 
             <motion.a
                 ref={cardRef}
                 href={`/package/${pkg.id}`}
-                className="relative block aspect-[4/5] overflow-hidden rounded-[2px] transition-all duration-700"
+                className="gig-cube"
                 style={{
                     rotateX,
                     rotateY,
                     scale,
-                    transformStyle: 'preserve-3d',
-                    background: 'rgba(255, 255, 255, 0.03)',
-                    backdropFilter: 'blur(25px) saturate(180%)',
-                    border: '1px solid rgba(255, 255, 255, 0.1)',
-                    boxShadow: '0 50px 100px -20px rgba(0,0,0,0.5)',
                 }}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => setIsHovered(true)}
@@ -142,62 +138,152 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     mouseY.set(0);
                 }}
             >
-                {/* GLOWING EDGES: Top and Bottom Gold Borders */}
-                <div className="absolute inset-0 z-20 pointer-events-none">
-                    {/* Golden Rim Light */}
-                    <div className={cn(
-                        "absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent transition-opacity duration-1000",
-                        isHovered ? "opacity-100" : "opacity-20"
-                    )} />
-                    <div className={cn(
-                        "absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent transition-opacity duration-1000",
-                        isHovered ? "opacity-100" : "opacity-20"
-                    )} />
-                </div>
-
-                {/* INTERNAL DEPTH: The "Object" inside the glass */}
-                <motion.div 
-                    className="absolute inset-8 z-10"
-                    style={{ transform: 'translateZ(40px)' }}
-                >
-                    <div className="relative w-full h-full overflow-hidden rounded-sm">
+                <div className="cube-content">
+                    <div className="cube-image-wrapper">
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
                             fill
-                            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                            className="cube-image"
                             sizes="400px"
                         />
-                        {/* Internal Refraction Shadow */}
-                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                     </div>
-                </motion.div>
 
-                {/* TYPOGRAPHY: Floating Serif Labels */}
-                <div className="absolute inset-0 p-12 flex flex-col justify-end z-30" style={{ transform: 'translateZ(100px)' }}>
-                    <div className="space-y-2">
-                        <span className="text-[9px] font-bold text-[#D4AF37] uppercase tracking-[0.6em] font-serif block opacity-80">
-                            {pkg.category}
-                        </span>
-                        <h3 className="text-3xl md:text-4xl font-light text-white leading-tight font-serif tracking-widest drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">
-                            {pkg.title[lang].split(' ').map((word, i) => (
-                                <span key={i} className="block">{word.toUpperCase()}</span>
-                            ))}
+                    <div className="glass-overlay" />
+
+                    <div className="cube-info">
+                        <span className="category-tag">{pkg.category.toUpperCase()}</span>
+                        <h3 className="cube-title">
+                            {pkg.title[lang]}
                         </h3>
                     </div>
-                </div>
 
-                {/* REFRACTION SHINE: Light following cursor */}
-                <motion.div 
-                    className="absolute inset-0 pointer-events-none z-40 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
-                    style={{
-                        background: `linear-gradient(${135 + mouseX.get() * 20}deg, rgba(255,255,255,0.1) 0%, transparent 40%, rgba(212,175,55,0.05) 100%)`,
-                    }}
-                />
+                    <div className="gold-frame" />
+                </div>
             </motion.a>
 
-            {/* Deep Floating Shadow */}
-            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-[80%] h-10 bg-black/60 blur-3xl rounded-full opacity-40 group-hover:opacity-100 transition-opacity duration-1000" />
+            <style jsx global>{`
+                :root {
+                    --gold-glow: rgba(212, 175, 55, 0.4);
+                    --glass-bg: rgba(255, 255, 255, 0.03);
+                }
+
+                .luxury-card-wrapper {
+                    position: relative;
+                    perspective: 1200px;
+                    width: 100%;
+                    height: 420px;
+                }
+
+                .luxury-caustic {
+                    position: absolute;
+                    inset: -60px;
+                    pointer-events: none;
+                    filter: blur(40px);
+                    opacity: 0;
+                    transition: opacity 0.8s ease;
+                    z-index: 0;
+                }
+
+                .gig-cube {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    transform-style: preserve-3d;
+                    cursor: pointer;
+                    transition: transform 0.15s ease-out, box-shadow 0.6s ease, border 0.6s ease;
+                    z-index: 1;
+                }
+
+                .cube-content {
+                    position: relative;
+                    width: 100%;
+                    height: 100%;
+                    background: var(--glass-bg);
+                    border-radius: 20px;
+                    border: 1px solid rgba(255, 255, 255, 0.1);
+                    overflow: hidden;
+                    backdrop-filter: blur(15px) saturate(150%);
+                    box-shadow:
+                       0 20px 40px rgba(0,0,0,0.4),
+                       inset 0 0 20px rgba(255,255,255,0.05);
+                }
+
+                .cube-image-wrapper {
+                    position: absolute;
+                    inset: 12px;
+                    overflow: hidden;
+                    transform: translateZ(-20px);
+                    border-radius: 6px;
+                }
+
+                .cube-image {
+                    object-fit: cover;
+                    opacity: 0.85;
+                    transform: scale(1.1);
+                    transition: transform 0.8s ease, opacity 0.6s ease;
+                }
+
+                .glass-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(145deg, rgba(255,255,255,0.08), rgba(0,0,0,0.35));
+                    mix-blend-mode: screen;
+                    pointer-events: none;
+                }
+
+                .gold-frame {
+                    position: absolute;
+                    inset: 0;
+                    border: 1.5px solid transparent;
+                    border-radius: 20px;
+                    background: linear-gradient(135deg, #d4af37, transparent, #d4af37) border-box;
+                    mask: linear-gradient(#fff 0 0) padding-box, linear-gradient(#fff 0 0);
+                    mask-composite: exclude;
+                    opacity: 0.3;
+                    transition: 0.4s ease;
+                    box-shadow: 0 0 15px rgba(212, 175, 55, 0.15);
+                }
+
+                .cube-info {
+                    position: absolute;
+                    bottom: 28px;
+                    left: 24px;
+                    transform: translateZ(50px);
+                    text-align: left;
+                    max-width: 80%;
+                }
+
+                .cube-title {
+                    font-family: var(--font-serif), serif;
+                    color: #fff;
+                    font-size: 26px;
+                    margin: 6px 0 0 0;
+                    letter-spacing: 0.1em;
+                    line-height: 1.2;
+                    text-shadow: 0 5px 15px rgba(0,0,0,0.5), 0 0 12px rgba(212,175,55,0.25);
+                }
+
+                .category-tag {
+                    font-size: 10px;
+                    color: #d4af37;
+                    letter-spacing: 0.3em;
+                    text-transform: uppercase;
+                    font-weight: 700;
+                    font-family: var(--font-serif), serif;
+                }
+
+                /* Hover states */
+                .gig-cube:hover .cube-image {
+                    transform: scale(1.18);
+                    opacity: 1;
+                }
+
+                .gig-cube:hover .gold-frame {
+                    opacity: 1;
+                    box-shadow: 0 0 20px var(--gold-glow);
+                }
+            `}</style>
         </div>
     );
 }
