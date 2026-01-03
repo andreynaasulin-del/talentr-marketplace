@@ -24,16 +24,17 @@ export default function GigCarousel() {
     };
 
     const t = content[lang];
-    // Убираем алкоголь: исключаем категории/титулы, связанные с баром и алкоголем
+    // Фильтр: убираем алкоголь
     const filtered = packages.filter(
         (p) =>
             !['Bartender', 'Sommelier'].includes(p.category) &&
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + p.title.he)
     );
 
-    // Без повторов: разбиваем на два ряда (четные/нечетные)
-    const topRow = filtered.filter((_, i) => i % 2 === 0);
-    const bottomRow = filtered.filter((_, i) => i % 2 === 1);
+    // Без повторов: делим список пополам (если нечётное — верхний ряд длиннее на 1)
+    const mid = Math.ceil(filtered.length / 2);
+    const topRow = filtered.slice(0, mid);
+    const bottomRow = filtered.slice(mid);
 
     return (
         <section id="packages" className="py-12 md:py-16 bg-[#020617] overflow-hidden relative">
@@ -61,11 +62,11 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* Infinite horizontal slider: верхний вправо, нижний влево */}
+            {/* Два ряда: верх вправо, низ влево; без повторов (loop только для бесшовности) */}
             <div className="relative z-10 max-w-7xl mx-auto px-2 md:px-4">
-                <div className="overflow-hidden perspective-[1500px]">
+                <div className="overflow-hidden perspective-[1500px] flex flex-col gap-10">
                     <MarqueeRow items={topRow} direction="right" lang={lang} speed={55} />
-                    <MarqueeRow items={bottomRow} direction="left" lang={lang} speed={65} />
+                    <MarqueeRow items={bottomRow} direction="left" lang={lang} speed={60} />
                 </div>
             </div>
         </section>
@@ -343,11 +344,11 @@ function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     100% { transform: translateX(-50%); }
                 }
                 @keyframes marquee-right {
-                    0% { transform: translateX(-50%); }
-                    100% { transform: translateX(0); }
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(50%); }
                 }
                 .animate-marquee {
-                    animation: marquee-left 45s linear infinite;
+                    animation: marquee-left 50s linear infinite;
                     will-change: transform;
                 }
                 .animate-marquee.marquee-right {
