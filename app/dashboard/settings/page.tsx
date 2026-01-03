@@ -164,31 +164,55 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-gray-50">
-                <Loader2 className="w-10 h-10 text-blue-500 animate-spin" />
+            <div className="min-h-screen flex items-center justify-center" style={{ background: '#05070A' }}>
+                <Loader2 className="w-10 h-10 animate-spin" style={{ color: '#D4AF37' }} />
             </div>
         );
     }
 
     return (
-        <>
+        <div className="obsidian-settings min-h-screen text-white relative" style={{ background: '#05070A' }}>
             <Navbar />
-            <div className="max-w-3xl mx-auto px-4 md:px-6 pt-24 pb-12">
+
+            {/* Ambient depth */}
+            <div className="pointer-events-none absolute inset-0 overflow-hidden">
+                <div
+                    className="absolute -top-64 left-1/4 w-[900px] h-[900px] rounded-full blur-3xl opacity-25"
+                    style={{ background: 'radial-gradient(circle at 30% 30%, rgba(212,175,55,0.22), transparent 60%)' }}
+                />
+                <div
+                    className="absolute top-20 -right-64 w-[1000px] h-[1000px] rounded-full blur-3xl opacity-35"
+                    style={{ background: 'radial-gradient(circle at 35% 35%, rgba(0, 180, 255, 0.10), transparent 60%)' }}
+                />
+                <div
+                    className="absolute inset-0 opacity-[0.08]"
+                    style={{
+                        backgroundImage: 'radial-gradient(rgba(212,175,55,0.9) 1px, transparent 1px)',
+                        backgroundSize: '140px 140px',
+                        backgroundPosition: '10px 10px',
+                    }}
+                />
+            </div>
+
+            <main className="relative max-w-3xl mx-auto px-4 md:px-6 pt-28 pb-14">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
+                <div className="flex items-center justify-between mb-7">
                     <div className="flex items-center gap-4">
                         <Link
                             href="/dashboard"
-                            className="p-3 bg-gray-100 hover:bg-gray-200 rounded-xl transition-colors"
+                            className="p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl"
                         >
-                            <ArrowLeft className="w-5 h-5 text-gray-700" />
+                            <ArrowLeft className="w-5 h-5 text-white/70" />
                         </Link>
                         <div>
-                            <h1 className="text-2xl md:text-3xl font-bold text-gray-900">
+                            <h1
+                                className="text-2xl md:text-3xl tracking-[0.16em]"
+                                style={{ fontFamily: 'var(--font-serif), serif' }}
+                            >
                                 {language === 'he' ? 'הגדרות פרופיל' : 'Profile Settings'}
                             </h1>
-                            <p className="text-gray-500">
+                            <p className="text-white/55 text-sm mt-1">
                                 {language === 'he' ? 'מלא את הפרטים כדי לקבל הזמנות' : 'Complete your profile to get bookings'}
                             </p>
                         </div>
@@ -196,7 +220,7 @@ export default function SettingsPage() {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all disabled:opacity-50"
+                        className="flex items-center gap-2 px-5 py-2.5 bg-[#D4AF37] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
                     >
                         {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                         {language === 'he' ? 'שמור' : 'Save'}
@@ -204,33 +228,45 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="bg-white rounded-2xl p-6 shadow-sm border border-gray-100 mb-8">
+                <div className="rounded-3xl p-5 border border-white/10 bg-white/4 backdrop-blur-xl mb-7">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-sm font-bold text-gray-600">
+                        <span className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em]">
                             {language === 'he' ? 'השלמת פרופיל' : 'Profile Completion'}
                         </span>
-                        <span className="text-lg font-black text-blue-600">{Math.round(progressPercent)}%</span>
+                        <span
+                            className="text-lg font-semibold tracking-[0.12em]"
+                            style={{ fontFamily: 'var(--font-serif), serif', color: '#D4AF37' }}
+                        >
+                            {Math.round(progressPercent)}%
+                        </span>
                     </div>
-                    <div className="h-3 bg-gray-100 rounded-full overflow-hidden">
+                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
-                            className="h-full bg-gradient-to-r from-blue-500 to-purple-600 rounded-full"
+                            className="h-full rounded-full"
+                            style={{
+                                background: 'linear-gradient(90deg, rgba(212,175,55,0.9), rgba(212,175,55,0.55))',
+                                boxShadow: '0 0 18px rgba(212,175,55,0.22)',
+                            }}
                         />
                     </div>
                 </div>
 
                 {/* Form Sections */}
-                <div className="space-y-8">
+                <div className="space-y-6">
 
                     {/* Basic Info */}
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
+                        className="rounded-3xl p-5 md:p-6 border border-white/10 bg-white/4 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.60)]"
                     >
-                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <UserIcon className="w-5 h-5 text-blue-600" />
+                        <h2
+                            className="text-sm uppercase tracking-[0.35em] text-white/70 mb-5 flex items-center gap-2"
+                            style={{ fontFamily: 'var(--font-serif), serif' }}
+                        >
+                            <UserIcon className="w-5 h-5" style={{ color: '#D4AF37' }} />
                             {language === 'he' ? 'מידע בסיסי' : 'Basic Information'}
                         </h2>
 
@@ -455,14 +491,57 @@ export default function SettingsPage() {
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-purple-600 hover:opacity-90 text-white font-bold rounded-xl transition-all disabled:opacity-50 shadow-lg shadow-blue-500/30"
+                            className="flex items-center gap-2 px-7 py-3 bg-[#D4AF37] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50 shadow-[0_0_40px_rgba(212,175,55,0.18)]"
                         >
                             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                             {language === 'he' ? 'שמור שינויים' : 'Save Changes'}
                         </button>
                     </div>
                 </div>
-            </div>
-        </>
+            </main>
+
+            {/* Obsidian & Gold theme overrides for legacy classes */}
+            <style jsx global>{`
+                .obsidian-settings .bg-white {
+                    background: rgba(255, 255, 255, 0.04) !important;
+                }
+                .obsidian-settings .bg-gray-50,
+                .obsidian-settings .bg-gray-100 {
+                    background: rgba(255, 255, 255, 0.05) !important;
+                }
+                .obsidian-settings .border-gray-100,
+                .obsidian-settings .border-gray-200 {
+                    border-color: rgba(255, 255, 255, 0.12) !important;
+                }
+                .obsidian-settings .text-gray-900,
+                .obsidian-settings .text-gray-800,
+                .obsidian-settings .text-gray-700 {
+                    color: rgba(255, 255, 255, 0.88) !important;
+                }
+                .obsidian-settings .text-gray-600,
+                .obsidian-settings .text-gray-500,
+                .obsidian-settings .text-gray-400 {
+                    color: rgba(255, 255, 255, 0.55) !important;
+                }
+                .obsidian-settings input,
+                .obsidian-settings textarea,
+                .obsidian-settings select {
+                    background: rgba(255, 255, 255, 0.05) !important;
+                    border-color: rgba(255, 255, 255, 0.12) !important;
+                    color: rgba(255, 255, 255, 0.92) !important;
+                }
+                .obsidian-settings input::placeholder,
+                .obsidian-settings textarea::placeholder {
+                    color: rgba(255, 255, 255, 0.25) !important;
+                }
+                .obsidian-settings input:focus,
+                .obsidian-settings textarea:focus,
+                .obsidian-settings select:focus {
+                    border-color: rgba(212, 175, 55, 0.55) !important;
+                    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
+                    outline: none !important;
+                }
+            `}</style>
+        </div>
     );
 }
