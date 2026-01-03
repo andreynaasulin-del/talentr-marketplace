@@ -15,97 +15,73 @@ export default function GigCarousel() {
 
     const content = {
         en: {
-            title: 'Digital Boutique',
-            subtitle: 'Exclusive sets curated for the most demanding occasions.',
-            explore: 'Explore',
+            title: 'The Collection',
+            subtitle: 'Curated artistic experiences, encased in digital crystal.',
         },
         he: {
-            title: 'בוטיק דיגיטלי',
-            subtitle: 'סטים בלעדיים שנבחרו לרגעים התובעניים ביותר.',
-            explore: 'גלה',
+            title: 'האוסף',
+            subtitle: 'חוויות אמנותיות נבחרות, עטופות בקריסטל דיגיטלי.',
         },
     };
 
     const t = content[lang];
-    
     const allPackages = [...packages, ...packages];
     const firstRow = allPackages.slice(0, 10);
     const secondRow = allPackages.slice(10, 20);
 
     return (
-        <section id="packages" className="py-24 md:py-48 bg-[#020617] overflow-visible relative">
-            {/* Ultra-Luxury Dynamic Ambient Lighting */}
+        <section id="packages" className="py-32 md:py-56 bg-[#020617] overflow-visible relative">
+            {/* Dynamic Ambient Background */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
-                <div className="absolute top-[-10%] left-[-10%] w-[100%] h-[100%] bg-radial-gradient from-blue-900/20 via-transparent to-transparent opacity-40 blur-[150px]" />
-                <div className="absolute bottom-[-20%] right-[-10%] w-[80%] h-[80%] bg-radial-gradient from-cyan-900/10 via-transparent to-transparent opacity-30 blur-[120px]" />
-                
-                {/* Floating Bokeh Light Particles */}
-                <motion.div 
-                    animate={{ 
-                        x: [0, 100, 0], 
-                        y: [0, -50, 0],
-                        opacity: [0.1, 0.3, 0.1] 
-                    }}
-                    transition={{ duration: 15, repeat: Infinity, ease: "easeInOut" }}
-                    className="absolute top-1/4 left-1/3 w-64 h-64 bg-cyan-500/10 rounded-full blur-[100px]" 
-                />
+                <div className="absolute top-0 left-0 w-full h-full bg-[radial-gradient(circle_at_50%_50%,_rgba(10,25,47,1)_0%,_rgba(2,6,23,1)_100%)]" />
+                <div className="absolute top-1/4 left-1/4 w-[800px] h-[800px] bg-blue-500/5 rounded-full blur-[150px] animate-pulse" />
             </div>
             
             <div className="relative z-10 max-w-7xl mx-auto px-4 md:px-8 mb-24 md:mb-40">
                 <motion.div
-                    initial={{ opacity: 0, y: 60 }}
+                    initial={{ opacity: 0, y: 40 }}
                     whileInView={{ opacity: 1, y: 0 }}
                     viewport={{ once: true }}
-                    transition={{ duration: 1.2, ease: [0.16, 1, 0.3, 1] }}
+                    transition={{ duration: 1.5, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
-                    <div className="inline-flex items-center gap-3 px-6 py-2 bg-white/5 border border-white/10 rounded-full mb-10 backdrop-blur-2xl">
-                        <span className="text-[11px] font-black text-amber-200/60 uppercase tracking-[0.6em] font-serif italic">Privé</span>
-                    </div>
-                    
-                    <h2 className="text-6xl md:text-9xl font-black text-white mb-10 tracking-tighter leading-[0.9]">
-                        <span className="text-gradient-luxury">{t.title}</span>
+                    <span className="inline-block text-[10px] font-black text-[#D4AF37] uppercase tracking-[0.8em] mb-8 font-serif italic">Exclusive</span>
+                    <h2 className="text-6xl md:text-9xl font-black text-white mb-10 tracking-tighter leading-none font-sans">
+                        {t.title}
                     </h2>
-                    <p className="text-white/20 text-xl md:text-3xl max-w-4xl mx-auto font-medium leading-relaxed font-serif italic">
+                    <p className="text-white/20 text-lg md:text-2xl max-w-3xl mx-auto font-medium leading-relaxed font-serif italic">
                         {t.subtitle}
                     </p>
                 </motion.div>
             </div>
 
-            {/* Fluid Floating Layout with staggering */}
             <div className="relative z-10 flex flex-col gap-24 md:gap-40" style={{ direction: 'ltr' }}>
-                <MarqueeRow items={firstRow} direction="left" lang={lang} t={t} staggered />
-                <MarqueeRow items={secondRow} direction="right" lang={lang} t={t} />
+                <MarqueeRow items={firstRow} direction="left" lang={lang} />
+                <MarqueeRow items={secondRow} direction="right" lang={lang} />
             </div>
         </section>
     );
 }
 
-function MarqueeRow({ items, direction, lang, t, staggered = false }: { items: Package[]; direction: 'left' | 'right'; lang: 'en' | 'he'; t: any; staggered?: boolean }) {
+function MarqueeRow({ items, direction, lang }: { items: Package[]; direction: 'left' | 'right'; lang: 'en' | 'he' }) {
     const doubledItems = [...items, ...items];
 
     return (
-        <div className="flex w-full overflow-hidden select-none">
+        <div className="flex w-full overflow-hidden select-none py-20">
             <motion.div
-                className="flex gap-16 md:gap-24 items-center"
+                className="flex gap-16 md:gap-28 items-center"
                 animate={{
-                    x: direction === 'left' ? [0, -400 * items.length] : [-400 * items.length, 0],
+                    x: direction === 'left' ? [0, -450 * items.length] : [-450 * items.length, 0],
                 }}
                 transition={{
-                    duration: 70,
+                    duration: 80,
                     repeat: Infinity,
                     ease: "linear",
                 }}
             >
                 {doubledItems.map((pkg, idx) => (
-                    <div 
-                        key={`${pkg.id}-${idx}`} 
-                        className={cn(
-                            "flex-shrink-0 w-[320px] md:w-[400px] transition-all duration-1000 ease-in-out",
-                            staggered && idx % 2 === 0 ? "translate-y-16" : staggered ? "-translate-y-16" : "translate-y-0"
-                        )}
-                    >
-                        <PackageCubeLuxury pkg={pkg} lang={lang} t={t} />
+                    <div key={`${pkg.id}-${idx}`} className="flex-shrink-0 w-[320px] md:w-[420px]">
+                        <GlassCube pkg={pkg} lang={lang} />
                     </div>
                 ))}
             </motion.div>
@@ -113,17 +89,18 @@ function MarqueeRow({ items, direction, lang, t, staggered = false }: { items: P
     );
 }
 
-function PackageCubeLuxury({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; t: any }) {
+function GlassCube({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     const cardRef = useRef<HTMLAnchorElement>(null);
     const [isHovered, setIsHovered] = useState(false);
     
     const mouseX = useMotionValue(0);
     const mouseY = useMotionValue(0);
     
-    const springConfig = { stiffness: 60, damping: 20, mass: 1.2 };
+    // Physics for 3D Tilt
+    const springConfig = { stiffness: 40, damping: 20, mass: 1.5 };
     const rotateX = useSpring(useTransform(mouseY, [-0.5, 0.5], [15, -15]), springConfig);
     const rotateY = useSpring(useTransform(mouseX, [-0.5, 0.5], [-15, 15]), springConfig);
-    const scale = useSpring(isHovered ? 1.1 : 1, springConfig);
+    const scale = useSpring(isHovered ? 1.05 : 1, springConfig);
     
     const handleMouseMove = (e: MouseEvent<HTMLAnchorElement>) => {
         if (!cardRef.current) return;
@@ -133,22 +110,29 @@ function PackageCubeLuxury({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; 
     };
 
     return (
-        <motion.div
-            className="relative perspective-[2500px]"
-            initial={{ opacity: 0, filter: 'blur(40px)', scale: 0.7 }}
-            whileInView={{ opacity: 1, filter: 'blur(0px)', scale: 1 }}
-            viewport={{ once: true, margin: "-150px" }}
-            transition={{ duration: 1.8, ease: [0.16, 1, 0.3, 1] }}
-        >
+        <div className="relative group perspective-[1200px]">
+            {/* CAUSTICS: Refraction light under the cube */}
+            <motion.div 
+                className="absolute -inset-20 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-1000 z-0"
+                style={{
+                    background: `radial-gradient(circle at ${50 + mouseX.get() * 50}% ${50 + mouseY.get() * 50}%, rgba(212, 175, 55, 0.15) 0%, transparent 70%)`,
+                    filter: 'blur(40px)',
+                }}
+            />
+
             <motion.a
                 ref={cardRef}
                 href={`/package/${pkg.id}`}
-                className="group block relative aspect-[2/3] overflow-hidden rounded-[80px] bg-white/[0.02] border border-white/10 shadow-[0_50px_100px_-20px_rgba(0,0,0,0.5)] transition-all duration-1000"
+                className="relative block aspect-[4/5] overflow-hidden rounded-[2px] transition-all duration-700"
                 style={{
                     rotateX,
                     rotateY,
                     scale,
                     transformStyle: 'preserve-3d',
+                    background: 'rgba(255, 255, 255, 0.03)',
+                    backdropFilter: 'blur(25px) saturate(180%)',
+                    border: '1px solid rgba(255, 255, 255, 0.1)',
+                    boxShadow: '0 50px 100px -20px rgba(0,0,0,0.5)',
                 }}
                 onMouseMove={handleMouseMove}
                 onMouseEnter={() => setIsHovered(true)}
@@ -158,96 +142,62 @@ function PackageCubeLuxury({ pkg, lang, t }: { pkg: Package; lang: 'en' | 'he'; 
                     mouseY.set(0);
                 }}
             >
-                {/* Advanced 3D Refraction & Glass Polish */}
-                <div className="absolute inset-0 bg-gradient-to-tr from-white/10 via-transparent to-black/60 mix-blend-overlay z-10 pointer-events-none" />
-                <div className="absolute inset-0 bg-[radial-gradient(ellipse_at_top_left,_var(--tw-gradient-stops))] from-white/5 via-transparent to-transparent z-10 pointer-events-none" />
-                
-                {/* Thin Glowing Borders */}
-                <div className={cn(
-                    "absolute inset-0 rounded-[80px] border-[1px] transition-all duration-1000 z-20 pointer-events-none",
-                    isHovered ? "border-cyan-400/40 shadow-[inset_0_0_60px_rgba(0,212,255,0.15)]" : "border-white/10"
-                )} />
+                {/* GLOWING EDGES: Top and Bottom Gold Borders */}
+                <div className="absolute inset-0 z-20 pointer-events-none">
+                    {/* Golden Rim Light */}
+                    <div className={cn(
+                        "absolute top-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent transition-opacity duration-1000",
+                        isHovered ? "opacity-100" : "opacity-20"
+                    )} />
+                    <div className={cn(
+                        "absolute bottom-0 left-0 w-full h-[1px] bg-gradient-to-r from-transparent via-[#D4AF37]/50 to-transparent transition-opacity duration-1000",
+                        isHovered ? "opacity-100" : "opacity-20"
+                    )} />
+                </div>
 
-                {/* Talent Visual - Simulated Video Loop with slow pan/zoom */}
+                {/* INTERNAL DEPTH: The "Object" inside the glass */}
                 <motion.div 
-                    className="absolute inset-0 w-full h-full"
-                    animate={isHovered ? { 
-                        scale: 1.2, 
-                        filter: 'blur(0px)',
-                        x: [0, -10, 10, 0],
-                        y: [0, 5, -5, 0]
-                    } : { 
-                        scale: 1.05, 
-                        filter: 'blur(4px)',
-                        x: 0,
-                        y: 0
-                    }}
-                    transition={{ 
-                        scale: { duration: 1.5 },
-                        x: { duration: 10, repeat: Infinity, ease: "linear" },
-                        y: { duration: 8, repeat: Infinity, ease: "linear" }
-                    }}
+                    className="absolute inset-8 z-10"
+                    style={{ transform: 'translateZ(40px)' }}
                 >
-                    <Image
-                        src={pkg.image}
-                        alt={pkg.title[lang]}
-                        fill
-                        className="object-cover"
-                        sizes="500px"
-                    />
-                    
-                    {/* Intimate Vignette */}
-                    <div className="absolute inset-0 bg-[radial-gradient(circle_at_center,_transparent_0%,_rgba(2,6,23,0.8)_100%)] opacity-60" />
-                    <div className="absolute inset-0 bg-gradient-to-t from-[#020617] via-transparent to-transparent opacity-90" />
+                    <div className="relative w-full h-full overflow-hidden rounded-sm">
+                        <Image
+                            src={pkg.image}
+                            alt={pkg.title[lang]}
+                            fill
+                            className="object-cover transition-transform duration-1000 group-hover:scale-110"
+                            sizes="400px"
+                        />
+                        {/* Internal Refraction Shadow */}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    </div>
                 </motion.div>
-                
-                {/* Information Overlay - Hyper Parallax */}
-                <motion.div 
-                    className="absolute inset-0 p-12 flex flex-col justify-end z-30"
-                    style={{ transform: 'translateZ(120px)' }}
-                >
-                    <div className="space-y-6">
-                        <span className="inline-block text-[12px] font-black text-amber-200/80 uppercase tracking-[0.8em] font-serif italic mb-4">
+
+                {/* TYPOGRAPHY: Floating Serif Labels */}
+                <div className="absolute inset-0 p-12 flex flex-col justify-end z-30" style={{ transform: 'translateZ(100px)' }}>
+                    <div className="space-y-2">
+                        <span className="text-[9px] font-bold text-[#D4AF37] uppercase tracking-[0.6em] font-serif block opacity-80">
                             {pkg.category}
                         </span>
-                        <h3 className="text-3xl md:text-4xl font-black text-white leading-[1.1] tracking-tight drop-shadow-[0_10px_30px_rgba(0,0,0,0.8)]">
-                            {pkg.title[lang]}
+                        <h3 className="text-3xl md:text-4xl font-light text-white leading-tight font-serif tracking-widest drop-shadow-[0_0_15px_rgba(212,175,55,0.3)]">
+                            {pkg.title[lang].split(' ').map((word, i) => (
+                                <span key={i} className="block">{word.toUpperCase()}</span>
+                            ))}
                         </h3>
-                        
-                        <motion.div
-                            initial={{ opacity: 0, y: 30 }}
-                            animate={isHovered ? { opacity: 1, y: 0 } : { opacity: 0, y: 30 }}
-                            transition={{ duration: 0.8, ease: [0.16, 1, 0.3, 1], delay: 0.2 }}
-                        >
-                            <p className="text-white/40 text-sm font-medium leading-relaxed font-serif italic border-t border-white/5 pt-8 mt-4">
-                                {pkg.description[lang]}
-                            </p>
-                        </motion.div>
                     </div>
-                    
-                    {/* Floating Action Circle */}
-                    <div className={cn(
-                        "absolute top-12 right-12 w-16 h-16 rounded-full flex items-center justify-center transition-all duration-1000 backdrop-blur-3xl border border-white/10",
-                        isHovered ? "bg-white text-slate-950 scale-110 rotate-[315deg] shadow-[0_0_50px_rgba(255,255,255,0.4)]" : "bg-white/5 text-white"
-                    )}>
-                        <ArrowUpRight className="w-8 h-8" />
-                    </div>
-                </motion.div>
+                </div>
 
-                {/* Liquid Light Caustic Follower */}
+                {/* REFRACTION SHINE: Light following cursor */}
                 <motion.div 
-                    className="absolute inset-0 pointer-events-none z-40 opacity-0 group-hover:opacity-100 transition-opacity duration-1000"
+                    className="absolute inset-0 pointer-events-none z-40 opacity-0 group-hover:opacity-100 transition-opacity duration-700"
                     style={{
-                        background: `radial-gradient(circle at ${50 + mouseX.get() * 100}% ${50 + mouseY.get() * 100}%, rgba(255,255,255,0.2) 0%, transparent 50%)`,
+                        background: `linear-gradient(${135 + mouseX.get() * 20}deg, rgba(255,255,255,0.1) 0%, transparent 40%, rgba(212,175,55,0.05) 100%)`,
                     }}
                 />
             </motion.a>
-            
-            {/* Realistic Drop Shadow */}
-            <div className={cn(
-                "absolute -bottom-16 left-1/2 -translate-x-1/2 w-[70%] h-12 bg-black/60 blur-[60px] rounded-full transition-all duration-1000",
-                isHovered ? "opacity-100 scale-110" : "opacity-30 scale-90"
-            )} />
-        </motion.div>
+
+            {/* Deep Floating Shadow */}
+            <div className="absolute -bottom-12 left-1/2 -translate-x-1/2 w-[80%] h-10 bg-black/60 blur-3xl rounded-full opacity-40 group-hover:opacity-100 transition-opacity duration-1000" />
+        </div>
     );
 }
