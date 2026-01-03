@@ -1,23 +1,24 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, AnimatePresence } from 'framer-motion';
+import { motion } from 'framer-motion';
 import { MessageCircle, Sparkles } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 
 export default function HeroSection() {
     const { language } = useLanguage();
     const lang = language as 'en' | 'he';
-    const [currentIndex, setCurrentIndex] = useState(0);
-
+    
     const content = {
         en: {
-            headlines: [
-                { line1: 'The Highest Standard', line2: 'of Entertainment.' },
-                { line1: 'Find the Perfect', line2: 'Talent for Your Event.' },
-                { line1: 'Book Top Artists', line2: 'in Minutes.' },
-                { line1: 'Unforgettable Events', line2: 'Start Here.' },
+            staticStart: 'We help you',
+            phrases: [
+                'find the perfect DJ',
+                'book top artists',
+                'throw epic parties',
+                'create magic moments',
+                'make it unforgettable',
             ],
             tagline: 'No Compromises.',
             description: 'The only ecosystem in Israel where verified industry leaders are gathered.',
@@ -27,11 +28,13 @@ export default function HeroSection() {
             forMastersCta: 'Apply Now',
         },
         he: {
-            headlines: [
-                { line1: 'הסטנדרט הגבוה ביותר', line2: 'של בידור.' },
-                { line1: 'מצא את הכישרון', line2: 'המושלם לאירוע שלך.' },
-                { line1: 'הזמן אמנים מובילים', line2: 'בדקות.' },
-                { line1: 'אירועים בלתי נשכחים', line2: 'מתחילים כאן.' },
+            staticStart: 'אנחנו עוזרים לך',
+            phrases: [
+                'למצוא את הדיג׳יי המושלם',
+                'להזמין אמנים מובילים',
+                'לעשות מסיבה אדירה',
+                'ליצור רגעים קסומים',
+                'להפוך את זה לבלתי נשכח',
             ],
             tagline: 'ללא פשרות.',
             description: 'המערכת היחידה בישראל בה מרוכזים מובילי התעשייה המאומתים.',
@@ -44,13 +47,51 @@ export default function HeroSection() {
 
     const t = content[lang];
 
-    // Rotate headlines every 3 seconds
+    // Typewriter state
+    const [phraseIndex, setPhraseIndex] = useState(0);
+    const [displayText, setDisplayText] = useState('');
+    const [isDeleting, setIsDeleting] = useState(false);
+
+    const currentPhrase = t.phrases[phraseIndex];
+
+    const typeSpeed = 80;
+    const deleteSpeed = 40;
+    const pauseBeforeDelete = 2000;
+    const pauseBeforeNext = 300;
+
+    const tick = useCallback(() => {
+        if (!isDeleting) {
+            // Typing
+            if (displayText.length < currentPhrase.length) {
+                setDisplayText(currentPhrase.slice(0, displayText.length + 1));
+            } else {
+                // Finished typing, wait then start deleting
+                setTimeout(() => setIsDeleting(true), pauseBeforeDelete);
+            }
+        } else {
+            // Deleting
+            if (displayText.length > 0) {
+                setDisplayText(displayText.slice(0, -1));
+            } else {
+                // Finished deleting, move to next phrase
+                setIsDeleting(false);
+                setPhraseIndex((prev) => (prev + 1) % t.phrases.length);
+            }
+        }
+    }, [displayText, isDeleting, currentPhrase, t.phrases.length]);
+
     useEffect(() => {
-        const interval = setInterval(() => {
-            setCurrentIndex((prev) => (prev + 1) % t.headlines.length);
-        }, 3500);
-        return () => clearInterval(interval);
-    }, [t.headlines.length]);
+        const speed = isDeleting ? deleteSpeed : typeSpeed;
+        const timer = setTimeout(tick, speed);
+        return () => clearTimeout(timer);
+    }, [tick, isDeleting]);
+
+    // Reset when language changes
+    useEffect(() => {
+        setDisplayText('');
+        setPhraseIndex(0);
+        setIsDeleting(false);
+    }, [lang]);
 
     return (
         <section className="relative min-h-screen bg-[#009de0] overflow-hidden">
@@ -63,25 +104,17 @@ export default function HeroSection() {
             {/* Content */}
             <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-8 pt-32 md:pt-40 pb-20">
                 
-                {/* Main Headline with Rotation */}
+                {/* Main Headline with Typewriter */}
                 <div className="text-center mb-16 md:mb-20">
                     
-                    {/* Rotating Headlines */}
-                    <div className="h-[180px] sm:h-[200px] md:h-[220px] lg:h-[260px] flex items-center justify-center overflow-hidden">
-                        <AnimatePresence mode="wait">
-                            <motion.h1
-                                key={currentIndex}
-                                className="text-4xl sm:text-5xl md:text-6xl lg:text-7xl font-black text-white leading-[1.1] tracking-tight"
-                                initial={{ opacity: 0, y: 40 }}
-                                animate={{ opacity: 1, y: 0 }}
-                                exit={{ opacity: 0, y: -40 }}
-                                transition={{ duration: 0.5, ease: [0.22, 1, 0.36, 1] }}
-                            >
-                                <span className="block">{t.headlines[currentIndex].line1}</span>
-                                <span className="block">{t.headlines[currentIndex].line2}</span>
-                            </motion.h1>
-                        </AnimatePresence>
-                    </div>
+                    {/* Static start + Typewriter */}
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.2] tracking-tight mb-6">
+                        <span className="block mb-2">{t.staticStart}</span>
+                        <span className="block text-white/90 min-h-[1.2em]">
+                            {displayText}
+                            <span className="inline-block w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
+                        </span>
+                    </h1>
 
                     {/* Static Tagline */}
                     <motion.p 
