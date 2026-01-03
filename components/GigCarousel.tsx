@@ -63,8 +63,8 @@ export default function GigCarousel() {
             </div>
 
             {/* Два ряда: верх вправо, низ влево; без повторов (loop только для бесшовности) */}
-            <div className="relative z-10 max-w-7xl mx-auto px-2 md:px-4">
-                <div className="overflow-hidden perspective-[1500px] flex flex-col gap-6 md:gap-8">
+            <div className="relative z-10 max-w-7xl mx-auto px-2 md:px-4 mt-4">
+                <div className="overflow-hidden perspective-[1500px] flex flex-col gap-6 md:gap-6">
                     <MarqueeRow items={topRow} direction="right" lang={lang} speed={55} />
                     <MarqueeRow items={bottomRow} direction="left" lang={lang} speed={60} />
                 </div>
@@ -77,7 +77,7 @@ function MarqueeRow({ items, direction, lang, speed = 55 }: { items: Package[]; 
     // дублируем, чтобы луп был бесшовным и без пустот
     const loopItems = [...items, ...items, ...items];
     return (
-        <div className="w-full overflow-hidden">
+        <div className="w-full overflow-hidden py-2">
             <div className="flex gap-4 md:gap-6 items-stretch">
                 <div
                     className={cn(
