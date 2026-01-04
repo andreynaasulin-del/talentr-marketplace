@@ -40,7 +40,7 @@ export default function GigCarousel() {
     console.log('GigCarousel render:', { lang, topRowCount: topRow.length, bottomRowCount: bottomRow.length });
 
     return (
-        <section style={{ position: 'relative', paddingTop: '96px', paddingBottom: '128px', overflow: 'hidden', background: '#020304', minHeight: '900px' }}>
+        <section style={{ position: 'relative', paddingTop: '96px', paddingBottom: '128px', overflow: 'visible', background: '#020304', minHeight: '1400px' }}>
             {/* Background */}
             <div style={{ position: 'absolute', inset: 0, pointerEvents: 'none', zIndex: 0 }}>
                 <div style={{ position: 'absolute', inset: 0, background: 'radial-gradient(circle at 50% 0%, rgba(20,20,25,1) 0%, #000 80%)' }} />
@@ -68,29 +68,25 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* TWO ROWS - SIMPLE AND GUARANTEED */}
-            <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '64px' }}>
-                {/* ROW 1 */}
-                {topRow.length > 0 && (
-                    <div style={{ width: '100%', display: 'flex', overflow: 'visible', perspective: '2000px' }}>
-                        <div className="marquee-track-left" style={{ display: 'flex', gap: '48px', width: 'max-content', transformStyle: 'preserve-3d', padding: '20px 0' }}>
-                            {[...topRow, ...topRow, ...topRow].map((pkg, i) => (
-                                <GigCard key={`${lang}-row1-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
-                            ))}
-                        </div>
+            {/* TWO ROWS - ALWAYS VISIBLE */}
+            <div style={{ position: 'relative', zIndex: 10, display: 'flex', flexDirection: 'column', gap: '80px', width: '100%' }}>
+                {/* ROW 1 - ALWAYS RENDERS */}
+                <div style={{ width: '100%', display: 'flex', overflow: 'visible', perspective: '2000px', minHeight: '420px' }}>
+                    <div className="marquee-track-left" style={{ display: 'flex', gap: '48px', width: 'max-content', transformStyle: 'preserve-3d', padding: '20px 0' }}>
+                        {[...topRow, ...topRow, ...topRow].map((pkg, i) => (
+                            <GigCard key={`${lang}-row1-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        ))}
                     </div>
-                )}
+                </div>
 
-                {/* ROW 2 */}
-                {bottomRow.length > 0 && (
-                    <div style={{ width: '100%', display: 'flex', overflow: 'visible', perspective: '2000px' }}>
-                        <div className="marquee-track-right" style={{ display: 'flex', gap: '48px', width: 'max-content', transformStyle: 'preserve-3d', padding: '20px 0' }}>
-                            {[...bottomRow, ...bottomRow, ...bottomRow].map((pkg, i) => (
-                                <GigCard key={`${lang}-row2-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
-                            ))}
-                        </div>
+                {/* ROW 2 - ALWAYS RENDERS */}
+                <div style={{ width: '100%', display: 'flex', overflow: 'visible', perspective: '2000px', minHeight: '420px' }}>
+                    <div className="marquee-track-right" style={{ display: 'flex', gap: '48px', width: 'max-content', transformStyle: 'preserve-3d', padding: '20px 0' }}>
+                        {[...bottomRow, ...bottomRow, ...bottomRow].map((pkg, i) => (
+                            <GigCard key={`${lang}-row2-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        ))}
                     </div>
-                )}
+                </div>
             </div>
 
             <style jsx global>{`
