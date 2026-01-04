@@ -6,7 +6,8 @@ import Image from 'next/image';
 import { packages, Package } from '@/lib/gigs';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, useState, CSSProperties, MouseEvent } from 'react';
+import { useRef, MouseEvent } from 'react';
+import { cn } from '@/lib/utils';
 
 export default function GigCarousel() {
     const { language } = useLanguage();
@@ -44,16 +45,16 @@ export default function GigCarousel() {
     }
 
     return (
-        <section className="gig-carousel-section">
+        <section className="relative py-24 pb-32 bg-[#020304] overflow-hidden">
             {/* Background */}
-            <div className="gig-bg">
-                <div className="gig-bg-gradient" />
-                <div className="gig-bg-orb gig-bg-orb-1" />
-                <div className="gig-bg-orb gig-bg-orb-2" />
+            <div className="absolute inset-0 pointer-events-none z-0">
+                <div className="absolute inset-0 bg-[radial-gradient(circle_at_50%_0%,_rgba(20,20,25,1)_0%,_#000_80%)]" />
+                <div className="absolute top-[-10%] left-[20%] w-[800px] h-[800px] rounded-full bg-[#D4AF37] blur-[120px] opacity-15 mix-blend-screen" />
+                <div className="absolute bottom-[-10%] right-[10%] w-[600px] h-[600px] rounded-full bg-[#4B0082] blur-[120px] opacity-15 mix-blend-screen" />
             </div>
 
             {/* Header */}
-            <div className="gig-header">
+            <div className="relative z-10 max-w-[1280px] mx-auto mb-24 px-6">
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -61,24 +62,30 @@ export default function GigCarousel() {
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                     className="text-center"
                 >
-                    <span className="gig-label">Exclusive</span>
-                    <h2 className="gig-title">{t.title}</h2>
-                    <p className="gig-subtitle">{t.subtitle}</p>
+                    <span className="inline-block text-[10px] font-extrabold text-[#D4AF37] uppercase tracking-[0.8em] mb-6 drop-shadow-[0_0_20px_rgba(212,175,55,0.4)]">
+                        Exclusive
+                    </span>
+                    <h2 className="font-serif text-[clamp(2.5rem,8vw,6.5rem)] font-normal text-white tracking-tighter leading-[0.95] mb-6 bg-gradient-to-br from-white to-gray-400 bg-clip-text text-transparent">
+                        {t.title}
+                    </h2>
+                    <p className="text-white/35 text-[clamp(1rem,1.5vw,1.2rem)] max-w-[500px] mx-auto font-light leading-relaxed">
+                        {t.subtitle}
+                    </p>
                 </motion.div>
             </div>
 
             {/* Two Row Marquee */}
-            <div className="gig-marquee-container">
-                <div className="gig-marquee-row">
-                    <div className="gig-marquee-track gig-marquee-left">
+            <div className="relative z-10 flex flex-col gap-16">
+                <div className="w-full py-5 overflow-visible perspective-[1500px]">
+                    <div className="flex gap-16 w-max pl-5 animate-marquee-left hover:[animation-play-state:paused] will-change-transform">
                         {[...topRow, ...topRow, ...topRow].map((pkg, i) => (
                             <GigCard key={`top-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
 
-                <div className="gig-marquee-row">
-                    <div className="gig-marquee-track gig-marquee-right">
+                <div className="w-full py-5 overflow-visible perspective-[1500px]">
+                    <div className="flex gap-16 w-max pl-5 animate-marquee-right hover:[animation-play-state:paused] will-change-transform">
                         {[...bottomRow, ...bottomRow, ...bottomRow].map((pkg, i) => (
                             <GigCard key={`bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
@@ -87,135 +94,16 @@ export default function GigCarousel() {
             </div>
 
             <style jsx global>{`
-                /* ===== SECTION ===== */
-                .gig-carousel-section {
-                    position: relative;
-                    padding: 100px 0 120px;
-                    background: #020304; /* Obsidian black */
-                    overflow: hidden;
-                    --gold-primary: #D4AF37;
-                    --gold-accent: #F7E7CE;
-                    --glass-dark: rgba(0, 0, 0, 0.65);
-                }
-
-                /* ===== BACKGROUND ===== */
-                .gig-bg {
-                    position: absolute;
-                    inset: 0;
-                    pointer-events: none;
-                    z-index: 0;
-                }
-                .gig-bg-gradient {
-                    position: absolute;
-                    inset: 0;
-                    background: radial-gradient(circle at 50% 0%, rgba(20, 20, 25, 1) 0%, #000 80%);
-                }
-                .gig-bg-orb {
-                    position: absolute;
-                    border-radius: 50%;
-                    filter: blur(120px);
-                    opacity: 0.15;
-                }
-                .gig-bg-orb-1 {
-                    top: -10%;
-                    left: 20%;
-                    width: 800px;
-                    height: 800px;
-                    background: var(--gold-primary);
-                    mix-blend-mode: screen;
-                }
-                .gig-bg-orb-2 {
-                    bottom: -10%;
-                    right: 10%;
-                    width: 600px;
-                    height: 600px;
-                    background: #4B0082;
-                    mix-blend-mode: screen;
-                }
-
-                /* ===== HEADER ===== */
-                .gig-header {
-                    position: relative;
-                    z-index: 10;
-                    max-width: 1280px;
-                    margin: 0 auto 100px;
-                    padding: 0 24px;
-                }
-                .gig-label {
-                    display: inline-block;
-                    font-size: 10px;
-                    font-weight: 800;
-                    color: var(--gold-primary);
-                    text-transform: uppercase;
-                    letter-spacing: 0.8em;
-                    margin-bottom: 24px;
-                    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
-                }
-                .gig-title {
-                    font-family: var(--font-serif), serif;
-                    font-size: clamp(3.5rem, 10vw, 8.5rem);
-                    font-weight: 400;
-                    color: white;
-                    letter-spacing: -0.02em;
-                    line-height: 0.95;
-                    margin-bottom: 24px;
-                    background: linear-gradient(135deg, #fff 0%, #ccc 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                }
-                .gig-subtitle {
-                    color: rgba(255, 255, 255, 0.35);
-                    font-size: clamp(1rem, 1.5vw, 1.2rem);
-                    max-width: 500px;
-                    margin: 0 auto;
-                    font-weight: 300;
-                }
-
-                /* ===== MARQUEE ===== */
-                .gig-marquee-container {
-                    position: relative;
-                    z-index: 10;
-                    display: flex;
-                    flex-direction: column;
-                    gap: 60px; /* More space between rows */
-                }
-
-                .gig-marquee-row {
-                    width: 100%;
-                    padding: 20px 0; /* Bleed area for 3D tilt */
-                    overflow: visible; /* Allow 3D elements to poke out */
-                }
-
-                .gig-marquee-track {
-                    display: flex;
-                    gap: 60px; /* Spacious luxury spacing */
-                    width: max-content;
-                    padding-left: 20px;
-                    will-change: transform;
-                    /* Pause on hover handled by JS or simple CSS is tricky with complex 3D */
-                }
-                .gig-marquee-row:hover .gig-marquee-track {
-                    animation-play-state: paused;
-                }
-
-                .gig-marquee-left { animation: gig-scroll-left 90s linear infinite; }
-                .gig-marquee-right { animation: gig-scroll-right 100s linear infinite; }
-
-                @keyframes gig-scroll-left {
+                @keyframes marquee-left {
                     0% { transform: translate3d(0, 0, 0); }
                     100% { transform: translate3d(-33.3333%, 0, 0); }
                 }
-                @keyframes gig-scroll-right {
+                @keyframes marquee-right {
                     0% { transform: translate3d(-33.3333%, 0, 0); }
                     100% { transform: translate3d(0, 0, 0); }
                 }
-
-                /* Resp */
-                @media (max-width: 768px) {
-                    .gig-marquee-track { gap: 30px; }
-                    .gig-marquee-container { gap: 40px; }
-                    .gig-title { font-size: 3rem; }
-                }
+                .animate-marquee-left { animation: marquee-left 100s linear infinite; }
+                .animate-marquee-right { animation: marquee-right 110s linear infinite; }
             `}</style>
         </section>
     );
@@ -231,8 +119,8 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     const mouseXSpring = useSpring(x, { stiffness: 400, damping: 30 });
     const mouseYSpring = useSpring(y, { stiffness: 400, damping: 30 });
 
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
 
     // Dynamic Glare Position
     const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
@@ -259,58 +147,62 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     };
 
     return (
-        <div
-            className="monolith-wrapper"
-            style={{ perspective: '1500px' }}
-        >
+        <div className="w-[340px] h-[340px] shrink-0 relative group perspective-[1500px]">
             <motion.div
                 ref={cardRef}
-                className="monolith-card"
+                className="w-full h-full relative rounded-[2px] cursor-pointer transition-transform duration-100 ease-out preserve-3d"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                style={{
-                    rotateX,
-                    rotateY,
-                    transformStyle: "preserve-3d",
-                }}
+                style={{ rotateX, rotateY }}
             >
                 <Link href={`/package/${pkg.id}`} className="block w-full h-full preserve-3d">
 
                     {/* LAYER 1: Base Image (Deep inside) */}
-                    <div className="monolith-layer layer-base">
+                    <div className="absolute inset-0 rounded-lg overflow-hidden bg-[#111] shadow-[0_40px_80px_rgba(0,0,0,0.8)] [transform:translateZ(10px)_scale(0.96)]">
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
                             fill
                             sizes="400px"
-                            className="monolith-image"
+                            className="object-cover opacity-100 transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 saturate-[1.1]"
                         />
-                        <div className="monolith-overlay" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
                     </div>
 
                     {/* LAYER 2: Glass Body (The physical block) */}
-                    <div className="monolith-layer layer-glass">
-                        {/* Gold Bevel */}
-                        <div className="monolith-border" />
-                        {/* Inner Glow */}
-                        <div className="monolith-glow" />
-                        {/* Glare Effect */}
-                        <motion.div
-                            className="monolith-glare"
+                    <div className="absolute inset-0 rounded-lg [transform:translateZ(30px)] bg-white/[0.03] backdrop-blur-[1px] border border-white/10 shadow-[inner_0_0_40px_rgba(255,255,255,0.05)] overflow-hidden">
+                        {/* Gold Bevel (Edge Glow) */}
+                        <div className="absolute inset-0 border-[1.5px] border-transparent rounded-lg opacity-80"
                             style={{
-                                background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.2) 0%, transparent 60%)`
+                                background: 'linear-gradient(135deg, #D4AF37 0%, transparent 50%, #D4AF37 100%)',
+                                WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
+                                WebkitMaskComposite: 'xor',
+                                maskComposite: 'exclude'
                             }}
+                        />
+
+                        {/* Inner Gold Glow */}
+                        <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(212,175,55,0.15)] opacity-60 group-hover:opacity-100 group-hover:shadow-[inset_0_0_50px_rgba(212,175,55,0.25)] transition-all duration-500" />
+
+                        {/* Dynamic Glare */}
+                        <motion.div
+                            className="absolute inset-[-50%] w-[200%] h-[200%] opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay pointer-events-none"
+                            style={{ background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.3) 0%, transparent 60%)` }}
                         />
                     </div>
 
                     {/* LAYER 3: Content (Floating above) */}
-                    <div className="monolith-layer layer-content">
-                        <div className="monolith-content-inner">
-                            <span className="monolith-category">{pkg.category}</span>
-                            <h3 className="monolith-title">{pkg.title[lang]}</h3>
-                            <div className="monolith-divider" />
-                            <div className="monolith-action">
-                                <span className="view-text">{lang === 'he' ? 'צפה' : 'View'}</span>
+                    <div className="absolute inset-0 flex items-end p-8 [transform:translateZ(60px)]">
+                        <div className="w-full text-left">
+                            <span className="block text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold mb-3 drop-shadow-md">
+                                {pkg.category}
+                            </span>
+                            <h3 className="font-serif text-[26px] leading-tight text-[#F7E7CE] mb-5 drop-shadow-[0_4_20px_rgba(0,0,0,1)] filter drop-shadow-[0_0_8px_rgba(212,175,55,0.2)]">
+                                {pkg.title[lang]}
+                            </h3>
+                            <div className="w-10 h-[1px] bg-[#D4AF37]/60 group-hover:w-full group-hover:bg-[#D4AF37] transition-all duration-500 mb-5" />
+                            <div className="flex items-center gap-2 text-white text-[11px] uppercase tracking-[0.15em] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
+                                <span>{lang === 'he' ? 'צפה' : 'View'}</span>
                                 <ArrowUpRight className="w-4 h-4" />
                             </div>
                         </div>
@@ -318,186 +210,6 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                 </Link>
             </motion.div>
-
-            <style jsx>{`
-                .monolith-wrapper {
-                    width: 320px;
-                    height: 320px;
-                    flex-shrink: 0;
-                    position: relative;
-                }
-
-                .monolith-card {
-                    width: 100%;
-                    height: 100%;
-                    position: relative;
-                    border-radius: 2px; /* Sharp, monolith corners */
-                    transition: transform 0.1s;
-                }
-
-                .preserve-3d {
-                    transform-style: preserve-3d;
-                }
-
-                /* === LAYERS === */
-                .monolith-layer {
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 4px;
-                    pointer-events: none;
-                }
-
-                /* Layer 1: Image */
-                .layer-base {
-                    transform: translateZ(10px) scale(0.96);
-                    overflow: hidden;
-                    background: #111;
-                    box-shadow: 0 40px 80px rgba(0,0,0,0.8);
-                }
-                .monolith-image {
-                    object-fit: cover;
-                    opacity: 1; /* Fully visible base */
-                    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
-                    filter: saturate(1.2) contrast(1.1);
-                }
-                .monolith-card:hover .monolith-image {
-                    transform: scale(1.1);
-                }
-                .monolith-overlay {
-                    position: absolute;
-                    inset: 0;
-                    background: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.9) 100%); /* Clearer top */
-                }
-
-                /* Layer 2: Glass */
-                .layer-glass {
-                    transform: translateZ(30px);
-                    background: rgba(255, 255, 255, 0.03); /* Crystal clear glass */
-                    backdrop-filter: blur(1px); /* Slight texture, not obscuring */
-                    -webkit-backdrop-filter: blur(1px);
-                    border: 1px solid rgba(255,255,255,0.1);
-                    box-shadow: inset 0 0 40px rgba(255,255,255,0.05);
-                }
-
-                /* Gold Border / Bevel */
-                .monolith-border {
-                    position: absolute;
-                    inset: -1px;
-                    border-radius: 4px;
-                    padding: 1.5px; /* Border width */
-                    background: linear-gradient(135deg, rgba(212, 175, 55, 1) 0%, rgba(212, 175, 55, 0.1) 50%, rgba(212, 175, 55, 1) 100%);
-                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    opacity: 0.8;
-                }
-                
-                /* Inner Gold Glow */
-                .monolith-glow {
-                    position: absolute;
-                    inset: 0;
-                    box-shadow: inset 0 0 30px rgba(212, 175, 55, 0.15);
-                    opacity: 0.6;
-                    transition: opacity 0.5s ease;
-                }
-                .monolith-card:hover .monolith-glow {
-                    opacity: 1;
-                    box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.25);
-                }
-
-                .monolith-glare {
-                    position: absolute;
-                    inset: -50%;
-                    width: 200%;
-                    height: 200%;
-                    opacity: 0;
-                    transition: opacity 0.3s;
-                    mix-blend-mode: overlay;
-                    pointer-events: none;
-                }
-                .monolith-card:hover .monolith-glare {
-                    opacity: 1;
-                }
-
-
-                /* Layer 3: Content */
-                .layer-content {
-                    transform: translateZ(60px);
-                    display: flex;
-                    align-items: flex-end;
-                    padding: 32px;
-                }
-
-                .monolith-content-inner {
-                    width: 100%;
-                    text-align: left;
-                }
-
-                .monolith-category {
-                    display: block;
-                    font-size: 9px;
-                    text-transform: uppercase;
-                    letter-spacing: 0.3em;
-                    color: #D4AF37; /* Gold */
-                    margin-bottom: 12px;
-                    font-weight: 700;
-                    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
-                }
-
-                .monolith-title {
-                    font-family: var(--font-serif), serif;
-                    font-size: 28px;
-                    line-height: 1.1;
-                    color: #F7E7CE; /* Champagne */
-                    margin-bottom: 20px;
-                    text-shadow: 0 4px 20px rgba(0,0,0,0.9);
-                    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.2));
-                }
-
-                .monolith-divider {
-                    width: 40px;
-                    height: 1px;
-                    background: #D4AF37;
-                    margin-bottom: 20px;
-                    opacity: 0.6;
-                    transform-origin: left;
-                    transition: width 0.4s ease;
-                }
-                .monolith-card:hover .monolith-divider {
-                    width: 100%;
-                    opacity: 1;
-                }
-
-                .monolith-action {
-                    display: flex;
-                    align-items: center;
-                    gap: 8px;
-                    color: #fff;
-                    font-size: 11px;
-                    text-transform: uppercase;
-                    letter-spacing: 0.15em;
-                    opacity: 0;
-                    transform: translateY(10px);
-                    transition: all 0.4s ease;
-                }
-                .monolith-card:hover .monolith-action {
-                    opacity: 1;
-                    transform: translateY(0);
-                }
-
-                @media (max-width: 768px) {
-                    .monolith-wrapper {
-                        width: 260px;
-                        height: 260px;
-                    }
-                    .monolith-title {
-                        font-size: 22px;
-                    }
-                    .layer-content {
-                        padding: 24px;
-                    }
-                }
-            `}</style>
         </div>
     );
 }
