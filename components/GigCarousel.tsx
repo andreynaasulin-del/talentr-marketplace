@@ -99,7 +99,7 @@ export default function GigCarousel() {
                 <div className="w-full flex overflow-visible" style={{ perspective: '2000px' }}>
                     <div className="flex gap-12 w-max animate-marquee-left hover:[animation-play-state:paused]" style={{ transformStyle: 'preserve-3d', padding: '20px 0' }}>
                         {[...topRow, ...topRow].map((pkg, i) => (
-                            <GigCard key={`top-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                            <GigCard key={`${lang}-top-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
@@ -108,7 +108,7 @@ export default function GigCarousel() {
                 <div className="w-full flex overflow-visible" style={{ perspective: '2000px' }}>
                     <div className="flex gap-12 w-max animate-marquee-right hover:[animation-play-state:paused]" style={{ transformStyle: 'preserve-3d', padding: '20px 0' }}>
                         {[...bottomRow, ...bottomRow].map((pkg, i) => (
-                            <GigCard key={`bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                            <GigCard key={`${lang}-bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
@@ -150,22 +150,47 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
         y.set((e.clientY - rect.top) / rect.height - 0.5);
     };
 
+    const isHebrew = lang === 'he';
+
     return (
-        <div className="w-[380px] h-[380px] shrink-0 relative group" style={{ perspective: '1500px' }}>
+        <div style={{ width: '380px', height: '380px', flexShrink: 0, position: 'relative', perspective: '1500px' }} className="group">
             <motion.div
                 ref={cardRef}
-                className="w-full h-full relative cursor-pointer"
+                style={{
+                    width: '100%',
+                    height: '100%',
+                    position: 'relative',
+                    cursor: 'pointer',
+                    rotateX,
+                    rotateY,
+                    transformStyle: 'preserve-3d'
+                }}
                 onMouseMove={handleMouseMove}
                 onMouseLeave={() => { x.set(0); y.set(0); }}
-                style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
             >
                 <Link
                     href={`/package/${pkg.id}`}
-                    className="block w-full h-full"
-                    style={{ transformStyle: 'preserve-3d', textDecoration: 'none' }}
+                    style={{
+                        display: 'block',
+                        width: '100%',
+                        height: '100%',
+                        transformStyle: 'preserve-3d',
+                        textDecoration: 'none',
+                        position: 'relative'
+                    }}
                 >
                     {/* LAYER 1: IMAGE (Base) */}
-                    <div className="absolute inset-0 rounded-2xl overflow-hidden bg-[#050505] shadow-[0_50px_100px_rgba(0,0,0,1)]" style={{ transform: 'translateZ(10px) scale(0.96)' }}>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            borderRadius: '16px',
+                            overflow: 'hidden',
+                            background: '#050505',
+                            boxShadow: '0 50px 100px rgba(0,0,0,1)',
+                            transform: 'translateZ(10px) scale(0.96)'
+                        }}
+                    >
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
@@ -173,13 +198,21 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                             sizes="400px"
                             className="object-cover opacity-90 transition-all duration-1000 group-hover:scale-110 group-hover:opacity-60 saturate-[1.2]"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/30 to-transparent" />
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            background: 'linear-gradient(to top, black, rgba(0,0,0,0.3) 50%, transparent)'
+                        }} />
                     </div>
 
                     {/* LAYER 2: THE MONOLITH GLASS FRAME */}
                     <div
-                        className="absolute inset-0 rounded-2xl border border-white/10 overflow-hidden"
                         style={{
+                            position: 'absolute',
+                            inset: 0,
+                            borderRadius: '16px',
+                            border: '1px solid rgba(255,255,255,0.1)',
+                            overflow: 'hidden',
                             transform: 'translateZ(45px)',
                             background: 'rgba(255, 255, 255, 0.02)',
                             backdropFilter: 'blur(2px)',
@@ -187,8 +220,13 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         }}
                     >
                         {/* REAL METAL BEVEL */}
-                        <div className="absolute inset-0 border-[2.5px] border-transparent rounded-2xl opacity-100"
+                        <div
                             style={{
+                                position: 'absolute',
+                                inset: 0,
+                                border: '2.5px solid transparent',
+                                borderRadius: '16px',
+                                opacity: 1,
                                 background: 'linear-gradient(135deg, #D4AF37 0%, #F7E7CE 25%, #B8860B 50%, #D4AF37 75%, #F7E7CE 100%)',
                                 WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                                 WebkitMaskComposite: 'xor',
@@ -197,35 +235,64 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         />
 
                         {/* AMBIENT INTERNAL GLOW */}
-                        <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(212,175,55,0.2)] opacity-60 group-hover:opacity-100 transition-all duration-700" />
+                        <div style={{
+                            position: 'absolute',
+                            inset: 0,
+                            boxShadow: 'inset 0 0 40px rgba(212,175,55,0.2)',
+                            opacity: 0.6,
+                            transition: 'all 0.7s'
+                        }} className="group-hover:opacity-100" />
 
                         {/* GLARE SWEEP */}
                         <motion.div
-                            className="absolute inset-[-100%] w-[300%] h-[300%] opacity-0 group-hover:opacity-100 mix-blend-overlay pointer-events-none"
-                            style={{ background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.5) 0%, transparent 60%)` }}
+                            className="opacity-0 group-hover:opacity-100 pointer-events-none"
+                            style={{
+                                position: 'absolute',
+                                inset: '-100%',
+                                width: '300%',
+                                height: '300%',
+                                mixBlendMode: 'overlay',
+                                background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.5) 0%, transparent 60%)`
+                            }}
                         />
                     </div>
 
                     {/* LAYER 3: THE FLOATING CONTENT */}
-                    <div className="absolute inset-0 flex flex-col justify-end p-10" style={{ transform: 'translateZ(90px)', direction: lang === 'he' ? 'rtl' : 'ltr' }}>
-                        <div style={{ textAlign: lang === 'he' ? 'right' : 'left' }}>
+                    <div
+                        style={{
+                            position: 'absolute',
+                            inset: 0,
+                            display: 'flex',
+                            flexDirection: 'column',
+                            justifyContent: 'flex-end',
+                            padding: '40px',
+                            transform: 'translateZ(90px)',
+                            direction: isHebrew ? 'rtl' : 'ltr'
+                        }}
+                    >
+                        <div style={{ textAlign: isHebrew ? 'right' : 'left' }}>
                             <span
-                                className="block uppercase font-black mb-3"
                                 style={{
+                                    display: 'block',
+                                    textTransform: 'uppercase',
+                                    fontWeight: 900,
+                                    marginBottom: '12px',
                                     color: '#D4AF37',
-                                    fontSize: lang === 'he' ? '12px' : '9px',
-                                    letterSpacing: lang === 'he' ? '0' : '0.5em',
+                                    fontSize: isHebrew ? '12px' : '9px',
+                                    letterSpacing: isHebrew ? '0' : '0.5em',
                                     textShadow: '0 2px 10px rgba(0,0,0,0.5)'
                                 }}
                             >
                                 {pkg.category}
                             </span>
                             <h3
-                                className="font-serif leading-[1.1] mb-6"
                                 style={{
+                                    fontFamily: 'var(--font-serif), serif',
+                                    lineHeight: 1.1,
+                                    marginBottom: '24px',
                                     color: '#F7E7CE',
-                                    fontSize: lang === 'he' ? '34px' : '28px',
-                                    fontWeight: lang === 'he' ? '700' : '400',
+                                    fontSize: isHebrew ? '34px' : '28px',
+                                    fontWeight: isHebrew ? 700 : 400,
                                     textShadow: '0 10px 40px rgba(0,0,0,1)',
                                     filter: 'drop-shadow(0 0 15px rgba(212, 175, 55, 0.3))'
                                 }}
@@ -234,22 +301,45 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                             </h3>
 
                             {/* DYNAMIC LINE */}
-                            <div style={{
-                                height: '2.5px',
-                                background: '#D4AF37',
-                                transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
-                                width: '40px',
-                                marginBottom: '24px',
-                                opacity: '0.6',
-                                borderRadius: '1px'
-                            }} className="group-hover:w-full group-hover:opacity-100" />
+                            <div
+                                className="group-hover:w-full group-hover:opacity-100"
+                                style={{
+                                    height: '2.5px',
+                                    background: '#D4AF37',
+                                    transition: 'all 0.8s cubic-bezier(0.16, 1, 0.3, 1)',
+                                    width: '40px',
+                                    marginBottom: '24px',
+                                    opacity: 0.6,
+                                    borderRadius: '1px',
+                                    float: isHebrew ? 'right' : 'left'
+                                }}
+                            />
+                            <div style={{ clear: 'both' }} />
 
                             <div
-                                className="flex items-center gap-3 text-white text-[11px] uppercase font-bold tracking-[0.25em] opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-700"
-                                style={{ flexDirection: lang === 'he' ? 'row-reverse' : 'row' }}
+                                className="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0"
+                                style={{
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    gap: '12px',
+                                    color: 'white',
+                                    fontSize: '11px',
+                                    textTransform: 'uppercase',
+                                    fontWeight: 700,
+                                    letterSpacing: '0.25em',
+                                    transition: 'all 0.7s',
+                                    flexDirection: isHebrew ? 'row-reverse' : 'row'
+                                }}
                             >
-                                <span>{lang === 'he' ? 'גלה עוד' : 'Discover More'}</span>
-                                <ArrowUpRight className={cn("w-5 h-5", lang === 'he' && "rotate-[-90deg]")} style={{ color: '#D4AF37' }} />
+                                <span>{isHebrew ? 'גלה עוד' : 'Discover More'}</span>
+                                <ArrowUpRight
+                                    style={{
+                                        width: '20px',
+                                        height: '20px',
+                                        color: '#D4AF37',
+                                        transform: isHebrew ? 'rotate(-90deg)' : 'none'
+                                    }}
+                                />
                             </div>
                         </div>
                     </div>
