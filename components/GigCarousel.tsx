@@ -95,92 +95,57 @@ export default function GigCarousel() {
             <style jsx global>{`
                 .gig-carousel-section {
                     position: relative;
-                    padding: 48px 0 64px;
-                    background: #020304;
+                    padding: 64px 0 80px;
+                    background: #FFFFFF;
                     width: 100%;
                     max-width: 100vw;
                     overflow: hidden !important;
-                    overflow-x: hidden !important;
                 }
                 
                 .gig-bg {
-                    position: absolute;
-                    inset: 0;
-                    pointer-events: none;
-                    z-index: 0;
+                    display: none;
                 }
                 
-                .gig-bg-gradient {
-                    position: absolute;
-                    inset: 0;
-                    background: radial-gradient(circle at 50% 0%, rgba(20,20,25,1) 0%, #000 80%);
-                }
-                
-                .gig-bg-orb-gold {
-                    position: absolute;
-                    top: -10%;
-                    left: 20%;
-                    width: 800px;
-                    height: 800px;
-                    border-radius: 50%;
-                    background: #D4AF37;
-                    filter: blur(120px);
-                    opacity: 0.15;
-                    mix-blend-mode: screen;
-                }
-                
+                .gig-bg-gradient,
+                .gig-bg-orb-gold,
                 .gig-bg-orb-purple {
-                    position: absolute;
-                    bottom: -10%;
-                    right: 10%;
-                    width: 600px;
-                    height: 600px;
-                    border-radius: 50%;
-                    background: #4B0082;
-                    filter: blur(120px);
-                    opacity: 0.15;
-                    mix-blend-mode: screen;
+                    display: none;
                 }
                 
                 .gig-header {
                     position: relative;
                     z-index: 10;
                     max-width: 1280px;
-                    margin: 0 auto 40px;
-                    padding: 0 16px;
+                    margin: 0 auto 48px;
+                    padding: 0 24px;
                     text-align: center;
                 }
                 
                 .gig-eyebrow {
                     display: inline-block;
                     text-transform: uppercase;
-                    font-weight: 900;
+                    font-weight: 600;
                     margin-bottom: 8px;
-                    font-size: 8px;
-                    color: #D4AF37;
-                    letter-spacing: 0.4em;
-                    text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
+                    font-size: 12px;
+                    color: #6B7280;
+                    letter-spacing: 0.1em;
                 }
                 
                 .gig-title {
-                    font-family: var(--font-serif), serif;
-                    font-weight: 400;
+                    font-weight: 700;
                     letter-spacing: -0.02em;
-                    line-height: 1;
+                    line-height: 1.1;
                     margin-bottom: 12px;
-                    font-size: clamp(1.5rem, 5vw, 2.5rem);
-                    background: linear-gradient(180deg, #FFFFFF 0%, #D4AF37 100%);
-                    -webkit-background-clip: text;
-                    -webkit-text-fill-color: transparent;
-                    display: inline-block;
+                    font-size: clamp(1.75rem, 4vw, 2.5rem);
+                    color: #111827;
                 }
                 
                 .gig-subtitle {
-                    color: rgba(255,255,255,0.4);
-                    font-size: clamp(0.8rem, 1.2vw, 1rem);
+                    color: #6B7280;
+                    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
                     max-width: 500px;
-                    margin: 8px auto 0;
-                    font-weight: 300;
+                    margin: 0 auto;
+                    font-weight: 400;
                     line-height: 1.5;
                 }
                 
@@ -313,31 +278,62 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     const isHebrew = lang === 'he';
 
     return (
-        <div className="gig-card-wrap group" style={{ width: '280px', height: '320px', flexShrink: 0 }}>
-            <Link href={`/package/${pkg.id}`} className="block w-full h-full relative rounded-2xl overflow-hidden">
-                {/* Image */}
-                <Image
-                    src={pkg.image}
-                    alt={pkg.title[lang]}
-                    fill
-                    sizes="300px"
-                    className="object-cover transition-transform duration-500 group-hover:scale-105"
-                />
+        <div
+            className="gig-card-wrap group"
+            style={{
+                width: '280px',
+                flexShrink: 0,
+                direction: isHebrew ? 'rtl' : 'ltr'
+            }}
+        >
+            <Link href={`/package/${pkg.id}`} className="block">
+                {/* Image Container */}
+                <div className="relative aspect-[4/3] rounded-xl overflow-hidden mb-3">
+                    <Image
+                        src={pkg.image}
+                        alt={pkg.title[lang]}
+                        fill
+                        sizes="300px"
+                        className="object-cover transition-transform duration-300 group-hover:scale-105"
+                    />
 
-                {/* Gradient overlay */}
-                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
+                    {/* Wishlist Heart - Airbnb style */}
+                    <button
+                        className="absolute top-3 right-3 w-8 h-8 rounded-full bg-white/80 backdrop-blur-sm flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-200 hover:bg-white hover:scale-110"
+                        onClick={(e) => { e.preventDefault(); }}
+                    >
+                        <svg className="w-4 h-4 text-gray-700" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                        </svg>
+                    </button>
+                </div>
 
                 {/* Content */}
-                <div
-                    className="absolute inset-0 flex flex-col justify-end p-5"
-                    style={{ direction: isHebrew ? 'rtl' : 'ltr', textAlign: isHebrew ? 'right' : 'left' }}
-                >
-                    <span className="text-white/60 text-xs uppercase tracking-wider mb-2">
-                        {pkg.category}
-                    </span>
-                    <h3 className="text-white text-xl font-semibold leading-tight">
+                <div className="space-y-1">
+                    {/* Category & Rating */}
+                    <div className="flex items-center justify-between text-sm">
+                        <span className="text-gray-500 font-medium">
+                            {pkg.category}
+                        </span>
+                        <div className="flex items-center gap-1">
+                            <svg className="w-4 h-4 text-gray-900" fill="currentColor" viewBox="0 0 20 20">
+                                <path d="M9.049 2.927c.3-.921 1.603-.921 1.902 0l1.07 3.292a1 1 0 00.95.69h3.462c.969 0 1.371 1.24.588 1.81l-2.8 2.034a1 1 0 00-.364 1.118l1.07 3.292c.3.921-.755 1.688-1.54 1.118l-2.8-2.034a1 1 0 00-1.175 0l-2.8 2.034c-.784.57-1.838-.197-1.539-1.118l1.07-3.292a1 1 0 00-.364-1.118L2.98 8.72c-.783-.57-.38-1.81.588-1.81h3.461a1 1 0 00.951-.69l1.07-3.292z" />
+                            </svg>
+                            <span className="font-semibold text-gray-900">4.9</span>
+                        </div>
+                    </div>
+
+                    {/* Title */}
+                    <h3 className="text-gray-900 font-semibold text-base leading-snug group-hover:underline">
                         {pkg.title[lang]}
                     </h3>
+
+                    {/* Price */}
+                    <p className="text-gray-500 text-sm">
+                        <span className="text-gray-900 font-semibold">₪{pkg.fixedPrice}</span>
+                        {' '}
+                        {isHebrew ? 'לאירוע' : 'per event'}
+                    </p>
                 </div>
             </Link>
         </div>
