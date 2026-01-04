@@ -279,16 +279,8 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 href={`/package/${pkg.id}`}
                 className="block overflow-hidden transition-transform duration-200 hover:-translate-y-1"
             >
-                {/* IMAGE CONTAINER - Top rounded only, no overlays */}
-                <div className="relative aspect-[4/3] rounded-t-2xl overflow-hidden bg-[#F7F7F9]">
-                    <Image
-                        src={pkg.image}
-                        alt={pkg.title[lang]}
-                        fill
-                        sizes="320px"
-                        className="object-cover"
-                    />
-                </div>
+                {/* IMAGE PLACEHOLDER - Empty for now */}
+                <div className="aspect-[4/3] rounded-t-2xl bg-[#E8E8E8]" />
 
                 {/* CONTENT CONTAINER - White, bottom rounded */}
                 <div className="bg-white p-4 rounded-b-2xl shadow-sm">
