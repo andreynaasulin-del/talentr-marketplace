@@ -30,7 +30,7 @@ const itemVariants = {
         y: 0,
         transition: {
             duration: 0.5,
-            ease: [0.16, 1, 0.3, 1],
+            ease: "easeOut" as const,
         },
     },
 };
@@ -42,7 +42,7 @@ const floatVariants = {
         transition: {
             duration: 6,
             repeat: Infinity,
-            ease: 'easeInOut',
+            ease: "easeInOut" as const,
         },
     },
 };
@@ -106,6 +106,16 @@ export default function SignInPage() {
         <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row">
             <BlueAmbientBackground />
 
+            {/* Logo - Fixed Top Left */}
+            <motion.div
+                className="absolute top-6 left-6 z-50"
+                initial={{ opacity: 0, x: -20 }}
+                animate={{ opacity: 1, x: 0 }}
+                transition={{ duration: 0.5, delay: 0.1 }}
+            >
+                <Logo size="lg" />
+            </motion.div>
+
             {/* Left Side - Visual/Marketing (Desktop only) */}
             <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-white/10 bg-white/5 backdrop-blur-xl">
                 {/* Floating orbs */}
@@ -130,15 +140,12 @@ export default function SignInPage() {
                     style={{ animationDelay: '4s' }}
                 />
 
-                <div className="relative z-10 max-w-lg">
+                <div className="relative z-10 max-w-lg pt-16">
                     <motion.div
                         variants={containerVariants}
                         initial="hidden"
                         animate="visible"
                     >
-                        <motion.div variants={itemVariants}>
-                            <Logo size="xl" className="mb-8" asLink={false} />
-                        </motion.div>
 
                         <motion.h2
                             variants={itemVariants}
@@ -206,9 +213,8 @@ export default function SignInPage() {
                     animate="visible"
                 >
                     {/* Header with Language Switcher */}
-                    <motion.div variants={itemVariants} className="flex items-center justify-between mb-12">
-                        <Logo size="lg" className="md:hidden" />
-                        <div className="relative ms-auto">
+                    <motion.div variants={itemVariants} className="flex items-center justify-end mb-12 pt-8">
+                        <div className="relative">
                             <motion.button
                                 onClick={() => setShowLangDropdown(!showLangDropdown)}
                                 className="flex items-center gap-2 px-4 py-2 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white hover:bg-white/10 hover:border-white/20 transition-all text-sm"
@@ -339,10 +345,10 @@ export default function SignInPage() {
 
                     <motion.div variants={itemVariants} className="mt-8 relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/10"></div>
+                            <div className="w-full border-t border-white/20"></div>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase font-bold">
-                            <span className="bg-slate-950 px-4 text-white/30">{t('orDivider')}</span>
+                            <span className="px-4 text-white/40 backdrop-blur-sm">{t('orDivider')}</span>
                         </div>
                     </motion.div>
 
