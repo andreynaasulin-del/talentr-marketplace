@@ -236,6 +236,116 @@ export default function GigCarousel() {
                     0% { transform: translateX(-100%); }
                     100% { transform: translateX(0); }
                 }
+
+                /* ===== MOBILE OPTIMIZATION ===== */
+                @media (max-width: 768px) {
+                    .gig-header {
+                        padding: 80px 16px 40px;
+                    }
+                    
+                    .gig-eyebrow {
+                        font-size: 8px;
+                        letter-spacing: 0.5em;
+                        margin-bottom: 16px;
+                    }
+                    
+                    .gig-title {
+                        font-size: clamp(2rem, 12vw, 3.5rem);
+                        margin-bottom: 16px;
+                    }
+                    
+                    .gig-subtitle {
+                        font-size: 0.9rem;
+                        padding: 0 8px;
+                    }
+                    
+                    .gig-rows {
+                        gap: 24px;
+                    }
+                    
+                    .gig-track {
+                        gap: 16px;
+                        padding: 12px 8px;
+                    }
+                    
+                    .gig-track-left {
+                        animation-duration: 45s;
+                    }
+                    
+                    .gig-track-right {
+                        animation-duration: 50s;
+                    }
+                    
+                    .gig-card-wrap {
+                        width: 260px !important;
+                        height: 300px !important;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .gig-header {
+                        padding: 60px 12px 32px;
+                    }
+                    
+                    .gig-title {
+                        font-size: clamp(1.8rem, 14vw, 2.5rem);
+                    }
+                    
+                    .gig-card-wrap {
+                        width: 220px !important;
+                        height: 260px !important;
+                    }
+                    
+                    .gig-rows {
+                        gap: 16px;
+                    }
+                    
+                    .gig-track {
+                        gap: 12px;
+                    }
+                }
+
+                /* Card content responsive */
+                @media (max-width: 768px) {
+                    .gig-card-content {
+                        padding: 20px !important;
+                    }
+                    
+                    .gig-card-category {
+                        font-size: 8px !important;
+                        margin-bottom: 8px !important;
+                    }
+                    
+                    .gig-card-title {
+                        font-size: 20px !important;
+                        margin-bottom: 10px !important;
+                    }
+                    
+                    .gig-card-cta {
+                        display: none !important;
+                    }
+                    
+                    .gig-card-underline {
+                        margin-bottom: 0 !important;
+                    }
+                }
+                
+                @media (max-width: 480px) {
+                    .gig-card-content {
+                        padding: 16px !important;
+                    }
+                    
+                    .gig-card-title {
+                        font-size: 18px !important;
+                    }
+                }
+                
+                /* Disable 3D on mobile for performance */
+                @media (max-width: 768px) {
+                    .gig-card-inner {
+                        transform: none !important;
+                    }
+                }
             `}</style>
         </section>
     );
@@ -392,7 +502,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     />
 
                     {/* LAYER 5: CONTENT - Floating text */}
-                    <div style={{
+                    <div className="gig-card-content" style={{
                         position: 'absolute',
                         inset: 0,
                         display: 'flex',
@@ -404,7 +514,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         textAlign: isHebrew ? 'right' : 'left'
                     }}>
                         {/* Category badge */}
-                        <span style={{
+                        <span className="gig-card-category" style={{
                             display: 'inline-block',
                             textTransform: 'uppercase',
                             fontWeight: 800,
@@ -419,7 +529,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         </span>
 
                         {/* Title */}
-                        <h3 style={{
+                        <h3 className="gig-card-title" style={{
                             fontFamily: 'var(--font-serif), Georgia, serif',
                             lineHeight: 1.05,
                             marginBottom: '16px',
@@ -434,7 +544,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                         {/* Animated underline */}
                         <div
-                            className="group-hover:w-[80px] group-hover:opacity-100"
+                            className="gig-card-underline group-hover:w-[80px] group-hover:opacity-100"
                             style={{
                                 height: '2px',
                                 background: 'linear-gradient(90deg, #D4AF37, #F7E7CE)',
@@ -450,7 +560,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
                         {/* CTA */}
                         <div
-                            className="opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500"
+                            className="gig-card-cta opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500"
                             style={{
                                 display: 'flex',
                                 alignItems: 'center',
