@@ -96,7 +96,7 @@ export default function GigCarousel() {
                 .gig-carousel-section {
                     position: relative;
                     padding: 64px 0 80px;
-                    background: #FFFFFF;
+                    background: #F5F5F5;
                     width: 100%;
                     max-width: 100vw;
                     overflow: hidden !important;
