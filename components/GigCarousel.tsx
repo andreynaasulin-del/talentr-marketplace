@@ -76,16 +76,16 @@ export default function GigCarousel() {
 
             {/* Two Row Marquee */}
             <div className="relative z-10 flex flex-col gap-16">
-                <div className="w-full py-5 overflow-visible perspective-[1500px]">
-                    <div className="flex gap-16 w-max pl-5 animate-marquee-left hover:[animation-play-state:paused] will-change-transform">
+                <div className="w-full py-5 overflow-visible" style={{ perspective: '1500px' }}>
+                    <div className="flex gap-16 w-max pl-5 animate-marquee-left hover:[animation-play-state:paused] will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
                         {[...topRow, ...topRow, ...topRow].map((pkg, i) => (
                             <GigCard key={`top-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
 
-                <div className="w-full py-5 overflow-visible perspective-[1500px]">
-                    <div className="flex gap-16 w-max pl-5 animate-marquee-right hover:[animation-play-state:paused] will-change-transform">
+                <div className="w-full py-5 overflow-visible" style={{ perspective: '1500px' }}>
+                    <div className="flex gap-16 w-max pl-5 animate-marquee-right hover:[animation-play-state:paused] will-change-transform" style={{ transformStyle: 'preserve-3d' }}>
                         {[...bottomRow, ...bottomRow, ...bottomRow].map((pkg, i) => (
                             <GigCard key={`bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
@@ -147,18 +147,18 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     };
 
     return (
-        <div className="w-[340px] h-[340px] shrink-0 relative group perspective-[1500px]">
+        <div className="w-[340px] h-[340px] shrink-0 relative group" style={{ perspective: '1500px' }}>
             <motion.div
                 ref={cardRef}
-                className="w-full h-full relative rounded-[2px] cursor-pointer transition-transform duration-100 ease-out preserve-3d"
+                className="w-full h-full relative rounded-[2px] cursor-pointer transition-transform duration-100 ease-out"
                 onMouseMove={handleMouseMove}
                 onMouseLeave={handleMouseLeave}
-                style={{ rotateX, rotateY }}
+                style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
             >
-                <Link href={`/package/${pkg.id}`} className="block w-full h-full preserve-3d">
+                <Link href={`/package/${pkg.id}`} className="block w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
 
                     {/* LAYER 1: Base Image (Deep inside) */}
-                    <div className="absolute inset-0 rounded-lg overflow-hidden bg-[#111] shadow-[0_40px_80px_rgba(0,0,0,0.8)] [transform:translateZ(10px)_scale(0.96)]">
+                    <div className="absolute inset-0 rounded-lg overflow-hidden bg-[#111] shadow-[0_40px_80px_rgba(0,0,0,0.8)]" style={{ transform: 'translateZ(10px) scale(0.96)' }}>
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
@@ -170,7 +170,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     </div>
 
                     {/* LAYER 2: Glass Body (The physical block) */}
-                    <div className="absolute inset-0 rounded-lg [transform:translateZ(30px)] bg-white/[0.03] backdrop-blur-[1px] border border-white/10 shadow-[inner_0_0_40px_rgba(255,255,255,0.05)] overflow-hidden">
+                    <div className="absolute inset-0 rounded-lg bg-white/[0.03] backdrop-blur-[1px] border border-white/10 shadow-[inner_0_0_40px_rgba(255,255,255,0.05)] overflow-hidden" style={{ transform: 'translateZ(30px)' }}>
                         {/* Gold Bevel (Edge Glow) */}
                         <div className="absolute inset-0 border-[1.5px] border-transparent rounded-lg opacity-80"
                             style={{
@@ -192,7 +192,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     </div>
 
                     {/* LAYER 3: Content (Floating above) */}
-                    <div className="absolute inset-0 flex items-end p-8 [transform:translateZ(60px)]">
+                    <div className="absolute inset-0 flex items-end p-8" style={{ transform: 'translateZ(60px)' }}>
                         <div className="w-full text-left">
                             <span className="block text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold mb-3 drop-shadow-md">
                                 {pkg.category}
