@@ -9,7 +9,7 @@ import { useState, useEffect, useCallback } from 'react';
 export default function HeroSection() {
     const { language } = useLanguage();
     const lang = language as 'en' | 'he';
-    
+
     const content = {
         en: {
             staticStart: 'We help you',
@@ -284,7 +284,7 @@ export default function HeroSection() {
                             <span className="inline-block w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
                         </span>
                     </h1>
-
+                    
                     <motion.p 
                         className="text-2xl sm:text-3xl md:text-4xl font-black text-amber-400 mb-6"
                         initial={{ opacity: 0 }}
@@ -304,11 +304,11 @@ export default function HeroSection() {
                     </motion.p>
 
                     {/* Chat Input */}
-                    <motion.div
+                <motion.div 
                         initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
+                    animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
-                    >
+                >
                         <Link
                             href="#chat"
                             className="group flex items-center gap-4 w-full max-w-xl mx-auto mt-10 px-6 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
@@ -322,7 +322,7 @@ export default function HeroSection() {
                             </div>
                         </Link>
                     </motion.div>
-                </div>
+                        </div>
 
                 {/* For Masters Block */}
                 <motion.div 
@@ -334,17 +334,17 @@ export default function HeroSection() {
                     {/* Glass card with subtle glow */}
                     <div className="p-8 md:p-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl text-center shadow-2xl">
                         <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] mb-4">
-                            {t.forMasters}
-                        </h3>
+                        {t.forMasters}
+                    </h3>
                         <p className="text-white/80 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-6">
-                            {t.forMastersDesc}
-                        </p>
-                        <a
-                            href="/join"
+                        {t.forMastersDesc}
+                    </p>
+                    <a
+                        href="/join"
                             className="inline-block px-8 py-4 bg-white text-[#009de0] font-bold rounded-xl hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
-                        >
-                            {t.forMastersCta}
-                        </a>
+                    >
+                        {t.forMastersCta}
+                    </a>
                     </div>
                 </motion.div>
             </div>

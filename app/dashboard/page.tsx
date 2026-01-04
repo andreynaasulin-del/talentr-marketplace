@@ -88,22 +88,22 @@ export default function DashboardPage() {
         return bookings
             .filter((b) => b.status === 'pending')
             .map((b) => ({
-            id: b.id,
+                id: b.id,
                 date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
                     day: 'numeric',
                     month: 'short',
                 }),
-            eventType: b.event_type,
+                eventType: b.event_type,
                 clientName: language === 'he' ? 'לקוח' : 'Client',
-        }));
+            }));
     }, [bookings, language]);
 
     const recentActivity = useMemo(() => {
         return bookings
             .filter((b) => b.status !== 'pending')
-        .slice(0, 3)
+            .slice(0, 3)
             .map((b) => ({
-            id: b.id,
+                id: b.id,
                 date: new Date(b.event_date).toLocaleDateString(language === 'he' ? 'he-IL' : 'en-US', {
                     day: 'numeric',
                     month: 'short',
@@ -128,27 +128,27 @@ export default function DashboardPage() {
                 const authUser = data.user;
 
                 if (!authUser) {
-                router.push('/signin');
-                return;
-            }
+                    router.push('/signin');
+                    return;
+                }
 
-            const { data: vendorData } = await supabase
-                .from('vendors')
-                .select('id, full_name, bio, avatar_url, portfolio_gallery, price_from, category, city')
+                const { data: vendorData } = await supabase
+                    .from('vendors')
+                    .select('id, full_name, bio, avatar_url, portfolio_gallery, price_from, category, city')
                     .eq('user_id', authUser.id)
-                .single();
+                    .single();
 
-            if (vendorData) {
-                setVendorId(vendorData.id);
-                setVendorProfile(vendorData as VendorProfile);
-            }
+                if (vendorData) {
+                    setVendorId(vendorData.id);
+                    setVendorProfile(vendorData as VendorProfile);
+                }
 
                 setUser(authUser);
             } catch (err) {
                 console.error('Dashboard auth check failed:', err);
                 router.push('/signin');
             } finally {
-            setLoading(false);
+                setLoading(false);
             }
         };
 
@@ -316,7 +316,7 @@ export default function DashboardPage() {
                             }}
                         >
                             {/* inner ambient */}
-                    <motion.div
+                            <motion.div
                                 className="pointer-events-none absolute inset-0 opacity-70"
                                 style={{
                                     background:
@@ -326,7 +326,7 @@ export default function DashboardPage() {
                                 transition={{ duration: 16, repeat: Infinity, ease: 'easeInOut' }}
                             />
 
-                        <div className="relative z-10">
+                            <div className="relative z-10">
                                 <div className={cn('flex items-start justify-between gap-4 mb-4', isRTL && 'flex-row-reverse')}>
                                     <div className={cn('flex items-start gap-3', isRTL && 'flex-row-reverse')}>
                                         <div
@@ -341,38 +341,38 @@ export default function DashboardPage() {
                                                 style={{ fontFamily: 'var(--font-serif), serif' }}
                                             >
                                                 {language === 'he' ? 'פאנל ספק פרטי' : 'Private Vendor Panel'}
-                                </div>
+                                            </div>
                                             <h2
                                                 className="mt-1 text-xl sm:text-2xl tracking-[0.14em]"
                                                 style={{ fontFamily: 'var(--font-serif), serif' }}
                                             >
                                                 {language === 'he' ? 'ברוכים הבאים' : 'Welcome'} {language === 'he' ? 'ל‑Talentr' : 'to Talentr'}
-                                    </h2>
+                                            </h2>
                                             <p className="mt-1 text-white/60 text-sm">
                                                 {language === 'he'
                                                     ? 'השלם את הפרופיל כדי להתחיל לקבל הזמנות.'
                                                     : 'Complete your profile to start receiving bookings.'}
-                                    </p>
-                                </div>
-                            </div>
+                                            </p>
+                                        </div>
+                                    </div>
 
                                     <div className="flex-shrink-0">
                                         <RingProgress value={profileCompletion} />
+                                    </div>
                                 </div>
-                            </div>
 
                                 {/* Action bricks */}
                                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-3">
                                     {onboardingActions.map((action, idx) => (
-                                    <motion.div
-                                        key={action.id}
+                                        <motion.div
+                                            key={action.id}
                                             initial={{ opacity: 0, y: 10 }}
-                                        animate={{ opacity: 1, y: 0 }}
+                                            animate={{ opacity: 1, y: 0 }}
                                             transition={{ delay: 0.05 * idx }}
-                                    >
-                                        <Link
-                                            href={action.href}
-                                            className={cn(
+                                        >
+                                            <Link
+                                                href={action.href}
+                                                className={cn(
                                                     'lux-card group relative block rounded-2xl p-4',
                                                     'bg-white/4 border border-white/10 backdrop-blur-xl',
                                                     'transition-colors',
@@ -398,14 +398,14 @@ export default function DashboardPage() {
                                                             <div className="text-sm font-bold text-white/90">{action.title}</div>
                                                             <div className="mt-1 text-xs text-white/55">{action.description}</div>
                                                         </div>
-                                            </div>
+                                                    </div>
 
                                                     {action.completed ? (
                                                         <CheckCircle className="w-5 h-5 text-white/50" />
                                                     ) : null}
                                                 </div>
 
-                                            {!action.completed && (
+                                                {!action.completed && (
                                                     <div
                                                         className={cn(
                                                             'mt-3 flex items-center gap-2 text-xs uppercase tracking-[0.32em] text-white/55',
@@ -416,13 +416,13 @@ export default function DashboardPage() {
                                                         <ArrowRight
                                                             className={cn('w-4 h-4 transition-transform group-hover:translate-x-0.5', isRTL && 'rotate-180 group-hover:-translate-x-0.5')}
                                                         />
-                                                </div>
-                                            )}
-                                        </Link>
-                                    </motion.div>
-                                ))}
+                                                    </div>
+                                                )}
+                                            </Link>
+                                        </motion.div>
+                                    ))}
+                                </div>
                             </div>
-                        </div>
                         </div>
                     </motion.section>
                 )}
@@ -506,7 +506,7 @@ export default function DashboardPage() {
                                     <Copy className="w-5 h-5 text-white/70" />
                                 )}
                                 <span style={{ color: copied ? ACCENT : 'rgba(255,255,255,0.85)' }}>
-                                {copied
+                                    {copied
                                         ? language === 'he'
                                             ? 'הועתק!'
                                             : 'Copied!'
@@ -550,32 +550,32 @@ export default function DashboardPage() {
                                             <div className="text-sm font-semibold text-white/80">{request.clientName}</div>
                                             <div className="text-xs text-white/45">
                                                 {language === 'he' ? 'לקוח' : 'Client'}
+                                            </div>
                                         </div>
-                                    </div>
 
                                         <div className={cn('flex items-center gap-2', isRTL && 'flex-row-reverse')}>
-                                        <button
-                                            onClick={() => handleBookingAction(request.id, 'confirmed')}
+                                            <button
+                                                onClick={() => handleBookingAction(request.id, 'confirmed')}
                                                 className={cn(
                                                     'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold',
                                                     `border border-[rgba(${ACCENT_RGB},0.35)] bg-[rgba(${ACCENT_RGB},0.12)] text-[rgba(${ACCENT_RGB},0.95)] hover:bg-[rgba(${ACCENT_RGB},0.18)] transition-colors`,
                                                     isRTL && 'flex-row-reverse'
                                                 )}
-                                        >
-                                            <Check className="w-4 h-4" />
+                                            >
+                                                <Check className="w-4 h-4" />
                                                 <span>{language === 'he' ? 'אשר' : 'Accept'}</span>
-                                        </button>
-                                        <button
-                                            onClick={() => handleBookingAction(request.id, 'declined')}
+                                            </button>
+                                            <button
+                                                onClick={() => handleBookingAction(request.id, 'declined')}
                                                 className={cn(
                                                     'inline-flex items-center gap-2 rounded-xl px-4 py-2 text-sm font-bold',
                                                     'border border-white/10 bg-white/5 hover:bg-white/10 transition-colors text-white/80',
                                                     isRTL && 'flex-row-reverse'
                                                 )}
-                                        >
-                                            <X className="w-4 h-4" />
+                                            >
+                                                <X className="w-4 h-4" />
                                                 <span>{language === 'he' ? 'דחה' : 'Decline'}</span>
-                                        </button>
+                                            </button>
                                         </div>
                                     </div>
                                 </div>
@@ -779,7 +779,7 @@ function RingProgress({ value }: { value: number }) {
                     strokeWidth={stroke}
                     fill="transparent"
                 />
-                <circle
+                <motion.circle
                     cx={size / 2}
                     cy={size / 2}
                     r={r}
@@ -788,7 +788,9 @@ function RingProgress({ value }: { value: number }) {
                     fill="transparent"
                     strokeLinecap="round"
                     strokeDasharray={c}
-                    strokeDashoffset={offset}
+                    initial={{ strokeDashoffset: c }}
+                    animate={{ strokeDashoffset: offset }}
+                    transition={{ duration: 2, ease: [0.16, 1, 0.3, 1] }}
                     style={{ filter: `drop-shadow(0 0 10px rgba(${ACCENT_RGB},0.18))` }}
                 />
             </svg>

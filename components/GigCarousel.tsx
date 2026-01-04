@@ -1,45 +1,12 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { motion } from 'framer-motion';
+import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
 import Image from 'next/image';
 import { packages, Package } from '@/lib/gigs';
 import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import type { CSSProperties } from 'react';
-
-type GigMood = {
-    moodA: string; // "r,g,b"
-    moodB: string; // "r,g,b"
-};
-
-function getGigMood(pkg: Package): GigMood {
-    const text = `${pkg.title.en} ${pkg.description.en} ${pkg.category}`.toLowerCase();
-
-    // Romantic / dinner / intimate → warm, muted
-    if (
-        /romantic|proposal|anniversary|date|serenity|harp|acoustic|sushi|chef/.test(text) ||
-        pkg.category === 'Chef'
-    ) {
-        return { moodA: '255,210,160', moodB: '200,179,122' };
-    }
-
-    // Party / DJ / nightlife → cold crystal
-    if (
-        pkg.category === 'DJ' ||
-        /party|beats|club|rooftop|dance|techno|house/.test(text)
-    ) {
-        return { moodA: '150,220,255', moodB: '90,160,255' };
-    }
-
-    // Magic / surreal → refined violet
-    if (pkg.category === 'Magician' || /magic|illusion/.test(text)) {
-        return { moodA: '205,185,255', moodB: '150,140,255' };
-    }
-
-    // Default: neutral champagne brass
-    return { moodA: '200,179,122', moodB: '255,255,255' };
-}
+import { useRef, useState, CSSProperties, MouseEvent } from 'react';
 
 export default function GigCarousel() {
     const { language } = useLanguage();
@@ -70,7 +37,6 @@ export default function GigCarousel() {
     let topRow = filtered.slice(0, mid);
     let bottomRow = filtered.slice(mid);
 
-    // Safety: ensure both rows have items
     if (bottomRow.length === 0 && topRow.length > 1) {
         const split = Math.ceil(topRow.length / 2);
         bottomRow = topRow.slice(split);
@@ -103,20 +69,18 @@ export default function GigCarousel() {
 
             {/* Two Row Marquee */}
             <div className="gig-marquee-container">
-                {/* Row 1: Left */}
                 <div className="gig-marquee-row">
                     <div className="gig-marquee-track gig-marquee-left">
                         {[...topRow, ...topRow, ...topRow].map((pkg, i) => (
-                            <GigCard key={`top-${pkg.id}-${i}`} pkg={pkg} lang={lang} idx={i} />
+                            <GigCard key={`top-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
 
-                {/* Row 2: Right */}
                 <div className="gig-marquee-row">
                     <div className="gig-marquee-track gig-marquee-right">
                         {[...bottomRow, ...bottomRow, ...bottomRow].map((pkg, i) => (
-                            <GigCard key={`bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} idx={i} />
+                            <GigCard key={`bottom-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
@@ -126,9 +90,12 @@ export default function GigCarousel() {
                 /* ===== SECTION ===== */
                 .gig-carousel-section {
                     position: relative;
-                    padding: 82px 0 96px;
-                    background: #05070a;
+                    padding: 100px 0 120px;
+                    background: #020304; /* Obsidian black */
                     overflow: hidden;
+                    --gold-primary: #D4AF37;
+                    --gold-accent: #F7E7CE;
+                    --glass-dark: rgba(0, 0, 0, 0.65);
                 }
 
                 /* ===== BACKGROUND ===== */
@@ -141,28 +108,29 @@ export default function GigCarousel() {
                 .gig-bg-gradient {
                     position: absolute;
                     inset: 0;
-                    background:
-                        radial-gradient(ellipse 120% 85% at 50% 15%, rgba(10, 16, 24, 1) 0%, rgba(5, 7, 10, 1) 55%, rgba(0, 0, 0, 1) 100%);
+                    background: radial-gradient(circle at 50% 0%, rgba(20, 20, 25, 1) 0%, #000 80%);
                 }
                 .gig-bg-orb {
                     position: absolute;
                     border-radius: 50%;
-                    filter: blur(100px);
-                    opacity: 0.3;
+                    filter: blur(120px);
+                    opacity: 0.15;
                 }
                 .gig-bg-orb-1 {
-                    top: 10%;
-                    left: 5%;
-                    width: 600px;
-                    height: 600px;
-                    background: rgba(120, 200, 255, 0.12);
+                    top: -10%;
+                    left: 20%;
+                    width: 800px;
+                    height: 800px;
+                    background: var(--gold-primary);
+                    mix-blend-mode: screen;
                 }
                 .gig-bg-orb-2 {
-                    bottom: 10%;
-                    right: 5%;
-                    width: 500px;
-                    height: 500px;
-                    background: rgba(200, 179, 122, 0.10);
+                    bottom: -10%;
+                    right: 10%;
+                    width: 600px;
+                    height: 600px;
+                    background: #4B0082;
+                    mix-blend-mode: screen;
                 }
 
                 /* ===== HEADER ===== */
@@ -170,32 +138,37 @@ export default function GigCarousel() {
                     position: relative;
                     z-index: 10;
                     max-width: 1280px;
-                    margin: 0 auto 80px;
+                    margin: 0 auto 100px;
                     padding: 0 24px;
                 }
                 .gig-label {
                     display: inline-block;
-                    font-size: 11px;
+                    font-size: 10px;
                     font-weight: 800;
-                    color: rgba(200, 179, 122, 0.9);
+                    color: var(--gold-primary);
                     text-transform: uppercase;
-                    letter-spacing: 0.75em;
-                    margin-bottom: 20px;
+                    letter-spacing: 0.8em;
+                    margin-bottom: 24px;
+                    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
                 }
                 .gig-title {
-                    font-size: clamp(3rem, 10vw, 8rem);
-                    font-weight: 800;
+                    font-family: var(--font-serif), serif;
+                    font-size: clamp(3.5rem, 10vw, 8.5rem);
+                    font-weight: 400;
                     color: white;
-                    letter-spacing: -0.04em;
-                    line-height: 0.9;
-                    margin-bottom: 20px;
+                    letter-spacing: -0.02em;
+                    line-height: 0.95;
+                    margin-bottom: 24px;
+                    background: linear-gradient(135deg, #fff 0%, #ccc 100%);
+                    -webkit-background-clip: text;
+                    -webkit-text-fill-color: transparent;
                 }
                 .gig-subtitle {
-                    color: rgba(255, 255, 255, 0.25);
-                    font-size: clamp(1rem, 2vw, 1.3rem);
+                    color: rgba(255, 255, 255, 0.35);
+                    font-size: clamp(1rem, 1.5vw, 1.2rem);
                     max-width: 500px;
                     margin: 0 auto;
-                    font-style: italic;
+                    font-weight: 300;
                 }
 
                 /* ===== MARQUEE ===== */
@@ -204,411 +177,326 @@ export default function GigCarousel() {
                     z-index: 10;
                     display: flex;
                     flex-direction: column;
-                    gap: 26px;
-                    direction: ltr !important;
+                    gap: 60px; /* More space between rows */
                 }
 
                 .gig-marquee-row {
                     width: 100%;
-                    overflow: hidden;
-                    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
-                    -webkit-mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+                    padding: 20px 0; /* Bleed area for 3D tilt */
+                    overflow: visible; /* Allow 3D elements to poke out */
                 }
 
                 .gig-marquee-track {
                     display: flex;
-                    gap: 22px;
+                    gap: 60px; /* Spacious luxury spacing */
                     width: max-content;
-                    padding: 20px 0;
+                    padding-left: 20px;
                     will-change: transform;
-                    backface-visibility: hidden;
-                    -webkit-backface-visibility: hidden;
+                    /* Pause on hover handled by JS or simple CSS is tricky with complex 3D */
                 }
-
-                .gig-marquee-left {
-                    animation: gig-scroll-left 78s linear infinite;
-                }
-
-                .gig-marquee-right {
-                    animation: gig-scroll-right 86s linear infinite;
-                }
-
                 .gig-marquee-row:hover .gig-marquee-track {
                     animation-play-state: paused;
                 }
+
+                .gig-marquee-left { animation: gig-scroll-left 90s linear infinite; }
+                .gig-marquee-right { animation: gig-scroll-right 100s linear infinite; }
 
                 @keyframes gig-scroll-left {
                     0% { transform: translate3d(0, 0, 0); }
                     100% { transform: translate3d(-33.3333%, 0, 0); }
                 }
-
                 @keyframes gig-scroll-right {
                     0% { transform: translate3d(-33.3333%, 0, 0); }
                     100% { transform: translate3d(0, 0, 0); }
                 }
 
-                /* ===== CRYSTAL CUBE ===== */
-                .gig-carousel-section {
-                    --brass-rgb: 200, 179, 122; /* champagne brass */
-                    --ease-lux: cubic-bezier(0.16, 1, 0.3, 1);
-                }
-
-                .crystal-wrap {
-                    flex-shrink: 0;
-                    width: 300px;
-                    aspect-ratio: 1 / 1;
-                    position: relative;
-                    perspective: 2000px;
-                    transform: translate3d(0, 0, 0);
-                }
-
-                /* Caustics behind cube (emotional lighting) */
-                .crystal-caustic {
-                    position: absolute;
-                    inset: -90px;
-                    border-radius: 999px;
-                    filter: blur(30px);
-                    opacity: 0;
-                    transform: translate3d(0, 0, 0);
-                    transition: opacity 900ms var(--ease-lux);
-                    background:
-                        radial-gradient(circle at 35% 35%, rgba(var(--mood-a), 0.16), transparent 60%),
-                        radial-gradient(circle at 65% 55%, rgba(var(--mood-b), 0.12), transparent 62%);
-                    mix-blend-mode: screen;
-                    pointer-events: none;
-                }
-
-                .crystal-wrap:hover .crystal-caustic {
-                    opacity: 1;
-                }
-
-                /* Float / sway while scrolling */
-                .crystal-float {
-                    width: 100%;
-                    height: 100%;
-                    animation: crystal-float var(--float-dur) ease-in-out infinite;
-                    animation-delay: var(--float-delay);
-                    transform-style: preserve-3d;
-                    will-change: transform;
-                }
-
-                @keyframes crystal-float {
-                    0% { transform: translate3d(0, 0, 0) rotateZ(calc(var(--sway-sign) * -0.8deg)); }
-                    100% { transform: translate3d(0, -10px, 0) rotateZ(calc(var(--sway-sign) * 0.8deg)); }
-                }
-
-                .crystal-cube {
-                    display: block;
-                    position: relative;
-                    width: 100%;
-                    height: 100%;
-                    border-radius: 24px;
-                    overflow: hidden;
-                    transform-style: preserve-3d;
-                    background: rgba(255, 255, 255, 0.03);
-                    border: 1px solid rgba(255, 255, 255, 0.10);
-                    box-shadow: 0 30px 90px rgba(0, 0, 0, 0.55);
-                    transition:
-                        transform 850ms var(--ease-lux),
-                        box-shadow 1000ms var(--ease-lux),
-                        border-color 900ms var(--ease-lux);
-                    will-change: transform;
-                }
-
-                .crystal-cube:hover {
-                    transform: translate3d(0, -3px, 0) scale(1.02) rotateX(5deg) rotateY(-6deg);
-                    border-color: rgba(var(--brass-rgb), 0.22);
-                    box-shadow:
-                        0 55px 160px rgba(0, 0, 0, 0.72),
-                        0 0 120px rgba(var(--brass-rgb), 0.05);
-                }
-
-                /* Layers */
-                .crystal-layer {
-                    position: absolute;
-                    inset: 0;
-                    z-index: 1;
-                    transform-style: preserve-3d;
-                    border-radius: 24px;
-                }
-
-                .crystal-image {
-                    transform: translateZ(0px);
-                }
-
-                .crystal-image img {
-                    width: 100%;
-                    height: 100%;
-                    object-fit: cover;
-                    opacity: 0.86;
-                    filter: saturate(1.05) contrast(1.05);
-                    transition: transform 1200ms var(--ease-lux), opacity 900ms var(--ease-lux);
-                }
-
-                .crystal-cube:hover .crystal-image img {
-                    transform: scale(1.08);
-                    opacity: 1;
-                }
-
-                /* Glass / thickness */
-                .crystal-glass {
-                    position: absolute;
-                    inset: 0;
-                    z-index: 2;
-                    pointer-events: none;
-                    transform: translateZ(34px);
-                    background: rgba(255, 255, 255, 0.035);
-                    backdrop-filter: blur(18px) saturate(160%) contrast(110%);
-                    -webkit-backdrop-filter: blur(18px) saturate(160%) contrast(110%);
-                    box-shadow:
-                        inset 0 0 0 1px rgba(255, 255, 255, 0.06),
-                        inset 0 18px 40px rgba(0, 0, 0, 0.55),
-                        inset 0 -14px 28px rgba(255, 255, 255, 0.06);
-                }
-
-                /* Depth gradient / refraction */
-                .crystal-glass::before {
-                    content: '';
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 24px;
-                    background:
-                        radial-gradient(700px circle at 20% 10%, rgba(var(--mood-a), 0.10), transparent 55%),
-                        radial-gradient(700px circle at 80% 65%, rgba(var(--mood-b), 0.08), transparent 60%),
-                        linear-gradient(180deg, rgba(255, 255, 255, 0.08), transparent 40%, rgba(0, 0, 0, 0.55) 100%);
-                    opacity: 0.9;
-                    mix-blend-mode: screen;
-                    pointer-events: none;
-                }
-
-                /* Bevel pulse (quiet, boutique) */
-                .crystal-bevel {
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 24px;
-                    padding: 1px;
-                    background: conic-gradient(
-                        from 0deg,
-                        rgba(var(--brass-rgb), 0.00),
-                        rgba(var(--brass-rgb), 0.22),
-                        rgba(255, 255, 255, 0.10),
-                        rgba(var(--brass-rgb), 0.16),
-                        rgba(var(--brass-rgb), 0.00)
-                    );
-                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
-                    -webkit-mask-composite: xor;
-                    mask-composite: exclude;
-                    opacity: 0.22;
-                    filter: drop-shadow(0 0 16px rgba(var(--brass-rgb), 0.08));
-                    animation: bevel-pulse 5200ms var(--ease-lux) infinite;
-                    pointer-events: none;
-                }
-
-                @keyframes bevel-pulse {
-                    0%, 100% {
-                        opacity: 0.18;
-                        filter: drop-shadow(0 0 14px rgba(var(--brass-rgb), 0.06));
-                    }
-                    50% {
-                        opacity: 0.34;
-                        filter: drop-shadow(0 0 18px rgba(var(--brass-rgb), 0.10));
-                    }
-                }
-
-                /* Glare sweep */
-                .crystal-glare {
-                    position: absolute;
-                    inset: 0;
-                    border-radius: 24px;
-                    background: linear-gradient(
-                        115deg,
-                        transparent 42%,
-                        rgba(255, 255, 255, 0.16) 50%,
-                        transparent 58%
-                    );
-                    opacity: 0;
-                    transform: translateX(-120%) skewX(-20deg);
-                    pointer-events: none;
-                }
-
-                .crystal-cube:hover .crystal-glare {
-                    opacity: 1;
-                    animation: glare-sweep 1200ms var(--ease-lux) forwards;
-                }
-
-                @keyframes glare-sweep {
-                    0% { transform: translateX(-120%) skewX(-20deg); opacity: 0; }
-                    40% { opacity: 0.9; }
-                    100% { transform: translateX(120%) skewX(-20deg); opacity: 0; }
-                }
-
-                /* Top content layer */
-                .crystal-content {
-                    position: absolute;
-                    inset: 0;
-                    z-index: 4;
-                    transform: translateZ(70px);
-                    padding: 18px;
-                    display: flex;
-                    flex-direction: column;
-                    justify-content: flex-end;
-                    gap: 8px;
-                    pointer-events: none;
-                }
-
-                .crystal-tag {
-                    display: inline-block;
-                    font-size: 9px;
-                    letter-spacing: 0.42em;
-                    text-transform: uppercase;
-                    font-weight: 700;
-                    color: rgba(var(--brass-rgb), 0.85);
-                }
-
-                .crystal-title {
-                    font-family: var(--font-serif), serif;
-                    font-size: 22px;
-                    font-weight: 400;
-                    letter-spacing: 0.12em;
-                    text-transform: uppercase;
-                    line-height: 1.18;
-                    color: rgba(255, 255, 255, 0.92);
-                    text-shadow: 0 16px 40px rgba(0, 0, 0, 0.65);
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-
-                .crystal-desc {
-                    font-size: 12px;
-                    line-height: 1.45;
-                    color: rgba(255, 255, 255, 0.60);
-                    display: -webkit-box;
-                    -webkit-line-clamp: 2;
-                    -webkit-box-orient: vertical;
-                    overflow: hidden;
-                }
-
-                /* Action button */
-                .crystal-action {
-                    position: absolute;
-                    top: 16px;
-                    right: 16px;
-                    width: 38px;
-                    height: 38px;
-                    border-radius: 999px;
-                    background: rgba(255, 255, 255, 0.06);
-                    backdrop-filter: blur(14px);
-                    -webkit-backdrop-filter: blur(14px);
-                    border: 1px solid rgba(255, 255, 255, 0.10);
-                    display: flex;
-                    align-items: center;
-                    justify-content: center;
-                    color: rgba(255, 255, 255, 0.88);
-                    opacity: 0;
-                    transform: translateZ(84px) translate(10px, -10px);
-                    transition: opacity 600ms var(--ease-lux), transform 700ms var(--ease-lux), background-color 700ms var(--ease-lux), border-color 700ms var(--ease-lux);
-                }
-
-                .crystal-cube:hover .crystal-action {
-                    opacity: 1;
-                    transform: translateZ(84px) translate(0, 0);
-                    border-color: rgba(var(--brass-rgb), 0.22);
-                }
-
-                /* Mobile */
+                /* Resp */
                 @media (max-width: 768px) {
-                    .crystal-wrap {
-                        width: 250px;
-                    }
-                    .gig-marquee-track {
-                        gap: 18px;
-                    }
-                    .gig-marquee-container {
-                        gap: 20px;
-                    }
-                    .gig-header {
-                        margin-bottom: 56px;
-                    }
-                    .gig-carousel-section {
-                        padding: 68px 0 82px;
-                    }
-                    .crystal-title {
-                        font-size: 20px;
-                    }
-                }
-
-                @media (prefers-reduced-motion: reduce) {
-                    .crystal-float,
-                    .crystal-bevel,
-                    .crystal-glare,
-                    .gig-marquee-left,
-                    .gig-marquee-right {
-                        animation: none !important;
-                    }
-                    .crystal-cube,
-                    .crystal-image img,
-                    .crystal-action,
-                    .crystal-caustic {
-                        transition: none !important;
-                    }
+                    .gig-marquee-track { gap: 30px; }
+                    .gig-marquee-container { gap: 40px; }
+                    .gig-title { font-size: 3rem; }
                 }
             `}</style>
         </section>
     );
 }
 
-function GigCard({ pkg, lang, idx }: { pkg: Package; lang: 'en' | 'he'; idx: number }) {
-    const mood = getGigMood(pkg);
-    const floatDur = 6.6 + (idx % 5) * 0.85;
-    const floatDelay = -((idx % 6) * 0.55);
-    const swaySign = idx % 2 === 0 ? 1 : -1;
+function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
+    const cardRef = useRef<HTMLDivElement>(null);
 
-    const style = {
-        ['--mood-a' as any]: mood.moodA,
-        ['--mood-b' as any]: mood.moodB,
-        ['--float-dur' as any]: `${floatDur}s`,
-        ['--float-delay' as any]: `${floatDelay}s`,
-        ['--sway-sign' as any]: swaySign,
-    } as CSSProperties;
+    // 3D Motion Values
+    const x = useMotionValue(0);
+    const y = useMotionValue(0);
+
+    const mouseXSpring = useSpring(x, { stiffness: 400, damping: 30 });
+    const mouseYSpring = useSpring(y, { stiffness: 400, damping: 30 });
+
+    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["15deg", "-15deg"]);
+    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-15deg", "15deg"]);
+
+    // Dynamic Glare Position
+    const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
+    const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
+
+    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
+        if (!cardRef.current) return;
+        const rect = cardRef.current.getBoundingClientRect();
+        const width = rect.width;
+        const height = rect.height;
+        const mouseX = e.clientX - rect.left;
+        const mouseY = e.clientY - rect.top;
+
+        const xPct = (mouseX / width) - 0.5;
+        const yPct = (mouseY / height) - 0.5;
+
+        x.set(xPct);
+        y.set(yPct);
+    };
+
+    const handleMouseLeave = () => {
+        x.set(0);
+        y.set(0);
+    };
 
     return (
-        <div className="crystal-wrap" style={style}>
-            <div className="crystal-caustic" />
-            <div className="crystal-float">
-                <Link href={`/package/${pkg.id}`} className="crystal-cube">
-                    {/* Base image */}
-                    <div className="crystal-layer crystal-image">
+        <div
+            className="monolith-wrapper"
+            style={{ perspective: '1500px' }}
+        >
+            <motion.div
+                ref={cardRef}
+                className="monolith-card"
+                onMouseMove={handleMouseMove}
+                onMouseLeave={handleMouseLeave}
+                style={{
+                    rotateX,
+                    rotateY,
+                    transformStyle: "preserve-3d",
+                }}
+            >
+                <Link href={`/package/${pkg.id}`} className="block w-full h-full preserve-3d">
+
+                    {/* LAYER 1: Base Image (Deep inside) */}
+                    <div className="monolith-layer layer-base">
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
                             fill
-                            sizes="300px"
-                            style={{ objectFit: 'cover' }}
-                            priority={idx < 6}
+                            sizes="400px"
+                            className="monolith-image"
+                        />
+                        <div className="monolith-overlay" />
+                    </div>
+
+                    {/* LAYER 2: Glass Body (The physical block) */}
+                    <div className="monolith-layer layer-glass">
+                        {/* Gold Bevel */}
+                        <div className="monolith-border" />
+                        {/* Inner Glow */}
+                        <div className="monolith-glow" />
+                        {/* Glare Effect */}
+                        <motion.div
+                            className="monolith-glare"
+                            style={{
+                                background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.2) 0%, transparent 60%)`
+                            }}
                         />
                     </div>
 
-                    {/* Glass + bevel + glare */}
-                    <div className="crystal-layer crystal-glass">
-                        <div className="crystal-bevel" />
-                        <div className="crystal-glare" />
+                    {/* LAYER 3: Content (Floating above) */}
+                    <div className="monolith-layer layer-content">
+                        <div className="monolith-content-inner">
+                            <span className="monolith-category">{pkg.category}</span>
+                            <h3 className="monolith-title">{pkg.title[lang]}</h3>
+                            <div className="monolith-divider" />
+                            <div className="monolith-action">
+                                <span className="view-text">{lang === 'he' ? 'צפה' : 'View'}</span>
+                                <ArrowUpRight className="w-4 h-4" />
+                            </div>
+                        </div>
                     </div>
 
-                    {/* Content */}
-                    <div className="crystal-layer crystal-content">
-                        <span className="crystal-tag">{pkg.category}</span>
-                        <h3 className="crystal-title">{pkg.title[lang]}</h3>
-                        <p className="crystal-desc">{pkg.description[lang]}</p>
-                    </div>
-
-                    {/* Action */}
-                    <div className="crystal-action">
-                        <ArrowUpRight className="w-5 h-5" />
-                    </div>
                 </Link>
-            </div>
+            </motion.div>
+
+            <style jsx>{`
+                .monolith-wrapper {
+                    width: 320px;
+                    height: 320px;
+                    flex-shrink: 0;
+                    position: relative;
+                }
+
+                .monolith-card {
+                    width: 100%;
+                    height: 100%;
+                    position: relative;
+                    border-radius: 2px; /* Sharp, monolith corners */
+                    transition: transform 0.1s;
+                }
+
+                .preserve-3d {
+                    transform-style: preserve-3d;
+                }
+
+                /* === LAYERS === */
+                .monolith-layer {
+                    position: absolute;
+                    inset: 0;
+                    border-radius: 4px;
+                    pointer-events: none;
+                }
+
+                /* Layer 1: Image */
+                .layer-base {
+                    transform: translateZ(10px) scale(0.96);
+                    overflow: hidden;
+                    background: #000;
+                    box-shadow: 0 40px 80px rgba(0,0,0,0.8);
+                }
+                .monolith-image {
+                    object-fit: cover;
+                    opacity: 0.85;
+                    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+                }
+                .monolith-card:hover .monolith-image {
+                    transform: scale(1.1);
+                    opacity: 0.6; /* Darken image on hover to make text pop */
+                }
+                .monolith-overlay {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.8));
+                }
+
+                /* Layer 2: Glass */
+                .layer-glass {
+                    transform: translateZ(30px);
+                    background: rgba(10, 10, 12, 0.45); /* Dark Glass */
+                    backdrop-filter: blur(24px) saturate(140%);
+                    -webkit-backdrop-filter: blur(24px) saturate(140%);
+                    border: 1px solid rgba(255,255,255,0.05);
+                }
+
+                /* Gold Border / Bevel */
+                .monolith-border {
+                    position: absolute;
+                    inset: -1px;
+                    border-radius: 4px;
+                    padding: 1.5px; /* Border width */
+                    background: linear-gradient(135deg, rgba(212, 175, 55, 1) 0%, rgba(212, 175, 55, 0.1) 50%, rgba(212, 175, 55, 1) 100%);
+                    -webkit-mask: linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0);
+                    -webkit-mask-composite: xor;
+                    mask-composite: exclude;
+                    opacity: 0.8;
+                }
+                
+                /* Inner Gold Glow */
+                .monolith-glow {
+                    position: absolute;
+                    inset: 0;
+                    box-shadow: inset 0 0 30px rgba(212, 175, 55, 0.15);
+                    opacity: 0.6;
+                    transition: opacity 0.5s ease;
+                }
+                .monolith-card:hover .monolith-glow {
+                    opacity: 1;
+                    box-shadow: inset 0 0 50px rgba(212, 175, 55, 0.25);
+                }
+
+                .monolith-glare {
+                    position: absolute;
+                    inset: -50%;
+                    width: 200%;
+                    height: 200%;
+                    opacity: 0;
+                    transition: opacity 0.3s;
+                    mix-blend-mode: overlay;
+                    pointer-events: none;
+                }
+                .monolith-card:hover .monolith-glare {
+                    opacity: 1;
+                }
+
+
+                /* Layer 3: Content */
+                .layer-content {
+                    transform: translateZ(60px);
+                    display: flex;
+                    align-items: flex-end;
+                    padding: 32px;
+                }
+
+                .monolith-content-inner {
+                    width: 100%;
+                    text-align: left;
+                }
+
+                .monolith-category {
+                    display: block;
+                    font-size: 9px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.3em;
+                    color: #D4AF37; /* Gold */
+                    margin-bottom: 12px;
+                    font-weight: 700;
+                    text-shadow: 0 2px 10px rgba(0,0,0,0.8);
+                }
+
+                .monolith-title {
+                    font-family: var(--font-serif), serif;
+                    font-size: 28px;
+                    line-height: 1.1;
+                    color: #F7E7CE; /* Champagne */
+                    margin-bottom: 20px;
+                    text-shadow: 0 4px 20px rgba(0,0,0,0.9);
+                    filter: drop-shadow(0 0 8px rgba(212, 175, 55, 0.2));
+                }
+
+                .monolith-divider {
+                    width: 40px;
+                    height: 1px;
+                    background: #D4AF37;
+                    margin-bottom: 20px;
+                    opacity: 0.6;
+                    transform-origin: left;
+                    transition: width 0.4s ease;
+                }
+                .monolith-card:hover .monolith-divider {
+                    width: 100%;
+                    opacity: 1;
+                }
+
+                .monolith-action {
+                    display: flex;
+                    align-items: center;
+                    gap: 8px;
+                    color: #fff;
+                    font-size: 11px;
+                    text-transform: uppercase;
+                    letter-spacing: 0.15em;
+                    opacity: 0;
+                    transform: translateY(10px);
+                    transition: all 0.4s ease;
+                }
+                .monolith-card:hover .monolith-action {
+                    opacity: 1;
+                    transform: translateY(0);
+                }
+
+                @media (max-width: 768px) {
+                    .monolith-wrapper {
+                        width: 260px;
+                        height: 260px;
+                    }
+                    .monolith-title {
+                        font-size: 22px;
+                    }
+                    .layer-content {
+                        padding: 24px;
+                    }
+                }
+            `}</style>
         </div>
     );
 }

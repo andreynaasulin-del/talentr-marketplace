@@ -9,12 +9,12 @@ if (!supabaseUrl || !supabaseAnonKey) {
     console.error('Missing Supabase environment variables (NEXT_PUBLIC_SUPABASE_URL or NEXT_PUBLIC_SUPABASE_ANON_KEY). Auth will be disabled.');
 } else {
     supabase = createClient(supabaseUrl, supabaseAnonKey, {
-        auth: {
-            autoRefreshToken: true,
-            persistSession: true,
-            detectSessionInUrl: true,
-        },
-    });
+    auth: {
+        autoRefreshToken: true,
+        persistSession: true,
+        detectSessionInUrl: true,
+    },
+});
 }
 
 export { supabase };
