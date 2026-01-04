@@ -476,11 +476,6 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         </div>
                     </div>
 
-                    {/* LAYER 6: Corner accents - BIGGER & BRIGHTER */}
-                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', top: '8px', left: '8px', width: '35px', height: '35px', borderTop: '3px solid #D4AF37', borderLeft: '3px solid #D4AF37', borderRadius: '8px 0 0 0', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
-                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', top: '8px', right: '8px', width: '35px', height: '35px', borderTop: '3px solid #D4AF37', borderRight: '3px solid #D4AF37', borderRadius: '0 8px 0 0', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
-                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', bottom: '8px', left: '8px', width: '35px', height: '35px', borderBottom: '3px solid #D4AF37', borderLeft: '3px solid #D4AF37', borderRadius: '0 0 0 8px', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
-                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', bottom: '8px', right: '8px', width: '35px', height: '35px', borderBottom: '3px solid #D4AF37', borderRight: '3px solid #D4AF37', borderRadius: '0 0 8px 0', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
 
                 </Link>
             </motion.div>
