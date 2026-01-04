@@ -268,41 +268,49 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
 
     return (
         <div
-            className="gig-card-wrap group"
+            className="gig-card-wrap"
             style={{
-                width: '280px',
+                width: '300px',
                 flexShrink: 0,
                 direction: isHebrew ? 'rtl' : 'ltr'
             }}
         >
-            <Link href={`/package/${pkg.id}`} className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
-                {/* Image - 16:9 aspect ratio, top corners rounded only */}
-                <div className="relative aspect-[16/9] bg-[#F7F7F9]">
+            <Link
+                href={`/package/${pkg.id}`}
+                className="block overflow-hidden transition-transform duration-200 hover:-translate-y-1"
+            >
+                {/* IMAGE CONTAINER - Top rounded only, no overlays */}
+                <div className="relative aspect-[4/3] rounded-t-2xl overflow-hidden bg-[#F7F7F9]">
                     <Image
                         src={pkg.image}
                         alt={pkg.title[lang]}
                         fill
-                        sizes="300px"
+                        sizes="320px"
                         className="object-cover"
                     />
                 </div>
 
-                {/* Content - White area */}
-                <div className="p-3">
-                    {/* Title */}
-                    <h3 className="text-[#202125] font-semibold text-[15px] leading-tight mb-1">
-                        {pkg.title[lang]}
-                    </h3>
-
-                    {/* Category / Description */}
-                    <p className="text-[#545454] text-[13px] mb-2">
+                {/* CONTENT CONTAINER - White, bottom rounded */}
+                <div className="bg-white p-4 rounded-b-2xl shadow-sm">
+                    {/* Category - Small, muted */}
+                    <p className="text-[#999999] text-xs font-medium uppercase tracking-wide mb-1">
                         {pkg.category}
                     </p>
 
-                    {/* Badge */}
-                    <span className="inline-flex items-center px-2 py-1 text-[11px] font-medium rounded-full bg-[#E5F3FB] text-[#009DE0]">
-                        {isHebrew ? 'זמין להזמנה' : 'Available'}
-                    </span>
+                    {/* Title - Bold, dark, max 2 lines */}
+                    <h3 className="text-[#202125] font-bold text-base leading-snug line-clamp-2 mb-3">
+                        {pkg.title[lang]}
+                    </h3>
+
+                    {/* Bottom row - Price/CTA */}
+                    <div className="flex items-center justify-between">
+                        <span className="text-[#009DE0] text-sm font-semibold">
+                            {isHebrew ? 'לפרטים נוספים' : 'View Details'}
+                        </span>
+                        <svg className="w-4 h-4 text-[#009DE0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
+                        </svg>
+                    </div>
                 </div>
             </Link>
         </div>
