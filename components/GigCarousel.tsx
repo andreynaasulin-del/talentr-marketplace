@@ -352,243 +352,36 @@ export default function GigCarousel() {
 }
 
 function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
-    const cardRef = useRef<HTMLDivElement>(null);
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const mouseXSpring = useSpring(x, { stiffness: 400, damping: 30 });
-    const mouseYSpring = useSpring(y, { stiffness: 400, damping: 30 });
-
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["12deg", "-12deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-12deg", "12deg"]);
-    const glareX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
-    const glareY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
-
-    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        x.set((e.clientX - rect.left) / rect.width - 0.5);
-        y.set((e.clientY - rect.top) / rect.height - 0.5);
-    };
-
     const isHebrew = lang === 'he';
 
     return (
-        <div className="gig-card-wrap group" style={{ width: '340px', height: '380px', flexShrink: 0, perspective: '1200px' }}>
-            <motion.div
-                ref={cardRef}
-                className="gig-card-inner"
-                style={{
-                    width: '100%',
-                    height: '100%',
-                    position: 'relative',
-                    cursor: 'pointer',
-                    rotateX,
-                    rotateY,
-                    transformStyle: 'preserve-3d'
-                }}
-                onMouseMove={handleMouseMove}
-                onMouseLeave={() => { x.set(0); y.set(0); }}
-                whileHover={{ scale: 1.02 }}
-                transition={{ type: 'spring', stiffness: 300, damping: 20 }}
-            >
-                <Link href={`/package/${pkg.id}`} style={{ display: 'block', width: '100%', height: '100%', transformStyle: 'preserve-3d', textDecoration: 'none' }}>
+        <div className="gig-card-wrap group" style={{ width: '280px', height: '320px', flexShrink: 0 }}>
+            <Link href={`/package/${pkg.id}`} className="block w-full h-full relative rounded-2xl overflow-hidden">
+                {/* Image */}
+                <Image
+                    src={pkg.image}
+                    alt={pkg.title[lang]}
+                    fill
+                    sizes="300px"
+                    className="object-cover transition-transform duration-500 group-hover:scale-105"
+                />
 
-                    {/* LAYER 0: DEEP SHADOW BASE */}
-                    <div style={{
-                        position: 'absolute',
-                        inset: '10px',
-                        borderRadius: '24px',
-                        background: 'rgba(0,0,0,0.8)',
-                        transform: 'translateZ(-20px)',
-                        filter: 'blur(30px)',
-                    }} />
+                {/* Gradient overlay */}
+                <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
 
-                    {/* LAYER 1: CARD BASE - Dark foundation */}
-                    <div style={{
-                        position: 'absolute',
-                        inset: 0,
-                        borderRadius: '24px',
-                        overflow: 'hidden',
-                        background: 'linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%)',
-                        boxShadow: '0 50px 100px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05)',
-                        transform: 'translateZ(0px)',
-                    }}>
-                        {/* Image */}
-                        <Image
-                            src={pkg.image}
-                            alt={pkg.title[lang]}
-                            fill
-                            sizes="400px"
-                            className="object-cover transition-all duration-700 group-hover:scale-110"
-                            style={{ opacity: 0.85, filter: 'saturate(1.2) contrast(1.05)' }}
-                        />
-                        {/* Vignette */}
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            background: `
-                                radial-gradient(ellipse at center, transparent 30%, rgba(0,0,0,0.5) 100%),
-                                linear-gradient(to top, rgba(0,0,0,0.95) 0%, rgba(0,0,0,0.5) 35%, transparent 65%)
-                            `
-                        }} />
-                    </div>
-
-                    {/* LAYER 2: GLASS PANEL - Floating above image */}
-                    <div style={{
-                        position: 'absolute',
-                        inset: '8px',
-                        borderRadius: '16px',
-                        overflow: 'hidden',
-                        transform: 'translateZ(30px)',
-                        background: 'rgba(255,255,255,0.03)',
-                        backdropFilter: 'blur(1px)',
-                        boxShadow: 'inset 0 1px 1px rgba(255,255,255,0.1), inset 0 -1px 1px rgba(0,0,0,0.2)',
-                    }}>
-                        {/* Inner edge highlight */}
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            borderRadius: '16px',
-                            border: '1px solid rgba(255,255,255,0.08)',
-                            pointerEvents: 'none',
-                        }} />
-                    </div>
-
-                    {/* LAYER 3: GOLD BEVEL FRAME - 3D raised edge */}
-                    <div style={{
-                        position: 'absolute',
-                        inset: '4px',
-                        borderRadius: '18px',
-                        transform: 'translateZ(50px)',
-                        pointerEvents: 'none',
-                    }}>
-                        {/* Gold gradient border */}
-                        <div style={{
-                            position: 'absolute',
-                            inset: 0,
-                            borderRadius: '18px',
-                            padding: '3px',
-                            background: 'linear-gradient(145deg, #D4AF37 0%, #F7E7CE 20%, #B8860B 40%, #D4AF37 60%, #F7E7CE 80%, #B8860B 100%)',
-                            WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
-                            WebkitMaskComposite: 'xor',
-                            maskComposite: 'exclude',
-                            boxShadow: '0 0 30px rgba(212,175,55,0.5), 0 0 60px rgba(212,175,55,0.2), inset 0 0 15px rgba(212,175,55,0.3)',
-                        }} />
-
-                        {/* Top highlight - simulates light hitting the bevel */}
-                        <div style={{
-                            position: 'absolute',
-                            top: 0,
-                            left: '10%',
-                            right: '10%',
-                            height: '1px',
-                            background: 'linear-gradient(90deg, transparent, rgba(247,231,206,0.8), transparent)',
-                        }} />
-                    </div>
-
-                    {/* LAYER 4: GLARE EFFECT - Interactive shine */}
-                    <motion.div
-                        className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-500"
-                        style={{
-                            position: 'absolute',
-                            inset: '-50%',
-                            width: '200%',
-                            height: '200%',
-                            transform: 'translateZ(60px)',
-                            mixBlendMode: 'overlay',
-                            background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.5) 0%, transparent 40%)`
-                        }}
-                    />
-
-                    {/* LAYER 5: CONTENT - Floating text */}
-                    <div className="gig-card-content" style={{
-                        position: 'absolute',
-                        inset: 0,
-                        display: 'flex',
-                        flexDirection: 'column',
-                        justifyContent: 'flex-end',
-                        padding: '28px',
-                        transform: 'translateZ(80px)',
-                        direction: isHebrew ? 'rtl' : 'ltr',
-                        textAlign: isHebrew ? 'right' : 'left'
-                    }}>
-                        {/* Category badge */}
-                        <span className="gig-card-category" style={{
-                            display: 'inline-block',
-                            textTransform: 'uppercase',
-                            fontWeight: 800,
-                            marginBottom: '12px',
-                            color: '#D4AF37',
-                            fontSize: isHebrew ? '10px' : '9px',
-                            letterSpacing: isHebrew ? '0.1em' : '0.35em',
-                            textShadow: '0 2px 10px rgba(0,0,0,0.8)',
-                            padding: '4px 0',
-                        }}>
-                            {pkg.category}
-                        </span>
-
-                        {/* Title */}
-                        <h3 className="gig-card-title" style={{
-                            fontFamily: 'var(--font-serif), Georgia, serif',
-                            lineHeight: 1.05,
-                            marginBottom: '16px',
-                            color: '#F7E7CE',
-                            fontSize: isHebrew ? '28px' : '26px',
-                            fontWeight: isHebrew ? 700 : 400,
-                            textShadow: '0 4px 20px rgba(0,0,0,1), 0 8px 40px rgba(0,0,0,0.8)',
-                            filter: 'drop-shadow(0 0 8px rgba(212, 175, 55, 0.15))',
-                        }}>
-                            {pkg.title[lang]}
-                        </h3>
-
-                        {/* Animated underline */}
-                        <div
-                            className="gig-card-underline group-hover:w-[80px] group-hover:opacity-100"
-                            style={{
-                                height: '2px',
-                                background: 'linear-gradient(90deg, #D4AF37, #F7E7CE)',
-                                transition: 'all 0.6s cubic-bezier(0.16, 1, 0.3, 1)',
-                                width: '30px',
-                                marginBottom: '16px',
-                                opacity: 0.7,
-                                boxShadow: '0 0 8px rgba(212,175,55,0.5)',
-                                float: isHebrew ? 'right' : 'left',
-                            }}
-                        />
-                        <div style={{ clear: 'both' }} />
-
-                        {/* CTA */}
-                        <div
-                            className="gig-card-cta opacity-0 group-hover:opacity-100 translate-y-4 group-hover:translate-y-0 transition-all duration-500"
-                            style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '8px',
-                                color: 'white',
-                                fontSize: '10px',
-                                textTransform: 'uppercase',
-                                fontWeight: 700,
-                                letterSpacing: '0.15em',
-                                flexDirection: isHebrew ? 'row-reverse' : 'row'
-                            }}
-                        >
-                            <span style={{ textShadow: '0 2px 8px rgba(0,0,0,0.8)' }}>
-                                {isHebrew ? 'גלה עוד' : 'Discover More'}
-                            </span>
-                            <ArrowUpRight style={{
-                                width: '14px',
-                                height: '14px',
-                                color: '#D4AF37',
-                                filter: 'drop-shadow(0 0 4px rgba(212,175,55,0.5))',
-                                transform: isHebrew ? 'rotate(-90deg)' : 'none'
-                            }} />
-                        </div>
-                    </div>
-
-
-                </Link>
-            </motion.div>
+                {/* Content */}
+                <div
+                    className="absolute inset-0 flex flex-col justify-end p-5"
+                    style={{ direction: isHebrew ? 'rtl' : 'ltr', textAlign: isHebrew ? 'right' : 'left' }}
+                >
+                    <span className="text-white/60 text-xs uppercase tracking-wider mb-2">
+                        {pkg.category}
+                    </span>
+                    <h3 className="text-white text-xl font-semibold leading-tight">
+                        {pkg.title[lang]}
+                    </h3>
+                </div>
+            </Link>
         </div>
     );
 }
