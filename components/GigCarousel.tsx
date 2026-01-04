@@ -32,7 +32,7 @@ export default function GigCarousel() {
             !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + (p.title.he || ''))
     );
 
-    // GUARANTEED two rows
+    // Split rows
     const mid = Math.ceil(filtered.length / 2);
     const topRow = filtered.slice(0, mid);
     const bottomRow = filtered.slice(mid);
@@ -46,8 +46,8 @@ export default function GigCarousel() {
                 <div className="gig-bg-orb-purple" />
             </div>
 
-            {/* Header */}
-            <div className="gig-header">
+            {/* Header - respects language direction */}
+            <div className="gig-header" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                 <motion.div
                     initial={{ opacity: 0, y: 30 }}
                     whileInView={{ opacity: 1, y: 0 }}
@@ -60,18 +60,19 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* INFINITE SCROLL ROWS */}
-            <div className="gig-rows">
+            {/* CRITICAL: Force dir="ltr" on slider so animation physics don't break in Hebrew */}
+            <div className="gig-rows" dir="ltr">
                 {/* ROW 1 */}
                 <div className="gig-row">
                     <div className="gig-track gig-track-left">
                         {[...topRow, ...topRow].map((pkg, i) => (
-                            <GigCard key={`${lang}-r1-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                            <GigCard key={`r1-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
+                    {/* Duplicate track for seamless loop */}
                     <div className="gig-track gig-track-left" aria-hidden="true">
                         {[...topRow, ...topRow].map((pkg, i) => (
-                            <GigCard key={`${lang}-r1-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                            <GigCard key={`r1-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
@@ -80,12 +81,12 @@ export default function GigCarousel() {
                 <div className="gig-row">
                     <div className="gig-track gig-track-right">
                         {[...bottomRow, ...bottomRow].map((pkg, i) => (
-                            <GigCard key={`${lang}-r2-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                            <GigCard key={`r2-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                     <div className="gig-track gig-track-right" aria-hidden="true">
                         {[...bottomRow, ...bottomRow].map((pkg, i) => (
-                            <GigCard key={`${lang}-r2-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                            <GigCard key={`r2-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
                         ))}
                     </div>
                 </div>
@@ -96,7 +97,10 @@ export default function GigCarousel() {
                     position: relative;
                     padding: 96px 0 128px;
                     background: #020304;
-                    overflow: hidden;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    overflow-x: hidden !important;
                 }
                 
                 .gig-bg {
@@ -180,18 +184,25 @@ export default function GigCarousel() {
                     line-height: 1.6;
                 }
                 
+                /* SLIDER PHYSICS - FORCE LTR */
                 .gig-rows {
                     position: relative;
                     z-index: 10;
                     display: flex;
                     flex-direction: column;
                     gap: 60px;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    direction: ltr !important;
                 }
                 
                 .gig-row {
                     display: flex;
                     width: 100%;
-                    overflow: hidden;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    white-space: nowrap;
                 }
                 
                 .gig-track {
@@ -199,6 +210,8 @@ export default function GigCarousel() {
                     gap: 40px;
                     padding: 20px 0;
                     flex-shrink: 0;
+                    width: max-content;
+                    will-change: transform;
                 }
                 
                 .gig-track-left {
@@ -209,6 +222,7 @@ export default function GigCarousel() {
                     animation: scroll-right 100s linear infinite;
                 }
                 
+                /* Pause on hover */
                 .gig-row:hover .gig-track {
                     animation-play-state: paused;
                 }
@@ -268,19 +282,19 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
             >
                 <Link href={`/package/${pkg.id}`} style={{ display: 'block', width: '100%', height: '100%', transformStyle: 'preserve-3d', textDecoration: 'none' }}>
 
-                    {/* IMAGE */}
+                    {/* IMAGE - BASE LAYER */}
                     <div style={{ position: 'absolute', inset: 0, borderRadius: '16px', overflow: 'hidden', background: '#050505', boxShadow: '0 40px 80px rgba(0,0,0,0.9)', transform: 'translateZ(10px) scale(0.96)' }}>
                         <Image src={pkg.image} alt={pkg.title[lang]} fill sizes="400px" className="object-cover opacity-90 transition-all duration-700 group-hover:scale-110 group-hover:opacity-60 saturate-[1.15]" />
                         <div style={{ position: 'absolute', inset: 0, background: 'linear-gradient(to top, black, rgba(0,0,0,0.3) 50%, transparent)' }} />
                     </div>
 
-                    {/* GLASS */}
+                    {/* GLASS - MIDDLE LAYER */}
                     <div style={{ position: 'absolute', inset: 0, borderRadius: '16px', border: '1px solid rgba(255,255,255,0.1)', overflow: 'hidden', transform: 'translateZ(40px)', background: 'rgba(255,255,255,0.02)', backdropFilter: 'blur(2px)', boxShadow: 'inset 0 0 50px rgba(255,255,255,0.02)' }}>
                         <div style={{ position: 'absolute', inset: 0, border: '2px solid transparent', borderRadius: '16px', background: 'linear-gradient(135deg, #D4AF37 0%, #F7E7CE 25%, #B8860B 50%, #D4AF37 75%, #F7E7CE 100%)', WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)', WebkitMaskComposite: 'xor', maskComposite: 'exclude' }} />
                         <motion.div className="opacity-0 group-hover:opacity-100 pointer-events-none transition-opacity duration-300" style={{ position: 'absolute', inset: '-100%', width: '300%', height: '300%', mixBlendMode: 'overlay', background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.4) 0%, transparent 50%)` }} />
                     </div>
 
-                    {/* CONTENT */}
+                    {/* CONTENT - TOP LAYER (RTL logic ONLY here) */}
                     <div style={{ position: 'absolute', inset: 0, display: 'flex', flexDirection: 'column', justifyContent: 'flex-end', padding: '32px', transform: 'translateZ(80px)', direction: isHebrew ? 'rtl' : 'ltr', textAlign: isHebrew ? 'right' : 'left' }}>
                         <span style={{ display: 'block', textTransform: 'uppercase', fontWeight: 900, marginBottom: '10px', color: '#D4AF37', fontSize: isHebrew ? '11px' : '9px', letterSpacing: isHebrew ? '0' : '0.4em', textShadow: '0 2px 8px rgba(0,0,0,0.5)' }}>
                             {pkg.category}
