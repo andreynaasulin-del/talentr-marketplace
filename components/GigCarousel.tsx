@@ -95,7 +95,7 @@ export default function GigCarousel() {
             <style jsx global>{`
                 .gig-carousel-section {
                     position: relative;
-                    padding: 96px 0 128px;
+                    padding: 48px 0 64px;
                     background: #020304;
                     width: 100%;
                     max-width: 100vw;
@@ -146,8 +146,8 @@ export default function GigCarousel() {
                     position: relative;
                     z-index: 10;
                     max-width: 1280px;
-                    margin: 0 auto 80px;
-                    padding: 0 24px;
+                    margin: 0 auto 40px;
+                    padding: 0 16px;
                     text-align: center;
                 }
                 
@@ -155,20 +155,20 @@ export default function GigCarousel() {
                     display: inline-block;
                     text-transform: uppercase;
                     font-weight: 900;
-                    margin-bottom: 24px;
-                    font-size: 10px;
+                    margin-bottom: 8px;
+                    font-size: 8px;
                     color: #D4AF37;
-                    letter-spacing: 0.8em;
-                    text-shadow: 0 0 20px rgba(212, 175, 55, 0.4);
+                    letter-spacing: 0.4em;
+                    text-shadow: 0 0 15px rgba(212, 175, 55, 0.4);
                 }
                 
                 .gig-title {
                     font-family: var(--font-serif), serif;
                     font-weight: 400;
                     letter-spacing: -0.02em;
-                    line-height: 0.95;
-                    margin-bottom: 24px;
-                    font-size: clamp(3rem, 10vw, 7rem);
+                    line-height: 1;
+                    margin-bottom: 12px;
+                    font-size: clamp(1.5rem, 5vw, 2.5rem);
                     background: linear-gradient(180deg, #FFFFFF 0%, #D4AF37 100%);
                     -webkit-background-clip: text;
                     -webkit-text-fill-color: transparent;
@@ -177,11 +177,11 @@ export default function GigCarousel() {
                 
                 .gig-subtitle {
                     color: rgba(255,255,255,0.4);
-                    font-size: clamp(1.1rem, 1.8vw, 1.4rem);
-                    max-width: 600px;
-                    margin: 16px auto 0;
+                    font-size: clamp(0.8rem, 1.2vw, 1rem);
+                    max-width: 500px;
+                    margin: 8px auto 0;
                     font-weight: 300;
-                    line-height: 1.6;
+                    line-height: 1.5;
                 }
                 
                 /* SLIDER PHYSICS - FORCE LTR */
@@ -239,61 +239,28 @@ export default function GigCarousel() {
 
                 /* ===== MOBILE OPTIMIZATION ===== */
                 @media (max-width: 768px) {
+                    .gig-carousel-section {
+                        padding: 32px 0 48px;
+                    }
+                    
                     .gig-header {
-                        padding: 80px 16px 40px;
+                        margin: 0 auto 24px;
+                        padding: 0 12px;
                     }
                     
                     .gig-eyebrow {
-                        font-size: 8px;
-                        letter-spacing: 0.5em;
-                        margin-bottom: 16px;
+                        font-size: 7px;
+                        margin-bottom: 6px;
                     }
                     
                     .gig-title {
-                        font-size: clamp(2rem, 12vw, 3.5rem);
-                        margin-bottom: 16px;
+                        font-size: clamp(1.2rem, 6vw, 1.8rem);
+                        margin-bottom: 8px;
                     }
                     
                     .gig-subtitle {
-                        font-size: 0.9rem;
+                        font-size: 0.75rem;
                         padding: 0 8px;
-                    }
-                    
-                    .gig-rows {
-                        gap: 24px;
-                    }
-                    
-                    .gig-track {
-                        gap: 16px;
-                        padding: 12px 8px;
-                    }
-                    
-                    .gig-track-left {
-                        animation-duration: 45s;
-                    }
-                    
-                    .gig-track-right {
-                        animation-duration: 50s;
-                    }
-                    
-                    .gig-card-wrap {
-                        width: 260px !important;
-                        height: 300px !important;
-                    }
-                }
-                
-                @media (max-width: 480px) {
-                    .gig-header {
-                        padding: 60px 12px 32px;
-                    }
-                    
-                    .gig-title {
-                        font-size: clamp(1.8rem, 14vw, 2.5rem);
-                    }
-                    
-                    .gig-card-wrap {
-                        width: 220px !important;
-                        height: 260px !important;
                     }
                     
                     .gig-rows {
@@ -302,48 +269,39 @@ export default function GigCarousel() {
                     
                     .gig-track {
                         gap: 12px;
-                    }
-                }
-
-                /* Card content responsive */
-                @media (max-width: 768px) {
-                    .gig-card-content {
-                        padding: 20px !important;
+                        padding: 8px;
                     }
                     
-                    .gig-card-category {
-                        font-size: 8px !important;
-                        margin-bottom: 8px !important;
+                    .gig-track-left {
+                        animation-duration: 35s;
                     }
                     
-                    .gig-card-title {
-                        font-size: 20px !important;
-                        margin-bottom: 10px !important;
+                    .gig-track-right {
+                        animation-duration: 40s;
                     }
                     
-                    .gig-card-cta {
-                        display: none !important;
-                    }
-                    
-                    .gig-card-underline {
-                        margin-bottom: 0 !important;
+                    .gig-card-wrap {
+                        width: 200px !important;
+                        height: 240px !important;
                     }
                 }
                 
                 @media (max-width: 480px) {
-                    .gig-card-content {
-                        padding: 16px !important;
+                    .gig-carousel-section {
+                        padding: 24px 0 32px;
                     }
                     
-                    .gig-card-title {
-                        font-size: 18px !important;
+                    .gig-title {
+                        font-size: clamp(1rem, 5vw, 1.4rem);
                     }
-                }
-                
-                /* Disable 3D on mobile for performance */
-                @media (max-width: 768px) {
-                    .gig-card-inner {
-                        transform: none !important;
+                    
+                    .gig-card-wrap {
+                        width: 160px !important;
+                        height: 200px !important;
+                    }
+                    
+                    .gig-track {
+                        gap: 8px;
                     }
                 }
             `}</style>
