@@ -351,31 +351,32 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 .layer-base {
                     transform: translateZ(10px) scale(0.96);
                     overflow: hidden;
-                    background: #000;
+                    background: #111;
                     box-shadow: 0 40px 80px rgba(0,0,0,0.8);
                 }
                 .monolith-image {
                     object-fit: cover;
-                    opacity: 0.85;
-                    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+                    opacity: 1; /* Fully visible base */
+                    transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), filter 0.8s ease;
+                    filter: saturate(1.2) contrast(1.1);
                 }
                 .monolith-card:hover .monolith-image {
                     transform: scale(1.1);
-                    opacity: 0.6; /* Darken image on hover to make text pop */
                 }
                 .monolith-overlay {
                     position: absolute;
                     inset: 0;
-                    background: linear-gradient(to bottom, rgba(0,0,0,0), rgba(0,0,0,0.8));
+                    background: linear-gradient(to bottom, rgba(0,0,0,0) 40%, rgba(0,0,0,0.9) 100%); /* Clearer top */
                 }
 
                 /* Layer 2: Glass */
                 .layer-glass {
                     transform: translateZ(30px);
-                    background: rgba(10, 10, 12, 0.45); /* Dark Glass */
-                    backdrop-filter: blur(24px) saturate(140%);
-                    -webkit-backdrop-filter: blur(24px) saturate(140%);
-                    border: 1px solid rgba(255,255,255,0.05);
+                    background: rgba(255, 255, 255, 0.03); /* Crystal clear glass */
+                    backdrop-filter: blur(1px); /* Slight texture, not obscuring */
+                    -webkit-backdrop-filter: blur(1px);
+                    border: 1px solid rgba(255,255,255,0.1);
+                    box-shadow: inset 0 0 40px rgba(255,255,255,0.05);
                 }
 
                 /* Gold Border / Bevel */
