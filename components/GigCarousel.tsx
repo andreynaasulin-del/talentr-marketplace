@@ -95,17 +95,14 @@ export default function GigCarousel() {
             <style jsx global>{`
                 .gig-carousel-section {
                     position: relative;
-                    padding: 64px 0 80px;
-                    background: #F5F5F5;
+                    padding: 48px 0 64px;
+                    background: #F7F7F9;
                     width: 100%;
                     max-width: 100vw;
                     overflow: hidden !important;
                 }
                 
-                .gig-bg {
-                    display: none;
-                }
-                
+                .gig-bg,
                 .gig-bg-gradient,
                 .gig-bg-orb-gold,
                 .gig-bg-orb-purple {
@@ -115,36 +112,28 @@ export default function GigCarousel() {
                 .gig-header {
                     position: relative;
                     z-index: 10;
-                    max-width: 1280px;
-                    margin: 0 auto 48px;
-                    padding: 0 24px;
-                    text-align: center;
+                    max-width: 1200px;
+                    margin: 0 auto 32px;
+                    padding: 0 16px;
                 }
                 
                 .gig-eyebrow {
-                    display: inline-block;
-                    text-transform: uppercase;
-                    font-weight: 600;
-                    margin-bottom: 8px;
-                    font-size: 12px;
-                    color: #6B7280;
-                    letter-spacing: 0.1em;
+                    display: none;
                 }
                 
                 .gig-title {
                     font-weight: 700;
-                    letter-spacing: -0.02em;
-                    line-height: 1.1;
-                    margin-bottom: 12px;
-                    font-size: clamp(1.75rem, 4vw, 2.5rem);
-                    color: #111827;
+                    letter-spacing: -0.01em;
+                    line-height: 1.2;
+                    margin-bottom: 8px;
+                    font-size: 24px;
+                    color: #202125;
                 }
                 
                 .gig-subtitle {
-                    color: #6B7280;
-                    font-size: clamp(0.9rem, 1.5vw, 1.1rem);
+                    color: #545454;
+                    font-size: 15px;
                     max-width: 500px;
-                    margin: 0 auto;
                     font-weight: 400;
                     line-height: 1.5;
                 }
@@ -281,31 +270,39 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
         <div
             className="gig-card-wrap group"
             style={{
-                width: '260px',
+                width: '280px',
                 flexShrink: 0,
                 direction: isHebrew ? 'rtl' : 'ltr'
             }}
         >
-            <Link href={`/package/${pkg.id}`} className="block">
-                {/* Image */}
-                <div className="relative aspect-[4/3] rounded-2xl overflow-hidden mb-3 bg-gray-100">
+            <Link href={`/package/${pkg.id}`} className="block bg-white rounded-xl overflow-hidden shadow-sm hover:shadow-md transition-shadow duration-200">
+                {/* Image - 16:9 aspect ratio, top corners rounded only */}
+                <div className="relative aspect-[16/9] bg-[#F7F7F9]">
                     <Image
                         src={pkg.image}
                         alt={pkg.title[lang]}
                         fill
-                        sizes="280px"
-                        className="object-cover transition-transform duration-300 group-hover:scale-[1.03]"
+                        sizes="300px"
+                        className="object-cover"
                     />
                 </div>
 
-                {/* Text */}
-                <div className="px-1">
-                    <p className="text-gray-500 text-xs font-medium mb-1">
-                        {pkg.category}
-                    </p>
-                    <h3 className="text-gray-900 font-semibold text-sm leading-snug">
+                {/* Content - White area */}
+                <div className="p-3">
+                    {/* Title */}
+                    <h3 className="text-[#202125] font-semibold text-[15px] leading-tight mb-1">
                         {pkg.title[lang]}
                     </h3>
+
+                    {/* Category / Description */}
+                    <p className="text-[#545454] text-[13px] mb-2">
+                        {pkg.category}
+                    </p>
+
+                    {/* Badge */}
+                    <span className="inline-flex items-center px-2 py-1 text-[11px] font-medium rounded-full bg-[#E5F3FB] text-[#009DE0]">
+                        {isHebrew ? 'זמין להזמנה' : 'Available'}
+                    </span>
                 </div>
             </Link>
         </div>
