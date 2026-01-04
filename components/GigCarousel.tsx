@@ -155,55 +155,88 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                 onMouseLeave={handleMouseLeave}
                 style={{ rotateX, rotateY, transformStyle: 'preserve-3d' }}
             >
-                <Link href={`/package/${pkg.id}`} className="block w-full h-full" style={{ transformStyle: 'preserve-3d' }}>
+                <Link
+                    href={`/package/${pkg.id}`}
+                    className={cn(
+                        "block w-full h-full",
+                        lang === 'he' ? "text-right" : "text-left"
+                    )}
+                    style={{ transformStyle: 'preserve-3d', direction: lang === 'he' ? 'rtl' : 'ltr' }}
+                >
 
                     {/* LAYER 1: Base Image (Deep inside) */}
-                    <div className="absolute inset-0 rounded-lg overflow-hidden bg-[#111] shadow-[0_40px_80px_rgba(0,0,0,0.8)]" style={{ transform: 'translateZ(10px) scale(0.96)' }}>
+                    <div className="absolute inset-0 rounded-lg overflow-hidden bg-[#111] shadow-[0_45px_100px_rgba(0,0,0,0.9)]" style={{ transform: 'translateZ(10px) scale(0.96)' }}>
                         <Image
                             src={pkg.image}
                             alt={pkg.title[lang]}
                             fill
                             sizes="400px"
-                            className="object-cover opacity-100 transition-all duration-700 group-hover:scale-110 group-hover:opacity-80 saturate-[1.1]"
+                            className="object-cover opacity-100 transition-all duration-1000 group-hover:scale-110 group-hover:opacity-70 saturate-[1.1] contrast-[1.05]"
                         />
-                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/20 to-transparent" />
+                        <div className="absolute inset-0 bg-gradient-to-t from-black via-black/40 to-transparent" />
                     </div>
 
                     {/* LAYER 2: Glass Body (The physical block) */}
-                    <div className="absolute inset-0 rounded-lg bg-white/[0.03] backdrop-blur-[1px] border border-white/10 shadow-[inner_0_0_40px_rgba(255,255,255,0.05)] overflow-hidden" style={{ transform: 'translateZ(30px)' }}>
-                        {/* Gold Bevel (Edge Glow) */}
-                        <div className="absolute inset-0 border-[1.5px] border-transparent rounded-lg opacity-80"
+                    <div className="absolute inset-0 rounded-lg bg-white/[0.04] backdrop-blur-[2px] border border-white/10 shadow-[inner_0_0_50px_rgba(255,255,255,0.05)] overflow-hidden" style={{ transform: 'translateZ(35px)' }}>
+
+                        {/* THE GOLDEN BEVEL (Real Metal Look) */}
+                        <div className="absolute inset-0 border-[2px] border-transparent rounded-lg opacity-90"
                             style={{
-                                background: 'linear-gradient(135deg, #D4AF37 0%, transparent 50%, #D4AF37 100%)',
+                                background: 'linear-gradient(135deg, #D4AF37 0%, #F7E7CE 20%, #B8860B 40%, rgba(212,175,55,0.2) 50%, #D4AF37 70%, #F7E7CE 85%, #B8860B 100%)',
                                 WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                                 WebkitMaskComposite: 'xor',
                                 maskComposite: 'exclude'
                             }}
                         />
 
-                        {/* Inner Gold Glow */}
-                        <div className="absolute inset-0 shadow-[inset_0_0_30px_rgba(212,175,55,0.15)] opacity-60 group-hover:opacity-100 group-hover:shadow-[inset_0_0_50px_rgba(212,175,55,0.25)] transition-all duration-500" />
+                        {/* Edge Highlight (Top left) */}
+                        <div className="absolute top-0 left-0 w-full h-full bg-gradient-to-br from-white/20 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-700 pointer-events-none" />
 
-                        {/* Dynamic Glare */}
+                        {/* Inner Gold Ambient Glow */}
+                        <div className="absolute inset-0 shadow-[inset_0_0_40px_rgba(212,175,55,0.2)] opacity-60 group-hover:opacity-100 group-hover:shadow-[inset_0_0_60px_rgba(212,175,55,0.35)] transition-all duration-700" />
+
+                        {/* Dynamic Glare - Sweep light */}
                         <motion.div
-                            className="absolute inset-[-50%] w-[200%] h-[200%] opacity-0 group-hover:opacity-100 transition-opacity duration-300 mix-blend-overlay pointer-events-none"
-                            style={{ background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.3) 0%, transparent 60%)` }}
+                            className="absolute inset-[-100%] w-[300%] h-[300%] opacity-0 group-hover:opacity-100 transition-opacity duration-500 mix-blend-overlay pointer-events-none"
+                            style={{
+                                background: `radial-gradient(circle at ${glareX} ${glareY}, rgba(255,255,255,0.4) 0%, transparent 50%)`
+                            }}
                         />
                     </div>
 
                     {/* LAYER 3: Content (Floating above) */}
-                    <div className="absolute inset-0 flex items-end p-8" style={{ transform: 'translateZ(60px)' }}>
-                        <div className="w-full text-left">
-                            <span className="block text-[9px] uppercase tracking-[0.3em] text-[#D4AF37] font-bold mb-3 drop-shadow-md">
+                    <div className="absolute inset-0 flex items-end p-9" style={{ transform: 'translateZ(75px)' }}>
+                        <div className="w-full">
+                            <span className={cn(
+                                "block uppercase font-black mb-3 drop-shadow-lg",
+                                lang === 'he' ? "text-[11px] tracking-normal" : "text-[9px] tracking-[0.35em]",
+                                "text-[#D4AF37]"
+                            )}>
                                 {pkg.category}
                             </span>
-                            <h3 className="font-serif text-[26px] leading-tight text-[#F7E7CE] mb-5 drop-shadow-[0_4_20px_rgba(0,0,0,1)] filter drop-shadow-[0_0_8px_rgba(212,175,55,0.2)]">
+                            <h3 className={cn(
+                                "font-serif leading-[1.1] text-[#F7E7CE] mb-6 drop-shadow-[0_8px_30px_rgba(0,0,0,1)]",
+                                lang === 'he' ? "text-3xl font-bold" : "text-2xl font-normal"
+                            )}
+                                style={{ filter: 'drop-shadow(0 0 12px rgba(212, 175, 55, 0.25))' }}
+                            >
                                 {pkg.title[lang]}
                             </h3>
-                            <div className="w-10 h-[1px] bg-[#D4AF37]/60 group-hover:w-full group-hover:bg-[#D4AF37] transition-all duration-500 mb-5" />
-                            <div className="flex items-center gap-2 text-white text-[11px] uppercase tracking-[0.15em] opacity-0 translate-y-2 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-500">
-                                <span>{lang === 'he' ? 'צפה' : 'View'}</span>
-                                <ArrowUpRight className="w-4 h-4" />
+
+                            {/* Animated Underline */}
+                            <div className={cn(
+                                "h-[1.5px] bg-[#D4AF37] transition-all duration-700 ease-out",
+                                lang === 'he' ? "origin-right" : "origin-left",
+                                "w-10 group-hover:w-full opacity-60 group-hover:opacity-100 mb-6"
+                            )} />
+
+                            {/* Action Button */}
+                            <div className={cn(
+                                "flex items-center gap-2 text-white text-[11px] uppercase font-bold tracking-[0.2em] opacity-0 translate-y-3 group-hover:opacity-100 group-hover:translate-y-0 transition-all duration-700",
+                                lang === 'he' && "flex-row-reverse"
+                            )}>
+                                <span>{lang === 'he' ? 'צפה בפרטים' : 'View Details'}</span>
+                                <ArrowUpRight className={cn("w-4 h-4", lang === 'he' && "rotate-[-90deg]")} />
                             </div>
                         </div>
                     </div>
