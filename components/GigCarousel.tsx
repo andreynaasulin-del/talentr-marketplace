@@ -207,8 +207,8 @@ export default function GigCarousel() {
                 
                 .gig-track {
                     display: flex;
-                    gap: 40px;
-                    padding: 20px 0;
+                    gap: 32px;
+                    padding: 20px 16px;
                     flex-shrink: 0;
                     width: max-content;
                     will-change: transform;
