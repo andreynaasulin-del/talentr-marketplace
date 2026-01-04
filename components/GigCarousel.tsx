@@ -298,7 +298,7 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                     <div style={{
                         position: 'absolute',
                         inset: 0,
-                        borderRadius: '20px',
+                        borderRadius: '24px',
                         overflow: 'hidden',
                         background: 'linear-gradient(145deg, #0a0a0a 0%, #1a1a1a 100%)',
                         boxShadow: '0 50px 100px rgba(0,0,0,0.9), 0 20px 40px rgba(0,0,0,0.8), inset 0 1px 0 rgba(255,255,255,0.05)',
@@ -358,12 +358,12 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                             position: 'absolute',
                             inset: 0,
                             borderRadius: '18px',
-                            padding: '2px',
+                            padding: '3px',
                             background: 'linear-gradient(145deg, #D4AF37 0%, #F7E7CE 20%, #B8860B 40%, #D4AF37 60%, #F7E7CE 80%, #B8860B 100%)',
                             WebkitMask: 'linear-gradient(#fff 0 0) content-box, linear-gradient(#fff 0 0)',
                             WebkitMaskComposite: 'xor',
                             maskComposite: 'exclude',
-                            boxShadow: '0 0 20px rgba(212,175,55,0.3), inset 0 0 10px rgba(212,175,55,0.2)',
+                            boxShadow: '0 0 30px rgba(212,175,55,0.5), 0 0 60px rgba(212,175,55,0.2), inset 0 0 15px rgba(212,175,55,0.3)',
                         }} />
 
                         {/* Top highlight - simulates light hitting the bevel */}
@@ -476,11 +476,11 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
                         </div>
                     </div>
 
-                    {/* LAYER 6: Corner accents */}
-                    <div style={{ position: 'absolute', top: '12px', left: '12px', width: '20px', height: '20px', borderTop: '2px solid rgba(212,175,55,0.4)', borderLeft: '2px solid rgba(212,175,55,0.4)', borderRadius: '4px 0 0 0', transform: 'translateZ(70px)', opacity: 0.6 }} />
-                    <div style={{ position: 'absolute', top: '12px', right: '12px', width: '20px', height: '20px', borderTop: '2px solid rgba(212,175,55,0.4)', borderRight: '2px solid rgba(212,175,55,0.4)', borderRadius: '0 4px 0 0', transform: 'translateZ(70px)', opacity: 0.6 }} />
-                    <div style={{ position: 'absolute', bottom: '12px', left: '12px', width: '20px', height: '20px', borderBottom: '2px solid rgba(212,175,55,0.4)', borderLeft: '2px solid rgba(212,175,55,0.4)', borderRadius: '0 0 0 4px', transform: 'translateZ(70px)', opacity: 0.6 }} />
-                    <div style={{ position: 'absolute', bottom: '12px', right: '12px', width: '20px', height: '20px', borderBottom: '2px solid rgba(212,175,55,0.4)', borderRight: '2px solid rgba(212,175,55,0.4)', borderRadius: '0 0 4px 0', transform: 'translateZ(70px)', opacity: 0.6 }} />
+                    {/* LAYER 6: Corner accents - BIGGER & BRIGHTER */}
+                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', top: '8px', left: '8px', width: '35px', height: '35px', borderTop: '3px solid #D4AF37', borderLeft: '3px solid #D4AF37', borderRadius: '8px 0 0 0', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
+                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', top: '8px', right: '8px', width: '35px', height: '35px', borderTop: '3px solid #D4AF37', borderRight: '3px solid #D4AF37', borderRadius: '0 8px 0 0', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
+                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', bottom: '8px', left: '8px', width: '35px', height: '35px', borderBottom: '3px solid #D4AF37', borderLeft: '3px solid #D4AF37', borderRadius: '0 0 0 8px', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
+                    <div className="transition-all duration-300 group-hover:opacity-100 group-hover:scale-110" style={{ position: 'absolute', bottom: '8px', right: '8px', width: '35px', height: '35px', borderBottom: '3px solid #D4AF37', borderRight: '3px solid #D4AF37', borderRadius: '0 0 8px 0', transform: 'translateZ(70px)', opacity: 0.7, filter: 'drop-shadow(0 0 6px rgba(212,175,55,0.5))' }} />
 
                 </Link>
             </motion.div>
