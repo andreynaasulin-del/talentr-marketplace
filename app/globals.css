@@ -169,6 +169,41 @@ textarea {
     display: none;
   }
 
+  /* Custom Luxury Scrollbar */
+  .scrollbar-luxury {
+    scrollbar-width: thin;
+    scrollbar-color: rgba(0, 157, 224, 0.3) transparent;
+  }
+
+  .scrollbar-luxury::-webkit-scrollbar {
+    width: 6px;
+    height: 6px;
+  }
+
+  .scrollbar-luxury::-webkit-scrollbar-track {
+    background: rgba(255, 255, 255, 0.05);
+    border-radius: 3px;
+  }
+
+  .scrollbar-luxury::-webkit-scrollbar-thumb {
+    background: linear-gradient(180deg, var(--brand-accent), var(--brand-secondary));
+    border-radius: 3px;
+  }
+
+  .scrollbar-luxury::-webkit-scrollbar-thumb:hover {
+    background: linear-gradient(180deg, var(--brand-light), var(--brand-primary));
+  }
+
+  /* Focus Ring Luxury - Accessible Custom Focus */
+  .focus-ring-luxury:focus,
+  .focus-ring-luxury:focus-visible {
+    outline: none;
+    box-shadow: 
+      0 0 0 2px var(--background),
+      0 0 0 4px var(--brand-primary),
+      0 0 20px rgba(0, 157, 224, 0.3);
+  }
+
   /* Glassmorphism */
   .glass {
     background: rgba(255, 255, 255, 0.7);

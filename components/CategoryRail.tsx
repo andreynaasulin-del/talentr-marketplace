@@ -167,18 +167,22 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
 
                 {/* Navigation arrows */}
                 <div className="hidden md:flex gap-2">
-                    <button
+                    <motion.button
                         onClick={() => scroll('left')}
-                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-cyan-50 dark:hover:bg-slate-700 flex items-center justify-center transition-all border border-transparent hover:border-cyan-200 dark:hover:border-cyan-500/30"
+                        whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)' }}
+                        whileTap={{ scale: 0.95 }}
                     >
                         <ChevronLeft className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    </button>
-                    <button
+                    </motion.button>
+                    <motion.button
                         onClick={() => scroll('right')}
-                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-gray-200 dark:hover:bg-slate-700 flex items-center justify-center transition-colors"
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-cyan-50 dark:hover:bg-slate-700 flex items-center justify-center transition-all border border-transparent hover:border-cyan-200 dark:hover:border-cyan-500/30"
+                        whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)' }}
+                        whileTap={{ scale: 0.95 }}
                     >
                         <ChevronRight className="w-5 h-5 text-gray-600 dark:text-gray-300" />
-                    </button>
+                    </motion.button>
                 </div>
             </div>
 

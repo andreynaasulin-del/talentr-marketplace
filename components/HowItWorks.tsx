@@ -82,7 +82,7 @@ export default function HowItWorks() {
                     >
                         {lang === 'he' ? 'פשוט כמו 1-2-3' : 'Easy as 1-2-3'}
                     </motion.span>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold text-gray-900 dark:text-white mb-4">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight text-gray-900 dark:text-white mb-4">
                         {t.title}
                     </h2>
                     <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto text-lg">
@@ -102,15 +102,22 @@ export default function HowItWorks() {
                                 whileInView={{ opacity: 1, y: 0 }}
                                 viewport={{ once: true }}
                                 transition={{ delay: index * 0.15 }}
+                                whileHover={{
+                                    y: -8,
+                                    rotateX: 5,
+                                    rotateY: -5,
+                                }}
+                                style={{ perspective: 1000, transformStyle: 'preserve-3d' }}
                             >
                                 {/* Card */}
                                 <div className={cn(
-                                    "relative bg-white dark:bg-slate-800/50 rounded-3xl p-8 md:p-10",
+                                    "relative bg-white/80 dark:bg-slate-800/50 rounded-3xl p-8 md:p-10",
                                     "border border-gray-100 dark:border-slate-700/50",
                                     "shadow-lg shadow-gray-200/50 dark:shadow-none",
+                                    "backdrop-blur-sm",
                                     "transition-all duration-500",
-                                    "hover:shadow-xl hover:shadow-gray-200/70 dark:hover:shadow-lg dark:hover:shadow-black/20",
-                                    "hover:-translate-y-2"
+                                    "group-hover:shadow-xl group-hover:shadow-gray-200/70 dark:group-hover:shadow-lg dark:group-hover:shadow-cyan-500/10",
+                                    "group-hover:border-cyan-200 dark:group-hover:border-cyan-500/20"
                                 )}>
                                     {/* Glow effect on hover */}
                                     <div className={cn(
