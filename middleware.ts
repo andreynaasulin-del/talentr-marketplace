@@ -26,10 +26,19 @@ export async function middleware(request: NextRequest) {
         },
     });
 
+    // Check if Supabase is configured
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    // If Supabase is not configured, skip auth checks
+    if (!supabaseUrl || !supabaseAnonKey) {
+        return response;
+    }
+
     // Create Supabase client for server-side
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 getAll() {
