@@ -1,12 +1,15 @@
-'use server';
-
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { supabase } from '@/lib/supabase';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialize OpenAI client
+const getOpenAI = () => {
+    const apiKey = process.env.OPENAI_API_KEY;
+    if (!apiKey) {
+        throw new Error('OPENAI_API_KEY not configured');
+    }
+    return new OpenAI({ apiKey });
+};
 
 export async function POST(request: NextRequest) {
     try {
@@ -29,6 +32,7 @@ Respond ONLY with a JSON object, nothing else. Example:
 
 If something is not mentioned, use null for that field.`;
 
+        const openai = getOpenAI();
         const completion = await openai.chat.completions.create({
             model: 'gpt-4o',  // Premium model for better understanding
             messages: [
