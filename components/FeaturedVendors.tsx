@@ -12,7 +12,7 @@ import Link from 'next/link';
 
 // Skeleton loader for cards
 const VendorCardSkeleton = () => (
-    <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden border border-gray-100 dark:border-slate-700 animate-pulse">
+    <div className="bg-white dark:bg-slate-800 rounded-2xl overflow-hidden shadow-sm animate-pulse">
         <div className="aspect-[4/3] bg-gray-100 dark:bg-slate-700" />
         <div className="p-4 space-y-3">
             <div className="h-4 bg-gray-100 dark:bg-slate-700 rounded w-3/4" />

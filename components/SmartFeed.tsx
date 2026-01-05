@@ -208,63 +208,40 @@ export default function SmartFeed({ initialMessage }: SmartFeedProps) {
                     {/* Background Glow */}
                     <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[500px] h-[500px] bg-blue-500/5 rounded-full blur-[100px] pointer-events-none" />
 
-                    {/* AI Avatar/Logo - Premium Polish */}
-                    <div className="relative mb-8 group cursor-default">
-                        <div className="w-24 h-24 rounded-[32px] bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-xl shadow-blue-500/20 group-hover:scale-110 transition-transform duration-500 rotate-3 group-hover:rotate-6">
-                            <Sparkles className="w-12 h-12 text-white animate-pulse" />
+                    {/* AI Avatar/Logo - Clean */}
+                    <div className="relative mb-6">
+                        <div className="w-20 h-20 rounded-2xl bg-gradient-to-tr from-blue-600 to-purple-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                            <Sparkles className="w-10 h-10 text-white" />
                         </div>
-                        {/* Status Ring */}
-                        <div className="absolute -bottom-2 -right-2 w-8 h-8 bg-white rounded-full p-1 shadow-lg">
-                            <div className="w-full h-full bg-green-500 rounded-full animate-pulse border-2 border-green-200" />
-                        </div>
-                        {/* Floating Particles */}
-                        <div className="absolute -top-4 -left-4 w-4 h-4 bg-amber-400 rounded-full blur-sm opacity-60 animate-float" />
-                        <div className="absolute top-1/2 -right-6 w-3 h-3 bg-blue-400 rounded-full blur-sm opacity-60 animate-float" style={{ animationDelay: '1s' }} />
                     </div>
 
                     {/* Welcome Text */}
                     <div className="text-center max-w-lg mb-12">
-                        <h2 className="text-4xl font-bold text-gray-900 mb-4 tracking-tight">
+                        <h2 className="text-3xl font-bold text-gray-900 mb-3 tracking-tight">
                             {language === 'he' ? 'היי! אני Talentr AI' : "Hey! I'm Talentr AI"}
                         </h2>
-                        <p className="text-xl text-gray-500 leading-relaxed font-medium">
+                        <p className="text-lg text-gray-500 leading-relaxed">
                             {language === 'he'
                                 ? 'ספר לי על האירוע שלך - אמצא את המקצוענים המושלמים תוך שניות.'
                                 : "Describe your event — I'll find the perfect professionals in seconds."}
                         </p>
                     </div>
 
-                    {/* Category Cards Grid - Wolt Style Premium */}
+                    {/* Category Cards Grid - Clean Minimalist */}
                     <div className="w-full max-w-3xl">
                         <div className="grid grid-cols-2 md:grid-cols-3 gap-4">
                             {categoryCards.map((category) => (
                                 <button
                                     key={category.id}
                                     onClick={() => handleCategoryClick(category)}
-                                    className="group relative aspect-[3/2] md:aspect-square rounded-[24px] overflow-hidden bg-white shadow-card hover:shadow-card-hover transition-all duration-500"
+                                    className="group flex flex-col items-center justify-center aspect-[4/3] bg-white rounded-2xl shadow-sm hover:shadow-md transition-all duration-300"
                                 >
-                                    {/* Background Image with Zoom */}
-                                    <Image
-                                        src={category.image}
-                                        alt={category.label[language] || category.label.en}
-                                        fill
-                                        sizes="(max-width: 768px) 50vw, 200px"
-                                        className="object-cover opacity-90 group-hover:opacity-100 group-hover:scale-110 transition-transform duration-700 ease-out"
-                                    />
-                                    {/* Premium Gradient Overlay */}
-                                    <div className="absolute inset-0 bg-gradient-to-t from-black/90 via-black/30 to-transparent" />
-
-                                    {/* Content Overlay */}
-                                    <div className="absolute inset-x-0 bottom-0 p-5 flex flex-col items-center">
-                                        <div className={`w-12 h-12 ${category.color} rounded-2xl flex items-center justify-center mb-3 shadow-lg transform group-hover:-translate-y-2 transition-transform duration-500 border-2 border-white/20`}>
-                                            <category.icon className="w-6 h-6 text-white" />
-                                        </div>
-                                        <span className="text-white text-base font-bold text-center tracking-wide">
-                                            {category.label[language] || category.label.en}
-                                        </span>
+                                    <div className={`w-12 h-12 ${category.color} rounded-xl flex items-center justify-center mb-3 shadow-sm group-hover:scale-110 transition-transform duration-300`}>
+                                        <category.icon className="w-6 h-6 text-white" />
                                     </div>
-                                    {/* Hover Shine Effect */}
-                                    <div className="absolute inset-0 bg-white/0 group-hover:bg-white/5 transition-colors duration-500" />
+                                    <span className="text-gray-900 font-medium text-sm text-center">
+                                        {category.label[language] || category.label.en}
+                                    </span>
                                 </button>
                             ))}
                         </div>

@@ -21,37 +21,10 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
     const [imageLoaded, setImageLoaded] = useState(false);
     const cardRef = useRef<HTMLDivElement>(null);
 
+    // Simplified hover animation state
     const isLiked = isFavorite(vendor.id);
     const isVerified = vendor.reviewsCount > 100;
     const isPremium = vendor.rating >= 4.8 && vendor.reviewsCount > 50;
-
-    // 3D Tilt effect
-    const x = useMotionValue(0);
-    const y = useMotionValue(0);
-
-    const mouseXSpring = useSpring(x, { stiffness: 300, damping: 30 });
-    const mouseYSpring = useSpring(y, { stiffness: 300, damping: 30 });
-
-    const rotateX = useTransform(mouseYSpring, [-0.5, 0.5], ["8deg", "-8deg"]);
-    const rotateY = useTransform(mouseXSpring, [-0.5, 0.5], ["-8deg", "8deg"]);
-
-    // Shine effect position
-    const shineX = useTransform(mouseXSpring, [-0.5, 0.5], ["0%", "100%"]);
-    const shineY = useTransform(mouseYSpring, [-0.5, 0.5], ["0%", "100%"]);
-
-    const handleMouseMove = (e: MouseEvent<HTMLDivElement>) => {
-        if (!cardRef.current) return;
-        const rect = cardRef.current.getBoundingClientRect();
-        const centerX = rect.left + rect.width / 2;
-        const centerY = rect.top + rect.height / 2;
-        x.set((e.clientX - centerX) / rect.width);
-        y.set((e.clientY - centerY) / rect.height);
-    };
-
-    const handleMouseLeave = () => {
-        x.set(0);
-        y.set(0);
-    };
 
     return (
         <motion.div
@@ -68,39 +41,20 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
             <Link href={`/vendor/${vendor.id}`} className="block group">
                 <motion.div
                     ref={cardRef}
-                    onMouseMove={handleMouseMove}
-                    onMouseLeave={handleMouseLeave}
-                    style={{
-                        rotateX,
-                        rotateY,
-                        transformStyle: "preserve-3d",
-                    }}
                     whileTap={{ scale: 0.98 }}
+                    whileHover={{ y: -4 }}
+                    transition={{ type: "spring", stiffness: 300, damping: 30 }}
                     className="relative"
                 >
-                    <motion.article
+                    <article
                         className={cn(
-                            "relative overflow-hidden rounded-3xl",
-                            "bg-white dark:bg-slate-800/90",
-                            "border border-gray-100/50 dark:border-slate-700/50",
-                            "shadow-xl shadow-gray-200/50 dark:shadow-slate-900/50",
-                            "backdrop-blur-sm",
-                            "transition-shadow duration-500",
-                            "group-hover:shadow-2xl group-hover:shadow-blue-500/10"
+                            "relative overflow-hidden rounded-2xl",
+                            "bg-white dark:bg-slate-800",
+                            "border-0",
+                            "shadow-sm hover:shadow-lg hover:shadow-gray-200/50 dark:shadow-slate-900/50",
+                            "transition-all duration-300"
                         )}
                     >
-                        {/* Shine Overlay */}
-                        <motion.div
-                            className="absolute inset-0 z-10 pointer-events-none opacity-0 group-hover:opacity-100 transition-opacity duration-500"
-                            style={{
-                                background: `radial-gradient(circle at ${shineX} ${shineY}, rgba(255,255,255,0.15) 0%, transparent 50%)`,
-                            }}
-                        />
-
-                        {/* Gradient Border Effect */}
-                        <div className="absolute inset-0 rounded-3xl opacity-0 group-hover:opacity-100 transition-opacity duration-500 pointer-events-none">
-                            <div className="absolute inset-[-1px] rounded-3xl bg-gradient-to-br from-blue-400/20 via-purple-400/20 to-pink-400/20" />
-                        </div>
 
                         {/* Image Container */}
                         <div className="relative aspect-[4/3] overflow-hidden bg-gradient-to-br from-gray-100 to-gray-200 dark:from-slate-700 dark:to-slate-800">
@@ -256,7 +210,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                                 </div>
                             </div>
                         </div>
-                    </motion.article>
+                    </article>
                 </motion.div>
             </Link>
         </motion.div>
