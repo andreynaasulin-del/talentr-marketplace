@@ -190,7 +190,7 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
                 direction: isHebrew ? 'rtl' : 'ltr'
             }}
         >
-            <div className="block overflow-hidden rounded-2xl bg-white shadow-sm">
+            <div className="block overflow-hidden rounded-2xl bg-[#F7F7F9] shadow-sm">
                 {/* IMAGE */}
                 <div className="h-48 relative overflow-hidden">
                     <Image
