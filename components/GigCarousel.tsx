@@ -1,12 +1,11 @@
 'use client';
 
 import { useLanguage } from '@/context/LanguageContext';
-import { motion, useMotionValue, useSpring, useTransform } from 'framer-motion';
+import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { packages, Package } from '@/lib/gigs';
-import { ArrowUpRight } from 'lucide-react';
 import Link from 'next/link';
-import { useRef, MouseEvent } from 'react';
+import { memo } from 'react';
 
 export default function GigCarousel() {
     const { language } = useLanguage();
@@ -26,79 +25,204 @@ export default function GigCarousel() {
     const t = content[lang];
 
     // Show all packages
-    const allPackages = packages;
+    const filtered = packages;
+    const mid = Math.ceil(filtered.length / 2);
+    const topRow = filtered.slice(0, mid);
+    const bottomRow = filtered.slice(mid);
 
     return (
-        <section className="py-12 md:py-16 bg-white border-b border-gray-100">
-            <div className="container-wolt">
-                {/* Header */}
-                <div className="mb-8 md:mb-12" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <h2 className="text-2xl md:text-3xl font-bold text-[#202125] mb-2">{t.title}</h2>
-                        <p className="text-[#545454] text-base md:text-lg max-w-2xl">{t.subtitle}</p>
-                    </motion.div>
+        <section className="gig-carousel-section">
+            {/* Header */}
+            <div className="gig-header" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                <motion.div
+                    initial={{ opacity: 0, y: 30 }}
+                    whileInView={{ opacity: 1, y: 0 }}
+                    viewport={{ once: true }}
+                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                >
+                    <span className="gig-eyebrow">Exclusive</span>
+                    <h2 className="gig-title">{t.title}</h2>
+                    <p className="gig-subtitle">{t.subtitle}</p>
+                </motion.div>
+            </div>
+
+            {/* Carousel Rows */}
+            <div className="gig-rows" dir="ltr">
+                {/* ROW 1 */}
+                <div className="gig-row">
+                    <div className="gig-track gig-track-left">
+                        {[...topRow, ...topRow].map((pkg, i) => (
+                            <GigCard key={`r1-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        ))}
+                    </div>
+                    {/* Duplicate track for loop */}
+                    <div className="gig-track gig-track-left" aria-hidden="true">
+                        {[...topRow, ...topRow].map((pkg, i) => (
+                            <GigCard key={`r1-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        ))}
+                    </div>
                 </div>
 
-                {/* Grid Layout - No Cut-offs */}
-                <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-6" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                    {allPackages.map((pkg, i) => (
-                        <motion.div
-                            key={pkg.id}
-                            initial={{ opacity: 0, y: 20 }}
-                            whileInView={{ opacity: 1, y: 0 }}
-                            viewport={{ once: true }}
-                            transition={{ delay: i * 0.05, duration: 0.5 }}
-                        >
-                            <GigCard pkg={pkg} lang={lang} />
-                        </motion.div>
-                    ))}
+                {/* ROW 2 */}
+                <div className="gig-row">
+                    <div className="gig-track gig-track-right">
+                        {[...bottomRow, ...bottomRow].map((pkg, i) => (
+                            <GigCard key={`r2-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        ))}
+                    </div>
+                    <div className="gig-track gig-track-right" aria-hidden="true">
+                        {[...bottomRow, ...bottomRow].map((pkg, i) => (
+                            <GigCard key={`r2-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        ))}
+                    </div>
                 </div>
             </div>
+
+            <style jsx global>{`
+                .gig-carousel-section {
+                    position: relative;
+                    padding: 48px 0 64px;
+                    background: #F7F7F9;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                }
+                
+                .gig-header {
+                    position: relative;
+                    z-index: 10;
+                    max-width: 1200px;
+                    margin: 0 auto 32px;
+                    padding: 0 16px;
+                }
+                
+                .gig-eyebrow {
+                    display: none;
+                }
+                
+                .gig-title {
+                    font-weight: 700;
+                    letter-spacing: -0.01em;
+                    line-height: 1.2;
+                    margin-bottom: 8px;
+                    font-size: 24px;
+                    color: #202125;
+                }
+                
+                .gig-subtitle {
+                    color: #545454;
+                    font-size: 15px;
+                    max-width: 500px;
+                    font-weight: 400;
+                    line-height: 1.5;
+                }
+                
+                .gig-rows {
+                    position: relative;
+                    z-index: 10;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 40px;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    direction: ltr !important;
+                }
+                
+                .gig-row {
+                    display: flex;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    white-space: nowrap;
+                }
+                
+                .gig-track {
+                    display: flex;
+                    gap: 32px;
+                    padding: 10px 16px;
+                    flex-shrink: 0;
+                    width: max-content;
+                    will-change: transform;
+                }
+                
+                .gig-track-left {
+                    animation: scroll-left 90s linear infinite;
+                }
+                
+                .gig-track-right {
+                    animation: scroll-right 100s linear infinite;
+                }
+                
+                .gig-row:hover .gig-track {
+                    animation-play-state: paused;
+                }
+                
+                @keyframes scroll-left {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-100%); }
+                }
+                
+                @keyframes scroll-right {
+                    0% { transform: translateX(-100%); }
+                    100% { transform: translateX(0); }
+                }
+
+                @media (max-width: 768px) {
+                    .gig-carousel-section { padding: 32px 0 48px; }
+                    .gig-title { font-size: 1.5rem; }
+                    .gig-rows { gap: 24px; }
+                    .gig-track { gap: 16px; }
+                }
+            `}</style>
         </section>
     );
 }
 
-function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
+// Separate component for performance
+const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
     const isHebrew = lang === 'he';
 
     return (
-        <div className="w-full">
+        <div
+            style={{
+                width: '300px',
+                flexShrink: 0,
+                direction: isHebrew ? 'rtl' : 'ltr'
+            }}
+        >
             <Link
                 href={`/package/${pkg.id}`}
-                className="block overflow-hidden rounded-2xl bg-white shadow-sm transition-all duration-300 hover:-translate-y-1 hover:shadow-lg hover:shadow-gray-200/50"
+                className="block overflow-hidden rounded-2xl bg-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
+            // REMOVED border and shadow-sm classes to fix the 'black frame' issue
+            // Only hover:shadow-xl remains for lift effect
             >
-                {/* IMAGE - Real category image */}
-                <div className="h-48 relative overflow-hidden">
+                {/* IMAGE */}
+                <div className="h-48 relative overflow-hidden bg-gray-50">
                     <Image
                         src={pkg.image}
                         alt={pkg.title[lang]}
                         fill
-                        className="object-cover"
+                        className="object-cover transition-transform duration-700 hover:scale-105"
                         sizes="300px"
-                        priority={false}
                     />
                 </div>
 
-                {/* CONTENT CONTAINER - White, bottom rounded */}
+                {/* CONTENT */}
                 <div className="p-4">
-                    {/* Category - Small, muted */}
+                    {/* Category */}
                     <p className="text-[#999999] text-xs font-medium uppercase tracking-wide mb-1">
                         {pkg.category}
                     </p>
 
-                    {/* Title - Bold, dark, max 2 lines */}
+                    {/* Title */}
                     <h3 className="text-[#202125] font-bold text-base leading-snug line-clamp-2 mb-3">
                         {pkg.title[lang]}
                     </h3>
 
-                    {/* Bottom row - Price/CTA */}
+                    {/* CTA */}
                     <div className="flex items-center justify-between">
-                        <span className="text-[#009DE0] text-sm font-semibold">
+                        <span className="text-[#009DE0] text-sm font-semibold group-hover:underline">
                             {isHebrew ? 'לפרטים נוספים' : 'View Details'}
                         </span>
                         <svg className="w-4 h-4 text-[#009DE0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -109,4 +233,4 @@ function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
             </Link>
         </div>
     );
-}
+});
