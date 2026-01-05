@@ -25,12 +25,8 @@ export default function GigCarousel() {
 
     const t = content[lang];
 
-    // Filter packages
-    const filtered = packages.filter(
-        (p) =>
-            !['Bartender', 'Sommelier'].includes(p.category) &&
-            !/whisky|whiskey|cocktail|бар|алко/i.test(p.title.en + ' ' + (p.title.he || ''))
-    );
+    // Show all packages (no filtering needed)
+    const filtered = packages;
 
     // Split rows
     const mid = Math.ceil(filtered.length / 2);
