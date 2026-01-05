@@ -4,9 +4,16 @@ import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { supabase } from '@/lib/supabase';
 
-const openai = new OpenAI({
-    apiKey: process.env.OPENAI_API_KEY,
-});
+// Lazy initialization to avoid build-time errors
+let openai: OpenAI | null = null;
+function getOpenAI() {
+    if (!openai && process.env.OPENAI_API_KEY) {
+        openai = new OpenAI({
+            apiKey: process.env.OPENAI_API_KEY,
+        });
+    }
+    return openai;
+}
 
 export async function POST(request: NextRequest) {
     try {
@@ -17,6 +24,11 @@ export async function POST(request: NextRequest) {
         }
         if (!supabase) {
             return NextResponse.json({ error: 'Service unavailable' }, { status: 503 });
+        }
+
+        const openaiClient = getOpenAI();
+        if (!openaiClient) {
+            return NextResponse.json({ error: 'AI search is not configured' }, { status: 503 });
         }
 
         // Step 1: Use AI to understand the search intent
@@ -32,7 +44,7 @@ Respond ONLY with a JSON object, nothing else. Example:
 
 If something is not mentioned, use null for that field.`;
 
-        const completion = await openai.chat.completions.create({
+        const completion = await openaiClient.chat.completions.create({
             model: 'gpt-4o',  // Premium model for better understanding
             messages: [
                 { role: 'system', content: systemPrompt },
@@ -84,7 +96,7 @@ If something is not mentioned, use null for that field.`;
                 ? `На основе запроса "${query}", напиши короткое предложение (до 20 слов) объясняющее что мы нашли. Без кавычек.`
                 : `Based on the request "${query}", write a short sentence (max 20 words) explaining what we found. No quotes.`;
 
-        const summaryCompletion = await openai.chat.completions.create({
+        const summaryCompletion = await openaiClient.chat.completions.create({
             model: 'gpt-4o',  // Premium model for better summaries
             messages: [
                 { role: 'system', content: 'You help summarize search results in a friendly, concise way.' },
