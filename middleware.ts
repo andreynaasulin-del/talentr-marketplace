@@ -4,9 +4,6 @@ import { NextResponse, type NextRequest } from 'next/server';
 // Protected routes that require authentication
 const protectedRoutes = ['/bookings', '/profile', '/vendor/dashboard'];
 
-// Public routes that don't need auth
-const publicRoutes = ['/signin', '/signup', '/test-admin', '/'];
-
 export async function middleware(request: NextRequest) {
     const { pathname } = request.nextUrl;
 
@@ -19,6 +16,15 @@ export async function middleware(request: NextRequest) {
         return NextResponse.next();
     }
 
+    // Check if Supabase env vars are available
+    const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
+    const supabaseAnonKey = process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY;
+
+    // If no Supabase config, just pass through
+    if (!supabaseUrl || !supabaseAnonKey) {
+        return NextResponse.next();
+    }
+
     // Create response to modify cookies
     let response = NextResponse.next({
         request: {
@@ -28,8 +34,8 @@ export async function middleware(request: NextRequest) {
 
     // Create Supabase client for server-side
     const supabase = createServerClient(
-        process.env.NEXT_PUBLIC_SUPABASE_URL!,
-        process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY!,
+        supabaseUrl,
+        supabaseAnonKey,
         {
             cookies: {
                 getAll() {
@@ -50,7 +56,6 @@ export async function middleware(request: NextRequest) {
 
     const isAuthenticated = !!session;
     const isProtectedRoute = protectedRoutes.some(route => pathname.startsWith(route));
-    const isPublicRoute = publicRoutes.includes(pathname);
 
     // Redirect unauthenticated users from protected routes
     if (isProtectedRoute && !isAuthenticated) {
