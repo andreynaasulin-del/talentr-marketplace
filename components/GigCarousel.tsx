@@ -230,6 +230,18 @@ export default function GigCarousel() {
                     filter: saturate(1.2) contrast(1.1);
                 }
 
+                /* Empty placeholder */
+                .cube-placeholder {
+                    position: absolute;
+                    inset: 0;
+                    background: linear-gradient(
+                        135deg,
+                        rgba(30, 40, 60, 1) 0%,
+                        rgba(20, 25, 40, 1) 50%,
+                        rgba(15, 20, 35, 1) 100%
+                    );
+                }
+
                 /* Premium overlay - deeper gradient */
                 .cube-overlay {
                     position: absolute;
@@ -470,14 +482,18 @@ function CubeCard({ pkg, lang, index }: { pkg: Package; lang: 'en' | 'he', index
     return (
         <div className="cube-card-wrapper" style={{ '--levitate-duration': `${levDuration}s` } as React.CSSProperties}>
             <Link href={`/package/${pkg.id}`} className="cube-card">
-                {/* Image layer */}
+                {/* Image layer or empty placeholder */}
                 <div className="cube-image">
-                    <Image
-                        src={pkg.image}
-                        alt={pkg.title[lang]}
-                        fill
-                        sizes="300px"
-                    />
+                    {pkg.image ? (
+                        <Image
+                            src={pkg.image}
+                            alt={pkg.title[lang]}
+                            fill
+                            sizes="300px"
+                        />
+                    ) : (
+                        <div className="cube-placeholder" />
+                    )}
                 </div>
 
                 {/* Glass reflection on top */}
