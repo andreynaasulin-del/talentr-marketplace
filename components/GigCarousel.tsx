@@ -4,7 +4,6 @@ import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import { packages, Package } from '@/lib/gigs';
-import Link from 'next/link';
 import { memo } from 'react';
 
 export default function GigCarousel() {
@@ -191,19 +190,14 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
                 direction: isHebrew ? 'rtl' : 'ltr'
             }}
         >
-            <Link
-                href={`/package/${pkg.id}`}
-                className="block overflow-hidden rounded-2xl bg-white hover:shadow-xl transition-all duration-300 transform hover:-translate-y-1"
-            // REMOVED border and shadow-sm classes to fix the 'black frame' issue
-            // Only hover:shadow-xl remains for lift effect
-            >
+            <div className="block overflow-hidden rounded-2xl bg-white shadow-sm">
                 {/* IMAGE */}
-                <div className="h-48 relative overflow-hidden bg-gray-50">
+                <div className="h-48 relative overflow-hidden">
                     <Image
                         src={pkg.image}
                         alt={pkg.title[lang]}
                         fill
-                        className="object-cover transition-transform duration-700 hover:scale-105"
+                        className="object-cover"
                         sizes="300px"
                     />
                 </div>
@@ -216,21 +210,11 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-[#202125] font-bold text-base leading-snug line-clamp-2 mb-3">
+                    <h3 className="text-[#202125] font-bold text-base leading-snug line-clamp-2">
                         {pkg.title[lang]}
                     </h3>
-
-                    {/* CTA */}
-                    <div className="flex items-center justify-between">
-                        <span className="text-[#009DE0] text-sm font-semibold group-hover:underline">
-                            {isHebrew ? 'לפרטים נוספים' : 'View Details'}
-                        </span>
-                        <svg className="w-4 h-4 text-[#009DE0]" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                            <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M9 5l7 7-7 7" />
-                        </svg>
-                    </div>
                 </div>
-            </Link>
+            </div>
         </div>
     );
 });
