@@ -115,49 +115,84 @@ export default function DashboardPage() {
     }
 
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-gray-50">
             <Navbar />
 
-            <div className="max-w-6xl mx-auto px-4 sm:px-6 py-8 sm:py-12" dir={isRTL ? 'rtl' : 'ltr'}>
+            <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12" dir={isRTL ? 'rtl' : 'ltr'}>
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8 sm:mb-12 pb-6 border-b border-gray-200">
-                    <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t.dashboard}</h1>
-                    <div className="flex items-center gap-2 sm:gap-4">
-                        <Link
-                            href="/dashboard/settings"
-                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                            <Settings className="w-5 h-5" />
-                        </Link>
-                        <button
-                            onClick={handleLogout}
-                            className="p-2 text-gray-600 hover:text-gray-900 hover:bg-gray-100 rounded-lg transition-colors"
-                        >
-                            <LogOut className="w-5 h-5" />
-                        </button>
+                <div className="mb-8 sm:mb-10">
+                    <div className="flex items-center justify-between mb-2">
+                        <div>
+                            <h1 className="text-2xl sm:text-3xl font-bold text-gray-900">{t.dashboard}</h1>
+                            <p className="text-sm text-gray-600 mt-1">
+                                {user?.email || ''}
+                            </p>
+                        </div>
+                        <div className="flex items-center gap-2">
+                            <Link
+                                href="/dashboard/settings"
+                                className="p-2.5 text-gray-600 hover:text-gray-900 hover:bg-white rounded-lg transition-colors border border-gray-200"
+                                title={t.settings}
+                            >
+                                <Settings className="w-5 h-5" />
+                            </Link>
+                            <button
+                                onClick={handleLogout}
+                                className="p-2.5 text-gray-600 hover:text-red-600 hover:bg-white rounded-lg transition-colors border border-gray-200"
+                                title={t.logout}
+                            >
+                                <LogOut className="w-5 h-5" />
+                            </button>
+                        </div>
                     </div>
                 </div>
 
                 {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 sm:gap-6 mb-8 sm:mb-12">
-                    <div className="p-6 border border-gray-200 rounded-xl">
-                        <p className="text-sm text-gray-600 mb-1">{t.pending}</p>
-                        <p className="text-3xl font-bold text-gray-900">
+                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                    <div className="p-6 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t.pending}</p>
+                        <p className="text-3xl font-bold text-amber-600">
                             {bookings.filter(b => b.status === 'pending').length}
                         </p>
                     </div>
-                    <div className="p-6 border border-gray-200 rounded-xl">
-                        <p className="text-sm text-gray-600 mb-1">{t.confirmed}</p>
-                        <p className="text-3xl font-bold text-gray-900">
+                    <div className="p-6 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t.confirmed}</p>
+                        <p className="text-3xl font-bold text-green-600">
                             {bookings.filter(b => b.status === 'confirmed').length}
                         </p>
                     </div>
-                    <div className="p-6 border border-gray-200 rounded-xl">
-                        <p className="text-sm text-gray-600 mb-1">{t.completed}</p>
-                        <p className="text-3xl font-bold text-gray-900">
+                    <div className="p-6 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-shadow">
+                        <p className="text-xs font-medium text-gray-500 uppercase tracking-wide mb-2">{t.completed}</p>
+                        <p className="text-3xl font-bold text-blue-600">
                             {bookings.filter(b => b.status === 'completed').length}
                         </p>
                     </div>
+                </div>
+
+                {/* Quick Actions */}
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
+                    <Link
+                        href="/dashboard/settings"
+                        className="p-6 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all group"
+                    >
+                        <Settings className="w-8 h-8 text-gray-400 group-hover:text-gray-600 mb-3 transition-colors" />
+                        <h3 className="font-semibold text-gray-900 mb-1">{t.settings}</h3>
+                        <p className="text-sm text-gray-600">
+                            {lang === 'he' ? 'עדכן את הפרופיל שלך' : 'Update your profile'}
+                        </p>
+                    </Link>
+                    <Link
+                        href="/"
+                        className="p-6 bg-white border border-gray-200 rounded-xl hover:border-gray-300 hover:shadow-sm transition-all group"
+                    >
+                        <Calendar className="w-8 h-8 text-gray-400 group-hover:text-gray-600 mb-3 transition-colors" />
+                        <h3 className="font-semibold text-gray-900 mb-1">
+                            {lang === 'he' ? 'חזור לדף הבית' : 'Back to Home'}
+                        </h3>
+                        <p className="text-sm text-gray-600">
+                            {lang === 'he' ? 'גלה עוד שירותים' : 'Discover more services'}
+                        </p>
+                    </Link>
                 </div>
 
                 {/* Bookings List */}
@@ -165,30 +200,34 @@ export default function DashboardPage() {
                     <h2 className="text-xl font-bold text-gray-900 mb-6">{t.bookings}</h2>
 
                     {bookings.length === 0 ? (
-                        <div className="text-center py-12 border border-gray-200 rounded-xl">
-                            <Calendar className="w-12 h-12 text-gray-400 mx-auto mb-4" />
-                            <p className="text-gray-600">{t.noBookings}</p>
+                        <div className="text-center py-16 bg-white border border-gray-200 rounded-xl">
+                            <Calendar className="w-16 h-16 text-gray-300 mx-auto mb-4" />
+                            <p className="text-gray-600 font-medium mb-2">{t.noBookings}</p>
+                            <p className="text-sm text-gray-500">
+                                {lang === 'he' ? 'ההזמנות שלך יופיעו כאן' : 'Your bookings will appear here'}
+                            </p>
                         </div>
                     ) : (
                         <div className="space-y-3">
                             {bookings.map((booking) => (
                                 <div
                                     key={booking.id}
-                                    className="p-4 sm:p-6 border border-gray-200 rounded-xl hover:border-gray-300 transition-colors"
+                                    className="p-5 bg-white border border-gray-200 rounded-xl hover:shadow-sm transition-all"
                                 >
-                                    <div className="flex items-start justify-between gap-4">
+                                    <div className="flex items-center justify-between gap-4">
                                         <div className="flex-1 min-w-0">
-                                            <p className="text-sm font-medium text-gray-900 mb-1 truncate">
+                                            <p className="font-semibold text-gray-900 mb-1 truncate">
                                                 {booking.event_type}
                                             </p>
-                                            <p className="text-sm text-gray-600">
+                                            <p className="text-sm text-gray-600 flex items-center gap-2">
+                                                <Calendar className="w-4 h-4" />
                                                 {new Date(booking.event_date).toLocaleDateString(
                                                     lang === 'he' ? 'he-IL' : 'en-US',
                                                     { day: 'numeric', month: 'long', year: 'numeric' }
                                                 )}
                                             </p>
                                         </div>
-                                        <span className={`px-3 py-1 text-xs font-medium rounded-full flex-shrink-0 ${getStatusColor(booking.status)}`}>
+                                        <span className={`px-3 py-1.5 text-xs font-semibold rounded-full flex-shrink-0 ${getStatusColor(booking.status)}`}>
                                             {t[booking.status as keyof typeof t] || booking.status}
                                         </span>
                                     </div>
