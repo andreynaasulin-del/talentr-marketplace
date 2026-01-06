@@ -158,7 +158,6 @@ export default function HeroSection() {
 
             setChatMessages(prev => [...prev, aiMessage]);
         } catch (error) {
-            console.error('Chat error:', error);
             setChatMessages(prev => [...prev, {
                 id: (Date.now() + 1).toString(),
                 role: 'assistant',

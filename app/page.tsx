@@ -18,7 +18,7 @@ export default function Home() {
                 if (!supabase) return;
                 await supabase.auth.getUser();
             } catch (error) {
-                console.error('Auth check failed:', error);
+                // Auth check failed silently
             } finally {
                 setIsLoading(false);
             }

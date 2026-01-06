@@ -111,7 +111,6 @@ async function findVendors(
         if (results.length === 0 && city) results = await filterVendors({ city });
         return results.slice(0, limit);
     } catch (error) {
-        console.error('Error finding vendors:', error);
         return [];
     }
 }
@@ -239,7 +238,6 @@ async function generateAIResponse(
 
         return completion.choices[0]?.message?.content || generateFallbackResponse(pkgs, language);
     } catch (error) {
-        console.error('OpenAI API error:', error);
         return generateFallbackResponse(pkgs, language);
     }
 }
@@ -310,7 +308,6 @@ export async function POST(request: NextRequest) {
             suggestions: suggestions.slice(0, 3),
         });
     } catch (error) {
-        console.error('Chat API error:', error);
         return NextResponse.json({ 
             error: 'Internal error',
             response: "Something went wrong. Please try again.",
