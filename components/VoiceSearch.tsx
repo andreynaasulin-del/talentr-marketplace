@@ -75,10 +75,7 @@ export default function VoiceSearch({ onTranscript, className }: VoiceSearchProp
             };
 
             recognition.onerror = (event: SpeechRecognitionErrorEvent) => {
-                // 'aborted' is not an error - it happens when user stops listening
-                if (event.error !== 'aborted') {
-                    console.error('Speech recognition error:', event.error);
-                }
+                // Silently handle errors - 'aborted' is normal when user stops
                 setIsListening(false);
             };
 

@@ -34,7 +34,7 @@ export default function FeaturedVendors() {
                 const data = await getFeaturedVendors(4);
                 setFeaturedVendors(data);
             } catch (error) {
-                console.error('Error fetching featured vendors:', error);
+                setFeaturedVendors([]);
             } finally {
                 setLoading(false);
             }

@@ -27,7 +27,7 @@ export default function VendorGrid({ category = 'All' }: VendorGridProps) {
                     : await getVendorsByCategory(category as VendorCategory);
                 setVendors(data);
             } catch (error) {
-                console.error('Error fetching vendors:', error);
+                setVendors([]);
             } finally {
                 setLoading(false);
             }

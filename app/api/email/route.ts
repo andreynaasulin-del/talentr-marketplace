@@ -215,11 +215,9 @@ export async function POST(request: NextRequest) {
             });
 
             if (error) {
-                console.error('Resend error:', error);
                 return NextResponse.json({
                     success: false,
-                    error: 'Failed to send email',
-                    details: error.message
+                    error: 'Failed to send email'
                 }, { status: 500 });
             }
 
@@ -231,13 +229,7 @@ export async function POST(request: NextRequest) {
             });
         }
 
-        // Fallback: Log email for development (no RESEND_API_KEY)
-        console.log('📧 Email would be sent:', {
-            to: data.to,
-            subject: emailTemplate.subject,
-            template
-        });
-
+        // Fallback: Development mode (no RESEND_API_KEY)
         return NextResponse.json({
             success: true,
             message: 'Email queued (dev mode - no RESEND_API_KEY)',
@@ -245,7 +237,6 @@ export async function POST(request: NextRequest) {
         });
 
     } catch (error) {
-        console.error('Email API error:', error);
         return NextResponse.json({ error: 'Failed to send email' }, { status: 500 });
     }
 }

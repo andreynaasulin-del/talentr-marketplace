@@ -85,7 +85,6 @@ If something is not mentioned, use null for that field.`;
         const { data: vendors, error } = await vendorQuery;
 
         if (error) {
-            console.error('Supabase error:', error);
             return NextResponse.json({ error: 'Failed to fetch vendors' }, { status: 500 });
         }
 
@@ -118,9 +117,8 @@ If something is not mentioned, use null for that field.`;
         });
 
     } catch (error: any) {
-        console.error('AI Search error:', error);
         return NextResponse.json(
-            { error: error.message || 'AI search failed' },
+            { error: error?.message || 'AI search failed' },
             { status: 500 }
         );
     }
