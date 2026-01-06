@@ -343,21 +343,21 @@ export default function HeroSection() {
             <div className="absolute inset-0 bg-black/30 pointer-events-none" />
 
             {/* === CONTENT === */}
-            <div className="relative z-10 max-w-5xl mx-auto px-4 md:px-8 pt-32 md:pt-40 pb-20">
+            <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pt-24 sm:pt-32 md:pt-40 pb-16 sm:pb-20">
 
                 {/* Main Headline with Typewriter */}
-                <div className="text-center mb-16 md:mb-20">
+                <div className="text-center mb-12 sm:mb-16 md:mb-20">
 
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl font-black text-white leading-[1.2] tracking-tight mb-6">
-                        <span className="block mb-2">{t.staticStart}</span>
+                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.2] tracking-tight mb-4 sm:mb-6 px-2">
+                        <span className="block mb-1 sm:mb-2">{t.staticStart}</span>
                         <span className="block text-white/90 min-h-[1.2em]">
                             {displayText}
-                            <span className="inline-block w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
+                            <span className="inline-block w-[2px] sm:w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
                         </span>
                     </h1>
 
                     <motion.p
-                        className="text-2xl sm:text-3xl md:text-4xl font-black text-amber-400 mb-6"
+                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-amber-400 mb-4 sm:mb-6 px-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -366,7 +366,7 @@ export default function HeroSection() {
                     </motion.p>
 
                     <motion.p
-                        className="text-lg md:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed"
+                        className="text-sm sm:text-base md:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed px-4"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
@@ -379,17 +379,18 @@ export default function HeroSection() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.5 }}
+                        className="px-4"
                     >
                         <button
                             onClick={() => setIsChatOpen(true)}
-                            className="group flex items-center gap-4 w-full max-w-xl mx-auto mt-10 px-6 py-4 bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
+                            className="group flex items-center gap-3 sm:gap-4 w-full max-w-xl mx-auto mt-8 sm:mt-10 px-4 sm:px-6 py-3 sm:py-4 bg-white/95 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
                         >
-                            <MessageCircle className="w-6 h-6 text-[#009de0]/50 group-hover:text-[#009de0] transition-colors" />
-                            <span className="flex-1 text-[#009de0]/50 text-lg text-start">
+                            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#009de0]/50 group-hover:text-[#009de0] transition-colors flex-shrink-0" />
+                            <span className="flex-1 text-[#009de0]/50 text-sm sm:text-base md:text-lg text-start">
                                 {t.chat}
                             </span>
-                            <div className="w-10 h-10 bg-gradient-to-br from-[#009de0] to-[#0077b6] rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg">
-                                <Sparkles className="w-5 h-5 text-white" />
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#009de0] to-[#0077b6] rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
+                                <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                             </div>
                         </button>
                     </motion.div>
@@ -397,21 +398,21 @@ export default function HeroSection() {
 
                 {/* For Masters Block */}
                 <motion.div
-                    className="relative group"
+                    className="relative group px-4"
                     initial={{ opacity: 0, y: 30 }}
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                 >
-                    <div className="p-8 md:p-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-3xl text-center shadow-2xl">
-                        <h3 className="text-sm font-bold text-white uppercase tracking-[0.2em] mb-4">
+                    <div className="p-6 sm:p-8 md:p-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl sm:rounded-3xl text-center shadow-2xl">
+                        <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-3 sm:mb-4">
                             {t.forMasters}
                         </h3>
-                        <p className="text-white/80 text-lg md:text-xl max-w-xl mx-auto leading-relaxed mb-6">
+                        <p className="text-white/80 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto leading-relaxed mb-5 sm:mb-6">
                             {t.forMastersDesc}
                         </p>
                         <a
                             href="/join"
-                            className="inline-block px-8 py-4 bg-white text-[#009de0] font-bold rounded-xl hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
+                            className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-white text-[#009de0] text-sm sm:text-base font-bold rounded-lg sm:rounded-xl hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
                         >
                             {t.forMastersCta}
                         </a>

@@ -86,7 +86,7 @@ export default function GigCarousel() {
                     max-width: 100vw;
                     overflow: hidden !important;
                 }
-                
+
                 .gig-header {
                     position: relative;
                     z-index: 10;
@@ -94,11 +94,11 @@ export default function GigCarousel() {
                     margin: 0 auto 32px;
                     padding: 0 16px;
                 }
-                
+
                 .gig-eyebrow {
                     display: none;
                 }
-                
+
                 .gig-title {
                     font-weight: 700;
                     letter-spacing: -0.01em;
@@ -107,7 +107,7 @@ export default function GigCarousel() {
                     font-size: 24px;
                     color: #202125;
                 }
-                
+
                 .gig-subtitle {
                     color: #545454;
                     font-size: 15px;
@@ -115,7 +115,7 @@ export default function GigCarousel() {
                     font-weight: 400;
                     line-height: 1.5;
                 }
-                
+
                 .gig-rows {
                     position: relative;
                     z-index: 10;
@@ -127,7 +127,7 @@ export default function GigCarousel() {
                     overflow: hidden !important;
                     direction: ltr !important;
                 }
-                
+
                 .gig-row {
                     display: flex;
                     width: 100%;
@@ -135,43 +135,66 @@ export default function GigCarousel() {
                     overflow: hidden !important;
                     white-space: nowrap;
                 }
-                
+
                 .gig-track {
                     display: flex;
-                    gap: 32px;
+                    gap: 20px;
                     padding: 10px 16px;
                     flex-shrink: 0;
                     width: max-content;
                     will-change: transform;
                 }
-                
+
                 .gig-track-left {
                     animation: scroll-left 90s linear infinite;
                 }
-                
+
                 .gig-track-right {
                     animation: scroll-right 100s linear infinite;
                 }
-                
+
                 .gig-row:hover .gig-track {
                     animation-play-state: paused;
                 }
-                
+
                 @keyframes scroll-left {
                     0% { transform: translateX(0); }
                     100% { transform: translateX(-100%); }
                 }
-                
+
                 @keyframes scroll-right {
                     0% { transform: translateX(-100%); }
                     100% { transform: translateX(0); }
                 }
 
                 @media (max-width: 768px) {
-                    .gig-carousel-section { padding: 32px 0 48px; }
-                    .gig-title { font-size: 1.5rem; }
-                    .gig-rows { gap: 24px; }
-                    .gig-track { gap: 16px; }
+                    .gig-carousel-section {
+                        padding: 24px 0 32px;
+                    }
+                    .gig-header {
+                        margin-bottom: 20px;
+                        padding: 0 12px;
+                    }
+                    .gig-title {
+                        font-size: 20px;
+                        margin-bottom: 4px;
+                    }
+                    .gig-subtitle {
+                        font-size: 13px;
+                    }
+                    .gig-rows {
+                        gap: 16px;
+                    }
+                    .gig-track {
+                        gap: 12px;
+                        padding: 8px 12px;
+                    }
+                    .gig-track-left {
+                        animation: scroll-left 60s linear infinite;
+                    }
+                    .gig-track-right {
+                        animation: scroll-right 65s linear infinite;
+                    }
                 }
             `}</style>
         </section>
@@ -184,37 +207,53 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
 
     return (
         <div
+            className="gig-card-wrapper"
             style={{
-                width: '300px',
-                flexShrink: 0,
                 direction: isHebrew ? 'rtl' : 'ltr'
             }}
         >
-            <div className="block overflow-hidden rounded-2xl bg-[#E8E8ED] shadow-sm">
+            <div className="block overflow-hidden rounded-xl sm:rounded-2xl bg-[#E8E8ED] shadow-sm">
                 {/* IMAGE */}
-                <div className="h-48 relative overflow-hidden">
+                <div className="gig-card-image relative overflow-hidden">
                     <Image
                         src={pkg.image}
                         alt={pkg.title[lang]}
                         fill
                         className="object-cover"
-                        sizes="300px"
+                        sizes="(max-width: 640px) 240px, 300px"
                     />
                 </div>
 
                 {/* CONTENT */}
-                <div className="p-4">
+                <div className="p-3 sm:p-4">
                     {/* Category */}
-                    <p className="text-[#999999] text-xs font-medium uppercase tracking-wide mb-1">
+                    <p className="text-[#999999] text-[10px] sm:text-xs font-medium uppercase tracking-wide mb-1">
                         {pkg.category}
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-[#202125] font-bold text-base leading-snug line-clamp-2">
+                    <h3 className="text-[#202125] font-bold text-sm sm:text-base leading-snug line-clamp-2">
                         {pkg.title[lang]}
                     </h3>
                 </div>
             </div>
+            <style jsx>{`
+                .gig-card-wrapper {
+                    width: 300px;
+                    flex-shrink: 0;
+                }
+                .gig-card-image {
+                    height: 192px;
+                }
+                @media (max-width: 640px) {
+                    .gig-card-wrapper {
+                        width: 240px;
+                    }
+                    .gig-card-image {
+                        height: 160px;
+                    }
+                }
+            `}</style>
         </div>
     );
 });
