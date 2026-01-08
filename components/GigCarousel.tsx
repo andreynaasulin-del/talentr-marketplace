@@ -146,11 +146,11 @@ export default function GigCarousel() {
                 }
 
                 .gig-track-left {
-                    animation: scroll-left 90s linear infinite;
+                    animation: scroll-left 150s linear infinite;
                 }
 
                 .gig-track-right {
-                    animation: scroll-right 100s linear infinite;
+                    animation: scroll-right 160s linear infinite;
                 }
 
                 .gig-row:hover .gig-track {
@@ -190,10 +190,10 @@ export default function GigCarousel() {
                         padding: 8px 12px;
                     }
                     .gig-track-left {
-                        animation: scroll-left 60s linear infinite;
+                        animation: scroll-left 100s linear infinite;
                     }
                     .gig-track-right {
-                        animation: scroll-right 65s linear infinite;
+                        animation: scroll-right 105s linear infinite;
                     }
                 }
             `}</style>
@@ -239,18 +239,18 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
             </div>
             <style jsx>{`
                 .gig-card-wrapper {
-                    width: 300px;
+                    width: 240px;
                     flex-shrink: 0;
                 }
                 .gig-card-image {
-                    height: 192px;
+                    height: 140px;
                 }
                 @media (max-width: 640px) {
                     .gig-card-wrapper {
-                        width: 240px;
+                        width: 200px;
                     }
                     .gig-card-image {
-                        height: 160px;
+                        height: 120px;
                     }
                 }
             `}</style>

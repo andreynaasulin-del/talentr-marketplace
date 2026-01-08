@@ -382,6 +382,7 @@ export default function HeroSection() {
                         className="px-4"
                     >
                         <button
+                            data-chat-trigger
                             onClick={() => setIsChatOpen(true)}
                             className="group flex items-center gap-3 sm:gap-4 w-full max-w-xl mx-auto mt-8 sm:mt-10 px-4 sm:px-6 py-3 sm:py-4 bg-white/95 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
                         >

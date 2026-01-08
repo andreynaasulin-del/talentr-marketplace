@@ -102,18 +102,25 @@ export default function Navbar() {
                         {/* Secondary CTA */}
                         <Link
                             href="/join"
-                            className="hidden md:block px-4 py-2 text-sm font-semibold text-[#009DE0] hover:bg-[#E5F3FB] rounded-lg transition-colors"
+                            className="hidden md:block px-4 py-2 text-sm font-semibold text-gray-700 hover:bg-gray-100 rounded-lg transition-colors"
                         >
                             {t.becomeVendor}
                         </Link>
 
                         {/* Primary CTA */}
-                        <Link
-                            href={isHome ? "#packages" : "/#packages"}
-                            className="px-5 py-2.5 bg-[#009DE0] hover:bg-[#0088C6] text-white text-sm font-semibold rounded-lg transition-colors"
+                        <button
+                            onClick={() => {
+                                if (isHome) {
+                                    const chatButton = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
+                                    chatButton?.click();
+                                } else {
+                                    window.location.href = '/';
+                                }
+                            }}
+                            className="px-5 py-2.5 bg-gray-900 hover:bg-gray-800 text-white text-sm font-semibold rounded-lg transition-colors"
                         >
                             {t.findTalent}
-                        </Link>
+                        </button>
                     </div>
                 </div>
             </div>
