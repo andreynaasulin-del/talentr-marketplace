@@ -15,6 +15,8 @@ type Step = 0 | 1 | 2 | 3 | 4 | 5;
 export default function JoinPage() {
     const { language, setLanguage } = useLanguage();
     const [showLangDropdown, setShowLangDropdown] = useState(false);
+    const [showCountryDropdown, setShowCountryDropdown] = useState(false);
+    const [countryCode, setCountryCode] = useState('+972');
     const [currentStep, setCurrentStep] = useState<Step>(0);
     const [loading, setLoading] = useState(false);
     const [error, setError] = useState('');
@@ -24,7 +26,15 @@ export default function JoinPage() {
         { code: 'he' as const, label: 'עב', flag: '🇮🇱' },
     ];
 
+    const countryCodes = [
+        { code: '+972', label: 'Israel', flag: '🇮🇱' },
+        { code: '+1', label: 'USA', flag: '🇺🇸' },
+        { code: '+44', label: 'UK', flag: '🇬🇧' },
+        { code: '+971', label: 'UAE', flag: '🇦🇪' },
+    ];
+
     const currentLang = languages.find((l) => l.code === language) || languages[0];
+    const currentCountry = countryCodes.find((c) => c.code === countryCode) || countryCodes[0];
 
     const [formData, setFormData] = useState({
         fullName: '',
@@ -187,7 +197,7 @@ export default function JoinPage() {
                 email: formData.email,
                 category: formData.category,
                 city: formData.city,
-                phone: formData.phone.startsWith('972') ? formData.phone : `972${formData.phone.replace(/^0/, '')}`,
+                phone: `${countryCode.replace('+', '')}${formData.phone.replace(/^0/, '')}`,
                 image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
                 price_from: 1000,
                 description: '',
@@ -199,7 +209,6 @@ export default function JoinPage() {
 
         } catch (err: unknown) {
             const errorMessage = err instanceof Error ? err.message : 'Error';
-            console.error('Registration error:', err);
             setError(errorMessage);
             setLoading(false);
         }
@@ -341,17 +350,65 @@ export default function JoinPage() {
                     )}
 
                     {currentStep === 5 && (
-                        <div className="relative">
-                            <Phone className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                            <span className="absolute start-12 top-1/2 -translate-y-1/2 text-gray-500 font-medium">+972</span>
-                            <input
-                                type="tel"
-                                value={formData.phone}
-                                onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                placeholder={t.phonePlaceholder}
-                                className="w-full h-14 ps-24 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] transition-all text-lg"
-                                autoFocus
-                            />
+                        <div className="relative flex gap-2">
+                            {/* Country Code Dropdown */}
+                            <div className="relative">
+                                <button
+                                    type="button"
+                                    onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                                    className="h-14 px-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl flex items-center gap-2 hover:border-gray-300 transition-all"
+                                >
+                                    <span className="text-lg">{currentCountry.flag}</span>
+                                    <span className="font-medium text-gray-900 dark:text-white">{currentCountry.code}</span>
+                                    <ChevronDown className="w-4 h-4 text-gray-400" />
+                                </button>
+
+                                <AnimatePresence>
+                                    {showCountryDropdown && (
+                                        <>
+                                            <div className="fixed inset-0 z-40" onClick={() => setShowCountryDropdown(false)} />
+                                            <motion.div
+                                                initial={{ opacity: 0, y: -10 }}
+                                                animate={{ opacity: 1, y: 0 }}
+                                                exit={{ opacity: 0, y: -10 }}
+                                                className="absolute start-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg py-1 z-50 border-2 border-gray-200 dark:border-slate-600"
+                                            >
+                                                {countryCodes.map((country) => (
+                                                    <button
+                                                        key={country.code}
+                                                        type="button"
+                                                        onClick={() => {
+                                                            setCountryCode(country.code);
+                                                            setShowCountryDropdown(false);
+                                                        }}
+                                                        className={cn(
+                                                            "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors",
+                                                            countryCode === country.code ? 'bg-[#009de0]/10 text-[#009de0]' : 'text-gray-700 dark:text-gray-300'
+                                                        )}
+                                                    >
+                                                        <span className="text-lg">{country.flag}</span>
+                                                        <span className="font-medium">{country.code}</span>
+                                                        <span className="text-sm opacity-60">{country.label}</span>
+                                                    </button>
+                                                ))}
+                                            </motion.div>
+                                        </>
+                                    )}
+                                </AnimatePresence>
+                            </div>
+
+                            {/* Phone Input */}
+                            <div className="relative flex-1">
+                                <Phone className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                <input
+                                    type="tel"
+                                    value={formData.phone}
+                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                    placeholder={t.phonePlaceholder}
+                                    className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] transition-all text-lg"
+                                    autoFocus
+                                />
+                            </div>
                         </div>
                     )}
 
@@ -457,20 +514,20 @@ export default function JoinPage() {
                         />
                     </div>
                     {/* Step indicators */}
-                    <div className="flex justify-between mt-3">
+                    <div className="flex justify-between mt-4">
                         {[0, 1, 2, 3, 4, 5].map((step) => (
                             <div
                                 key={step}
                                 className={cn(
-                                    "w-7 h-7 rounded-full flex items-center justify-center text-xs font-bold transition-all",
+                                    "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-lg",
                                     step < currentStep
                                         ? "bg-green-500 text-white"
                                         : step === currentStep
-                                            ? "bg-white text-[#009de0]"
+                                            ? "bg-white text-[#009de0] scale-110"
                                             : "bg-white/20 text-white/50"
                                 )}
                             >
-                                {step < currentStep ? <Check className="w-3 h-3" /> : step + 1}
+                                {step < currentStep ? <Check className="w-4 h-4" /> : step + 1}
                             </div>
                         ))}
                     </div>

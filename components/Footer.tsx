@@ -3,7 +3,6 @@
 import Link from 'next/link';
 import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
-import { motion } from 'framer-motion';
 
 export default function Footer() {
     const { language } = useLanguage();
@@ -31,11 +30,6 @@ export default function Footer() {
 
     const t = content[lang];
 
-    const linkVariants = {
-        initial: { x: 0 },
-        hover: { x: 4 },
-    };
-
     return (
         <footer className="relative bg-slate-950 border-t border-white/5 overflow-hidden">
             {/* Noise texture overlay */}
@@ -49,67 +43,41 @@ export default function Footer() {
             {/* Subtle glow */}
             <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
 
-            <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-12 md:py-16">
-                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-8">
+            <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
+                <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
                     {/* Logo & Tagline */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6 }}
-                    >
-                        <div className="mb-3">
-                            <Logo size="lg" />
-                        </div>
-                        <p className="text-white/40 text-sm max-w-xs font-medium">
+                    <div className="flex items-center gap-4">
+                        <Logo size="md" />
+                        <p className="text-white/40 text-xs font-medium">
                             {t.tagline}
                         </p>
-                    </motion.div>
+                    </div>
 
-                    {/* Links - Bigger hit areas */}
-                    <motion.div
-                        className="flex flex-wrap gap-2 md:gap-4"
-                        initial={{ opacity: 0, y: 20 }}
-                        whileInView={{ opacity: 1, y: 0 }}
-                        viewport={{ once: true }}
-                        transition={{ duration: 0.6, delay: 0.1 }}
-                    >
+                    {/* Links - Compact */}
+                    <div className="flex flex-wrap gap-1">
                         {[
                             { href: '#packages', label: t.findTalent },
                             { href: '/join', label: t.forVendors },
                             { href: '/terms', label: t.terms },
                             { href: '/privacy', label: t.privacy },
-                        ].map((link, i) => (
-                            <motion.div
+                        ].map((link) => (
+                            <Link
                                 key={link.href}
-                                variants={linkVariants}
-                                initial="initial"
-                                whileHover="hover"
-                                transition={{ type: 'spring', stiffness: 400, damping: 20 }}
+                                href={link.href}
+                                className="px-3 py-2 text-xs font-medium text-white/60 hover:text-cyan-400 transition-colors rounded-lg hover:bg-white/5"
                             >
-                                <Link
-                                    href={link.href}
-                                    className="block px-4 py-2.5 text-sm font-medium text-white/60 hover:text-cyan-400 transition-colors rounded-xl hover:bg-white/5"
-                                >
-                                    {link.label}
-                                </Link>
-                            </motion.div>
+                                {link.label}
+                            </Link>
                         ))}
-                    </motion.div>
+                    </div>
                 </div>
 
                 {/* Copyright */}
-                <motion.div
-                    className="mt-12 pt-8 border-t border-white/5"
-                    initial={{ opacity: 0 }}
-                    whileInView={{ opacity: 1 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 0.6, delay: 0.2 }}
-                >
-                    <p className="text-white/30 text-xs font-medium tracking-wide">
+                <div className="mt-4 pt-4 border-t border-white/5">
+                    <p className="text-white/30 text-xs font-medium">
                         © {currentYear} Talentr. {t.rights}
                     </p>
-                </motion.div>
+                </div>
             </div>
         </footer>
     );
