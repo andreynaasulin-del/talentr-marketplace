@@ -6,6 +6,7 @@ import { useRouter } from 'next/navigation';
 import Link from 'next/link';
 import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import Logo from '@/components/Logo';
 
 export default function SignInPage() {
     const router = useRouter();
@@ -70,8 +71,8 @@ export default function SignInPage() {
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
                 <div className="w-full max-w-md">
                     {/* Logo/Brand */}
-                    <Link href="/" className="block text-center mb-8">
-                        <h1 className="text-4xl font-black text-white">talentr</h1>
+                    <Link href="/" className="flex justify-center mb-8">
+                        <Logo size="lg" />
                     </Link>
 
                     {/* Sign In Card */}
