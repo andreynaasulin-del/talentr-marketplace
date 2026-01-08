@@ -87,7 +87,7 @@ export default function Navbar() {
                                                     setLanguage(l.code);
                                                     setShowLangDropdown(false);
                                                 }}
-                                                className={`w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-[#F7F7F9] transition-colors ${language === l.code ? 'text-amber-600 font-semibold' : 'text-[#545454]'
+                                                className={`w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-[#F7F7F9] transition-colors ${language === l.code ? 'text-#0052CC font-semibold' : 'text-[#545454]'
                                                     }`}
                                             >
                                                 <span>{l.flag}</span>
@@ -117,7 +117,7 @@ export default function Navbar() {
                                     window.location.href = '/';
                                 }
                             }}
-                            className="px-5 py-2.5 bg-amber-500 hover:bg-amber-600 text-black text-sm font-semibold rounded-lg transition-all shadow-lg hover:shadow-amber-500/50"
+                            className="px-5 py-2.5 bg-#0066FF hover:bg-#0052CC text-black text-sm font-semibold rounded-lg transition-all shadow-lg hover:shadow-#0066FF/50"
                         >
                             {t.findTalent}
                         </button>
