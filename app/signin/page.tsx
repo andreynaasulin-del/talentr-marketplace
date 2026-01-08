@@ -64,27 +64,7 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen relative overflow-hidden">
-            {/* Same gradient background as homepage */}
-            <div className="absolute inset-0">
-                <div
-                    className="absolute inset-0 opacity-100"
-                    style={{
-                        background: `
-                            radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
-                            radial-gradient(at 97% 21%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
-                            radial-gradient(at 52% 99%, hsla(196, 100%, 57%, 1) 0px, transparent 50%),
-                            radial-gradient(at 10% 29%, hsla(195, 100%, 39%, 1) 0px, transparent 50%),
-                            radial-gradient(at 97% 96%, hsla(195, 84%, 45%, 1) 0px, transparent 50%),
-                            radial-gradient(at 33% 50%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
-                            radial-gradient(at 79% 53%, hsla(196, 100%, 48%, 1) 0px, transparent 50%)
-                        `,
-                    }}
-                />
-            </div>
-
-            {/* Dark overlay for text readability */}
-            <div className="absolute inset-0 bg-black/30" />
+        <div className="min-h-screen relative overflow-hidden bg-zinc-950">
 
             {/* Content */}
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
@@ -119,7 +99,7 @@ export default function SignInPage() {
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009de0] focus:border-transparent transition-all"
+                                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                         placeholder="you@example.com"
                                         required
                                     />
@@ -137,7 +117,7 @@ export default function SignInPage() {
                                         type={showPassword ? 'text' : 'password'}
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-[#009de0] focus:border-transparent transition-all"
+                                        className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-amber-500 focus:border-transparent transition-all"
                                         placeholder="••••••••"
                                         required
                                     />
@@ -153,7 +133,7 @@ export default function SignInPage() {
 
                             {/* Forgot Password */}
                             <div className="text-right">
-                                <Link href="/forgot-password" className="text-sm text-[#009de0] hover:underline">
+                                <Link href="/forgot-password" className="text-sm text-amber-500 hover:underline">
                                     {t.forgotPassword}
                                 </Link>
                             </div>
@@ -162,7 +142,7 @@ export default function SignInPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 bg-[#009de0] text-white font-bold rounded-lg hover:bg-[#0088cc] disabled:opacity-50 disabled:cursor-not-allowed transition-colors"
+                                className="w-full py-3 bg-amber-500 text-black font-bold rounded-lg hover:bg-amber-600 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-amber-500/50"
                             >
                                 {loading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
@@ -175,7 +155,7 @@ export default function SignInPage() {
                         {/* Sign Up Link */}
                         <div className="mt-6 text-center text-sm text-gray-600">
                             {t.noAccount}{' '}
-                            <Link href="/signup" className="text-[#009de0] font-semibold hover:underline">
+                            <Link href="/signup" className="text-amber-500 font-semibold hover:underline">
                                 {t.signUp}
                             </Link>
                         </div>
