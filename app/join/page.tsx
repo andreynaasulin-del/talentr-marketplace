@@ -246,7 +246,7 @@ export default function JoinPage() {
                                 value={formData.fullName}
                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                 placeholder={t.namePlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-amber-500 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -260,7 +260,7 @@ export default function JoinPage() {
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder={t.emailPlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-amber-500 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -274,7 +274,7 @@ export default function JoinPage() {
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 placeholder={t.passwordPlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-amber-500 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -289,7 +289,7 @@ export default function JoinPage() {
                                     className={cn(
                                         "relative flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
                                         formData.category === cat.id
-                                            ? "border-[#009de0] bg-[#009de0]/10"
+                                            ? "border-amber-500 bg-amber-500/10"
                                             : "border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-gray-300"
                                     )}
                                 >
@@ -297,7 +297,7 @@ export default function JoinPage() {
                                     <span className={cn(
                                         "text-xs font-medium text-center",
                                         formData.category === cat.id
-                                            ? "text-[#009de0]"
+                                            ? "text-amber-500"
                                             : "text-gray-600 dark:text-gray-300"
                                     )}>
                                         {cat.label[language] || cat.label.en}
@@ -306,7 +306,7 @@ export default function JoinPage() {
                                         <motion.div
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            className="absolute -top-1 -end-1 w-5 h-5 bg-[#009de0] rounded-full flex items-center justify-center"
+                                            className="absolute -top-1 -end-1 w-5 h-5 bg-amber-500 rounded-full flex items-center justify-center"
                                         >
                                             <Check className="w-3 h-3 text-white" />
                                         </motion.div>
@@ -325,24 +325,24 @@ export default function JoinPage() {
                                     className={cn(
                                         "flex items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         formData.city === city.id
-                                            ? "border-[#009de0] bg-[#009de0]/10"
+                                            ? "border-amber-500 bg-amber-500/10"
                                             : "border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-gray-300"
                                     )}
                                 >
                                     <MapPin className={cn(
                                         "w-4 h-4",
-                                        formData.city === city.id ? "text-[#009de0]" : "text-gray-400"
+                                        formData.city === city.id ? "text-amber-500" : "text-gray-400"
                                     )} />
                                     <span className={cn(
                                         "font-medium text-sm",
                                         formData.city === city.id
-                                            ? "text-[#009de0]"
+                                            ? "text-amber-500"
                                             : "text-gray-700 dark:text-gray-300"
                                     )}>
                                         {city.label[language] || city.label.en}
                                     </span>
                                     {formData.city === city.id && (
-                                        <Check className="w-4 h-4 text-[#009de0] ms-auto" />
+                                        <Check className="w-4 h-4 text-amber-500 ms-auto" />
                                     )}
                                 </button>
                             ))}
@@ -383,7 +383,7 @@ export default function JoinPage() {
                                                         }}
                                                         className={cn(
                                                             "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors",
-                                                            countryCode === country.code ? 'bg-[#009de0]/10 text-[#009de0]' : 'text-gray-700 dark:text-gray-300'
+                                                            countryCode === country.code ? 'bg-amber-500/10 text-amber-500' : 'text-gray-700 dark:text-gray-300'
                                                         )}
                                                     >
                                                         <span className="text-lg">{country.flag}</span>
@@ -405,7 +405,7 @@ export default function JoinPage() {
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                     placeholder={t.phonePlaceholder}
-                                    className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] transition-all text-lg"
+                                    className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-amber-500 transition-all text-lg"
                                     autoFocus
                                 />
                             </div>
@@ -457,7 +457,7 @@ export default function JoinPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex flex-col bg-[#009de0] dark:bg-slate-900">
+            <div className="w-full lg:w-1/2 flex flex-col bg-gradient-to-br from-zinc-900 via-neutral-900 to-stone-900 dark:bg-slate-900">
                 {/* Header */}
                 <div className="flex items-center justify-end p-4">
                     {/* Language Switcher */}
@@ -489,7 +489,7 @@ export default function JoinPage() {
                                                 }}
                                                 className={cn(
                                                     "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700",
-                                                    language === lang.code ? 'text-[#009de0]' : 'text-gray-700 dark:text-gray-300'
+                                                    language === lang.code ? 'text-amber-500' : 'text-gray-700 dark:text-gray-300'
                                                 )}
                                             >
                                                 <span className="text-lg">{lang.flag}</span>
@@ -523,7 +523,7 @@ export default function JoinPage() {
                                     step < currentStep
                                         ? "bg-green-500 text-white"
                                         : step === currentStep
-                                            ? "bg-white text-[#009de0] scale-110"
+                                            ? "bg-white text-amber-500 scale-110"
                                             : "bg-white/20 text-white/50"
                                 )}
                             >
@@ -555,7 +555,7 @@ export default function JoinPage() {
                                 onClick={nextStep}
                                 disabled={loading}
                                 className={cn(
-                                    "flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-[#009de0] text-white font-bold rounded-xl hover:bg-[#008acc] transition-colors",
+                                    "flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-amber-500 text-black font-bold rounded-xl hover:bg-amber-600 transition-colors shadow-lg hover:shadow-amber-500/50",
                                     loading && "opacity-70 cursor-not-allowed"
                                 )}
                             >

@@ -40,8 +40,8 @@ export default function Footer() {
                 }}
             />
 
-            {/* Subtle glow */}
-            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-cyan-500/20 to-transparent" />
+            {/* Subtle gold glow */}
+            <div className="absolute top-0 left-1/2 -translate-x-1/2 w-[600px] h-[1px] bg-gradient-to-r from-transparent via-amber-500/20 to-transparent" />
 
             <div className="relative max-w-7xl mx-auto px-4 md:px-8 py-6 md:py-8">
                 <div className="flex flex-col md:flex-row md:items-center md:justify-between gap-4">
@@ -64,7 +64,7 @@ export default function Footer() {
                             <Link
                                 key={link.href}
                                 href={link.href}
-                                className="px-3 py-2 text-xs font-medium text-white/60 hover:text-cyan-400 transition-colors rounded-lg hover:bg-white/5"
+                                className="px-3 py-2 text-xs font-medium text-white/60 hover:text-amber-400 transition-colors rounded-lg hover:bg-white/5"
                             >
                                 {link.label}
                             </Link>

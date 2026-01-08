@@ -184,13 +184,13 @@ export default function HeroSection() {
                     className="absolute inset-0 opacity-100"
                     style={{
                         background: `
-                            radial-gradient(at 27% 37%, hsla(215, 98%, 61%, 1) 0px, transparent 0%),
-                            radial-gradient(at 97% 21%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
-                            radial-gradient(at 52% 99%, hsla(196, 100%, 57%, 1) 0px, transparent 50%),
-                            radial-gradient(at 10% 29%, hsla(195, 100%, 39%, 1) 0px, transparent 50%),
-                            radial-gradient(at 97% 96%, hsla(195, 84%, 45%, 1) 0px, transparent 50%),
-                            radial-gradient(at 33% 50%, hsla(195, 100%, 50%, 1) 0px, transparent 50%),
-                            radial-gradient(at 79% 53%, hsla(196, 100%, 48%, 1) 0px, transparent 50%)
+                            radial-gradient(at 27% 37%, hsla(0, 0%, 4%, 1) 0px, transparent 0%),
+                            radial-gradient(at 97% 21%, hsla(30, 45%, 50%, 0.15) 0px, transparent 50%),
+                            radial-gradient(at 52% 99%, hsla(35, 60%, 45%, 0.12) 0px, transparent 50%),
+                            radial-gradient(at 10% 29%, hsla(0, 0%, 8%, 1) 0px, transparent 50%),
+                            radial-gradient(at 97% 96%, hsla(40, 50%, 55%, 0.1) 0px, transparent 50%),
+                            radial-gradient(at 33% 50%, hsla(0, 0%, 6%, 1) 0px, transparent 50%),
+                            radial-gradient(at 79% 53%, hsla(35, 55%, 50%, 0.08) 0px, transparent 50%)
                         `,
                         animation: 'meshMove 20s ease-in-out infinite',
                     }}
@@ -251,7 +251,7 @@ export default function HeroSection() {
                 <motion.div
                     className="absolute w-[400px] h-[400px] rounded-full"
                     style={{
-                        background: 'radial-gradient(circle, rgba(72,202,228,0.07) 0%, transparent 70%)',
+                        background: 'radial-gradient(circle, rgba(212,165,116,0.08) 0%, transparent 70%)',
                         filter: 'blur(70px)',
                         bottom: '20%',
                         left: '40%',
