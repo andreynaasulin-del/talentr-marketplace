@@ -61,7 +61,7 @@ export default function CookieConsent() {
                     exit={{ opacity: 0, y: 50 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 >
-                    <div className="bg-white dark:bg-slate-800 rounded-2xl shadow-2xl border border-gray-100 dark:border-slate-700 p-4 backdrop-blur-sm">
+                    <div className="bg-zinc-900 rounded-2xl shadow-2xl shadow-black/50 border border-zinc-800 p-4 backdrop-blur-sm">
                         <div className="flex items-start gap-3">
                             {/* Cookie icon */}
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
@@ -70,11 +70,11 @@ export default function CookieConsent() {
 
                             {/* Content */}
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm text-gray-700 dark:text-gray-200 leading-relaxed">
+                                <p className="text-sm text-zinc-300 leading-relaxed">
                                     {t.text}{' '}
                                     <Link
                                         href="/privacy"
-                                        className="text-blue-600 dark:text-blue-400 hover:underline font-medium"
+                                        className="text-blue-500 hover:underline font-medium"
                                     >
                                         {t.privacy}
                                     </Link>
@@ -90,7 +90,7 @@ export default function CookieConsent() {
                                     </button>
                                     <button
                                         onClick={handleDecline}
-                                        className="px-4 py-2 bg-gray-100 dark:bg-slate-700 hover:bg-gray-200 dark:hover:bg-slate-600 text-gray-700 dark:text-gray-200 text-sm font-medium rounded-xl transition-colors"
+                                        className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium rounded-xl transition-colors border border-zinc-700"
                                     >
                                         {t.decline}
                                     </button>
@@ -100,7 +100,7 @@ export default function CookieConsent() {
                             {/* Close button */}
                             <button
                                 onClick={handleDecline}
-                                className="p-1 text-gray-400 hover:text-gray-600 dark:hover:text-gray-200 transition-colors"
+                                className="p-1 text-zinc-500 hover:text-white transition-colors"
                                 aria-label="Close"
                             >
                                 <X className="w-4 h-4" />

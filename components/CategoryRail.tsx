@@ -53,7 +53,7 @@ const categories: CategoryItem[] = [
     },
     {
         id: 'MC',
-        label: { en: 'MC / Host', he: 'מנחה' },
+        label: { en: 'MC / Host', he: 'מנחה אירועים' },
         image: 'https://images.unsplash.com/photo-1475721027785-f74eccf877e2?w=400&h=400&fit=crop&q=80',
         gradient: 'from-amber-600 to-yellow-500'
     },
@@ -77,7 +77,7 @@ const categories: CategoryItem[] = [
     },
     {
         id: 'Comedian',
-        label: { en: 'Comedian', he: 'סטנדאפ' },
+        label: { en: 'Comedian', he: 'סטנדאפיסט' },
         image: 'https://images.unsplash.com/photo-1585699324551-f6c309eedeca?w=400&h=400&fit=crop&q=80',
         gradient: 'from-yellow-500 to-amber-400'
     },
@@ -95,19 +95,19 @@ const categories: CategoryItem[] = [
     },
     {
         id: 'Bar Show',
-        label: { en: 'Bar Show', he: 'בר שואו' },
+        label: { en: 'Bar Show', he: 'מופע בר' },
         image: 'https://images.unsplash.com/photo-1551024709-8f23befc6f87?w=400&h=400&fit=crop&q=80',
         gradient: 'from-cyan-600 to-blue-500'
     },
     {
         id: 'Event Decor',
-        label: { en: 'Decor', he: 'עיצוב' },
+        label: { en: 'Decor', he: 'עיצוב אירועים' },
         image: 'https://images.unsplash.com/photo-1519225421980-715cb0215aed?w=400&h=400&fit=crop&q=80',
         gradient: 'from-violet-600 to-purple-500'
     },
     {
         id: 'Kids Animator',
-        label: { en: 'Kids', he: 'אנימטור' },
+        label: { en: 'Kids', he: 'מפעיל לילדים' },
         image: 'https://images.unsplash.com/photo-1566140967404-b8b3932483f5?w=400&h=400&fit=crop&q=80',
         gradient: 'from-lime-500 to-green-500'
     },
@@ -153,14 +153,14 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     };
 
     return (
-        <div className="py-8 md:py-12 bg-white dark:bg-slate-900">
+        <div className="py-8 md:py-12 bg-black">
             {/* Header */}
             <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6 flex items-end justify-between">
                 <div>
-                    <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
+                    <h2 className="text-2xl md:text-3xl font-black text-white">
                         {lang === 'he' ? 'מצאו כישרונות' : 'Find Talents'}
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 mt-1">
+                    <p className="text-zinc-400 mt-1">
                         {lang === 'he' ? 'בחרו קטגוריה' : 'Choose a category'}
                     </p>
                 </div>
@@ -169,7 +169,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                 <div className="hidden md:flex gap-2">
                     <motion.button
                         onClick={() => scroll('left')}
-                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-cyan-50 dark:hover:bg-slate-700 flex items-center justify-center transition-all border border-transparent hover:border-cyan-200 dark:hover:border-cyan-500/30"
+                        className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 flex items-center justify-center transition-all border border-zinc-800 hover:border-blue-600"
                         whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)' }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -177,7 +177,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                     </motion.button>
                     <motion.button
                         onClick={() => scroll('right')}
-                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-slate-800 hover:bg-cyan-50 dark:hover:bg-slate-700 flex items-center justify-center transition-all border border-transparent hover:border-cyan-200 dark:hover:border-cyan-500/30"
+                        className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 flex items-center justify-center transition-all border border-zinc-800 hover:border-blue-600"
                         whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)' }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -260,7 +260,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <div className="flex items-center gap-3 p-4 bg-blue-50 dark:bg-blue-900/20 rounded-2xl">
+                    <div className="flex items-center gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-2xl">
                         <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
                             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

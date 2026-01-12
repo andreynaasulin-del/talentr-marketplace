@@ -12,6 +12,52 @@ interface ChatMessage {
     content: string;
 }
 
+interface CityOption {
+    id: string;
+    icon: string;
+    label: { en: string; he: string };
+}
+
+interface EventTypeOption {
+    id: string;
+    icon: string;
+    label: { en: string; he: string };
+}
+
+interface DateOption {
+    id: string;
+    value: string;
+    label: { en: string; he: string };
+}
+
+// Cities for wizard
+const CITIES: CityOption[] = [
+    { id: 'tel-aviv', icon: '🏙️', label: { en: 'Tel Aviv', he: 'תל אביב' } },
+    { id: 'jerusalem', icon: '🕌', label: { en: 'Jerusalem', he: 'ירושלים' } },
+    { id: 'haifa', icon: '⛵', label: { en: 'Haifa', he: 'חיפה' } },
+    { id: 'eilat', icon: '🏖️', label: { en: 'Eilat', he: 'אילת' } },
+    { id: 'rishon', icon: '🌆', label: { en: 'Rishon LeZion', he: 'ראשון לציון' } },
+    { id: 'netanya', icon: '🌊', label: { en: 'Netanya', he: 'נתניה' } },
+];
+
+// Event types for wizard
+const EVENT_TYPES: EventTypeOption[] = [
+    { id: 'wedding', icon: '💍', label: { en: 'Wedding', he: 'חתונה' } },
+    { id: 'birthday', icon: '🎂', label: { en: 'Birthday', he: 'יום הולדת' } },
+    { id: 'bar-mitzvah', icon: '✡️', label: { en: 'Bar/Bat Mitzvah', he: 'בר/בת מצווה' } },
+    { id: 'corporate', icon: '💼', label: { en: 'Corporate', he: 'אירוע עסקי' } },
+    { id: 'party', icon: '🎉', label: { en: 'Party', he: 'מסיבה' } },
+    { id: 'other', icon: '✨', label: { en: 'Other', he: 'אחר' } },
+];
+
+// Quick date options
+const DATE_OPTIONS: DateOption[] = [
+    { id: 'flexible', value: 'flexible', label: { en: 'I\'m flexible', he: 'אני גמיש' } },
+    { id: 'this-month', value: 'this-month', label: { en: 'This month', he: 'החודש' } },
+    { id: 'next-month', value: 'next-month', label: { en: 'Next month', he: 'חודש הבא' } },
+    { id: 'later', value: 'later', label: { en: '3+ months', he: '3+ חודשים' } },
+];
+
 export default function HeroSection() {
     const { language } = useLanguage();
     const lang = language as 'en' | 'he';
@@ -23,38 +69,46 @@ export default function HeroSection() {
     const [isTyping, setIsTyping] = useState(false);
     const chatEndRef = useRef<HTMLDivElement>(null);
 
+    // Wizard state
+    const [wizardStep, setWizardStep] = useState(0);
+    const [wizardData, setWizardData] = useState({
+        city: '',
+        date: '',
+        eventType: ''
+    });
+
     const content = {
         en: {
             staticStart: 'We help you',
             phrases: [
-                'find the perfect DJ',
-                'book top artists',
-                'throw epic parties',
-                'create magic moments',
-                'make it unforgettable',
+                'Find the perfect DJ',
+                'Book top artists',
+                'Throw epic parties',
+                'Create magic moments',
+                'Make it unforgettable',
             ],
             tagline: 'No Compromises.',
             description: 'The only ecosystem in Israel where verified industry leaders are gathered.',
             chat: 'What are we celebrating? 🎉',
-            forMasters: 'For Masters',
+            forMasters: 'For Talents',
             forMastersDesc: 'Focus on what you do best. We ensure your talent earns what it deserves.',
             forMastersCta: 'Apply Now',
             chatPlaceholder: 'Tell me about your event...',
             welcomeMessage: "Hey! 👋 I'm your Talentr AI assistant. Tell me about your event and I'll help you find the perfect entertainment!",
         },
         he: {
-            staticStart: 'אנחנו עוזרים לך',
+            staticStart: '',
             phrases: [
-                'למצוא את הדיג׳יי המושלם',
-                'להזמין אמנים מובילים',
-                'לעשות מסיבה אדירה',
-                'ליצור רגעים קסומים',
-                'להפוך את זה לבלתי נשכח',
+                'מצא את הדיג׳יי המושלם',
+                'הזמן אמנים מובילים',
+                'הרם מסיבה אדירה',
+                'צור רגעים קסומים',
+                'הפוך את זה לבלתי נשכח',
             ],
             tagline: 'ללא פשרות.',
             description: 'המערכת היחידה בישראל בה מרוכזים מובילי התעשייה המאומתים.',
             chat: 'מה חוגגים ומתי? 🎉',
-            forMasters: 'לאמנים',
+            forMasters: 'לכישרונות',
             forMastersDesc: 'התמקדו במה שאתם עושים הכי טוב. אנחנו נדאג שהכישרון שלכם ירוויח את מה שמגיע לו.',
             forMastersCta: 'הגש מועמדות',
             chatPlaceholder: 'ספר לי על האירוע שלך...',
@@ -184,8 +238,8 @@ export default function HeroSection() {
                 {/* Main Headline with Typewriter */}
                 <div className="text-center mb-12 sm:mb-16 md:mb-20">
 
-                    <h1 className="text-2xl sm:text-3xl md:text-4xl lg:text-5xl xl:text-6xl font-black text-white leading-[1.2] tracking-tight mb-4 sm:mb-6 px-2">
-                        <span className="block mb-1 sm:mb-2">{t.staticStart}</span>
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.2] tracking-tight mb-4 sm:mb-6 px-2">
+                        {/* <span className="block mb-1 sm:mb-2">{t.staticStart}</span> */}
                         <span className="block text-white/90 min-h-[1.2em]">
                             {displayText}
                             <span className="inline-block w-[2px] sm:w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
@@ -193,7 +247,7 @@ export default function HeroSection() {
                     </h1>
 
                     <motion.p
-                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-amber-400 mb-4 sm:mb-6 px-2"
+                        className="text-xl sm:text-2xl md:text-3xl lg:text-4xl font-black text-blue-500 mb-4 sm:mb-6 px-2"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.3 }}
@@ -220,13 +274,13 @@ export default function HeroSection() {
                         <button
                             data-chat-trigger
                             onClick={() => setIsChatOpen(true)}
-                            className="group flex items-center gap-3 sm:gap-4 w-full max-w-xl mx-auto mt-8 sm:mt-10 px-4 sm:px-6 py-3 sm:py-4 bg-white/95 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl shadow-black/10 hover:shadow-black/20 hover:bg-white transition-all cursor-pointer border border-white/20"
+                            className="group flex items-center gap-3 sm:gap-4 w-full max-w-xl mx-auto mt-8 sm:mt-10 px-4 sm:px-6 py-3 sm:py-4 bg-zinc-900/80 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl shadow-black/50 hover:bg-zinc-800 transition-all cursor-pointer border border-zinc-800 hover:border-blue-500/50"
                         >
-                            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-[#009de0]/50 group-hover:text-[#009de0] transition-colors flex-shrink-0" />
-                            <span className="flex-1 text-[#009de0]/50 text-sm sm:text-base md:text-lg text-start">
+                            <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 group-hover:text-blue-400 transition-colors flex-shrink-0" />
+                            <span className="flex-1 text-zinc-400 text-sm sm:text-base md:text-lg text-start group-hover:text-zinc-200 transition-colors">
                                 {t.chat}
                             </span>
-                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-gradient-to-br from-[#009de0] to-[#0077b6] rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg flex-shrink-0">
+                            <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-blue-600/20 flex-shrink-0">
                                 <Sparkles className="w-4 h-4 sm:w-5 sm:h-5 text-white" />
                             </div>
                         </button>
@@ -240,16 +294,16 @@ export default function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                 >
-                    <div className="p-6 sm:p-8 md:p-12 bg-white/10 backdrop-blur-xl border border-white/20 rounded-2xl sm:rounded-3xl text-center shadow-2xl">
-                        <h3 className="text-xs sm:text-sm font-bold text-white uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-3 sm:mb-4">
+                    <div className="p-6 sm:p-8 md:p-12 bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 hover:border-zinc-700 rounded-2xl sm:rounded-3xl text-center shadow-2xl transition-all">
+                        <h3 className="text-xs sm:text-sm font-bold text-zinc-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-3 sm:mb-4">
                             {t.forMasters}
                         </h3>
-                        <p className="text-white/80 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto leading-relaxed mb-5 sm:mb-6">
+                        <p className="text-zinc-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto leading-relaxed mb-5 sm:mb-6">
                             {t.forMastersDesc}
                         </p>
                         <a
                             href="/join"
-                            className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-white text-[#009de0] text-sm sm:text-base font-bold rounded-lg sm:rounded-xl hover:bg-white/90 hover:scale-105 transition-all shadow-lg"
+                            className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-transparent border border-zinc-700 text-white text-sm sm:text-base font-bold rounded-lg sm:rounded-xl hover:bg-zinc-800 hover:border-zinc-600 transition-all"
                         >
                             {t.forMastersCta}
                         </a>
@@ -258,100 +312,284 @@ export default function HeroSection() {
             </div>
 
 
-            {/* === CHAT MODAL === */}
+            {/* === FULLSCREEN AI WIZARD === */}
             <AnimatePresence>
                 {isChatOpen && (
                     <motion.div
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 flex items-center justify-center p-4 bg-black/50 backdrop-blur-sm"
-                        onClick={() => setIsChatOpen(false)}
+                        className="fixed inset-0 z-50 bg-black"
+                        style={{ direction: lang === 'he' ? 'rtl' : 'ltr' }}
                     >
-                        <motion.div
-                            initial={{ scale: 0.9, opacity: 0, y: 20 }}
-                            animate={{ scale: 1, opacity: 1, y: 0 }}
-                            exit={{ scale: 0.9, opacity: 0, y: 20 }}
-                            transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                            onClick={(e) => e.stopPropagation()}
-                            className="w-full max-w-lg bg-white rounded-3xl shadow-2xl overflow-hidden flex flex-col"
-                            style={{ maxHeight: '80vh', direction: lang === 'he' ? 'rtl' : 'ltr' }}
+                        {/* Close Button */}
+                        <button
+                            onClick={() => {
+                                setIsChatOpen(false);
+                                setWizardStep(0);
+                                setWizardData({ city: '', date: '', eventType: '' });
+                            }}
+                            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-zinc-900 hover:bg-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-800"
                         >
-                            {/* Chat Header */}
-                            <div className="flex items-center justify-between px-6 py-4 border-b border-gray-100 bg-gradient-to-r from-[#009de0] to-[#0077b6]">
-                                <div className="flex items-center gap-3">
-                                    <div className="w-10 h-10 bg-white/20 backdrop-blur rounded-xl flex items-center justify-center">
-                                        <Sparkles className="w-5 h-5 text-white" />
-                                    </div>
-                                    <div>
-                                        <h3 className="font-bold text-white">Talentr AI</h3>
-                                        <span className="text-xs text-white/70">{lang === 'he' ? 'מוכן לעזור' : 'Ready to help'}</span>
-                                    </div>
-                                </div>
-                                <button
-                                    onClick={() => setIsChatOpen(false)}
-                                    className="w-8 h-8 flex items-center justify-center rounded-full hover:bg-white/20 transition-colors"
-                                >
-                                    <X className="w-5 h-5 text-white" />
-                                </button>
-                            </div>
+                            <X className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
+                        </button>
 
-                            {/* Chat Messages */}
-                            <div className="flex-1 overflow-y-auto p-6 space-y-4 min-h-[300px] max-h-[400px]">
-                                {chatMessages.map((msg) => (
-                                    <div
-                                        key={msg.id}
-                                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
-                                    >
-                                        <div
-                                            className={`max-w-[80%] px-4 py-3 rounded-2xl ${msg.role === 'user'
-                                                ? 'bg-[#009de0] text-white rounded-br-md'
-                                                : 'bg-gray-100 text-gray-900 rounded-bl-md'
-                                                }`}
+                        {/* Progress Bar */}
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-zinc-900">
+                            <motion.div
+                                className="h-full bg-blue-600"
+                                initial={{ width: '0%' }}
+                                animate={{ width: `${((wizardStep + 1) / 4) * 100}%` }}
+                                transition={{ duration: 0.3 }}
+                            />
+                        </div>
+
+                        {/* Wizard Content */}
+                        <div className="h-full flex flex-col pt-20 sm:pt-24 px-4 sm:px-8 pb-safe-bottom overflow-y-auto">
+                            <div className="flex-1 max-w-2xl mx-auto w-full flex flex-col">
+                                <AnimatePresence mode="wait">
+                                    {/* Step 1: Where? */}
+                                    {wizardStep === 0 && (
+                                        <motion.div
+                                            key="step-where"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            className="space-y-8"
                                         >
-                                            {msg.content}
-                                        </div>
-                                    </div>
-                                ))}
+                                            <div className="text-center">
+                                                <span className="text-blue-500 text-sm font-bold uppercase tracking-widest">
+                                                    {lang === 'he' ? 'שלב 1 מתוך 3' : 'Step 1 of 3'}
+                                                </span>
+                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mt-3">
+                                                    {lang === 'he' ? 'איפה האירוע?' : 'Where is your event?'}
+                                                </h2>
+                                                <p className="text-zinc-400 mt-2 text-base sm:text-lg">
+                                                    {lang === 'he' ? 'בחר את העיר שלך' : 'Select your city'}
+                                                </p>
+                                            </div>
 
-                                {isTyping && (
-                                    <div className="flex justify-start">
-                                        <div className="bg-gray-100 px-4 py-3 rounded-2xl rounded-bl-md flex items-center gap-1">
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                            <div className="w-2 h-2 bg-gray-400 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
-                                        </div>
-                                    </div>
-                                )}
-                                <div ref={chatEndRef} />
+                                            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
+                                                {CITIES.map((city) => (
+                                                    <button
+                                                        key={city.id}
+                                                        onClick={() => {
+                                                            setWizardData({ ...wizardData, city: city.id });
+                                                            setWizardStep(1);
+                                                        }}
+                                                        className={`p-4 sm:p-5 rounded-2xl border-2 transition-all text-start ${wizardData.city === city.id
+                                                            ? 'border-blue-500 bg-blue-500/10'
+                                                            : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800'
+                                                            }`}
+                                                    >
+                                                        <span className="text-2xl sm:text-3xl mb-2 block">{city.icon}</span>
+                                                        <span className={`font-bold text-sm sm:text-base ${wizardData.city === city.id ? 'text-blue-400' : 'text-white'
+                                                            }`}>
+                                                            {city.label[lang]}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Step 2: When? */}
+                                    {wizardStep === 1 && (
+                                        <motion.div
+                                            key="step-when"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            className="space-y-8"
+                                        >
+                                            <div className="text-center">
+                                                <span className="text-blue-500 text-sm font-bold uppercase tracking-widest">
+                                                    {lang === 'he' ? 'שלב 2 מתוך 3' : 'Step 2 of 3'}
+                                                </span>
+                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mt-3">
+                                                    {lang === 'he' ? 'מתי?' : 'When is it?'}
+                                                </h2>
+                                                <p className="text-zinc-400 mt-2 text-base sm:text-lg">
+                                                    {lang === 'he' ? 'בחר תאריך משוער' : 'Select approximate date'}
+                                                </p>
+                                            </div>
+
+                                            <div className="space-y-4">
+                                                <input
+                                                    type="date"
+                                                    value={wizardData.date}
+                                                    onChange={(e) => setWizardData({ ...wizardData, date: e.target.value })}
+                                                    min={new Date().toISOString().split('T')[0]}
+                                                    className="w-full h-16 sm:h-20 px-6 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white text-lg sm:text-xl font-medium focus:outline-none focus:border-blue-500 transition-all scheme-dark"
+                                                />
+
+                                                {/* Quick Date Options */}
+                                                <div className="grid grid-cols-2 gap-3">
+                                                    {DATE_OPTIONS.map((opt) => (
+                                                        <button
+                                                            key={opt.id}
+                                                            onClick={() => {
+                                                                setWizardData({ ...wizardData, date: opt.value });
+                                                                setWizardStep(2);
+                                                            }}
+                                                            className="p-4 rounded-2xl border-2 border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800 transition-all text-start"
+                                                        >
+                                                            <span className="text-zinc-400 text-sm">{opt.label[lang]}</span>
+                                                        </button>
+                                                    ))}
+                                                </div>
+
+                                                {wizardData.date && (
+                                                    <button
+                                                        onClick={() => setWizardStep(2)}
+                                                        className="w-full py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold text-lg rounded-2xl transition-all mt-4"
+                                                    >
+                                                        {lang === 'he' ? 'המשך' : 'Continue'}
+                                                    </button>
+                                                )}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Step 3: For Whom? */}
+                                    {wizardStep === 2 && (
+                                        <motion.div
+                                            key="step-for-whom"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            className="space-y-8"
+                                        >
+                                            <div className="text-center">
+                                                <span className="text-blue-500 text-sm font-bold uppercase tracking-widest">
+                                                    {lang === 'he' ? 'שלב 3 מתוך 3' : 'Step 3 of 3'}
+                                                </span>
+                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mt-3">
+                                                    {lang === 'he' ? 'מה חוגגים?' : 'What are you celebrating?'}
+                                                </h2>
+                                                <p className="text-zinc-400 mt-2 text-base sm:text-lg">
+                                                    {lang === 'he' ? 'בחר סוג אירוע' : 'Select event type'}
+                                                </p>
+                                            </div>
+
+                                            <div className="grid grid-cols-2 gap-3">
+                                                {EVENT_TYPES.map((event) => (
+                                                    <button
+                                                        key={event.id}
+                                                        onClick={() => {
+                                                            setWizardData({ ...wizardData, eventType: event.id });
+                                                            setWizardStep(3);
+                                                            // Pre-fill AI chat with context
+                                                            const contextMessage = lang === 'he'
+                                                                ? `אני מחפש בידור ל${event.label.he} ב${CITIES.find(c => c.id === wizardData.city)?.label.he || wizardData.city}${wizardData.date ? `, בתאריך ${wizardData.date}` : ''}`
+                                                                : `I'm looking for entertainment for a ${event.label.en} in ${CITIES.find(c => c.id === wizardData.city)?.label.en || wizardData.city}${wizardData.date ? `, on ${wizardData.date}` : ''}`;
+                                                            setChatInput(contextMessage);
+                                                        }}
+                                                        className={`p-4 sm:p-5 rounded-2xl border-2 transition-all text-start ${wizardData.eventType === event.id
+                                                            ? 'border-blue-500 bg-blue-500/10'
+                                                            : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800'
+                                                            }`}
+                                                    >
+                                                        <span className="text-2xl sm:text-3xl mb-2 block">{event.icon}</span>
+                                                        <span className={`font-bold text-sm sm:text-base ${wizardData.eventType === event.id ? 'text-blue-400' : 'text-white'
+                                                            }`}>
+                                                            {event.label[lang]}
+                                                        </span>
+                                                    </button>
+                                                ))}
+                                            </div>
+                                        </motion.div>
+                                    )}
+
+                                    {/* Step 4: AI Chat */}
+                                    {wizardStep === 3 && (
+                                        <motion.div
+                                            key="step-chat"
+                                            initial={{ opacity: 0, y: 20 }}
+                                            animate={{ opacity: 1, y: 0 }}
+                                            exit={{ opacity: 0, y: -20 }}
+                                            className="h-full flex flex-col"
+                                        >
+                                            <div className="text-center mb-6">
+                                                <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                                                    <Sparkles className="w-8 h-8 text-blue-500" />
+                                                </div>
+                                                <h2 className="text-2xl sm:text-3xl font-black text-white">
+                                                    {lang === 'he' ? 'נהדר! עכשיו ספר לי עוד' : 'Great! Now tell me more'}
+                                                </h2>
+                                                <p className="text-zinc-400 mt-2">
+                                                    {lang === 'he' ? 'אני אעזור לך למצוא את הבידור המושלם' : "I'll help you find the perfect entertainment"}
+                                                </p>
+                                            </div>
+
+                                            {/* Chat Messages */}
+                                            <div className="flex-1 overflow-y-auto space-y-4 mb-4 bg-zinc-900/50 rounded-2xl p-4 custom-scrollbar">
+                                                {chatMessages.map((msg) => (
+                                                    <div
+                                                        key={msg.id}
+                                                        className={`flex ${msg.role === 'user' ? 'justify-end' : 'justify-start'}`}
+                                                    >
+                                                        <div
+                                                            className={`max-w-[85%] px-4 py-3 rounded-2xl ${msg.role === 'user'
+                                                                ? 'bg-blue-600 text-white rounded-br-md'
+                                                                : 'bg-zinc-800 text-zinc-200 rounded-bl-md'
+                                                                }`}
+                                                        >
+                                                            {msg.content}
+                                                        </div>
+                                                    </div>
+                                                ))}
+
+                                                {isTyping && (
+                                                    <div className="flex justify-start">
+                                                        <div className="bg-zinc-800 px-4 py-3 rounded-2xl rounded-bl-md flex items-center gap-1">
+                                                            <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                            <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                            <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                        </div>
+                                                    </div>
+                                                )}
+                                                <div ref={chatEndRef} />
+                                            </div>
+
+                                            {/* Chat Input */}
+                                            <div className="flex items-center gap-3">
+                                                <input
+                                                    type="text"
+                                                    value={chatInput}
+                                                    onChange={(e) => setChatInput(e.target.value)}
+                                                    onKeyPress={handleKeyPress}
+                                                    placeholder={t.chatPlaceholder}
+                                                    className="flex-1 px-5 py-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white text-base placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-all"
+                                                    autoFocus
+                                                />
+                                                <button
+                                                    onClick={sendMessage}
+                                                    disabled={!chatInput.trim() || isTyping}
+                                                    className="w-14 h-14 bg-blue-600 hover:bg-blue-500 text-white rounded-2xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95"
+                                                >
+                                                    {isTyping ? (
+                                                        <Loader2 className="w-6 h-6 animate-spin" />
+                                                    ) : (
+                                                        <Send className="w-6 h-6" />
+                                                    )}
+                                                </button>
+                                            </div>
+                                        </motion.div>
+                                    )}
+                                </AnimatePresence>
                             </div>
 
-                            {/* Chat Input */}
-                            <div className="p-4 border-t border-gray-100">
-                                <div className="flex items-center gap-3">
-                                    <input
-                                        type="text"
-                                        value={chatInput}
-                                        onChange={(e) => setChatInput(e.target.value)}
-                                        onKeyPress={handleKeyPress}
-                                        placeholder={t.chatPlaceholder}
-                                        className="flex-1 px-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-gray-900 placeholder:text-gray-400 focus:outline-none focus:border-[#009de0] focus:ring-2 focus:ring-[#009de0]/20 transition-all"
-                                        autoFocus
-                                    />
-                                    <button
-                                        onClick={sendMessage}
-                                        disabled={!chatInput.trim() || isTyping}
-                                        className="w-12 h-12 bg-[#009de0] hover:bg-[#0088cc] text-white rounded-xl flex items-center justify-center disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg active:scale-95"
-                                    >
-                                        {isTyping ? (
-                                            <Loader2 className="w-5 h-5 animate-spin" />
-                                        ) : (
-                                            <Send className="w-5 h-5" />
-                                        )}
-                                    </button>
-                                </div>
-                            </div>
-                        </motion.div>
+                            {/* Back Button (except on first step) */}
+                            {wizardStep > 0 && wizardStep < 3 && (
+                                <button
+                                    onClick={() => setWizardStep(wizardStep - 1)}
+                                    className="mt-6 text-zinc-500 hover:text-white font-medium text-sm transition-colors mx-auto"
+                                >
+                                    ← {lang === 'he' ? 'חזרה' : 'Back'}
+                                </button>
+                            )}
+                        </div>
                     </motion.div>
                 )}
             </AnimatePresence>

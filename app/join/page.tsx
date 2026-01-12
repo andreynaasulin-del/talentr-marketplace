@@ -49,13 +49,13 @@ export default function JoinPage() {
         { id: 'Photographer', icon: '📸', label: { en: 'Photographer', he: 'צלם' } },
         { id: 'Videographer', icon: '🎬', label: { en: 'Videographer', he: 'צלם וידאו' } },
         { id: 'DJ', icon: '🎧', label: { en: 'DJ', he: 'DJ' } },
-        { id: 'MC', icon: '🎤', label: { en: 'MC / Host', he: 'מנחה' } },
+        { id: 'MC', icon: '🎤', label: { en: 'MC / Host', he: 'מנחה אירועים' } },
         { id: 'Magician', icon: '🎩', label: { en: 'Magician', he: 'קוסם' } },
         { id: 'Singer', icon: '🎵', label: { en: 'Singer', he: 'זמר' } },
         { id: 'Musician', icon: '🎸', label: { en: 'Musician', he: 'מוזיקאי' } },
         { id: 'Bartender', icon: '🍸', label: { en: 'Bartender', he: 'ברמן' } },
-        { id: 'Event Decor', icon: '🎨', label: { en: 'Event Decor', he: 'עיצוב' } },
-        { id: 'Kids Animator', icon: '🎈', label: { en: 'Kids', he: 'אנימטור' } },
+        { id: 'Event Decor', icon: '🎨', label: { en: 'Event Decor', he: 'עיצוב אירועים' } },
+        { id: 'Kids Animator', icon: '🎈', label: { en: 'Kids', he: 'מפעיל לילדים' } },
         { id: 'Chef', icon: '👨‍🍳', label: { en: 'Chef', he: 'שף' } },
         { id: 'Dancer', icon: '💃', label: { en: 'Dancer', he: 'רקדן' } },
     ];
@@ -65,7 +65,7 @@ export default function JoinPage() {
         { id: 'Jerusalem', label: { en: 'Jerusalem', he: 'ירושלים' } },
         { id: 'Haifa', label: { en: 'Haifa', he: 'חיפה' } },
         { id: 'Eilat', label: { en: 'Eilat', he: 'אילת' } },
-        { id: 'Rishon LeZion', label: { en: 'Rishon', he: 'ראשון' } },
+        { id: 'Rishon LeZion', label: { en: 'Rishon', he: 'ראשון לציון' } },
         { id: 'Netanya', label: { en: 'Netanya', he: 'נתניה' } },
         { id: 'Ashdod', label: { en: 'Ashdod', he: 'אשדוד' } },
     ];
@@ -123,8 +123,9 @@ export default function JoinPage() {
                 }
                 break;
             case 1:
-                if (!formData.email.includes('@')) {
-                    setError(language === 'he' ? 'אימייל לא תקין' : 'Invalid email');
+                const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+                if (!emailRegex.test(formData.email)) {
+                    setError(language === 'he' ? 'אימייל לא תקין' : 'Invalid email address');
                     return false;
                 }
                 break;
@@ -147,8 +148,11 @@ export default function JoinPage() {
                 }
                 break;
             case 5:
-                if (!formData.phone.trim()) {
-                    setError(language === 'he' ? 'הכנס טלפון' : 'Enter phone');
+                const phoneDigits = formData.phone.replace(/\D/g, ''); // Remove non-digits
+
+                // Basic length check (most international numbers are 8-15 digits)
+                if (phoneDigits.length < 8) {
+                    setError(language === 'he' ? 'מספר טלפון קצר מדי' : 'Phone number too short');
                     return false;
                 }
                 break;
@@ -172,18 +176,28 @@ export default function JoinPage() {
         }
     };
 
-    const handleRegister = async () => {
+    const handleRegister = async (skipPhone = false) => {
         setLoading(true);
         setError('');
         try {
             if (!supabase) throw new Error(language === 'he' ? 'שירות האימות לא זמין כרגע' : 'Auth service unavailable right now');
+
+            let fullPhone = null;
+
+            if (!skipPhone) {
+                // Sanitize phone: remove non-digits, remove leading zero (e.g. 050 -> 50)
+                const cleanPhone = formData.phone.replace(/\D/g, '').replace(/^0+/, '');
+                // Result: +972501234567
+                fullPhone = `${countryCode}${cleanPhone}`;
+            }
+
             const { data: authData, error: authError } = await supabase.auth.signUp({
                 email: formData.email,
                 password: formData.password,
                 options: {
                     data: {
                         full_name: formData.fullName,
-                        role: 'vendor',
+                        phone: fullPhone,
                     },
                 },
             });
@@ -191,24 +205,37 @@ export default function JoinPage() {
             if (authError) throw new Error(authError.message);
             if (!authData.user) throw new Error('Failed to create user');
 
+            // Generate UUID for the vendor ID to avoid "null value in column id" error
+            const newVendorId = crypto.randomUUID();
+
             const { error: vendorError } = await supabase.from('vendors').insert([{
+                id: newVendorId,
                 user_id: authData.user.id,
-                name: formData.fullName,
+                full_name: formData.fullName,
                 email: formData.email,
                 category: formData.category,
                 city: formData.city,
-                phone: `${countryCode.replace('+', '')}${formData.phone.replace(/^0/, '')}`,
-                image_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+                phone: fullPhone, // can be null
+                avatar_url: 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
                 price_from: 1000,
-                description: '',
             }]);
 
             if (vendorError) throw vendorError;
 
             window.location.href = '/dashboard';
 
-        } catch (err: unknown) {
-            const errorMessage = err instanceof Error ? err.message : 'Error';
+        } catch (err: any) {
+            console.error('Registration error details:', err);
+
+            let errorMessage = err.message || 'An unexpected error occurred';
+
+            // Handle specific Supabase/Postgres errors
+            if (err.code === '23505') {
+                errorMessage = language === 'he' ? 'דוא״ל או טלפון זה כבר רשום במערכת' : 'This email or phone is already registered';
+            } else if (errorMessage === 'Error') {
+                errorMessage = language === 'he' ? 'שגיאה ביצירת חשבון' : 'Failed to create account';
+            }
+
             setError(errorMessage);
             setLoading(false);
         }
@@ -228,10 +255,10 @@ export default function JoinPage() {
             >
                 {/* Question */}
                 <div className="text-center">
-                    <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-white mb-1">
                         {stepInfo.title}
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400">
+                    <p className="text-zinc-400">
                         {stepInfo.subtitle}
                     </p>
                 </div>
@@ -240,13 +267,13 @@ export default function JoinPage() {
                 <div className="max-w-md mx-auto">
                     {currentStep === 0 && (
                         <div className="relative">
-                            <User className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <User className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             <input
                                 type="text"
                                 value={formData.fullName}
                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                 placeholder={t.namePlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-#0066FF transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -254,13 +281,13 @@ export default function JoinPage() {
 
                     {currentStep === 1 && (
                         <div className="relative">
-                            <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Mail className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             <input
                                 type="email"
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder={t.emailPlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-#0066FF transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -268,13 +295,13 @@ export default function JoinPage() {
 
                     {currentStep === 2 && (
                         <div className="relative">
-                            <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                            <Lock className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                             <input
                                 type="password"
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 placeholder={t.passwordPlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-#0066FF transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -289,16 +316,16 @@ export default function JoinPage() {
                                     className={cn(
                                         "relative flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
                                         formData.category === cat.id
-                                            ? "border-#0066FF bg-#0066FF/10"
-                                            : "border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-gray-300"
+                                            ? "border-blue-600 bg-blue-600/10"
+                                            : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800"
                                     )}
                                 >
                                     <span className="text-2xl">{cat.icon}</span>
                                     <span className={cn(
                                         "text-xs font-medium text-center",
                                         formData.category === cat.id
-                                            ? "text-#0066FF"
-                                            : "text-gray-600 dark:text-gray-300"
+                                            ? "text-blue-500"
+                                            : "text-zinc-400"
                                     )}>
                                         {cat.label[language] || cat.label.en}
                                     </span>
@@ -306,13 +333,42 @@ export default function JoinPage() {
                                         <motion.div
                                             initial={{ scale: 0 }}
                                             animate={{ scale: 1 }}
-                                            className="absolute -top-1 -end-1 w-5 h-5 bg-#0066FF rounded-full flex items-center justify-center"
+                                            className="absolute -top-1 -end-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center"
                                         >
                                             <Check className="w-3 h-3 text-white" />
                                         </motion.div>
                                     )}
                                 </button>
                             ))}
+                            {/* Another Category Option */}
+                            <button
+                                onClick={() => setFormData({ ...formData, category: 'Other' })}
+                                className={cn(
+                                    "relative flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
+                                    formData.category === 'Other'
+                                        ? "border-blue-600 bg-blue-600/10"
+                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800"
+                                )}
+                            >
+                                <span className="text-2xl">✨</span>
+                                <span className={cn(
+                                    "text-xs font-medium text-center",
+                                    formData.category === 'Other'
+                                        ? "text-blue-500"
+                                        : "text-zinc-400"
+                                )}>
+                                    {language === 'he' ? 'אחר' : 'Another'}
+                                </span>
+                                {formData.category === 'Other' && (
+                                    <motion.div
+                                        initial={{ scale: 0 }}
+                                        animate={{ scale: 1 }}
+                                        className="absolute -top-1 -end-1 w-5 h-5 bg-blue-600 rounded-full flex items-center justify-center"
+                                    >
+                                        <Check className="w-3 h-3 text-white" />
+                                    </motion.div>
+                                )}
+                            </button>
                         </div>
                     )}
 
@@ -325,24 +381,24 @@ export default function JoinPage() {
                                     className={cn(
                                         "flex items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         formData.city === city.id
-                                            ? "border-#0066FF bg-#0066FF/10"
-                                            : "border-gray-200 dark:border-slate-600 bg-white dark:bg-slate-800 hover:border-gray-300"
+                                            ? "border-blue-600 bg-blue-600/10"
+                                            : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800"
                                     )}
                                 >
                                     <MapPin className={cn(
                                         "w-4 h-4",
-                                        formData.city === city.id ? "text-#0066FF" : "text-gray-400"
+                                        formData.city === city.id ? "text-blue-500" : "text-zinc-500"
                                     )} />
                                     <span className={cn(
                                         "font-medium text-sm",
                                         formData.city === city.id
-                                            ? "text-#0066FF"
-                                            : "text-gray-700 dark:text-gray-300"
+                                            ? "text-blue-500"
+                                            : "text-zinc-400"
                                     )}>
                                         {city.label[language] || city.label.en}
                                     </span>
                                     {formData.city === city.id && (
-                                        <Check className="w-4 h-4 text-#0066FF ms-auto" />
+                                        <Check className="w-4 h-4 text-blue-500 ms-auto" />
                                     )}
                                 </button>
                             ))}
@@ -350,65 +406,76 @@ export default function JoinPage() {
                     )}
 
                     {currentStep === 5 && (
-                        <div className="relative flex gap-2">
-                            {/* Country Code Dropdown */}
-                            <div className="relative">
-                                <button
-                                    type="button"
-                                    onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                                    className="h-14 px-3 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl flex items-center gap-2 hover:border-gray-300 transition-all"
-                                >
-                                    <span className="text-lg">{currentCountry.flag}</span>
-                                    <span className="font-medium text-gray-900 dark:text-white">{currentCountry.code}</span>
-                                    <ChevronDown className="w-4 h-4 text-gray-400" />
-                                </button>
+                        <div className="space-y-4">
+                            <div className="relative flex gap-2">
+                                {/* Country Code Dropdown */}
+                                <div className="relative">
+                                    <button
+                                        type="button"
+                                        onClick={() => setShowCountryDropdown(!showCountryDropdown)}
+                                        className="h-14 px-3 bg-zinc-900 border-2 border-zinc-800 rounded-2xl flex items-center gap-2 hover:border-zinc-700 transition-all text-white"
+                                    >
+                                        <span className="text-lg">{currentCountry.flag}</span>
+                                        <span className="font-medium text-white">{currentCountry.code}</span>
+                                        <ChevronDown className="w-4 h-4 text-zinc-500" />
+                                    </button>
 
-                                <AnimatePresence>
-                                    {showCountryDropdown && (
-                                        <>
-                                            <div className="fixed inset-0 z-40" onClick={() => setShowCountryDropdown(false)} />
-                                            <motion.div
-                                                initial={{ opacity: 0, y: -10 }}
-                                                animate={{ opacity: 1, y: 0 }}
-                                                exit={{ opacity: 0, y: -10 }}
-                                                className="absolute start-0 top-full mt-2 w-48 bg-white dark:bg-slate-800 rounded-xl shadow-lg py-1 z-50 border-2 border-gray-200 dark:border-slate-600"
-                                            >
-                                                {countryCodes.map((country) => (
-                                                    <button
-                                                        key={country.code}
-                                                        type="button"
-                                                        onClick={() => {
-                                                            setCountryCode(country.code);
-                                                            setShowCountryDropdown(false);
-                                                        }}
-                                                        className={cn(
-                                                            "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700 transition-colors",
-                                                            countryCode === country.code ? 'bg-#0066FF/10 text-#0066FF' : 'text-gray-700 dark:text-gray-300'
-                                                        )}
-                                                    >
-                                                        <span className="text-lg">{country.flag}</span>
-                                                        <span className="font-medium">{country.code}</span>
-                                                        <span className="text-sm opacity-60">{country.label}</span>
-                                                    </button>
-                                                ))}
-                                            </motion.div>
-                                        </>
-                                    )}
-                                </AnimatePresence>
+                                    <AnimatePresence>
+                                        {showCountryDropdown && (
+                                            <>
+                                                <div className="fixed inset-0 z-40" onClick={() => setShowCountryDropdown(false)} />
+                                                <motion.div
+                                                    initial={{ opacity: 0, y: -10 }}
+                                                    animate={{ opacity: 1, y: 0 }}
+                                                    exit={{ opacity: 0, y: -10 }}
+                                                    className="absolute start-0 top-full mt-2 w-48 bg-zinc-900 rounded-xl shadow-lg shadow-black/50 py-1 z-50 border-2 border-zinc-800"
+                                                >
+                                                    {countryCodes.map((country) => (
+                                                        <button
+                                                            key={country.code}
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setCountryCode(country.code);
+                                                                setShowCountryDropdown(false);
+                                                            }}
+                                                            className={cn(
+                                                                "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-800 transition-colors",
+                                                                countryCode === country.code ? 'bg-blue-600/10 text-blue-500' : 'text-zinc-300'
+                                                            )}
+                                                        >
+                                                            <span className="text-lg">{country.flag}</span>
+                                                            <span className="font-medium">{country.code}</span>
+                                                            <span className="text-sm opacity-60">{country.label}</span>
+                                                        </button>
+                                                    ))}
+                                                </motion.div>
+                                            </>
+                                        )}
+                                    </AnimatePresence>
+                                </div>
+
+                                {/* Phone Input */}
+                                <div className="relative flex-1">
+                                    <Phone className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder={t.phonePlaceholder}
+                                        className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
+                                        autoFocus
+                                    />
+                                </div>
                             </div>
 
-                            {/* Phone Input */}
-                            <div className="relative flex-1">
-                                <Phone className="absolute start-4 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
-                                <input
-                                    type="tel"
-                                    value={formData.phone}
-                                    onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    placeholder={t.phonePlaceholder}
-                                    className="w-full h-14 ps-12 pe-4 bg-white dark:bg-slate-800 border-2 border-gray-200 dark:border-slate-600 rounded-2xl text-gray-900 dark:text-white placeholder:text-gray-400 focus:outline-none focus:border-#0066FF transition-all text-lg"
-                                    autoFocus
-                                />
-                            </div>
+                            {/* Skip Button */}
+                            <button
+                                type="button"
+                                onClick={() => handleRegister(true)} // pass true to skip phone
+                                className="w-full py-2 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors"
+                            >
+                                {language === 'he' ? 'הוסף אחר כך (דלג)' : 'Skip and add later'}
+                            </button>
                         </div>
                     )}
 
@@ -457,7 +524,7 @@ export default function JoinPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex flex-col bg-black dark:bg-slate-900">
+            <div className="w-full lg:w-1/2 flex flex-col bg-black">
                 {/* Header */}
                 <div className="flex items-center justify-end p-4">
                     {/* Language Switcher */}
@@ -478,7 +545,7 @@ export default function JoinPage() {
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="absolute end-0 mt-2 w-32 bg-white dark:bg-slate-800 rounded-xl shadow-lg py-1 z-50"
+                                        className="absolute end-0 mt-2 w-32 bg-zinc-900 rounded-xl shadow-lg shadow-black/50 py-1 z-50 border border-zinc-800"
                                     >
                                         {languages.map((lang) => (
                                             <button
@@ -488,8 +555,8 @@ export default function JoinPage() {
                                                     setShowLangDropdown(false);
                                                 }}
                                                 className={cn(
-                                                    "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-gray-50 dark:hover:bg-slate-700",
-                                                    language === lang.code ? 'text-#0066FF' : 'text-gray-700 dark:text-gray-300'
+                                                    "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-800 transition-colors",
+                                                    language === lang.code ? 'text-blue-500' : 'text-zinc-300'
                                                 )}
                                             >
                                                 <span className="text-lg">{lang.flag}</span>
@@ -521,10 +588,10 @@ export default function JoinPage() {
                                 className={cn(
                                     "w-10 h-10 rounded-full flex items-center justify-center text-sm font-bold transition-all shadow-lg",
                                     step < currentStep
-                                        ? "bg-green-500 text-white"
+                                        ? "bg-blue-600 text-white"
                                         : step === currentStep
-                                            ? "bg-white text-#0066FF scale-110"
-                                            : "bg-white/20 text-white/50"
+                                            ? "bg-white text-blue-600 scale-110"
+                                            : "bg-white/10 text-white/30"
                                 )}
                             >
                                 {step < currentStep ? <Check className="w-4 h-4" /> : step + 1}
@@ -535,7 +602,7 @@ export default function JoinPage() {
 
                 {/* Main Content Card */}
                 <div className="flex-1 flex items-center justify-center p-4">
-                    <div className="w-full max-w-lg bg-gray-50 dark:bg-slate-800 rounded-3xl p-6 shadow-2xl">
+                    <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl shadow-black/50">
                         <AnimatePresence mode="wait">
                             {renderStepContent()}
                         </AnimatePresence>
@@ -545,7 +612,7 @@ export default function JoinPage() {
                             {currentStep > 0 && (
                                 <button
                                     onClick={prevStep}
-                                    className="flex items-center justify-center gap-2 px-5 py-3.5 bg-gray-200 dark:bg-slate-700 text-gray-700 dark:text-gray-200 font-semibold rounded-xl hover:bg-gray-300 dark:hover:bg-slate-600 transition-colors"
+                                    className="flex items-center justify-center gap-2 px-5 py-3.5 bg-zinc-800 text-zinc-300 font-semibold rounded-xl hover:bg-zinc-700 transition-colors border border-zinc-700"
                                 >
                                     <ArrowLeft className="w-5 h-5" />
                                     {t.back}
@@ -555,7 +622,7 @@ export default function JoinPage() {
                                 onClick={nextStep}
                                 disabled={loading}
                                 className={cn(
-                                    "flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-#0066FF text-black font-bold rounded-xl hover:bg-#0052CC transition-colors shadow-lg hover:shadow-#0066FF/50",
+                                    "flex-1 flex items-center justify-center gap-2 px-5 py-3.5 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-500 transition-colors shadow-lg shadow-blue-600/20",
                                     loading && "opacity-70 cursor-not-allowed"
                                 )}
                             >

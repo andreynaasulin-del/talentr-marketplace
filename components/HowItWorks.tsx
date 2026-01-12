@@ -59,7 +59,7 @@ export default function HowItWorks() {
     ];
 
     return (
-        <section className="py-20 md:py-28 bg-slate-50 dark:bg-slate-900/50 relative overflow-hidden">
+        <section className="py-20 md:py-28 bg-black relative overflow-hidden">
             {/* Background decoration */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl" />
@@ -75,17 +75,17 @@ export default function HowItWorks() {
                     viewport={{ once: true }}
                 >
                     <motion.span
-                        className="inline-block px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest text-blue-600 dark:text-blue-400 bg-blue-100 dark:bg-blue-900/30 rounded-full"
+                        className="inline-block px-4 py-1.5 mb-4 text-xs font-bold uppercase tracking-widest text-blue-400 bg-blue-900/20 rounded-full"
                         initial={{ opacity: 0, scale: 0.9 }}
                         whileInView={{ opacity: 1, scale: 1 }}
                         viewport={{ once: true }}
                     >
                         {lang === 'he' ? 'פשוט כמו 1-2-3' : 'Easy as 1-2-3'}
                     </motion.span>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight text-gray-900 dark:text-white mb-4">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight text-white mb-4">
                         {t.title}
                     </h2>
-                    <p className="text-gray-500 dark:text-gray-400 max-w-lg mx-auto text-lg">
+                    <p className="text-zinc-400 max-w-lg mx-auto text-lg">
                         {t.subtitle}
                     </p>
                 </motion.div>
@@ -111,9 +111,9 @@ export default function HowItWorks() {
                             >
                                 {/* Card */}
                                 <div className={cn(
-                                    "relative bg-white/80 dark:bg-slate-800/50 rounded-3xl p-8 md:p-10",
-                                    "border border-gray-100 dark:border-slate-700/50",
-                                    "shadow-lg shadow-gray-200/50 dark:shadow-none",
+                                    "relative bg-zinc-900/50 rounded-3xl p-8 md:p-10",
+                                    "border border-zinc-800",
+                                    "shadow-none",
                                     "backdrop-blur-sm",
                                     "transition-all duration-500",
                                     "group-hover:shadow-xl group-hover:shadow-gray-200/70 dark:group-hover:shadow-lg dark:group-hover:shadow-cyan-500/10",
@@ -146,10 +146,10 @@ export default function HowItWorks() {
                                             </span>
                                         </div>
 
-                                        <h3 className="text-xl md:text-2xl font-bold text-gray-900 dark:text-white mb-3">
+                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
                                             {step.title[lang] || step.title.en}
                                         </h3>
-                                        <p className="text-gray-500 dark:text-gray-400 leading-relaxed">
+                                        <p className="text-zinc-400 leading-relaxed">
                                             {step.desc[lang] || step.desc.en}
                                         </p>
                                     </div>
@@ -158,7 +158,7 @@ export default function HowItWorks() {
                                 {/* Connector Arrow (except last) */}
                                 {index < steps.length - 1 && (
                                     <div className="hidden md:flex absolute top-1/2 -right-4 lg:-right-6 transform -translate-y-1/2 z-10">
-                                        <ArrowRight className="w-6 h-6 text-gray-300 dark:text-slate-600" />
+                                        <ArrowRight className="w-6 h-6 text-zinc-700" />
                                     </div>
                                 )}
                             </motion.div>

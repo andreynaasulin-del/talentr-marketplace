@@ -11,19 +11,19 @@
   --primary-blue-light: rgba(0, 102, 255, 0.1);
 
   /* Backgrounds */
-  --bg-white: #FFFFFF;
-  --bg-gray: #F7F7F9;
+  --bg-white: #000000;
+  --bg-gray: #09090b;
   --bg-black: #000000;
-  --bg-card: #111111;
+  --bg-card: #09090b;
 
   /* Text Colors */
   --text-heading: #FFFFFF;
-  --text-body: #E5E5E5;
+  --text-body: #A1A1AA;
   --text-muted: #999999;
 
   /* Borders */
-  --border-light: #E4E4E4;
-  --border-dark: rgba(255, 255, 255, 0.1);
+  --border-light: #27272A;
+  --border-dark: #27272A;
 
   /* Shadows - Clean */
   --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
@@ -54,7 +54,7 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--bg-white);
+  background: var(--bg-black);
   color: var(--text-body);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
@@ -123,9 +123,10 @@ textarea {
 
 /* ===== CARDS ===== */
 .card-wolt {
-  background: var(--bg-white);
+  background: var(--bg-card);
   border-radius: var(--radius-lg);
-  box-shadow: var(--shadow-sm);
+  box-shadow: none;
+  border: 1px solid var(--border-light);
   overflow: hidden;
   transition: box-shadow var(--transition), transform var(--transition);
 }
@@ -143,9 +144,9 @@ textarea {
   font-size: 12px;
   font-weight: 500;
   border-radius: 100px;
-  background: var(--primary-blue-light);
+  background: rgba(0, 102, 255, 0.1);
   color: var(--primary-blue);
-  border: 1px solid var(--primary-blue);
+  border: 1px solid rgba(0, 102, 255, 0.2);
 }
 
 /* ===== INPUTS - PROFESSIONAL ===== */
@@ -161,9 +162,9 @@ textarea {
 
 .input-wolt:focus {
   outline: none;
-  background: var(--bg-white);
+  background: var(--bg-black);
   border-color: var(--primary-blue);
-  box-shadow: 0 0 0 3px var(--primary-blue-light);
+  box-shadow: 0 0 0 1px var(--primary-blue);
 }
 
 .input-wolt::placeholder {

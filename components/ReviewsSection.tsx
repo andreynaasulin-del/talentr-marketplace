@@ -63,11 +63,11 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
     const averageRating = reviews.reduce((acc, r) => acc + r.rating, 0) / reviews.length;
 
     return (
-        <div className="bg-white rounded-[32px] shadow-card p-8 border border-gray-100">
+        <div className="bg-zinc-900 rounded-[32px] p-8 border border-zinc-800">
             {/* Header */}
             <div className="flex items-center justify-between mb-8">
                 <div>
-                    <h3 className="text-2xl font-black text-gray-900 mb-2">
+                    <h3 className="text-2xl font-black text-white mb-2">
                         {language === 'he' ? 'ביקורות לקוחות' : 'Client Reviews'}
                     </h3>
                     <div className="flex items-center gap-3">
@@ -78,20 +78,20 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                                     className={cn(
                                         "w-5 h-5",
                                         star <= Math.round(averageRating)
-                                            ? "fill-amber-400 text-amber-400"
-                                            : "text-gray-200"
+                                            ? "fill-blue-500 text-blue-500"
+                                            : "text-zinc-700"
                                     )}
                                 />
                             ))}
                         </div>
-                        <span className="font-black text-xl text-gray-900">{averageRating.toFixed(1)}</span>
-                        <span className="text-gray-400 font-medium">({reviews.length} {t('reviews')})</span>
+                        <span className="font-black text-xl text-white">{averageRating.toFixed(1)}</span>
+                        <span className="text-zinc-400 font-medium">({reviews.length} {t('reviews')})</span>
                     </div>
                 </div>
 
                 <motion.button
                     onClick={() => setShowForm(!showForm)}
-                    className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-blue-600/20"
+                    className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl flex items-center gap-2 shadow-lg shadow-blue-600/20 hover:shadow-blue-600/40"
                     whileHover={{ scale: 1.02 }}
                     whileTap={{ scale: 0.98 }}
                 >
@@ -112,7 +112,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                     >
                         {/* Rating Selection */}
                         <div className="mb-4">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                            <label className="block text-sm font-bold text-zinc-400 mb-2">
                                 Your Rating
                             </label>
                             <div className="flex gap-2">
@@ -128,8 +128,8 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                                             className={cn(
                                                 "w-8 h-8 cursor-pointer transition-colors",
                                                 star <= newReview.rating
-                                                    ? "fill-amber-400 text-amber-400"
-                                                    : "text-gray-300 hover:text-amber-300"
+                                                    ? "fill-blue-500 text-blue-500"
+                                                    : "text-zinc-700 hover:text-blue-400"
                                             )}
                                         />
                                     </motion.button>
@@ -139,13 +139,13 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
 
                         {/* Event Type */}
                         <div className="mb-4">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                            <label className="block text-sm font-bold text-zinc-400 mb-2">
                                 Event Type
                             </label>
                             <select
                                 value={newReview.eventType}
                                 onChange={(e) => setNewReview({ ...newReview, eventType: e.target.value })}
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:outline-none font-medium"
+                                className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 focus:border-blue-500 focus:outline-none font-medium text-white"
                             >
                                 <option value="Wedding">{t('Wedding')}</option>
                                 <option value="Bar Mitzvah">{t('Bar Mitzvah')}</option>
@@ -157,14 +157,14 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
 
                         {/* Review Text */}
                         <div className="mb-4">
-                            <label className="block text-sm font-bold text-gray-700 mb-2">
+                            <label className="block text-sm font-bold text-zinc-400 mb-2">
                                 Your Review
                             </label>
                             <textarea
                                 value={newReview.text}
                                 onChange={(e) => setNewReview({ ...newReview, text: e.target.value })}
                                 placeholder="Share your experience..."
-                                className="w-full px-4 py-3 rounded-xl border border-gray-200 focus:border-blue-500 focus:outline-none font-medium min-h-[120px] resize-none"
+                                className="w-full px-4 py-3 rounded-xl bg-zinc-800 border border-zinc-700 focus:border-blue-500 focus:outline-none font-medium text-white min-h-[120px] resize-none placeholder:text-zinc-600"
                             />
                         </div>
 
@@ -197,22 +197,22 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                         animate={{ opacity: 1, y: 0 }}
                         className="text-center py-12 px-6"
                     >
-                        <div className="w-20 h-20 mx-auto mb-6 bg-gradient-to-br from-blue-100 to-purple-100 rounded-full flex items-center justify-center">
+                        <div className="w-20 h-20 mx-auto mb-6 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700">
                             <Star className="w-10 h-10 text-blue-500" />
                         </div>
-                        <h4 className="text-xl font-bold text-gray-900 mb-2">
+                        <h4 className="text-xl font-bold text-white mb-2">
                             {language === 'he'
                                 ? 'אין עדיין ביקורות'
                                 : 'No reviews yet'}
                         </h4>
-                        <p className="text-gray-500 mb-6 max-w-sm mx-auto">
+                        <p className="text-zinc-500 mb-6 max-w-sm mx-auto">
                             {language === 'he'
                                 ? `היו הראשונים לכתוב ביקורת על ${vendorName}!`
                                 : `Be the first to review ${vendorName}!`}
                         </p>
                         <motion.button
                             onClick={() => setShowForm(true)}
-                            className="px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl inline-flex items-center gap-2 shadow-lg shadow-blue-600/20"
+                            className="px-6 py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl inline-flex items-center gap-2 shadow-lg shadow-blue-600/20"
                             whileHover={{ scale: 1.02 }}
                             whileTap={{ scale: 0.98 }}
                         >
@@ -228,11 +228,11 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                             whileInView={{ opacity: 1, y: 0 }}
                             viewport={{ once: true }}
                             transition={{ delay: index * 0.1 }}
-                            className="p-6 bg-gray-50/50 rounded-2xl border border-gray-100 hover:border-gray-200 transition-colors"
+                            className="p-6 bg-zinc-900 border border-zinc-800 rounded-2xl hover:border-zinc-700 transition-colors"
                         >
                             <div className="flex items-start gap-4">
                                 {/* Avatar */}
-                                <div className="w-12 h-12 rounded-full bg-gradient-to-br from-blue-500 to-purple-600 flex items-center justify-center text-white font-bold flex-shrink-0">
+                                <div className="w-12 h-12 rounded-full bg-zinc-800 flex items-center justify-center text-white font-bold flex-shrink-0 border border-zinc-700">
                                     {review.author.charAt(0)}
                                 </div>
 
@@ -240,11 +240,11 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                                     {/* Header */}
                                     <div className="flex items-center justify-between mb-2">
                                         <div>
-                                            <h4 className="font-bold text-gray-900">{review.author}</h4>
-                                            <div className="flex items-center gap-2 text-sm text-gray-500">
+                                            <h4 className="font-bold text-white">{review.author}</h4>
+                                            <div className="flex items-center gap-2 text-sm text-zinc-500">
                                                 <span>{review.date}</span>
                                                 <span>•</span>
-                                                <span className="text-blue-600 font-medium">{t(review.eventType)}</span>
+                                                <span className="text-blue-500 font-medium">{t(review.eventType)}</span>
                                             </div>
                                         </div>
                                         <div className="flex items-center gap-0.5">
@@ -254,8 +254,8 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                                                     className={cn(
                                                         "w-4 h-4",
                                                         star <= review.rating
-                                                            ? "fill-amber-400 text-amber-400"
-                                                            : "text-gray-200"
+                                                            ? "fill-blue-500 text-blue-500"
+                                                            : "text-zinc-800"
                                                     )}
                                                 />
                                             ))}
@@ -263,11 +263,11 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
                                     </div>
 
                                     {/* Text */}
-                                    <p className="text-gray-600 leading-relaxed mb-4">{review.text}</p>
+                                    <p className="text-zinc-300 leading-relaxed mb-4">{review.text}</p>
 
                                     {/* Helpful */}
                                     <motion.button
-                                        className="flex items-center gap-2 text-sm text-gray-400 hover:text-blue-600 transition-colors"
+                                        className="flex items-center gap-2 text-sm text-zinc-500 hover:text-blue-500 transition-colors"
                                         whileHover={{ scale: 1.02 }}
                                         whileTap={{ scale: 0.98 }}
                                     >
@@ -284,7 +284,7 @@ export default function ReviewsSection({ vendorId, vendorName, initialReviews }:
             {/* Show More */}
             {reviews.length > 3 && (
                 <motion.button
-                    className="w-full mt-6 py-4 border border-gray-200 rounded-xl text-gray-600 font-bold hover:bg-gray-50 transition-colors"
+                    className="w-full mt-6 py-4 border border-zinc-800 rounded-xl text-zinc-400 font-bold hover:bg-zinc-800 hover:text-white transition-colors"
                     whileHover={{ scale: 1.01 }}
                     whileTap={{ scale: 0.99 }}
                 >

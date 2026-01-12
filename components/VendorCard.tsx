@@ -49,9 +49,9 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                     <article
                         className={cn(
                             "relative overflow-hidden rounded-2xl",
-                            "bg-white dark:bg-slate-800",
-                            "border-0",
-                            "shadow-sm hover:shadow-lg hover:shadow-gray-200/50 dark:shadow-slate-900/50",
+                            "bg-zinc-900",
+                            "border border-zinc-800",
+                            "hover:border-blue-600/50",
                             "transition-all duration-300"
                         )}
                     >
@@ -169,10 +169,10 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                         </div>
 
                         {/* Content - Glass Card */}
-                        <div className="relative p-5 bg-gradient-to-b from-white to-gray-50/80 dark:from-slate-800 dark:to-slate-900/80">
+                        <div className="relative p-5 bg-zinc-900">
                             {/* Name & Rating Row */}
                             <div className="flex items-start justify-between gap-3 mb-3">
-                                <h3 className="font-bold text-gray-900 dark:text-white text-lg leading-tight line-clamp-1 group-hover:text-blue-600 transition-colors duration-300">
+                                <h3 className="font-bold text-white text-lg leading-tight line-clamp-1 group-hover:text-blue-500 transition-colors duration-300">
                                     {vendor.name}
                                 </h3>
 
@@ -186,7 +186,7 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                             </div>
 
                             {/* Location & Reviews */}
-                            <div className="flex items-center gap-2 text-gray-500 dark:text-gray-400 text-sm mb-4">
+                            <div className="flex items-center gap-2 text-zinc-400 text-sm mb-4">
                                 <div className="flex items-center gap-1.5">
                                     <MapPin className="w-4 h-4 text-blue-500" />
                                     <span className="font-medium">{t(vendor.city)}</span>
@@ -196,13 +196,13 @@ function VendorCard({ vendor, index = 0 }: VendorCardProps) {
                             </div>
 
                             {/* Footer - Tags Section */}
-                            <div className="flex items-center justify-between pt-4 border-t border-gray-100 dark:border-slate-700">
+                            <div className="flex items-center justify-between pt-4 border-t border-zinc-800">
                                 {/* Tags */}
                                 <div className="flex gap-2 overflow-hidden">
                                     {vendor.tags.slice(0, 3).map((tag) => (
                                         <span
                                             key={tag}
-                                            className="text-xs bg-gray-100 dark:bg-slate-700 text-gray-600 dark:text-gray-300 px-2.5 py-1 rounded-lg whitespace-nowrap font-medium"
+                                            className="text-xs bg-zinc-800 text-zinc-300 px-2.5 py-1 rounded-lg whitespace-nowrap font-medium"
                                         >
                                             {t(tag)}
                                         </span>

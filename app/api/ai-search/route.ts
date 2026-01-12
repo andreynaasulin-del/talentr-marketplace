@@ -3,6 +3,7 @@
 import { NextRequest, NextResponse } from 'next/server';
 import OpenAI from 'openai';
 import { supabase } from '@/lib/supabase';
+import { rateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 
 // Lazy initialization to avoid build-time errors
 let openai: OpenAI | null = null;
@@ -17,6 +18,16 @@ function getOpenAI() {
 
 export async function POST(request: NextRequest) {
     try {
+        // Rate limiting (stricter for AI search - more expensive)
+        const clientIP = getClientIP(request);
+        const rateLimitResult = await rateLimit(clientIP, RATE_LIMITS.aiSearch);
+        if (!rateLimitResult.success) {
+            return NextResponse.json({
+                error: 'Rate limit exceeded. Please try again later.',
+                success: false,
+            }, { status: 429 });
+        }
+
         const { query, language = 'en' } = await request.json();
 
         if (!query) {
@@ -45,7 +56,7 @@ Respond ONLY with a JSON object, nothing else. Example:
 If something is not mentioned, use null for that field.`;
 
         const completion = await openaiClient.chat.completions.create({
-            model: 'gpt-4o',  // Premium model for better understanding
+            model: 'gpt-4o',  // Premium model for best understanding
             messages: [
                 { role: 'system', content: systemPrompt },
                 { role: 'user', content: query }
@@ -96,7 +107,7 @@ If something is not mentioned, use null for that field.`;
                 : `Based on the request "${query}", write a short sentence (max 20 words) explaining what we found. No quotes.`;
 
         const summaryCompletion = await openaiClient.chat.completions.create({
-            model: 'gpt-4o',  // Premium model for better summaries
+            model: 'gpt-4o',  // Premium model for best summaries
             messages: [
                 { role: 'system', content: 'You help summarize search results in a friendly, concise way.' },
                 { role: 'user', content: recommendationPrompt }

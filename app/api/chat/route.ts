@@ -60,16 +60,16 @@ function extractFromMessage(message: string): {
     const keywords: string[] = [];
 
     for (const [kw, cat] of Object.entries(categoryKeywords)) {
-        if (lower.includes(kw)) { 
-            category = cat; 
+        if (lower.includes(kw)) {
+            category = cat;
             keywords.push(kw);
-            break; 
+            break;
         }
     }
     for (const [kw, c] of Object.entries(cityKeywords)) {
-        if (lower.includes(kw)) { 
-            city = c; 
-            break; 
+        if (lower.includes(kw)) {
+            city = c;
+            break;
         }
     }
 
@@ -87,7 +87,7 @@ function findPackagesByKeywords(keywords: string[], category?: VendorCategory): 
         if (category && pkg.category.toLowerCase().includes(category.toLowerCase())) {
             return true;
         }
-        return keywords.some(kw => 
+        return keywords.some(kw =>
             pkg.title.en.toLowerCase().includes(kw) ||
             pkg.title.he.includes(kw) ||
             pkg.description.en.toLowerCase().includes(kw) ||
@@ -175,7 +175,7 @@ const SYSTEM_PROMPT = `You are the intelligent Concierge Service on the Talentr 
 // ===== GENERATE SUGGESTIONS =====
 function generateSuggestions(category?: VendorCategory, language: string = 'en'): string[] {
     const lang = language as 'en' | 'he';
-    
+
     const suggestions: Record<string, Record<string, string[]>> = {
         'Musician': {
             en: ['Romantic acoustic?', 'DJ for a party?', 'Live jazz?'],
@@ -226,14 +226,14 @@ async function generateAIResponse(
         const systemPrompt = SYSTEM_PROMPT.replace('[CONTEXT]', context || '[No specific match]');
 
         const completion = await client.chat.completions.create({
-            model: 'gpt-4o-mini',
+            model: 'gpt-4o', // Flagship model for maximum uniqueness and intelligence
             messages: [
                 { role: 'system', content: systemPrompt },
                 ...conversationHistory.slice(-4).map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content })),
                 { role: 'user', content: message }
             ],
             max_tokens: 150,
-            temperature: 0.6,
+            temperature: 0.8,
         });
 
         return completion.choices[0]?.message?.content || generateFallbackResponse(pkgs, language);
@@ -261,9 +261,9 @@ function generateFallbackResponse(pkgs: Package[], language: string): string {
 export async function POST(request: NextRequest) {
     try {
         const clientIP = getClientIP(request);
-        const rateLimitResult = rateLimit(clientIP, RATE_LIMITS.chat);
+        const rateLimitResult = await rateLimit(clientIP, RATE_LIMITS.chat);
         if (!rateLimitResult.success) {
-            return NextResponse.json({ 
+            return NextResponse.json({
                 error: 'Rate limit',
                 response: "Please wait a moment before sending another message.",
                 vendors: [],
@@ -280,35 +280,35 @@ export async function POST(request: NextRequest) {
         const { message, language } = validation.data;
         const conversationHistory = body.conversationHistory || [];
         const extracted = extractFromMessage(message);
-        
+
         // Find matching packages
         const matchedPackages = findPackagesByKeywords(extracted.keywords, extracted.category);
-        
+
         // Find vendors if specific category detected
-        const vendors = extracted.category 
+        const vendors = extracted.category
             ? await findVendors(extracted.category, extracted.city, 3)
             : [];
-        
+
         // Generate AI response
         const response = await generateAIResponse(
-            message, 
-            conversationHistory, 
-            matchedPackages, 
-            vendors, 
+            message,
+            conversationHistory,
+            matchedPackages,
+            vendors,
             language
         );
-        
+
         // Smart suggestions
         const suggestions = generateSuggestions(extracted.category, language);
 
-        return NextResponse.json({ 
-            response, 
-            vendors, 
+        return NextResponse.json({
+            response,
+            vendors,
             packages: matchedPackages,
             suggestions: suggestions.slice(0, 3),
         });
     } catch (error) {
-        return NextResponse.json({ 
+        return NextResponse.json({
             error: 'Internal error',
             response: "Something went wrong. Please try again.",
             vendors: [],

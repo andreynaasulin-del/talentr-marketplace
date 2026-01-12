@@ -7,7 +7,7 @@ interface SkeletonProps {
 export function Skeleton({ className = '' }: SkeletonProps) {
     return (
         <div
-            className={`animate-pulse bg-gradient-to-r from-gray-200 via-gray-100 to-gray-200 bg-[length:200%_100%] rounded ${className}`}
+            className={`animate-pulse bg-gradient-to-r from-zinc-800 via-zinc-700 to-zinc-800 bg-[length:200%_100%] rounded ${className}`}
             style={{
                 animation: 'shimmer 2s infinite',
             }}
@@ -18,7 +18,7 @@ export function Skeleton({ className = '' }: SkeletonProps) {
 // Vendor Card Skeleton (for Home Page grid)
 export function VendorCardSkeleton() {
     return (
-        <div className="bg-white rounded-2xl overflow-hidden shadow-card">
+        <div className="bg-zinc-900 border border-zinc-800 rounded-2xl overflow-hidden shadow-card">
             {/* Image Skeleton */}
             <Skeleton className="w-full aspect-[4/3]" />
 
@@ -33,7 +33,7 @@ export function VendorCardSkeleton() {
                 <Skeleton className="h-4 w-40 mb-4" />
 
                 {/* Footer Row */}
-                <div className="flex items-center justify-between pt-3 border-t border-gray-100">
+                <div className="flex items-center justify-between pt-3 border-t border-zinc-800">
                     <div className="flex gap-1.5">
                         <Skeleton className="h-6 w-16 rounded-md" />
                         <Skeleton className="h-6 w-20 rounded-md" />
@@ -83,7 +83,7 @@ export function AuthFormSkeleton() {
 // Vendor Profile Page Skeleton
 export function VendorProfileSkeleton() {
     return (
-        <div className="min-h-screen bg-white">
+        <div className="min-h-screen bg-black">
             {/* Hero Skeleton */}
             <div className="max-w-7xl mx-auto">
                 <Skeleton className="h-[400px] rounded-b-3xl" />
@@ -121,7 +121,7 @@ export function VendorProfileSkeleton() {
                     {/* Right Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24">
-                            <div className="bg-white border border-gray-100 rounded-2xl shadow-lg p-6">
+                            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-lg p-6">
                                 <Skeleton className="h-6 w-24 mb-1" />
                                 <Skeleton className="h-12 w-32 mb-6" />
                                 <Skeleton className="h-12 w-full rounded-xl mb-4" />
@@ -138,13 +138,13 @@ export function VendorProfileSkeleton() {
 // Page Loading Overlay
 export function PageLoader() {
     return (
-        <div className="fixed inset-0 bg-white/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="flex flex-col items-center gap-4">
                 <div className="relative w-16 h-16">
-                    <div className="absolute inset-0 border-4 border-blue-200 rounded-full"></div>
-                    <div className="absolute inset-0 border-4 border-blue-500 rounded-full border-t-transparent animate-spin"></div>
+                    <div className="absolute inset-0 border-4 border-blue-900/50 rounded-full"></div>
+                    <div className="absolute inset-0 border-4 border-blue-600 rounded-full border-t-transparent animate-spin"></div>
                 </div>
-                <p className="text-gray-600 font-medium">Loading...</p>
+                <p className="text-zinc-400 font-medium">Loading...</p>
             </div>
         </div>
     );

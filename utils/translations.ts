@@ -84,11 +84,11 @@ export const translations: Translations = {
     },
     'Comedian': {
         en: 'Comedian',
-        he: 'קומיקאי',
+        he: 'סטנדאפיסט',
     },
     'Comedians': {
         en: 'Comedians',
-        he: 'קומיקאים',
+        he: 'סטנדאפיסטים',
     },
     'Dancer': {
         en: 'Dancer',
@@ -120,11 +120,11 @@ export const translations: Translations = {
     },
     'Kids Animator': {
         en: 'Kids Animator',
-        he: 'אנימטור לילדים',
+        he: 'מפעיל לילדים',
     },
     'Kids Animators': {
         en: 'Kids Animators',
-        he: 'אנימטורים לילדים',
+        he: 'מפעילים לילדים',
     },
     'Face Painter': {
         en: 'Face Painter',

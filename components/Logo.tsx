@@ -27,7 +27,7 @@ export default function Logo({ size = 'md', asLink = true, className }: LogoProp
                 alt="Talentr"
                 width={width}
                 height={height}
-                className="object-contain"
+                className="object-contain invert hue-rotate-180"
                 priority
             />
         </div>

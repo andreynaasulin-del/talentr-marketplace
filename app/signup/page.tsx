@@ -9,7 +9,6 @@ import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
 import { cn } from '@/lib/utils';
 import { motion, AnimatePresence } from 'framer-motion';
-import BlueAmbientBackground from '@/components/BlueAmbientBackground';
 
 export default function SignUpPage() {
     const router = useRouter();
@@ -29,6 +28,13 @@ export default function SignUpPage() {
         e.preventDefault();
         setLoading(true);
         setError(null);
+
+        const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+        if (!emailRegex.test(formData.email)) {
+            setError(language === 'he' ? 'אימייל לא תקין' : 'Invalid email address');
+            setLoading(false);
+            return;
+        }
 
         try {
             if (!supabase) throw new Error('Auth service unavailable. Please try again later.');
@@ -73,10 +79,9 @@ export default function SignUpPage() {
     const currentLang = languages.find(l => l.code === language) || languages[0];
 
     return (
-        <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row">
-            <BlueAmbientBackground />
+        <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row bg-black">
             {/* Left Side - Visual */}
-            <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-white/10 bg-white/5 backdrop-blur-xl">
+            <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl">
 
                 <div className="relative z-10 max-w-lg">
                     <motion.div
@@ -86,10 +91,10 @@ export default function SignUpPage() {
                     >
                         <Logo size="xl" className="mb-8" asLink={false} />
                         <h2 className="text-4xl font-black text-white leading-tight mb-8">
-                            Find the <span className="text-cyan-400">perfect talent</span> <br />
+                            Find the <span className="text-blue-500">perfect talent</span> <br />
                             for your special event.
                         </h2>
-                        
+
                         <div className="space-y-5">
                             {[
                                 "Access to top-rated professionals",
@@ -98,10 +103,10 @@ export default function SignUpPage() {
                                 "Trusted reviews & verified profiles"
                             ].map((item, i) => (
                                 <div key={i} className="flex items-center gap-3">
-                                    <div className="w-6 h-6 rounded-full bg-cyan-500/20 flex items-center justify-center border border-cyan-500/30">
-                                        <Check className="w-3.5 h-3.5 text-cyan-400" />
+                                    <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
+                                        <Check className="w-3.5 h-3.5 text-blue-400" />
                                     </div>
-                                    <span className="text-slate-300 font-medium">{item}</span>
+                                    <span className="text-zinc-400 font-medium">{item}</span>
                                 </div>
                             ))}
                         </div>
@@ -130,7 +135,7 @@ export default function SignUpPage() {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="absolute end-0 mt-2 w-32 bg-slate-900 border border-white/10 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden"
+                                        className="absolute end-0 mt-2 w-32 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden"
                                     >
                                         {languages.map((l) => (
                                             <button
@@ -141,7 +146,7 @@ export default function SignUpPage() {
                                                 }}
                                                 className={cn(
                                                     "w-full px-4 py-2 text-start text-sm hover:bg-white/5 transition-colors",
-                                                    language === l.code ? "text-cyan-400 font-bold" : "text-white/70"
+                                                    language === l.code ? "text-blue-500 font-bold" : "text-zinc-400"
                                                 )}
                                             >
                                                 {l.flag} {l.label}
@@ -155,7 +160,7 @@ export default function SignUpPage() {
 
                     <div className="mb-10">
                         <h1 className="text-3xl font-black text-white mb-2">{t('signUpTitle')}</h1>
-                        <p className="text-slate-400">{t('signUpSubtitle')}</p>
+                        <p className="text-zinc-400">{t('signUpSubtitle')}</p>
                     </div>
 
                     {error && (
@@ -174,7 +179,7 @@ export default function SignUpPage() {
                                     required
                                     value={formData.fullName}
                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-white/10"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-600"
                                     placeholder={t('fullNamePlaceholder')}
                                 />
                             </div>
@@ -189,7 +194,7 @@ export default function SignUpPage() {
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-white/10"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-600"
                                     placeholder={t('emailPlaceholder')}
                                 />
                             </div>
@@ -204,7 +209,7 @@ export default function SignUpPage() {
                                     required
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full bg-white/5 border border-white/10 rounded-2xl py-4 pl-12 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-cyan-500/50 transition-all placeholder:text-white/10"
+                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-600"
                                     placeholder={t('passwordPlaceholder')}
                                 />
                                 <button
@@ -221,7 +226,7 @@ export default function SignUpPage() {
                         <button
                             type="submit"
                             disabled={loading}
-                            className="w-full bg-white text-slate-950 font-black py-4 rounded-2xl hover:bg-slate-100 transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100"
+                            className="w-full bg-blue-600 text-white font-bold py-4 rounded-2xl hover:bg-blue-500 transition-all active:scale-[0.98] disabled:opacity-50 disabled:active:scale-100 shadow-lg shadow-blue-600/20"
                         >
                             {loading ? t('creatingAccount') : t('createAccountBtn')}
                         </button>
@@ -249,9 +254,9 @@ export default function SignUpPage() {
                         {t('googleBtn')}
                     </button>
 
-                    <p className="mt-10 text-center text-slate-400 font-medium">
+                    <p className="mt-10 text-center text-zinc-500 font-medium">
                         {t('alreadyHaveAccount')}{' '}
-                        <Link href="/signin" className="text-cyan-400 font-bold hover:text-cyan-300">
+                        <Link href="/signin" className="text-blue-500 font-bold hover:text-blue-400">
                             {t('signInLink')}
                         </Link>
                     </p>

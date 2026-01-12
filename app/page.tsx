@@ -33,8 +33,8 @@ export default function Home() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-slate-950">
-                <div className="w-12 h-12 border-2 border-white/20 border-t-white rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-black">
+                <div className="w-12 h-12 border-2 border-zinc-800 border-t-blue-600 rounded-full animate-spin" />
             </div>
         );
     }

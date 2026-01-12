@@ -81,7 +81,7 @@ export default function GigCarousel() {
                 .gig-carousel-section {
                     position: relative;
                     padding: 48px 0 64px;
-                    background: #F7F7F9;
+                    background: #000000;
                     width: 100%;
                     max-width: 100vw;
                     overflow: hidden !important;
@@ -105,11 +105,11 @@ export default function GigCarousel() {
                     line-height: 1.2;
                     margin-bottom: 8px;
                     font-size: 24px;
-                    color: #202125;
+                    color: #FFFFFF;
                 }
 
                 .gig-subtitle {
-                    color: #545454;
+                    color: #a1a1aa;
                     font-size: 15px;
                     max-width: 500px;
                     font-weight: 400;
@@ -153,9 +153,7 @@ export default function GigCarousel() {
                     animation: scroll-right 160s linear infinite;
                 }
 
-                .gig-row:hover .gig-track {
-                    animation-play-state: paused;
-                }
+
 
                 @keyframes scroll-left {
                     0% { transform: translateX(0); }
@@ -212,7 +210,7 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
                 direction: isHebrew ? 'rtl' : 'ltr'
             }}
         >
-            <div className="block overflow-hidden rounded-xl sm:rounded-2xl bg-[#E8E8ED] shadow-sm">
+            <div className="block overflow-hidden rounded-xl sm:rounded-2xl bg-zinc-900 border border-zinc-800 hover:border-blue-600/30 transition-colors">
                 {/* IMAGE */}
                 <div className="gig-card-image relative overflow-hidden">
                     <Image
@@ -227,12 +225,12 @@ const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' 
                 {/* CONTENT */}
                 <div className="p-3 sm:p-4">
                     {/* Category */}
-                    <p className="text-[#999999] text-[10px] sm:text-xs font-medium uppercase tracking-wide mb-1">
+                    <p className="text-zinc-500 text-[10px] sm:text-xs font-medium uppercase tracking-wide mb-1">
                         {pkg.category}
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-[#202125] font-bold text-sm sm:text-base leading-snug line-clamp-2">
+                    <h3 className="text-white font-bold text-sm sm:text-base leading-snug line-clamp-2">
                         {pkg.title[lang]}
                     </h3>
                 </div>

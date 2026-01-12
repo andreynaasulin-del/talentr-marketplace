@@ -29,7 +29,7 @@ const EVENT_TYPES = [
     { id: 'corporate', icon: '💼', en: 'Corporate', he: 'אירוע עסקי' },
     { id: 'party', icon: '🎉', en: 'Party', he: 'מסיבה' },
     { id: 'anniversary', icon: '❤️', en: 'Anniversary', he: 'יום נישואין' },
-    { id: 'graduation', icon: '🎓', en: 'Graduation', he: 'סיום' },
+    { id: 'graduation', icon: '🎓', en: 'Graduation', he: 'מסיבת סיום' },
     { id: 'other', icon: '✨', en: 'Other', he: 'אחר' },
 ];
 
@@ -283,7 +283,7 @@ export default function BookingModal({
                 initial={{ opacity: 0 }}
                 animate={{ opacity: 1 }}
                 exit={{ opacity: 0 }}
-                className="absolute inset-0 bg-black/50 backdrop-blur-xl"
+                className="absolute inset-0 bg-black/80 backdrop-blur-xl"
                 onClick={onClose}
             />
 
@@ -293,44 +293,44 @@ export default function BookingModal({
                 animate={{ opacity: 1, scale: 1, y: 0 }}
                 exit={{ opacity: 0, scale: 0.95, y: 20 }}
                 transition={{ type: 'spring', damping: 25, stiffness: 300 }}
-                className="bg-white rounded-[32px] max-w-lg w-full overflow-hidden shadow-2xl relative"
+                className="bg-zinc-900 rounded-[32px] max-w-lg w-full overflow-hidden shadow-2xl shadow-black relative border border-zinc-800"
             >
                 {/* Gradient top */}
-                <div className="h-1.5 bg-gradient-to-r from-blue-600 via-purple-600 to-pink-500" />
+                <div className="h-1 bg-gradient-to-r from-blue-600 to-blue-400" />
 
                 {/* Header */}
-                <div className="px-6 py-5 flex items-center justify-between border-b border-gray-100">
+                <div className="p-4 sm:px-6 sm:py-5 flex items-center justify-between border-b border-zinc-800 sticky top-0 bg-zinc-900 z-10">
                     <div>
-                        <h3 className="text-xl font-black text-gray-900">
+                        <h3 className="text-xl font-black text-white">
                             {language === 'he' ? 'הזמנה' : 'Book Now'}
                         </h3>
-                        <p className="text-sm text-gray-500 font-medium">{vendorName}</p>
+                        <p className="text-sm text-zinc-400 font-medium">{vendorName}</p>
                     </div>
                     <button
                         onClick={onClose}
-                        className="w-10 h-10 flex items-center justify-center bg-gray-100 hover:bg-gray-200 rounded-xl transition-all"
+                        className="w-10 h-10 flex items-center justify-center bg-zinc-800 hover:bg-zinc-700 rounded-xl transition-all border border-zinc-700 hover:border-zinc-600"
                     >
-                        <X className="w-5 h-5 text-gray-500" />
+                        <X className="w-5 h-5 text-zinc-400" />
                     </button>
                 </div>
 
                 {/* Progress Steps */}
                 {!success && (
-                    <div className="px-6 py-4 bg-gray-50 flex items-center justify-between">
+                    <div className="px-4 py-3 sm:px-6 sm:py-4 bg-black/20 flex items-center justify-between border-b border-zinc-800">
                         {steps.map((step, idx) => (
                             <div key={step.id} className="flex items-center">
                                 <div className={cn(
                                     "w-8 h-8 rounded-full flex items-center justify-center text-sm font-bold transition-all",
                                     idx <= currentStepIndex
-                                        ? "bg-blue-600 text-white"
-                                        : "bg-gray-200 text-gray-500"
+                                        ? "bg-blue-600 text-white shadow-lg shadow-blue-600/20"
+                                        : "bg-zinc-800 text-zinc-500 border border-zinc-700"
                                 )}>
                                     {idx + 1}
                                 </div>
                                 {idx < steps.length - 1 && (
                                     <div className={cn(
                                         "w-8 h-0.5 mx-1",
-                                        idx < currentStepIndex ? "bg-blue-600" : "bg-gray-200"
+                                        idx < currentStepIndex ? "bg-blue-600" : "bg-zinc-800"
                                     )} />
                                 )}
                             </div>
@@ -339,7 +339,7 @@ export default function BookingModal({
                 )}
 
                 {/* Content */}
-                <div className="px-6 py-6 min-h-[320px]">
+                <div className="p-4 sm:p-6 min-h-[320px]">
                     <AnimatePresence mode="wait" custom={1}>
                         {success ? (
                             <motion.div
@@ -379,7 +379,7 @@ export default function BookingModal({
                                         exit="exit"
                                         custom={1}
                                     >
-                                        <h4 className="text-lg font-bold text-gray-900 mb-4 flex items-center gap-2">
+                                        <h4 className="text-lg font-bold text-white mb-4 flex items-center gap-2">
                                             <Sparkles className="w-5 h-5 text-blue-500" />
                                             {language === 'he' ? 'איזה אירוע?' : 'What type of event?'}
                                         </h4>
@@ -392,14 +392,14 @@ export default function BookingModal({
                                                     className={cn(
                                                         "p-4 rounded-2xl text-left transition-all border-2",
                                                         formData.eventType === event.id
-                                                            ? "bg-blue-50 border-blue-500 shadow-lg shadow-blue-500/10"
-                                                            : "bg-white border-gray-100 hover:border-gray-200 hover:bg-gray-50"
+                                                            ? "bg-blue-600/10 border-blue-600 shadow-lg shadow-blue-600/10"
+                                                            : "bg-zinc-800/50 border-zinc-800 hover:border-zinc-700 hover:bg-zinc-800"
                                                     )}
                                                 >
                                                     <span className="text-2xl mb-2 block">{event.icon}</span>
                                                     <span className={cn(
                                                         "font-bold text-sm",
-                                                        formData.eventType === event.id ? "text-blue-700" : "text-gray-700"
+                                                        formData.eventType === event.id ? "text-blue-500" : "text-zinc-400"
                                                     )}>
                                                         {getEventLabel(event)}
                                                     </span>
@@ -421,7 +421,7 @@ export default function BookingModal({
                                         className="space-y-5"
                                     >
                                         <div>
-                                            <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+                                            <label className="flex items-center gap-2 text-sm font-bold text-zinc-400 mb-2">
                                                 <Calendar className="w-4 h-4 text-blue-500" />
                                                 {language === 'he' ? 'תאריך האירוע' : 'Event Date'} *
                                             </label>
@@ -431,12 +431,12 @@ export default function BookingModal({
                                                 min={new Date().toISOString().split('T')[0]}
                                                 value={formData.eventDate}
                                                 onChange={(e) => setFormData({ ...formData, eventDate: e.target.value })}
-                                                className="w-full h-14 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none text-gray-900 font-medium"
+                                                className="w-full h-14 px-4 bg-zinc-800 rounded-xl border-2 border-zinc-700 focus:border-blue-500 focus:bg-zinc-900 transition-all outline-none text-white text-base font-medium scheme-dark"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+                                            <label className="flex items-center gap-2 text-sm font-bold text-zinc-400 mb-2">
                                                 <Clock className="w-4 h-4 text-blue-500" />
                                                 {language === 'he' ? 'שעה (אופציונלי)' : 'Time (optional)'}
                                             </label>
@@ -444,12 +444,12 @@ export default function BookingModal({
                                                 type="time"
                                                 value={formData.eventTime}
                                                 onChange={(e) => setFormData({ ...formData, eventTime: e.target.value })}
-                                                className="w-full h-14 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none text-gray-900 font-medium"
+                                                className="w-full h-14 px-4 bg-zinc-800 rounded-xl border-2 border-zinc-700 focus:border-blue-500 focus:bg-zinc-900 transition-all outline-none text-white text-base font-medium scheme-dark"
                                             />
                                         </div>
 
                                         <div>
-                                            <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-2">
+                                            <label className="flex items-center gap-2 text-sm font-bold text-zinc-400 mb-2">
                                                 <Users className="w-4 h-4 text-blue-500" />
                                                 {language === 'he' ? 'מספר אורחים' : 'Guest Count'}
                                             </label>
@@ -462,8 +462,8 @@ export default function BookingModal({
                                                         className={cn(
                                                             "p-3 rounded-xl text-sm font-medium transition-all border-2",
                                                             formData.guestCount === option.value
-                                                                ? "bg-blue-50 border-blue-500 text-blue-700"
-                                                                : "bg-white border-gray-100 text-gray-600 hover:border-gray-200"
+                                                                ? "bg-blue-600/10 border-blue-600 text-blue-500"
+                                                                : "bg-zinc-800 border-zinc-700 text-zinc-400 hover:border-zinc-600 hover:text-zinc-200"
                                                         )}
                                                     >
                                                         {getGuestLabel(option)}
@@ -484,14 +484,14 @@ export default function BookingModal({
                                         exit="exit"
                                         custom={1}
                                     >
-                                        <label className="flex items-center gap-2 text-sm font-bold text-gray-700 mb-3">
+                                        <label className="flex items-center gap-2 text-sm font-bold text-zinc-400 mb-3">
                                             <MessageSquare className="w-4 h-4 text-blue-500" />
                                             {language === 'he' ? 'הודעה לאיש המקצוע' : 'Message to the pro'}
                                         </label>
                                         <textarea
                                             value={formData.details}
                                             onChange={(e) => setFormData({ ...formData, details: e.target.value })}
-                                            className="w-full p-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none text-gray-900 min-h-[180px] resize-none"
+                                            className="w-full p-4 bg-zinc-800 rounded-xl border-2 border-zinc-700 focus:border-blue-500 focus:bg-zinc-900 transition-all outline-none text-white text-base min-h-[180px] resize-none placeholder:text-zinc-600"
                                             placeholder={
                                                 language === 'he'
                                                     ? 'ספר לנו עוד על האירוע שלך, העדפות, דרישות מיוחדות...'
@@ -512,35 +512,35 @@ export default function BookingModal({
                                         custom={1}
                                         className="space-y-4"
                                     >
-                                        <h4 className="text-lg font-bold text-gray-900 mb-4">
+                                        <h4 className="text-lg font-bold text-white mb-4">
                                             {language === 'he' ? 'אשר פרטים' : 'Confirm Details'}
                                         </h4>
 
-                                        <div className="bg-gray-50 rounded-2xl p-5 space-y-4">
+                                        <div className="bg-zinc-800/50 rounded-2xl p-5 space-y-4 border border-zinc-800">
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{language === 'he' ? 'איש מקצוע' : 'Professional'}</span>
-                                                <span className="font-bold text-gray-900">{vendorName}</span>
+                                                <span className="text-zinc-500">{language === 'he' ? 'איש מקצוע' : 'Professional'}</span>
+                                                <span className="font-bold text-white">{vendorName}</span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{language === 'he' ? 'אירוע' : 'Event'}</span>
-                                                <span className="font-bold text-gray-900">
+                                                <span className="text-zinc-500">{language === 'he' ? 'אירוע' : 'Event'}</span>
+                                                <span className="font-bold text-white">
                                                     {EVENT_TYPES.find(e => e.id === formData.eventType)?.icon} {getEventLabel(EVENT_TYPES.find(e => e.id === formData.eventType) || EVENT_TYPES[0])}
                                                 </span>
                                             </div>
                                             <div className="flex justify-between">
-                                                <span className="text-gray-500">{language === 'he' ? 'תאריך' : 'Date'}</span>
-                                                <span className="font-bold text-gray-900">{formData.eventDate}</span>
+                                                <span className="text-zinc-500">{language === 'he' ? 'תאריך' : 'Date'}</span>
+                                                <span className="font-bold text-white">{formData.eventDate}</span>
                                             </div>
                                             {formData.eventTime && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-gray-500">{language === 'he' ? 'שעה' : 'Time'}</span>
-                                                    <span className="font-bold text-gray-900">{formData.eventTime}</span>
+                                                    <span className="text-zinc-500">{language === 'he' ? 'שעה' : 'Time'}</span>
+                                                    <span className="font-bold text-white">{formData.eventTime}</span>
                                                 </div>
                                             )}
                                             {formData.guestCount && (
                                                 <div className="flex justify-between">
-                                                    <span className="text-gray-500">{language === 'he' ? 'אורחים' : 'Guests'}</span>
-                                                    <span className="font-bold text-gray-900">{formData.guestCount}</span>
+                                                    <span className="text-zinc-500">{language === 'he' ? 'אורחים' : 'Guests'}</span>
+                                                    <span className="font-bold text-white">{formData.guestCount}</span>
                                                 </div>
                                             )}
                                         </div>
@@ -559,11 +559,11 @@ export default function BookingModal({
 
                 {/* Footer Actions */}
                 {!success && (
-                    <div className="px-6 py-4 bg-gray-50 flex items-center justify-between gap-3 border-t border-gray-100">
+                    <div className="px-6 py-4 bg-zinc-900 flex items-center justify-between gap-3 border-t border-zinc-800">
                         {currentStep !== 'event' ? (
                             <button
                                 onClick={prevStep}
-                                className="px-5 py-3 text-gray-600 font-bold rounded-xl hover:bg-gray-200 transition-all"
+                                className="px-5 py-3 text-zinc-400 font-bold rounded-xl hover:bg-zinc-800 transition-all hover:text-white"
                             >
                                 {language === 'he' ? 'חזרה' : 'Back'}
                             </button>

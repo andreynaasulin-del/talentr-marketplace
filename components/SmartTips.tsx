@@ -99,7 +99,7 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                 animate={{ opacity: 1, y: 0, scale: 1 }}
                 exit={{ opacity: 0, y: -20, scale: 0.95 }}
                 className={cn(
-                    "relative overflow-hidden rounded-2xl border border-gray-100 bg-white shadow-lg",
+                    "relative overflow-hidden rounded-2xl border border-zinc-800 bg-zinc-900 shadow-lg",
                     className
                 )}
             >
@@ -131,7 +131,7 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                         </div>
                         <button
                             onClick={() => setIsDismissed(true)}
-                            className="p-1.5 rounded-full hover:bg-gray-100 transition-colors text-gray-400 hover:text-gray-600"
+                            className="p-1.5 rounded-full hover:bg-zinc-800 transition-colors text-zinc-500 hover:text-zinc-300"
                         >
                             <X className="w-4 h-4" />
                         </button>
@@ -146,10 +146,10 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                             exit={{ opacity: 0, x: -20 }}
                             transition={{ duration: 0.3 }}
                         >
-                            <h4 className="font-bold text-gray-900 mb-1">
+                            <h4 className="font-bold text-white mb-1">
                                 {currentTip.title[language as keyof typeof currentTip.title]}
                             </h4>
-                            <p className="text-sm text-gray-600 leading-relaxed">
+                            <p className="text-sm text-zinc-400 leading-relaxed">
                                 {currentTip.description[language as keyof typeof currentTip.description]}
                             </p>
                         </motion.div>
@@ -160,7 +160,7 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                         <motion.button
                             whileHover={{ scale: 1.02, x: 5 }}
                             whileTap={{ scale: 0.98 }}
-                            className="mt-4 flex items-center gap-2 text-sm font-bold text-blue-600 hover:text-blue-700"
+                            className="mt-4 flex items-center gap-2 text-sm font-bold text-blue-500 hover:text-blue-400"
                         >
                             {currentTip.action.label[language as keyof typeof currentTip.action.label]}
                             <ChevronRight className="w-4 h-4" />
@@ -168,7 +168,7 @@ export default function SmartTips({ vendorName, vendorCategory, className }: Sma
                     )}
 
                     {/* Tip Indicators */}
-                    <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-gray-100">
+                    <div className="flex items-center justify-center gap-2 mt-4 pt-4 border-t border-zinc-800">
                         {tips.map((tip, index) => (
                             <button
                                 key={tip.id}

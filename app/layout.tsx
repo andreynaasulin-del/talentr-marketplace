@@ -90,8 +90,8 @@ export const metadata: Metadata = {
 
 export const viewport: Viewport = {
     themeColor: [
-        { media: '(prefers-color-scheme: light)', color: '#ffffff' },
-        { media: '(prefers-color-scheme: dark)', color: '#0f172a' },
+        { media: '(prefers-color-scheme: light)', color: '#000000' },
+        { media: '(prefers-color-scheme: dark)', color: '#000000' },
     ],
     width: 'device-width',
     initialScale: 1,
@@ -125,9 +125,10 @@ export default function RootLayout({
                     closeButton
                     toastOptions={{
                         style: {
-                            background: 'white',
-                            border: '1px solid #e5e7eb',
+                            background: '#18181b',
+                            border: '1px solid #27272a',
                             borderRadius: '16px',
+                            color: 'white',
                         },
                     }}
                 />

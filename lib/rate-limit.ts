@@ -1,7 +1,60 @@
 /**
- * Simple in-memory rate limiter for API routes
- * For production, use Redis-based solution (Upstash)
+ * Hybrid Rate Limiter: Upstash Redis (production) + In-memory (fallback)
+ * 
+ * Priority:
+ * 1. If UPSTASH_REDIS_REST_URL is set → Use Upstash (serverless-compatible, distributed)
+ * 2. Otherwise → Use in-memory (for local development)
  */
+
+import { Ratelimit } from '@upstash/ratelimit';
+import { Redis } from '@upstash/redis';
+
+// ============================================================
+// TYPES
+// ============================================================
+
+interface RateLimitConfig {
+    maxRequests: number;  // Max requests per window
+    windowMs: number;     // Time window in milliseconds
+}
+
+interface RateLimitResult {
+    success: boolean;
+    remaining: number;
+    resetIn: number;
+    limit: number;
+}
+
+// ============================================================
+// UPSTASH REDIS RATE LIMITER (Production)
+// ============================================================
+
+let upstashRatelimit: Ratelimit | null = null;
+
+function getUpstashRatelimit(config: RateLimitConfig): Ratelimit | null {
+    // Check if Upstash credentials are available
+    if (!process.env.UPSTASH_REDIS_REST_URL || !process.env.UPSTASH_REDIS_REST_TOKEN) {
+        return null;
+    }
+
+    // Create Upstash Redis client
+    const redis = new Redis({
+        url: process.env.UPSTASH_REDIS_REST_URL,
+        token: process.env.UPSTASH_REDIS_REST_TOKEN,
+    });
+
+    // Create rate limiter with sliding window algorithm
+    return new Ratelimit({
+        redis,
+        limiter: Ratelimit.slidingWindow(config.maxRequests, `${config.windowMs}ms`),
+        analytics: true, // Enable analytics in Upstash dashboard
+        prefix: 'talentr_ratelimit',
+    });
+}
+
+// ============================================================
+// IN-MEMORY RATE LIMITER (Fallback for development)
+// ============================================================
 
 interface RateLimitEntry {
     count: number;
@@ -22,26 +75,9 @@ if (typeof setInterval !== 'undefined') {
     }, 5 * 60 * 1000);
 }
 
-interface RateLimitConfig {
-    maxRequests: number;  // Max requests per window
-    windowMs: number;     // Time window in milliseconds
-}
-
-interface RateLimitResult {
-    success: boolean;
-    remaining: number;
-    resetIn: number;
-    limit: number;
-}
-
-/**
- * Check if request should be rate limited
- * @param identifier - Unique identifier (IP, user ID, etc.)
- * @param config - Rate limit configuration
- */
-export function rateLimit(
+function inMemoryRateLimit(
     identifier: string,
-    config: RateLimitConfig = { maxRequests: 10, windowMs: 60 * 1000 }
+    config: RateLimitConfig
 ): RateLimitResult {
     const now = Date.now();
     const key = identifier;
@@ -85,20 +121,74 @@ export function rateLimit(
     };
 }
 
+// ============================================================
+// UNIFIED RATE LIMIT FUNCTION
+// ============================================================
+
+/**
+ * Check if request should be rate limited
+ * Uses Upstash Redis in production, falls back to in-memory for development
+ * 
+ * @param identifier - Unique identifier (IP, user ID, etc.)
+ * @param config - Rate limit configuration
+ */
+export async function rateLimit(
+    identifier: string,
+    config: RateLimitConfig = { maxRequests: 10, windowMs: 60 * 1000 }
+): Promise<RateLimitResult> {
+    // Try Upstash first (production)
+    const upstash = getUpstashRatelimit(config);
+
+    if (upstash) {
+        try {
+            const result = await upstash.limit(identifier);
+            return {
+                success: result.success,
+                remaining: result.remaining,
+                resetIn: result.reset - Date.now(),
+                limit: result.limit,
+            };
+        } catch (error) {
+            console.warn('[RateLimit] Upstash error, falling back to in-memory:', error);
+            // Fall through to in-memory
+        }
+    }
+
+    // Fallback to in-memory (development or Upstash error)
+    return inMemoryRateLimit(identifier, config);
+}
+
+// Synchronous version for backwards compatibility
+export function rateLimitSync(
+    identifier: string,
+    config: RateLimitConfig = { maxRequests: 10, windowMs: 60 * 1000 }
+): RateLimitResult {
+    return inMemoryRateLimit(identifier, config);
+}
+
+// ============================================================
+// UTILITY FUNCTIONS
+// ============================================================
+
 /**
  * Get client IP from request headers
  */
 export function getClientIP(request: Request): string {
+    // Vercel/Cloudflare headers
+    const cfConnectingIP = request.headers.get('cf-connecting-ip');
+    if (cfConnectingIP) return cfConnectingIP;
+
+    // X-Forwarded-For (most common)
     const forwarded = request.headers.get('x-forwarded-for');
+    if (forwarded) return forwarded.split(',')[0].trim();
+
+    // X-Real-IP (Nginx)
     const realIP = request.headers.get('x-real-ip');
+    if (realIP) return realIP;
 
-    if (forwarded) {
-        return forwarded.split(',')[0].trim();
-    }
-
-    if (realIP) {
-        return realIP;
-    }
+    // Vercel specific
+    const vercelIP = request.headers.get('x-vercel-forwarded-for');
+    if (vercelIP) return vercelIP.split(',')[0].trim();
 
     return 'unknown';
 }
@@ -114,16 +204,25 @@ export function rateLimitHeaders(result: RateLimitResult): HeadersInit {
     };
 }
 
-// Preset configurations
+// ============================================================
+// PRESET CONFIGURATIONS
+// ============================================================
+
 export const RATE_LIMITS = {
     // AI Chat: 20 requests per minute
     chat: { maxRequests: 20, windowMs: 60 * 1000 },
 
-    // Auth: 5 attempts per 15 minutes
+    // AI Search: 10 requests per minute (more expensive)
+    aiSearch: { maxRequests: 10, windowMs: 60 * 1000 },
+
+    // Auth: 5 attempts per 15 minutes (brute force protection)
     auth: { maxRequests: 5, windowMs: 15 * 60 * 1000 },
 
-    // Email: 3 per minute
+    // Email: 3 per minute (spam protection)
     email: { maxRequests: 3, windowMs: 60 * 1000 },
+
+    // Booking: 10 per minute
+    booking: { maxRequests: 10, windowMs: 60 * 1000 },
 
     // General API: 100 per minute
     api: { maxRequests: 100, windowMs: 60 * 1000 },

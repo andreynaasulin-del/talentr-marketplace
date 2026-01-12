@@ -4,7 +4,6 @@ import { useEffect, useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Navbar from '@/components/Navbar';
-import BlueAmbientBackground from '@/components/BlueAmbientBackground';
 import { User } from '@supabase/supabase-js';
 import {
     ArrowLeft, Save, Loader2, Camera, User as UserIcon,
@@ -165,37 +164,32 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="relative min-h-screen flex items-center justify-center overflow-hidden">
-                <BlueAmbientBackground />
-                <Loader2 className="w-10 h-10 animate-spin" style={{ color: '#C8B37A' }} />
+            <div className="relative min-h-screen bg-black flex items-center justify-center overflow-hidden">
+                <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
             </div>
         );
     }
 
     return (
-        <div className="obsidian-settings min-h-screen text-white relative overflow-hidden">
+        <div className="min-h-screen bg-black text-white relative">
             <Navbar />
-            <BlueAmbientBackground />
 
-            <main className="relative max-w-3xl mx-auto px-4 md:px-6 pt-28 pb-14">
+            <main className="relative max-w-4xl mx-auto px-4 md:px-6 pt-28 pb-14">
 
                 {/* Header */}
-                <div className="flex items-center justify-between mb-7">
+                <div className="flex items-center justify-between mb-8">
                     <div className="flex items-center gap-4">
                         <Link
                             href="/dashboard"
-                            className="p-3 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors backdrop-blur-xl"
+                            className="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
                         >
-                            <ArrowLeft className="w-5 h-5 text-white/70" />
+                            <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1
-                                className="text-2xl md:text-3xl tracking-[0.16em]"
-                                style={{ fontFamily: 'var(--font-serif), serif' }}
-                            >
+                            <h1 className="text-3xl font-bold text-white">
                                 {language === 'he' ? 'הגדרות פרופיל' : 'Profile Settings'}
                             </h1>
-                            <p className="text-white/55 text-sm mt-1">
+                            <p className="text-zinc-400 mt-1">
                                 {language === 'he' ? 'מלא את הפרטים כדי לקבל הזמנות' : 'Complete your profile to get bookings'}
                             </p>
                         </div>
@@ -203,7 +197,7 @@ export default function SettingsPage() {
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-5 py-2.5 bg-[#C8B37A] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50"
+                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl transition-all hover:bg-blue-500 disabled:opacity-50 shadow-lg shadow-blue-600/20"
                     >
                         {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                         {language === 'he' ? 'שמור' : 'Save'}
@@ -211,27 +205,20 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="rounded-3xl p-5 border border-white/10 bg-white/4 backdrop-blur-xl mb-7">
+                <div className="rounded-2xl p-5 border border-zinc-800 bg-zinc-900 mb-8">
                     <div className="flex items-center justify-between mb-3">
-                        <span className="text-[11px] font-bold text-white/55 uppercase tracking-[0.3em]">
+                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
                             {language === 'he' ? 'השלמת פרופיל' : 'Profile Completion'}
                         </span>
-                        <span
-                            className="text-lg font-semibold tracking-[0.12em]"
-                            style={{ fontFamily: 'var(--font-serif), serif', color: '#C8B37A' }}
-                        >
+                        <span className="text-lg font-bold text-blue-500">
                             {Math.round(progressPercent)}%
                         </span>
                     </div>
-                    <div className="h-2 bg-white/10 rounded-full overflow-hidden">
+                    <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
-                            className="h-full rounded-full"
-                            style={{
-                                background: 'linear-gradient(90deg, rgba(200,179,122,0.85), rgba(200,179,122,0.55))',
-                                boxShadow: '0 0 18px rgba(200,179,122,0.14)',
-                            }}
+                            className="h-full rounded-full bg-blue-600"
                         />
                     </div>
                 </div>
@@ -243,32 +230,29 @@ export default function SettingsPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="rounded-3xl p-5 md:p-6 border border-white/10 bg-white/4 backdrop-blur-xl shadow-[0_30px_120px_rgba(0,0,0,0.60)]"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
                     >
-                        <h2
-                            className="text-sm uppercase tracking-[0.35em] text-white/70 mb-5 flex items-center gap-2"
-                            style={{ fontFamily: 'var(--font-serif), serif' }}
-                        >
-                            <UserIcon className="w-5 h-5" style={{ color: '#C8B37A' }} />
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <UserIcon className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'מידע בסיסי' : 'Basic Information'}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     {language === 'he' ? 'שם מלא' : 'Full Name'}
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.full_name}
                                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="John Doe"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     <Mail className="w-4 h-4 inline mr-1" />
                                     Email
                                 </label>
@@ -276,13 +260,13 @@ export default function SettingsPage() {
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="your@email.com"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     <Phone className="w-4 h-4 inline mr-1" />
                                     {language === 'he' ? 'טלפון (WhatsApp)' : 'Phone (WhatsApp)'}
                                 </label>
@@ -290,13 +274,13 @@ export default function SettingsPage() {
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="972501234567"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     <Camera className="w-4 h-4 inline mr-1" />
                                     {language === 'he' ? 'URL תמונת פרופיל' : 'Profile Photo URL'}
                                 </label>
@@ -304,7 +288,7 @@ export default function SettingsPage() {
                                     type="url"
                                     value={formData.avatar_url}
                                     onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="https://..."
                                 />
                             </div>
@@ -316,24 +300,24 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-purple-600" />
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <FileText className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'אודות' : 'About You'}
-                            {formData.bio.length > 10 && <CheckCircle className="w-5 h-5 text-green-500" />}
+                            {formData.bio.length > 10 && <CheckCircle className="w-5 h-5 text-blue-500" />}
                         </h2>
 
                         <textarea
                             value={formData.bio}
                             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                             rows={5}
-                            className="w-full p-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none resize-none"
+                            className="w-full p-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all resize-none"
                             placeholder={language === 'he'
                                 ? 'ספר ללקוחות על הניסיון שלך, סגנון העבודה ולמה כדאי להזמין אותך...'
                                 : 'Tell clients about your experience, style, and why they should book you...'}
                         />
-                        <p className="text-sm text-gray-400 mt-2">
+                        <p className="text-sm text-zinc-500 mt-2">
                             {formData.bio.length}/500 {language === 'he' ? 'תווים' : 'characters'}
                         </p>
                     </motion.div>
@@ -343,23 +327,23 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <Tag className="w-5 h-5 text-amber-600" />
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <Tag className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'קטגוריה ומחירים' : 'Category & Pricing'}
-                            {formData.price_from > 0 && <CheckCircle className="w-5 h-5 text-green-500" />}
+                            {formData.price_from > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     {language === 'he' ? 'קטגוריה' : 'Category'}
                                 </label>
                                 <select
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white focus:border-blue-600 focus:outline-none transition-all"
                                 >
                                     <option value="">Select...</option>
                                     {CATEGORIES.map(cat => (
@@ -369,14 +353,14 @@ export default function SettingsPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     <MapPin className="w-4 h-4 inline mr-1" />
                                     {language === 'he' ? 'עיר' : 'City'}
                                 </label>
                                 <select
                                     value={formData.city}
                                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white focus:border-blue-600 focus:outline-none transition-all"
                                 >
                                     <option value="">Select...</option>
                                     {CITIES.map(city => (
@@ -386,14 +370,14 @@ export default function SettingsPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-bold text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     {language === 'he' ? 'מחיר החל מ (₪)' : 'Price from (₪)'}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.price_from || ''}
                                     onChange={(e) => setFormData({ ...formData, price_from: Number(e.target.value) })}
-                                    className="w-full h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="1500"
                                     min="0"
                                 />
@@ -406,15 +390,15 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="bg-white rounded-2xl p-6 md:p-8 shadow-sm border border-gray-100"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-gray-900 mb-6 flex items-center gap-2">
-                            <Camera className="w-5 h-5 text-pink-600" />
+                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                            <Camera className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'גלריית עבודות' : 'Portfolio Gallery'}
-                            {formData.portfolio_gallery.length > 0 && <CheckCircle className="w-5 h-5 text-green-500" />}
+                            {formData.portfolio_gallery.length > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
                         </h2>
 
-                        <p className="text-gray-500 mb-6">
+                        <p className="text-zinc-500 mb-6">
                             {language === 'he'
                                 ? 'הוסף קישורים לעבודות הטובות שלך (URL של תמונות)'
                                 : 'Add URLs to your best work samples (image URLs)'}
@@ -426,13 +410,13 @@ export default function SettingsPage() {
                                 type="url"
                                 value={newPhotoUrl}
                                 onChange={(e) => setNewPhotoUrl(e.target.value)}
-                                className="flex-1 h-12 px-4 bg-gray-50 rounded-xl border-2 border-gray-100 focus:border-blue-500 focus:bg-white transition-all outline-none"
+                                className="flex-1 h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                 placeholder="https://images.unsplash.com/..."
                                 onKeyDown={(e) => e.key === 'Enter' && addPhotoToGallery()}
                             />
                             <button
                                 onClick={addPhotoToGallery}
-                                className="px-6 h-12 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all flex items-center gap-2"
+                                className="px-6 h-12 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all flex items-center gap-2"
                             >
                                 <Plus className="w-5 h-5" />
                                 {language === 'he' ? 'הוסף' : 'Add'}
@@ -443,7 +427,7 @@ export default function SettingsPage() {
                         {formData.portfolio_gallery.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {formData.portfolio_gallery.map((url, index) => (
-                                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group">
+                                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-zinc-800">
                                         <Image
                                             src={url}
                                             alt={`Portfolio ${index + 1}`}
@@ -452,7 +436,7 @@ export default function SettingsPage() {
                                         />
                                         <button
                                             onClick={() => removePhotoFromGallery(index)}
-                                            className="absolute top-2 right-2 p-2 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                            className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
                                         >
                                             <X className="w-4 h-4" />
                                         </button>
@@ -460,9 +444,9 @@ export default function SettingsPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12 border-2 border-dashed border-gray-200 rounded-xl">
-                                <Camera className="w-12 h-12 mx-auto mb-4 text-gray-300" />
-                                <p className="text-gray-400">
+                            <div className="text-center py-12 border-2 border-dashed border-zinc-800 rounded-xl">
+                                <Camera className="w-12 h-12 mx-auto mb-4 text-zinc-700" />
+                                <p className="text-zinc-500">
                                     {language === 'he' ? 'אין עדיין תמונות בגלריה' : 'No photos in portfolio yet'}
                                 </p>
                             </div>
@@ -470,11 +454,11 @@ export default function SettingsPage() {
                     </motion.div>
 
                     {/* Save Button (Bottom) */}
-                    <div className="flex justify-end">
+                    <div className="flex justify-end pb-10">
                         <button
                             onClick={handleSave}
                             disabled={saving}
-                            className="flex items-center gap-2 px-7 py-3 bg-[#C8B37A] text-[#05070A] font-black rounded-xl transition-all hover:opacity-90 disabled:opacity-50 shadow-[0_0_40px_rgba(200,179,122,0.12)]"
+                            className="flex items-center gap-2 px-8 py-4 bg-blue-600 text-white font-bold rounded-xl transition-all hover:bg-blue-500 disabled:opacity-50 shadow-lg shadow-blue-600/20"
                         >
                             {saving ? <Loader2 className="w-5 h-5 animate-spin" /> : <Save className="w-5 h-5" />}
                             {language === 'he' ? 'שמור שינויים' : 'Save Changes'}
@@ -482,49 +466,6 @@ export default function SettingsPage() {
                     </div>
                 </div>
             </main>
-
-            {/* Obsidian & Gold theme overrides for legacy classes */}
-            <style jsx global>{`
-                .obsidian-settings .bg-white {
-                    background: rgba(255, 255, 255, 0.04) !important;
-                }
-                .obsidian-settings .bg-gray-50,
-                .obsidian-settings .bg-gray-100 {
-                    background: rgba(255, 255, 255, 0.05) !important;
-                }
-                .obsidian-settings .border-gray-100,
-                .obsidian-settings .border-gray-200 {
-                    border-color: rgba(255, 255, 255, 0.12) !important;
-                }
-                .obsidian-settings .text-gray-900,
-                .obsidian-settings .text-gray-800,
-                .obsidian-settings .text-gray-700 {
-                    color: rgba(255, 255, 255, 0.88) !important;
-                }
-                .obsidian-settings .text-gray-600,
-                .obsidian-settings .text-gray-500,
-                .obsidian-settings .text-gray-400 {
-                    color: rgba(255, 255, 255, 0.55) !important;
-                }
-                .obsidian-settings input,
-                .obsidian-settings textarea,
-                .obsidian-settings select {
-                    background: rgba(255, 255, 255, 0.05) !important;
-                    border-color: rgba(255, 255, 255, 0.12) !important;
-                    color: rgba(255, 255, 255, 0.92) !important;
-                }
-                .obsidian-settings input::placeholder,
-                .obsidian-settings textarea::placeholder {
-                    color: rgba(255, 255, 255, 0.25) !important;
-                }
-                .obsidian-settings input:focus,
-                .obsidian-settings textarea:focus,
-                .obsidian-settings select:focus {
-                    border-color: rgba(212, 175, 55, 0.55) !important;
-                    box-shadow: 0 0 0 3px rgba(212, 175, 55, 0.1) !important;
-                    outline: none !important;
-                }
-            `}</style>
         </div>
     );
 }

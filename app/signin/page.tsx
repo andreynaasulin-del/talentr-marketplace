@@ -4,14 +4,24 @@ import { useState } from 'react';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
 import Link from 'next/link';
-import { Mail, Lock, Eye, EyeOff } from 'lucide-react';
+import { Mail, Lock, Eye, EyeOff, ChevronDown } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
+import { motion, AnimatePresence } from 'framer-motion';
+import { cn } from '@/lib/utils';
 
 export default function SignInPage() {
     const router = useRouter();
-    const { language } = useLanguage();
+    const { language, setLanguage } = useLanguage();
     const lang = language as 'en' | 'he';
+    const [showLangDropdown, setShowLangDropdown] = useState(false);
+
+    const languages = [
+        { code: 'en' as const, label: 'EN', flag: '🇺🇸' },
+        { code: 'he' as const, label: 'עב', flag: '🇮🇱' },
+    ];
+
+    const currentLang = languages.find((l) => l.code === language) || languages[0];
 
     const [formData, setFormData] = useState({ email: '', password: '' });
     const [showPassword, setShowPassword] = useState(false);
@@ -65,7 +75,50 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen relative overflow-hidden bg-black">
+        <div className="min-h-screen relative overflow-hidden bg-black" dir={language === 'he' ? 'rtl' : 'ltr'}>
+            {/* Language Switcher */}
+            <div className="absolute top-4 end-4 z-20">
+                <div className="relative">
+                    <button
+                        onClick={() => setShowLangDropdown(!showLangDropdown)}
+                        className="flex items-center gap-1 px-3 py-2 text-sm font-bold text-white/90 hover:bg-white/10 rounded-xl transition-colors"
+                    >
+                        <span className="text-lg">{currentLang.flag}</span>
+                        <ChevronDown className={cn("w-4 h-4 transition-transform", showLangDropdown && "rotate-180")} />
+                    </button>
+
+                    <AnimatePresence>
+                        {showLangDropdown && (
+                            <>
+                                <div className="fixed inset-0 z-40" onClick={() => setShowLangDropdown(false)} />
+                                <motion.div
+                                    initial={{ opacity: 0, y: -10 }}
+                                    animate={{ opacity: 1, y: 0 }}
+                                    exit={{ opacity: 0, y: -10 }}
+                                    className="absolute end-0 mt-2 w-32 bg-zinc-900 rounded-xl shadow-lg shadow-black/50 py-1 z-50 border border-zinc-800"
+                                >
+                                    {languages.map((lang) => (
+                                        <button
+                                            key={lang.code}
+                                            onClick={() => {
+                                                setLanguage(lang.code);
+                                                setShowLangDropdown(false);
+                                            }}
+                                            className={cn(
+                                                "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-800 transition-colors",
+                                                language === lang.code ? 'text-blue-500' : 'text-zinc-300'
+                                            )}
+                                        >
+                                            <span className="text-lg">{lang.flag}</span>
+                                            <span className="font-medium">{lang.label}</span>
+                                        </button>
+                                    ))}
+                                </motion.div>
+                            </>
+                        )}
+                    </AnimatePresence>
+                </div>
+            </div>
 
             {/* Content */}
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
@@ -76,10 +129,10 @@ export default function SignInPage() {
                     </Link>
 
                     {/* Sign In Card */}
-                    <div className="bg-white/95 backdrop-blur-xl rounded-2xl shadow-2xl p-8 border border-white/20">
+                    <div className="bg-zinc-900 rounded-2xl shadow-2xl p-8 border border-zinc-800 shadow-black/50">
                         <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.title}</h2>
-                            <p className="text-gray-600">{t.subtitle}</p>
+                            <h2 className="text-2xl font-bold text-white mb-2">{t.title}</h2>
+                            <p className="text-zinc-400">{t.subtitle}</p>
                         </div>
 
                         {error && (
@@ -91,16 +144,16 @@ export default function SignInPage() {
                         <form onSubmit={handleSignIn} className="space-y-5">
                             {/* Email */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     {t.email}
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                                     <input
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-#0066FF focus:border-transparent transition-all"
+                                        className="w-full pl-11 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                                         placeholder="you@example.com"
                                         required
                                     />
@@ -109,16 +162,16 @@ export default function SignInPage() {
 
                             {/* Password */}
                             <div>
-                                <label className="block text-sm font-medium text-gray-700 mb-2">
+                                <label className="block text-sm font-medium text-zinc-400 mb-2">
                                     {t.password}
                                 </label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-gray-400" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        className="w-full pl-11 pr-12 py-3 border border-gray-300 rounded-lg focus:ring-2 focus:ring-#0066FF focus:border-transparent transition-all"
+                                        className="w-full pl-11 pr-12 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                                         placeholder="••••••••"
                                         required
                                     />
@@ -134,7 +187,7 @@ export default function SignInPage() {
 
                             {/* Forgot Password */}
                             <div className="text-right">
-                                <Link href="/forgot-password" className="text-sm text-#0066FF hover:underline">
+                                <Link href="/forgot-password" className="text-sm text-blue-500 hover:text-blue-400 hover:underline">
                                     {t.forgotPassword}
                                 </Link>
                             </div>
@@ -143,7 +196,7 @@ export default function SignInPage() {
                             <button
                                 type="submit"
                                 disabled={loading}
-                                className="w-full py-3 bg-#0066FF text-black font-bold rounded-lg hover:bg-#0052CC disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg hover:shadow-#0066FF/50"
+                                className="w-full py-3 bg-blue-600 text-white font-bold rounded-lg hover:bg-blue-500 disabled:opacity-50 disabled:cursor-not-allowed transition-all shadow-lg shadow-blue-600/20"
                             >
                                 {loading ? (
                                     <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mx-auto" />
@@ -154,9 +207,9 @@ export default function SignInPage() {
                         </form>
 
                         {/* Sign Up Link */}
-                        <div className="mt-6 text-center text-sm text-gray-600">
+                        <div className="mt-6 text-center text-sm text-zinc-400">
                             {t.noAccount}{' '}
-                            <Link href="/signup" className="text-#0066FF font-semibold hover:underline">
+                            <Link href="/signup" className="text-blue-500 font-semibold hover:text-blue-400 hover:underline">
                                 {t.signUp}
                             </Link>
                         </div>
@@ -164,7 +217,7 @@ export default function SignInPage() {
 
                     {/* Back to Home */}
                     <div className="mt-6 text-center">
-                        <Link href="/" className="text-white/80 hover:text-white text-sm">
+                        <Link href="/" className="text-zinc-500 hover:text-white text-sm transition-colors">
                             ← {lang === 'he' ? 'חזור לדף הבית' : 'Back to home'}
                         </Link>
                     </div>
