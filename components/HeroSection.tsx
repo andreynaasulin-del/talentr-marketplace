@@ -230,7 +230,7 @@ export default function HeroSection() {
     };
 
     return (
-        <section className="relative min-h-screen overflow-hidden bg-black">
+        <section className="relative min-h-screen overflow-hidden bg-white dark:bg-black transition-colors">
 
             {/* === CONTENT === */}
             <div className="relative z-10 max-w-5xl mx-auto px-4 sm:px-6 md:px-8 pt-24 sm:pt-32 md:pt-40 pb-16 sm:pb-20">
@@ -238,11 +238,11 @@ export default function HeroSection() {
                 {/* Main Headline with Typewriter */}
                 <div className="text-center mb-12 sm:mb-16 md:mb-20">
 
-                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-white leading-[1.2] tracking-tight mb-4 sm:mb-6 px-2">
+                    <h1 className="text-3xl sm:text-4xl md:text-5xl lg:text-6xl xl:text-7xl font-black text-zinc-900 dark:text-white leading-[1.2] tracking-tight mb-4 sm:mb-6 px-2">
                         {/* <span className="block mb-1 sm:mb-2">{t.staticStart}</span> */}
-                        <span className="block text-white/90 min-h-[1.2em]">
+                        <span className="block text-zinc-800 dark:text-white/90 min-h-[1.2em]">
                             {displayText}
-                            <span className="inline-block w-[2px] sm:w-[3px] h-[0.9em] bg-white/80 ml-1 animate-pulse" />
+                            <span className="inline-block w-[2px] sm:w-[3px] h-[0.9em] bg-zinc-800 dark:bg-white/80 ml-1 animate-pulse" />
                         </span>
                     </h1>
 
@@ -256,7 +256,7 @@ export default function HeroSection() {
                     </motion.p>
 
                     <motion.p
-                        className="text-sm sm:text-base md:text-lg lg:text-xl text-white/60 max-w-2xl mx-auto leading-relaxed px-4"
+                        className="text-sm sm:text-base md:text-lg lg:text-xl text-zinc-500 dark:text-white/60 max-w-2xl mx-auto leading-relaxed px-4"
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         transition={{ delay: 0.4 }}
@@ -274,10 +274,10 @@ export default function HeroSection() {
                         <button
                             data-chat-trigger
                             onClick={() => setIsChatOpen(true)}
-                            className="group flex items-center gap-3 sm:gap-4 w-full max-w-xl mx-auto mt-8 sm:mt-10 px-4 sm:px-6 py-3 sm:py-4 bg-zinc-900/80 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-2xl shadow-black/50 hover:bg-zinc-800 transition-all cursor-pointer border border-zinc-800 hover:border-blue-500/50"
+                            className="group flex items-center gap-3 sm:gap-4 w-full max-w-xl mx-auto mt-8 sm:mt-10 px-4 sm:px-6 py-3 sm:py-4 bg-zinc-100 dark:bg-zinc-900/80 backdrop-blur-xl rounded-xl sm:rounded-2xl shadow-xl dark:shadow-2xl shadow-black/10 dark:shadow-black/50 hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-all cursor-pointer border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50"
                         >
                             <MessageCircle className="w-5 h-5 sm:w-6 sm:h-6 text-blue-500 group-hover:text-blue-400 transition-colors flex-shrink-0" />
-                            <span className="flex-1 text-zinc-400 text-sm sm:text-base md:text-lg text-start group-hover:text-zinc-200 transition-colors">
+                            <span className="flex-1 text-zinc-500 dark:text-zinc-400 text-sm sm:text-base md:text-lg text-start group-hover:text-zinc-700 dark:group-hover:text-zinc-200 transition-colors">
                                 {t.chat}
                             </span>
                             <div className="w-9 h-9 sm:w-10 sm:h-10 bg-blue-600 rounded-lg sm:rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform shadow-lg shadow-blue-600/20 flex-shrink-0">
@@ -294,16 +294,16 @@ export default function HeroSection() {
                     animate={{ opacity: 1, y: 0 }}
                     transition={{ delay: 0.6 }}
                 >
-                    <div className="p-6 sm:p-8 md:p-12 bg-zinc-900/50 backdrop-blur-xl border border-zinc-800 hover:border-zinc-700 rounded-2xl sm:rounded-3xl text-center shadow-2xl transition-all">
-                        <h3 className="text-xs sm:text-sm font-bold text-zinc-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-3 sm:mb-4">
+                    <div className="p-6 sm:p-8 md:p-12 bg-zinc-100 dark:bg-zinc-900/50 backdrop-blur-xl border border-zinc-200 dark:border-zinc-800 hover:border-zinc-300 dark:hover:border-zinc-700 rounded-2xl sm:rounded-3xl text-center shadow-xl dark:shadow-2xl transition-all">
+                        <h3 className="text-xs sm:text-sm font-bold text-zinc-400 dark:text-zinc-500 uppercase tracking-[0.15em] sm:tracking-[0.2em] mb-3 sm:mb-4">
                             {t.forMasters}
                         </h3>
-                        <p className="text-zinc-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto leading-relaxed mb-5 sm:mb-6">
+                        <p className="text-zinc-600 dark:text-zinc-300 text-sm sm:text-base md:text-lg lg:text-xl max-w-xl mx-auto leading-relaxed mb-5 sm:mb-6">
                             {t.forMastersDesc}
                         </p>
                         <a
                             href="/join"
-                            className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-transparent border border-zinc-700 text-white text-sm sm:text-base font-bold rounded-lg sm:rounded-xl hover:bg-zinc-800 hover:border-zinc-600 transition-all"
+                            className="inline-block px-6 sm:px-8 py-3 sm:py-4 bg-transparent border border-zinc-300 dark:border-zinc-700 text-zinc-800 dark:text-white text-sm sm:text-base font-bold rounded-lg sm:rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-800 hover:border-zinc-400 dark:hover:border-zinc-600 transition-all"
                         >
                             {t.forMastersCta}
                         </a>

@@ -33,14 +33,14 @@ export default function Home() {
 
     if (isLoading) {
         return (
-            <div className="min-h-screen flex items-center justify-center bg-black">
-                <div className="w-12 h-12 border-2 border-zinc-800 border-t-blue-600 rounded-full animate-spin" />
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black transition-colors">
+                <div className="w-12 h-12 border-2 border-zinc-200 dark:border-zinc-800 border-t-blue-600 rounded-full animate-spin" />
             </div>
         );
     }
 
     return (
-        <main className="min-h-screen">
+        <main className="min-h-screen bg-white dark:bg-black transition-colors">
             <Navbar />
             <HeroSection />
             <GigCarousel />

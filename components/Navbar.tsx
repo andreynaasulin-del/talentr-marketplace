@@ -1,10 +1,11 @@
 'use client';
 
 import Link from 'next/link';
-import { ChevronDown, Menu, X } from 'lucide-react';
+import { ChevronDown, Menu, X, Sun, Moon } from 'lucide-react';
 import Logo from '@/components/Logo';
 import { useEffect, useState } from 'react';
 import { useLanguage } from '@/context/LanguageContext';
+import { useTheme } from '@/context/ThemeContext';
 import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
@@ -18,6 +19,7 @@ export default function Navbar() {
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [mounted, setMounted] = useState(false);
     const { language, setLanguage } = useLanguage();
+    const { theme, toggleTheme } = useTheme();
     const pathname = usePathname();
     const isHome = pathname === '/';
     const router = useRouter();
@@ -302,12 +304,52 @@ export default function Navbar() {
                             </>
                         )}
 
-                        {/* Language Selector */}
+                        {/* Theme & Language Selector */}
                         <div style={{
                             marginTop: '24px',
                             paddingTop: '24px',
                             borderTop: '1px solid #27272a'
                         }}>
+                            {/* Theme Toggle */}
+                            <p style={{
+                                color: '#71717a',
+                                marginBottom: '16px',
+                                textAlign: 'center',
+                                fontSize: '12px',
+                                textTransform: 'uppercase',
+                                letterSpacing: '0.1em',
+                                fontWeight: 'bold'
+                            }}>Theme</p>
+                            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '24px' }}>
+                                <button
+                                    onClick={() => toggleTheme()}
+                                    style={{
+                                        display: 'flex',
+                                        alignItems: 'center',
+                                        gap: '8px',
+                                        padding: '12px 24px',
+                                        borderRadius: '12px',
+                                        border: '1px solid #3b82f6',
+                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
+                                        color: '#60a5fa',
+                                        cursor: 'pointer',
+                                    }}
+                                >
+                                    {theme === 'dark' ? (
+                                        <>
+                                            <Sun style={{ width: '20px', height: '20px' }} />
+                                            <span style={{ fontWeight: 600 }}>Light</span>
+                                        </>
+                                    ) : (
+                                        <>
+                                            <Moon style={{ width: '20px', height: '20px' }} />
+                                            <span style={{ fontWeight: 600 }}>Dark</span>
+                                        </>
+                                    )}
+                                </button>
+                            </div>
+
+                            {/* Language Selector */}
                             <p style={{
                                 color: '#71717a',
                                 marginBottom: '16px',
@@ -352,10 +394,17 @@ export default function Navbar() {
     return (
         <>
             <nav
-                className="fixed top-0 left-0 right-0 z-50 bg-black/80 backdrop-blur-md border-b transition-all duration-200"
+                className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-200 ${
+                    theme === 'dark'
+                        ? 'bg-black/80 border-white/[0.08]'
+                        : 'bg-white/80 border-black/[0.08]'
+                }`}
                 style={{
-                    borderColor: 'rgba(255,255,255,0.08)',
-                    boxShadow: isScrolled ? '0 4px 20px rgba(0,0,0,0.5)' : 'none'
+                    boxShadow: isScrolled
+                        ? theme === 'dark'
+                            ? '0 4px 20px rgba(0,0,0,0.5)'
+                            : '0 4px 20px rgba(0,0,0,0.1)'
+                        : 'none'
                 }}
             >
                 <div className="max-w-[1200px] mx-auto px-4 md:px-6">
@@ -367,6 +416,19 @@ export default function Navbar() {
 
                         {/* Right side (Desktop) */}
                         <div className="hidden md:flex items-center gap-3">
+                            {/* Theme Toggle */}
+                            <button
+                                onClick={toggleTheme}
+                                className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
+                            >
+                                {theme === 'dark' ? (
+                                    <Sun className="w-5 h-5" />
+                                ) : (
+                                    <Moon className="w-5 h-5" />
+                                )}
+                            </button>
+
                             {/* Language Switcher */}
                             <div className="relative">
                                 <button

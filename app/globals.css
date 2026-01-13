@@ -2,7 +2,9 @@
 @tailwind components;
 @tailwind utilities;
 
-/* ===== PROFESSIONAL DARK DESIGN SYSTEM ===== */
+/* ===== PROFESSIONAL DESIGN SYSTEM WITH THEME SUPPORT ===== */
+
+/* LIGHT THEME (Default) */
 :root {
   /* Primary Colors - Business */
   --primary-black: #000000;
@@ -10,25 +12,31 @@
   --primary-blue-hover: #0052CC;
   --primary-blue-light: rgba(0, 102, 255, 0.1);
 
-  /* Backgrounds */
-  --bg-white: #000000;
-  --bg-gray: #09090b;
-  --bg-black: #000000;
-  --bg-card: #09090b;
+  /* Backgrounds - Light */
+  --bg-primary: #FFFFFF;
+  --bg-secondary: #F4F4F5;
+  --bg-tertiary: #E4E4E7;
+  --bg-card: #FFFFFF;
+  --bg-elevated: #FFFFFF;
+  --bg-input: #F4F4F5;
+  --bg-hover: #F4F4F5;
 
-  /* Text Colors */
-  --text-heading: #FFFFFF;
-  --text-body: #A1A1AA;
-  --text-muted: #999999;
+  /* Text Colors - Light */
+  --text-primary: #18181B;
+  --text-secondary: #3F3F46;
+  --text-muted: #71717A;
+  --text-inverted: #FFFFFF;
 
-  /* Borders */
-  --border-light: #27272A;
-  --border-dark: #27272A;
+  /* Borders - Light */
+  --border-primary: #E4E4E7;
+  --border-secondary: #D4D4D8;
+  --border-focus: #0066FF;
 
-  /* Shadows - Clean */
-  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
-  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
-  --shadow-blue: 0 0 20px rgba(0, 102, 255, 0.3);
+  /* Shadows - Light */
+  --shadow-sm: 0 1px 2px rgba(0, 0, 0, 0.05);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.1);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.12);
+  --shadow-blue: 0 0 20px rgba(0, 102, 255, 0.2);
 
   /* Border Radius */
   --radius-sm: 6px;
@@ -46,6 +54,46 @@
   --font-sans: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
 }
 
+/* DARK THEME */
+:root.dark {
+  /* Backgrounds - Dark */
+  --bg-primary: #000000;
+  --bg-secondary: #09090B;
+  --bg-tertiary: #18181B;
+  --bg-card: #09090B;
+  --bg-elevated: #18181B;
+  --bg-input: #18181B;
+  --bg-hover: #27272A;
+
+  /* Text Colors - Dark */
+  --text-primary: #FAFAFA;
+  --text-secondary: #A1A1AA;
+  --text-muted: #71717A;
+  --text-inverted: #18181B;
+
+  /* Borders - Dark */
+  --border-primary: #27272A;
+  --border-secondary: #3F3F46;
+  --border-focus: #0066FF;
+
+  /* Shadows - Dark */
+  --shadow-sm: 0 1px 3px rgba(0, 0, 0, 0.5);
+  --shadow-md: 0 4px 12px rgba(0, 0, 0, 0.6);
+  --shadow-lg: 0 8px 24px rgba(0, 0, 0, 0.7);
+  --shadow-blue: 0 0 20px rgba(0, 102, 255, 0.3);
+}
+
+/* Legacy variables for backward compatibility */
+:root {
+  --bg-white: var(--bg-primary);
+  --bg-gray: var(--bg-secondary);
+  --bg-black: var(--bg-primary);
+  --text-heading: var(--text-primary);
+  --text-body: var(--text-secondary);
+  --border-light: var(--border-primary);
+  --border-dark: var(--border-secondary);
+}
+
 /* ===== BASE ===== */
 html {
   font-size: 16px;
@@ -54,10 +102,11 @@ html {
 
 body {
   font-family: var(--font-sans);
-  background: var(--bg-black);
-  color: var(--text-body);
+  background: var(--bg-primary);
+  color: var(--text-secondary);
   line-height: 1.5;
   -webkit-font-smoothing: antialiased;
+  transition: background-color 0.2s ease, color 0.2s ease;
 }
 
 /* Input zoom prevention on iOS */
