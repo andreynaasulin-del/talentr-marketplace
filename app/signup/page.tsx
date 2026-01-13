@@ -79,9 +79,9 @@ export default function SignUpPage() {
     const currentLang = languages.find(l => l.code === language) || languages[0];
 
     return (
-        <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row bg-black">
+        <main className="min-h-screen relative overflow-hidden flex flex-col md:flex-row bg-white dark:bg-black transition-colors">
             {/* Left Side - Visual */}
-            <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-zinc-800 bg-zinc-900/50 backdrop-blur-xl">
+            <div className="hidden md:flex md:w-1/2 relative items-center justify-center p-12 overflow-hidden border-r border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900/50 backdrop-blur-xl">
 
                 <div className="relative z-10 max-w-lg">
                     <motion.div
@@ -90,7 +90,7 @@ export default function SignUpPage() {
                         transition={{ duration: 0.6 }}
                     >
                         <Logo size="xl" className="mb-8" asLink={false} />
-                        <h2 className="text-4xl font-black text-white leading-tight mb-8">
+                        <h2 className="text-4xl font-black text-zinc-900 dark:text-white leading-tight mb-8">
                             Find the <span className="text-blue-500">perfect talent</span> <br />
                             for your special event.
                         </h2>
@@ -106,7 +106,7 @@ export default function SignUpPage() {
                                     <div className="w-6 h-6 rounded-full bg-blue-500/20 flex items-center justify-center border border-blue-500/30">
                                         <Check className="w-3.5 h-3.5 text-blue-400" />
                                     </div>
-                                    <span className="text-zinc-400 font-medium">{item}</span>
+                                    <span className="text-zinc-500 dark:text-zinc-400 font-medium">{item}</span>
                                 </div>
                             ))}
                         </div>
@@ -122,7 +122,7 @@ export default function SignUpPage() {
                         <div className="relative ms-auto">
                             <button
                                 onClick={() => setShowLangDropdown(!showLangDropdown)}
-                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-white/5 border border-white/10 text-white/70 hover:text-white transition-colors text-sm"
+                                className="flex items-center gap-2 px-3 py-1.5 rounded-full bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-600 dark:text-white/70 hover:text-zinc-900 dark:hover:text-white transition-colors text-sm"
                             >
                                 <span>{currentLang.flag}</span>
                                 <span>{currentLang.label}</span>
@@ -135,7 +135,7 @@ export default function SignUpPage() {
                                         initial={{ opacity: 0, y: 10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: 10 }}
-                                        className="absolute end-0 mt-2 w-32 bg-zinc-900 border border-zinc-800 rounded-2xl shadow-2xl py-2 z-50 overflow-hidden"
+                                        className="absolute end-0 mt-2 w-32 bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-xl dark:shadow-2xl py-2 z-50 overflow-hidden"
                                     >
                                         {languages.map((l) => (
                                             <button
@@ -145,8 +145,8 @@ export default function SignUpPage() {
                                                     setShowLangDropdown(false);
                                                 }}
                                                 className={cn(
-                                                    "w-full px-4 py-2 text-start text-sm hover:bg-white/5 transition-colors",
-                                                    language === l.code ? "text-blue-500 font-bold" : "text-zinc-400"
+                                                    "w-full px-4 py-2 text-start text-sm hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors",
+                                                    language === l.code ? "text-blue-500 font-bold" : "text-zinc-500 dark:text-zinc-400"
                                                 )}
                                             >
                                                 {l.flag} {l.label}
@@ -159,68 +159,68 @@ export default function SignUpPage() {
                     </div>
 
                     <div className="mb-10">
-                        <h1 className="text-3xl font-black text-white mb-2">{t('signUpTitle')}</h1>
-                        <p className="text-zinc-400">{t('signUpSubtitle')}</p>
+                        <h1 className="text-3xl font-black text-zinc-900 dark:text-white mb-2">{t('signUpTitle')}</h1>
+                        <p className="text-zinc-500 dark:text-zinc-400">{t('signUpSubtitle')}</p>
                     </div>
 
                     {error && (
-                        <div className="mb-6 p-4 rounded-2xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm font-medium">
+                        <div className="mb-6 p-4 rounded-2xl bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 text-red-600 dark:text-red-400 text-sm font-medium">
                             {error}
                         </div>
                     )}
 
                     <form onSubmit={handleEmailSignUp} className="space-y-5">
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-white/70 ms-1">{t('fullNameLabel')}</label>
+                            <label className="text-sm font-bold text-zinc-600 dark:text-white/70 ms-1">{t('fullNameLabel')}</label>
                             <div className="relative">
-                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                                <User className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-white/30" />
                                 <input
                                     type="text"
                                     required
                                     value={formData.fullName}
                                     onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
-                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-600"
+                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
                                     placeholder={t('fullNamePlaceholder')}
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-white/70 ms-1">{t('emailLabel')}</label>
+                            <label className="text-sm font-bold text-zinc-600 dark:text-white/70 ms-1">{t('emailLabel')}</label>
                             <div className="relative">
-                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                                <Mail className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-white/30" />
                                 <input
                                     type="email"
                                     required
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-600"
+                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-2xl py-4 pl-12 pr-4 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
                                     placeholder={t('emailPlaceholder')}
                                 />
                             </div>
                         </div>
 
                         <div className="space-y-2">
-                            <label className="text-sm font-bold text-white/70 ms-1">{t('passwordLabel')}</label>
+                            <label className="text-sm font-bold text-zinc-600 dark:text-white/70 ms-1">{t('passwordLabel')}</label>
                             <div className="relative">
-                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/30" />
+                                <Lock className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-white/30" />
                                 <input
                                     type={showPassword ? 'text' : 'password'}
                                     required
                                     value={formData.password}
                                     onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                    className="w-full bg-zinc-900 border border-zinc-800 rounded-2xl py-4 pl-12 pr-12 text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-600"
+                                    className="w-full bg-white dark:bg-zinc-900 border border-zinc-300 dark:border-zinc-800 rounded-2xl py-4 pl-12 pr-12 text-zinc-900 dark:text-white focus:outline-none focus:ring-2 focus:ring-blue-600/50 focus:border-blue-600 transition-all placeholder:text-zinc-400 dark:placeholder:text-zinc-600"
                                     placeholder={t('passwordPlaceholder')}
                                 />
                                 <button
                                     type="button"
                                     onClick={() => setShowPassword(!showPassword)}
-                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-white/30 hover:text-white transition-colors"
+                                    className="absolute right-4 top-1/2 -translate-y-1/2 text-zinc-400 dark:text-white/30 hover:text-zinc-600 dark:hover:text-white transition-colors"
                                 >
                                     {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                 </button>
                             </div>
-                            <p className="text-[10px] text-white/30 px-1 font-medium">{t('atLeast6chars')}</p>
+                            <p className="text-[10px] text-zinc-400 dark:text-white/30 px-1 font-medium">{t('atLeast6chars')}</p>
                         </div>
 
                         <button
@@ -234,16 +234,16 @@ export default function SignUpPage() {
 
                     <div className="mt-8 relative">
                         <div className="absolute inset-0 flex items-center">
-                            <div className="w-full border-t border-white/10"></div>
+                            <div className="w-full border-t border-zinc-200 dark:border-white/10"></div>
                         </div>
                         <div className="relative flex justify-center text-xs uppercase font-bold">
-                            <span className="bg-slate-950 px-4 text-white/30">{t('orDivider')}</span>
+                            <span className="bg-white dark:bg-black px-4 text-zinc-400 dark:text-white/30">{t('orDivider')}</span>
                         </div>
                     </div>
 
                     <button
                         onClick={handleGoogleSignUp}
-                        className="w-full mt-8 bg-white/5 border border-white/10 text-white font-bold py-4 rounded-2xl hover:bg-white/10 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
+                        className="w-full mt-8 bg-zinc-100 dark:bg-white/5 border border-zinc-200 dark:border-white/10 text-zinc-800 dark:text-white font-bold py-4 rounded-2xl hover:bg-zinc-200 dark:hover:bg-white/10 transition-all flex items-center justify-center gap-3 active:scale-[0.98]"
                     >
                         <svg className="w-5 h-5" viewBox="0 0 24 24">
                             <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.18 1-.76 1.85-1.58 2.42v2.81h2.55c1.49-2.37 2.35-5.87 2.35-9.48z" fill="#4285F4" />

@@ -100,22 +100,22 @@ export default function DashboardPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <div className="w-8 h-8 border-2 border-zinc-800 border-t-blue-600 rounded-full animate-spin" />
+            <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center transition-colors">
+                <div className="w-8 h-8 border-2 border-zinc-200 dark:border-zinc-800 border-t-blue-600 rounded-full animate-spin" />
             </div>
         );
     }
 
     if (!user) {
         return (
-            <div className="min-h-screen bg-black flex items-center justify-center">
-                <p className="text-zinc-400">{t.loadingError}</p>
+            <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center transition-colors">
+                <p className="text-zinc-500 dark:text-zinc-400">{t.loadingError}</p>
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-white dark:bg-black transition-colors">
             <Navbar />
 
             <div className="max-w-6xl mx-auto px-4 sm:px-6 pt-24 sm:pt-28 pb-12" dir={isRTL ? 'rtl' : 'ltr'}>
@@ -123,22 +123,22 @@ export default function DashboardPage() {
                 <div className="mb-8 sm:mb-10">
                     <div className="flex items-center justify-between mb-2">
                         <div>
-                            <h1 className="text-2xl sm:text-3xl font-bold text-white">{t.dashboard}</h1>
-                            <p className="text-sm text-zinc-400 mt-1">
+                            <h1 className="text-2xl sm:text-3xl font-bold text-zinc-900 dark:text-white">{t.dashboard}</h1>
+                            <p className="text-sm text-zinc-500 dark:text-zinc-400 mt-1">
                                 {user?.email || ''}
                             </p>
                         </div>
                         <div className="flex items-center gap-2">
                             <Link
                                 href="/dashboard/settings"
-                                className="p-2.5 text-zinc-400 hover:text-white hover:bg-zinc-900 rounded-lg transition-colors border border-zinc-800"
+                                className="p-2.5 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors border border-zinc-200 dark:border-zinc-800"
                                 title={t.settings}
                             >
                                 <Settings className="w-5 h-5" />
                             </Link>
                             <button
                                 onClick={handleLogout}
-                                className="p-2.5 text-zinc-400 hover:text-red-500 hover:bg-zinc-900 rounded-lg transition-colors border border-zinc-800"
+                                className="p-2.5 text-zinc-500 dark:text-zinc-400 hover:text-red-500 hover:bg-zinc-100 dark:hover:bg-zinc-900 rounded-lg transition-colors border border-zinc-200 dark:border-zinc-800"
                                 title={t.logout}
                             >
                                 <LogOut className="w-5 h-5" />
@@ -149,19 +149,19 @@ export default function DashboardPage() {
 
                 {/* Stats */}
                 <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all">
+                    <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
                         <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.pending}</p>
                         <p className="text-3xl font-bold text-amber-500">
                             {bookings.filter(b => b.status === 'pending').length}
                         </p>
                     </div>
-                    <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all">
+                    <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
                         <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.confirmed}</p>
                         <p className="text-3xl font-bold text-green-500">
                             {bookings.filter(b => b.status === 'confirmed').length}
                         </p>
                     </div>
-                    <div className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all">
+                    <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
                         <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.completed}</p>
                         <p className="text-3xl font-bold text-blue-500">
                             {bookings.filter(b => b.status === 'completed').length}
@@ -173,23 +173,23 @@ export default function DashboardPage() {
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
                     <Link
                         href="/dashboard/settings"
-                        className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 hover:bg-zinc-800/50 transition-all group"
+                        className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-all group"
                     >
-                        <Settings className="w-8 h-8 text-zinc-500 group-hover:text-white mb-3 transition-colors" />
-                        <h3 className="font-semibold text-white mb-1">{t.settings}</h3>
-                        <p className="text-sm text-zinc-400">
+                        <Settings className="w-8 h-8 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white mb-3 transition-colors" />
+                        <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">{t.settings}</h3>
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             {lang === 'he' ? 'עדכן את הפרופיל שלך' : 'Update your profile'}
                         </p>
                     </Link>
                     <Link
                         href="/"
-                        className="p-6 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 hover:bg-zinc-800/50 transition-all group"
+                        className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800/50 transition-all group"
                     >
-                        <Calendar className="w-8 h-8 text-zinc-500 group-hover:text-white mb-3 transition-colors" />
-                        <h3 className="font-semibold text-white mb-1">
+                        <Calendar className="w-8 h-8 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white mb-3 transition-colors" />
+                        <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">
                             {lang === 'he' ? 'חזור לדף הבית' : 'Back to Home'}
                         </h3>
-                        <p className="text-sm text-zinc-400">
+                        <p className="text-sm text-zinc-500 dark:text-zinc-400">
                             {lang === 'he' ? 'גלה עוד שירותים' : 'Discover more services'}
                         </p>
                     </Link>
@@ -197,13 +197,13 @@ export default function DashboardPage() {
 
                 {/* Bookings List */}
                 <div>
-                    <h2 className="text-xl font-bold text-white mb-6">{t.bookings}</h2>
+                    <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6">{t.bookings}</h2>
 
                     {bookings.length === 0 ? (
-                        <div className="text-center py-16 bg-zinc-900 border border-zinc-800 rounded-xl">
-                            <Calendar className="w-16 h-16 text-zinc-700 mx-auto mb-4" />
-                            <p className="text-zinc-400 font-medium mb-2">{t.noBookings}</p>
-                            <p className="text-sm text-zinc-500">
+                        <div className="text-center py-16 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl">
+                            <Calendar className="w-16 h-16 text-zinc-300 dark:text-zinc-700 mx-auto mb-4" />
+                            <p className="text-zinc-500 dark:text-zinc-400 font-medium mb-2">{t.noBookings}</p>
+                            <p className="text-sm text-zinc-400 dark:text-zinc-500">
                                 {lang === 'he' ? 'ההזמנות שלך יופיעו כאן' : 'Your bookings will appear here'}
                             </p>
                         </div>
@@ -212,11 +212,11 @@ export default function DashboardPage() {
                             {bookings.map((booking) => (
                                 <div
                                     key={booking.id}
-                                    className="p-5 bg-zinc-900 border border-zinc-800 rounded-xl hover:border-zinc-700 transition-all"
+                                    className="p-5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all"
                                 >
                                     <div className="flex items-center justify-between gap-4">
                                         <div className="flex-1 min-w-0">
-                                            <p className="font-semibold text-white mb-1 truncate">
+                                            <p className="font-semibold text-zinc-900 dark:text-white mb-1 truncate">
                                                 {booking.event_type}
                                             </p>
                                             <p className="text-sm text-zinc-500 flex items-center gap-2">

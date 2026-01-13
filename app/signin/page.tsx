@@ -75,13 +75,13 @@ export default function SignInPage() {
     };
 
     return (
-        <div className="min-h-screen relative overflow-hidden bg-black" dir={language === 'he' ? 'rtl' : 'ltr'}>
+        <div className="min-h-screen relative overflow-hidden bg-white dark:bg-black transition-colors" dir={language === 'he' ? 'rtl' : 'ltr'}>
             {/* Language Switcher */}
             <div className="absolute top-4 end-4 z-20">
                 <div className="relative">
                     <button
                         onClick={() => setShowLangDropdown(!showLangDropdown)}
-                        className="flex items-center gap-1 px-3 py-2 text-sm font-bold text-white/90 hover:bg-white/10 rounded-xl transition-colors"
+                        className="flex items-center gap-1 px-3 py-2 text-sm font-bold text-zinc-700 dark:text-white/90 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-xl transition-colors"
                     >
                         <span className="text-lg">{currentLang.flag}</span>
                         <ChevronDown className={cn("w-4 h-4 transition-transform", showLangDropdown && "rotate-180")} />
@@ -95,7 +95,7 @@ export default function SignInPage() {
                                     initial={{ opacity: 0, y: -10 }}
                                     animate={{ opacity: 1, y: 0 }}
                                     exit={{ opacity: 0, y: -10 }}
-                                    className="absolute end-0 mt-2 w-32 bg-zinc-900 rounded-xl shadow-lg shadow-black/50 py-1 z-50 border border-zinc-800"
+                                    className="absolute end-0 mt-2 w-32 bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/50 py-1 z-50 border border-zinc-200 dark:border-zinc-800"
                                 >
                                     {languages.map((lang) => (
                                         <button
@@ -105,8 +105,8 @@ export default function SignInPage() {
                                                 setShowLangDropdown(false);
                                             }}
                                             className={cn(
-                                                "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-800 transition-colors",
-                                                language === lang.code ? 'text-blue-500' : 'text-zinc-300'
+                                                "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors",
+                                                language === lang.code ? 'text-blue-500' : 'text-zinc-600 dark:text-zinc-300'
                                             )}
                                         >
                                             <span className="text-lg">{lang.flag}</span>
@@ -129,14 +129,14 @@ export default function SignInPage() {
                     </Link>
 
                     {/* Sign In Card */}
-                    <div className="bg-zinc-900 rounded-2xl shadow-2xl p-8 border border-zinc-800 shadow-black/50">
+                    <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-2xl p-8 border border-zinc-200 dark:border-zinc-800 shadow-black/5 dark:shadow-black/50">
                         <div className="mb-8 text-center">
-                            <h2 className="text-2xl font-bold text-white mb-2">{t.title}</h2>
-                            <p className="text-zinc-400">{t.subtitle}</p>
+                            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">{t.title}</h2>
+                            <p className="text-zinc-500 dark:text-zinc-400">{t.subtitle}</p>
                         </div>
 
                         {error && (
-                            <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg text-sm text-red-600">
+                            <div className="mb-6 p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/20 rounded-lg text-sm text-red-600 dark:text-red-400">
                                 {error}
                             </div>
                         )}
@@ -144,16 +144,16 @@ export default function SignInPage() {
                         <form onSubmit={handleSignIn} className="space-y-5">
                             {/* Email */}
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     {t.email}
                                 </label>
                                 <div className="relative">
-                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                                    <Mail className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-zinc-500" />
                                     <input
                                         type="email"
                                         value={formData.email}
                                         onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full pl-11 pr-4 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                        className="w-full pl-11 pr-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                                         placeholder="you@example.com"
                                         required
                                     />
@@ -162,23 +162,23 @@ export default function SignInPage() {
 
                             {/* Password */}
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     {t.password}
                                 </label>
                                 <div className="relative">
-                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-500" />
+                                    <Lock className="absolute left-3 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400 dark:text-zinc-500" />
                                     <input
                                         type={showPassword ? 'text' : 'password'}
                                         value={formData.password}
                                         onChange={(e) => setFormData({ ...formData, password: e.target.value })}
-                                        className="w-full pl-11 pr-12 py-3 bg-zinc-800 border border-zinc-700 rounded-lg text-white placeholder:text-zinc-500 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
+                                        className="w-full pl-11 pr-12 py-3 bg-white dark:bg-zinc-800 border border-zinc-300 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-500 focus:ring-2 focus:ring-blue-600 focus:border-transparent transition-all"
                                         placeholder="••••••••"
                                         required
                                     />
                                     <button
                                         type="button"
                                         onClick={() => setShowPassword(!showPassword)}
-                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-gray-400 hover:text-gray-600"
+                                        className="absolute right-3 top-1/2 -translate-y-1/2 text-zinc-400 hover:text-zinc-600 dark:hover:text-zinc-300"
                                     >
                                         {showPassword ? <EyeOff className="w-5 h-5" /> : <Eye className="w-5 h-5" />}
                                     </button>
@@ -207,7 +207,7 @@ export default function SignInPage() {
                         </form>
 
                         {/* Sign Up Link */}
-                        <div className="mt-6 text-center text-sm text-zinc-400">
+                        <div className="mt-6 text-center text-sm text-zinc-500 dark:text-zinc-400">
                             {t.noAccount}{' '}
                             <Link href="/signup" className="text-blue-500 font-semibold hover:text-blue-400 hover:underline">
                                 {t.signUp}
@@ -217,7 +217,7 @@ export default function SignInPage() {
 
                     {/* Back to Home */}
                     <div className="mt-6 text-center">
-                        <Link href="/" className="text-zinc-500 hover:text-white text-sm transition-colors">
+                        <Link href="/" className="text-zinc-500 hover:text-zinc-800 dark:hover:text-white text-sm transition-colors">
                             ← {lang === 'he' ? 'חזור לדף הבית' : 'Back to home'}
                         </Link>
                     </div>
