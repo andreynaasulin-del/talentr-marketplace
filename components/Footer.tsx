@@ -1,6 +1,7 @@
 'use client';
 
 import Link from 'next/link';
+import { Instagram } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
 import Logo from '@/components/Logo';
 
@@ -17,6 +18,7 @@ export default function Footer() {
             terms: 'Terms',
             privacy: 'Privacy',
             rights: 'All rights reserved.',
+            followUs: 'Follow us',
         },
         he: {
             tagline: 'הסטנדרט הגבוה ביותר של בידור.',
@@ -25,6 +27,7 @@ export default function Footer() {
             terms: 'תנאים',
             privacy: 'פרטיות',
             rights: 'כל הזכויות שמורות.',
+            followUs: 'עקבו אחרינו',
         },
     };
 
@@ -44,7 +47,7 @@ export default function Footer() {
                     </div>
 
                     {/* Links - Compact */}
-                    <div className="flex flex-wrap gap-1">
+                    <div className="flex flex-wrap items-center gap-1">
                         {[
                             { href: '#packages', label: t.findTalent },
                             { href: '/join', label: t.forVendors },
@@ -59,6 +62,17 @@ export default function Footer() {
                                 {link.label}
                             </Link>
                         ))}
+
+                        {/* Instagram Link */}
+                        <a
+                            href="https://www.instagram.com/talentr_ai/"
+                            target="_blank"
+                            rel="noopener noreferrer"
+                            className="ml-2 p-2 text-zinc-500 dark:text-white/60 hover:text-[#E4405F] transition-colors"
+                            aria-label={t.followUs}
+                        >
+                            <Instagram className="w-5 h-5" />
+                        </a>
                     </div>
                 </div>
 
