@@ -1,6 +1,6 @@
 export default function Loading() {
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 flex items-center justify-center">
+        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-blue-50/30 to-indigo-50/20 dark:from-black dark:via-zinc-900 dark:to-zinc-900 flex items-center justify-center transition-colors">
             <div className="text-center">
                 {/* Premium Loader */}
                 <div className="relative w-24 h-24 mx-auto mb-6">
@@ -17,7 +17,7 @@ export default function Loading() {
 
                     {/* Center logo */}
                     <div className="absolute inset-0 flex items-center justify-center">
-                        <div className="w-12 h-12 rounded-2xl bg-white shadow-lg flex items-center justify-center">
+                        <div className="w-12 h-12 rounded-2xl bg-white dark:bg-zinc-800 shadow-lg flex items-center justify-center">
                             <span className="text-2xl font-black text-transparent bg-clip-text bg-gradient-to-r from-blue-600 to-purple-600">
                                 T
                             </span>
@@ -27,7 +27,7 @@ export default function Loading() {
 
                 {/* Loading text with shimmer */}
                 <div className="relative overflow-hidden">
-                    <p className="text-lg font-bold text-gray-400">
+                    <p className="text-lg font-bold text-gray-400 dark:text-zinc-500">
                         Loading
                         <span className="inline-flex ml-1">
                             <span className="animate-bounce" style={{ animationDelay: '0ms' }}>.</span>

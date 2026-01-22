@@ -59,7 +59,7 @@ export default function HowItWorks() {
     ];
 
     return (
-        <section className="py-20 md:py-28 bg-black relative overflow-hidden">
+        <section className="py-20 md:py-28 bg-zinc-50 dark:bg-black relative overflow-hidden transition-colors">
             {/* Background decoration */}
             <div className="absolute inset-0 overflow-hidden pointer-events-none">
                 <div className="absolute -top-40 -right-40 w-80 h-80 bg-blue-500/5 dark:bg-blue-500/10 rounded-full blur-3xl" />
@@ -82,7 +82,7 @@ export default function HowItWorks() {
                     >
                         {lang === 'he' ? 'פשוט כמו 1-2-3' : 'Easy as 1-2-3'}
                     </motion.span>
-                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight text-white mb-4">
+                    <h2 className="text-3xl md:text-4xl lg:text-5xl font-bold font-serif tracking-tight text-zinc-900 dark:text-white mb-4">
                         {t.title}
                     </h2>
                     <p className="text-zinc-400 max-w-lg mx-auto text-lg">
@@ -111,13 +111,13 @@ export default function HowItWorks() {
                             >
                                 {/* Card */}
                                 <div className={cn(
-                                    "relative bg-zinc-900/50 rounded-3xl p-8 md:p-10",
-                                    "border border-zinc-800",
-                                    "shadow-none",
+                                    "relative bg-white/50 dark:bg-zinc-900/50 rounded-3xl p-8 md:p-10",
+                                    "border border-zinc-200 dark:border-zinc-800",
+                                    "shadow-sm dark:shadow-none",
                                     "backdrop-blur-sm",
                                     "transition-all duration-500",
                                     "group-hover:shadow-xl group-hover:shadow-gray-200/70 dark:group-hover:shadow-lg dark:group-hover:shadow-cyan-500/10",
-                                    "group-hover:border-cyan-200 dark:group-hover:border-cyan-500/20"
+                                    "group-hover:border-blue-200 dark:group-hover:border-cyan-500/20"
                                 )}>
                                     {/* Glow effect on hover */}
                                     <div className={cn(
@@ -146,10 +146,10 @@ export default function HowItWorks() {
                                             </span>
                                         </div>
 
-                                        <h3 className="text-xl md:text-2xl font-bold text-white mb-3">
+                                        <h3 className="text-xl md:text-2xl font-bold text-zinc-900 dark:text-white mb-3">
                                             {step.title[lang] || step.title.en}
                                         </h3>
-                                        <p className="text-zinc-400 leading-relaxed">
+                                        <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                             {step.desc[lang] || step.desc.en}
                                         </p>
                                     </div>

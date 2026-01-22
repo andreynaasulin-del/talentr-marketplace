@@ -1,0 +1,529 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { Check, X, Edit3, Instagram, Globe, MapPin, Phone, Mail, Sparkles, Shield, Loader2 } from 'lucide-react';
+import Navbar from '@/components/Navbar';
+import Footer from '@/components/Footer';
+
+interface PendingVendor {
+    id: string;
+    name: string;
+    category?: string;
+    city?: string;
+    email?: string;
+    phone?: string;
+    instagram_handle?: string;
+    website?: string;
+    description?: string;
+    image_url?: string;
+    portfolio_urls?: string[];
+    price_from?: number;
+    tags?: string[];
+    instagram_followers?: number;
+    source_type: string;
+    source_url?: string;
+    status: string;
+}
+
+const categories = [
+    'Photographer', 'Videographer', 'DJ', 'MC', 'Magician', 'Singer',
+    'Musician', 'Comedian', 'Dancer', 'Bartender', 'Bar Show',
+    'Event Decor', 'Kids Animator', 'Face Painter', 'Piercing/Tattoo', 'Chef',
+    'Model', 'Influencer', 'Other'
+];
+
+const cities = ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat', 'Rishon LeZion', 'Netanya', 'Ashdod'];
+
+export default function ConfirmProfilePage() {
+    const params = useParams();
+    const router = useRouter();
+    const token = params.token as string;
+
+    const [pending, setPending] = useState<PendingVendor | null>(null);
+    const [loading, setLoading] = useState(true);
+    const [error, setError] = useState<string | null>(null);
+    const [isEditing, setIsEditing] = useState(false);
+    const [submitting, setSubmitting] = useState(false);
+    const [success, setSuccess] = useState(false);
+
+    // Editable form state
+    const [formData, setFormData] = useState({
+        name: '',
+        category: '',
+        city: '',
+        email: '',
+        phone: '',
+        description: '',
+        price_from: 0
+    });
+
+    useEffect(() => {
+        const fetchPendingVendor = async () => {
+            try {
+                const res = await fetch(`/api/confirm/${token}`);
+                const data = await res.json();
+
+                if (!res.ok) {
+                    setError(data.error || 'Invalid or expired link');
+                    return;
+                }
+
+                setPending(data.pending);
+                setFormData({
+                    name: data.pending.name || '',
+                    category: data.pending.category || '',
+                    city: data.pending.city || '',
+                    email: data.pending.email || '',
+                    phone: data.pending.phone || '',
+                    description: data.pending.description || '',
+                    price_from: data.pending.price_from || 0
+                });
+            } catch (err) {
+                setError('Failed to load profile');
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        if (token) {
+            fetchPendingVendor();
+        }
+    }, [token]);
+
+    const [editLink, setEditLink] = useState<string | null>(null);
+
+    const handleConfirm = async () => {
+        setSubmitting(true);
+        try {
+            const res = await fetch(`/api/confirm/${token}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    action: 'confirm',
+                    updates: formData
+                })
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                setError(data.error || 'Failed to confirm');
+                return;
+            }
+
+            setSuccess(true);
+            setEditLink(data.editLink);
+            // Don't redirect automatically - show success with edit link
+        } catch (err) {
+            setError('Failed to confirm profile');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    const handleDecline = async () => {
+        if (!confirm('Вы уверены что хотите отказаться? / Are you sure you want to decline?')) {
+            return;
+        }
+
+        setSubmitting(true);
+        try {
+            await fetch(`/api/confirm/${token}`, {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({ action: 'decline' })
+            });
+            router.push('/');
+        } catch (err) {
+            setError('Failed to decline');
+        } finally {
+            setSubmitting(false);
+        }
+    };
+
+    if (loading) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center">
+                <div className="text-center">
+                    <div className="w-16 h-16 border-4 border-blue-200 border-t-blue-600 rounded-full animate-spin mx-auto mb-4" />
+                    <p className="text-zinc-500 dark:text-zinc-400">Загрузка профиля...</p>
+                </div>
+            </div>
+        );
+    }
+
+    if (error || !pending) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-black transition-colors">
+                <Navbar />
+                <div className="max-w-2xl mx-auto px-6 py-20 text-center">
+                    <div className="w-24 h-24 bg-red-100 dark:bg-red-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <X className="w-12 h-12 text-red-500" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">
+                        Ссылка недействительна
+                    </h1>
+                    <p className="text-zinc-500 dark:text-zinc-400 mb-8">
+                        {error || 'Эта ссылка для подтверждения истекла или уже была использована.'}
+                    </p>
+                    <a
+                        href="/"
+                        className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-colors"
+                    >
+                        На главную
+                    </a>
+                </div>
+                <Footer />
+            </div>
+        );
+    }
+
+    if (success) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-black flex items-center justify-center px-4">
+                <div className="text-center max-w-lg animate-slide-up">
+                    <div className="w-24 h-24 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Check className="w-12 h-12 text-green-500" />
+                    </div>
+                    <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">
+                        Добро пожаловать в Talentr! 🎉
+                    </h1>
+                    <p className="text-zinc-500 dark:text-zinc-400 mb-6">
+                        Ваш профиль подтверждён и теперь виден клиентам!
+                    </p>
+
+                    {/* Magic Link Box */}
+                    {editLink && (
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6 mb-6 text-left">
+                            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold mb-3">
+                                <Shield className="w-5 h-5" />
+                                Ваша личная ссылка для редактирования
+                            </div>
+                            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                                Сохраните эту ссылку! Она понадобится для редактирования вашего профиля в будущем.
+                            </p>
+                            <div className="flex gap-2">
+                                <input
+                                    type="text"
+                                    value={editLink}
+                                    readOnly
+                                    className="flex-1 px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm"
+                                />
+                                <button
+                                    onClick={() => {
+                                        navigator.clipboard.writeText(editLink);
+                                        alert('Ссылка скопирована!');
+                                    }}
+                                    className="px-4 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700"
+                                >
+                                    Копировать
+                                </button>
+                            </div>
+                        </div>
+                    )}
+
+                    <div className="flex gap-4 justify-center">
+                        <a
+                            href="/"
+                            className="px-6 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-white font-bold rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700"
+                        >
+                            На главную
+                        </a>
+                        {editLink && (
+                            <a
+                                href={editLink}
+                                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700"
+                            >
+                                Редактировать профиль
+                            </a>
+                        )}
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">
+            <Navbar />
+
+            <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-16">
+                {/* Header */}
+                <div className="text-center mb-8 md:mb-12">
+                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-sm font-bold mb-4">
+                        <Sparkles className="w-4 h-4" />
+                        Приглашение в Talentr
+                    </div>
+                    <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white mb-4">
+                        Подтвердите ваш профиль
+                    </h1>
+                    <p className="text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
+                        Мы нашли информацию о вас {pending.source_type === 'instagram' ? 'в Instagram' : 'в интернете'} и создали для вас профиль.
+                        Проверьте данные и подтвердите, чтобы начать получать клиентов! ✨
+                    </p>
+                </div>
+
+                {/* Profile Card */}
+                <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden">
+                    {/* Header with Image */}
+                    <div className="relative h-48 md:h-64 bg-gradient-to-br from-blue-500 to-purple-600">
+                        {pending.image_url && (
+                            <Image
+                                src={pending.image_url}
+                                alt={pending.name}
+                                fill
+                                className="object-cover opacity-80"
+                            />
+                        )}
+                        <div className="absolute inset-0 bg-gradient-to-t from-black/60 to-transparent" />
+
+                        {/* Source Badge */}
+                        <div className="absolute top-4 left-4 flex items-center gap-2 px-3 py-1.5 bg-white/20 backdrop-blur-md rounded-full text-white text-sm">
+                            {pending.source_type === 'instagram' ? (
+                                <>
+                                    <Instagram className="w-4 h-4" />
+                                    @{pending.instagram_handle || 'instagram'}
+                                </>
+                            ) : (
+                                <>
+                                    <Globe className="w-4 h-4" />
+                                    {pending.source_type}
+                                </>
+                            )}
+                        </div>
+
+                        {/* Edit Button */}
+                        <button
+                            onClick={() => setIsEditing(!isEditing)}
+                            className="absolute top-4 right-4 flex items-center gap-2 px-4 py-2 bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-xl font-bold text-sm hover:scale-105 transition-transform"
+                        >
+                            <Edit3 className="w-4 h-4" />
+                            {isEditing ? 'Отмена' : 'Изменить'}
+                        </button>
+
+                        {/* Name on Image */}
+                        <div className="absolute bottom-4 left-4 right-4">
+                            <h2 className="text-2xl md:text-3xl font-black text-white drop-shadow-lg">
+                                {formData.name || pending.name}
+                            </h2>
+                            {pending.instagram_followers && (
+                                <p className="text-white/80 text-sm">
+                                    {pending.instagram_followers.toLocaleString()} подписчиков
+                                </p>
+                            )}
+                        </div>
+                    </div>
+
+                    {/* Profile Content */}
+                    <div className="p-6 md:p-8 space-y-6">
+                        {isEditing ? (
+                            /* Edit Form */
+                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                <div>
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Имя / Название
+                                    </label>
+                                    <input
+                                        type="text"
+                                        value={formData.name}
+                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Категория
+                                    </label>
+                                    <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    >
+                                        <option value="">Выберите категорию</option>
+                                        {categories.map((cat) => (
+                                            <option key={cat} value={cat}>{cat}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Город
+                                    </label>
+                                    <select
+                                        value={formData.city}
+                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    >
+                                        <option value="">Выберите город</option>
+                                        {cities.map((city) => (
+                                            <option key={city} value={city}>{city}</option>
+                                        ))}
+                                    </select>
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Email
+                                    </label>
+                                    <input
+                                        type="email"
+                                        value={formData.email}
+                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Телефон (WhatsApp)
+                                    </label>
+                                    <input
+                                        type="tel"
+                                        value={formData.phone}
+                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                        placeholder="+972..."
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div>
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Цена от (₪)
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={formData.price_from}
+                                        onChange={(e) => setFormData({ ...formData, price_from: parseInt(e.target.value) || 0 })}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                    />
+                                </div>
+                                <div className="md:col-span-2">
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                        Описание
+                                    </label>
+                                    <textarea
+                                        value={formData.description}
+                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                        rows={4}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                        placeholder="Расскажите о себе и своих услугах..."
+                                    />
+                                </div>
+                            </div>
+                        ) : (
+                            /* View Mode */
+                            <div className="space-y-4">
+                                <div className="flex flex-wrap gap-3">
+                                    {formData.category && (
+                                        <span className="px-4 py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-xl text-sm font-bold">
+                                            {formData.category}
+                                        </span>
+                                    )}
+                                    {formData.city && (
+                                        <span className="flex items-center gap-1.5 px-4 py-2 bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 rounded-xl text-sm font-medium">
+                                            <MapPin className="w-4 h-4" />
+                                            {formData.city}
+                                        </span>
+                                    )}
+                                </div>
+
+                                {formData.description && (
+                                    <p className="text-zinc-600 dark:text-zinc-300 leading-relaxed">
+                                        {formData.description}
+                                    </p>
+                                )}
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-3 pt-4">
+                                    {formData.email && (
+                                        <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
+                                            <Mail className="w-5 h-5 text-zinc-400" />
+                                            <span className="text-sm text-zinc-600 dark:text-zinc-300">{formData.email}</span>
+                                        </div>
+                                    )}
+                                    {formData.phone && (
+                                        <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
+                                            <Phone className="w-5 h-5 text-zinc-400" />
+                                            <span className="text-sm text-zinc-600 dark:text-zinc-300">{formData.phone}</span>
+                                        </div>
+                                    )}
+                                </div>
+
+                                {formData.price_from > 0 && (
+                                    <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-500/20">
+                                        <p className="text-sm text-green-700 dark:text-green-400 font-bold">
+                                            Цены от ₪{formData.price_from.toLocaleString()}
+                                        </p>
+                                    </div>
+                                )}
+                            </div>
+                        )}
+
+                        {/* Portfolio Preview */}
+                        {pending.portfolio_urls && pending.portfolio_urls.length > 0 && (
+                            <div className="pt-6 border-t border-zinc-200 dark:border-zinc-800">
+                                <h3 className="font-bold text-zinc-900 dark:text-white mb-4">
+                                    Портфолио ({pending.portfolio_urls.length} фото)
+                                </h3>
+                                <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                                    {pending.portfolio_urls.slice(0, 8).map((url, i) => (
+                                        <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                            <Image src={url} alt={`Portfolio ${i + 1}`} fill className="object-cover" />
+                                        </div>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Trust Badge */}
+                        <div className="p-4 bg-blue-50 dark:bg-blue-900/10 rounded-2xl border border-blue-200 dark:border-blue-500/20 flex items-start gap-4">
+                            <div className="w-12 h-12 bg-blue-100 dark:bg-blue-500/20 rounded-xl flex items-center justify-center flex-shrink-0">
+                                <Shield className="w-6 h-6 text-blue-600 dark:text-blue-400" />
+                            </div>
+                            <div>
+                                <h4 className="font-bold text-blue-900 dark:text-blue-100 mb-1">
+                                    Что даёт Talentr?
+                                </h4>
+                                <ul className="text-sm text-blue-700 dark:text-blue-300 space-y-1">
+                                    <li>✓ Новые клиенты находят вас через нашу платформу</li>
+                                    <li>✓ Безопасные сделки с гарантией оплаты</li>
+                                    <li>✓ Бесплатный профиль с портфолио</li>
+                                    <li>✓ Отзывы и рейтинг повышают доверие</li>
+                                </ul>
+                            </div>
+                        </div>
+                    </div>
+
+                    {/* Action Buttons */}
+                    <div className="p-6 md:p-8 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-800">
+                        <div className="flex flex-col md:flex-row gap-4">
+                            <button
+                                onClick={handleConfirm}
+                                disabled={submitting}
+                                className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-black text-lg rounded-2xl transition-all active:scale-95 shadow-xl shadow-green-600/20"
+                            >
+                                {submitting ? (
+                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                ) : (
+                                    <Check className="w-6 h-6" />
+                                )}
+                                Подтвердить профиль
+                            </button>
+                            <button
+                                onClick={handleDecline}
+                                disabled={submitting}
+                                className="px-6 py-4 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 font-bold rounded-2xl transition-colors"
+                            >
+                                Отказаться
+                            </button>
+                        </div>
+                        <p className="text-center text-xs text-zinc-500 dark:text-zinc-400 mt-4">
+                            Подтверждая, вы соглашаетесь с{' '}
+                            <a href="/terms" className="text-blue-500 hover:underline">условиями использования</a>
+                        </p>
+                    </div>
+                </div>
+            </div>
+
+            <Footer />
+        </div>
+    );
+}

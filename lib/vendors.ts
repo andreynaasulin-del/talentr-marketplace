@@ -3,37 +3,49 @@ import { Vendor, VendorCategory, City } from '@/types';
 
 // NOTE: Mock data removed - only real data from Supabase is used
 
-// Type for Supabase vendor row (matching actual schema)
+// Type for Supabase vendor row (matching actual schema - supports both old and new field names)
 interface VendorRow {
     id: string;
-    full_name: string;
+    // Name fields (old: full_name, new: name)
+    full_name?: string;
+    name?: string;
     email: string | null;
     category: VendorCategory;
     city: City;
     rating: number;
     reviews_count: number;
     price_from: number;
-    avatar_url: string | null;
-    bio: string | null;
+    // Image fields (old: avatar_url, new: image_url)
+    avatar_url?: string | null;
+    image_url?: string | null;
+    // Description fields (old: bio, new: description)
+    bio?: string | null;
+    description?: string | null;
     phone: string | null;
-    portfolio_gallery: string[] | null;
+    portfolio_gallery?: string[] | null;
+    // New fields
+    is_verified?: boolean;
+    is_featured?: boolean;
+    is_active?: boolean;
+    is_archived?: boolean;
+    tags?: string[];
 }
 
-// Convert Supabase row to app Vendor type (camelCase)
+// Convert Supabase row to app Vendor type (camelCase) - handles both old and new field names
 const toVendor = (row: VendorRow): Vendor => ({
     id: row.id,
-    name: row.full_name,
+    name: row.name || row.full_name || 'Unknown',
     category: row.category,
     city: row.city,
     rating: row.rating || 0,
     reviewsCount: row.reviews_count || 0,
     priceFrom: row.price_from || 0,
-    imageUrl: row.avatar_url || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
-    tags: [],
-    description: row.bio || undefined,
+    imageUrl: row.image_url || row.avatar_url || 'https://images.unsplash.com/photo-1519741497674-611481863552?auto=format&fit=crop&w=800&q=80',
+    tags: row.tags || [],
+    description: row.description || row.bio || undefined,
     phone: row.phone || undefined,
-    isVerified: true, // Default for now
-    isFeatured: false,
+    isVerified: row.is_verified ?? true,
+    isFeatured: row.is_featured ?? false,
 });
 
 // ========== VENDOR QUERIES ==========
@@ -47,6 +59,7 @@ export async function getVendors(): Promise<Vendor[]> {
         const { data, error } = await supabase
             .from('vendors')
             .select('*')
+            .eq('is_archived', false)
             .order('rating', { ascending: false });
 
         if (error || !data || data.length === 0) {
@@ -71,6 +84,7 @@ export async function getVendorsByCategory(category: VendorCategory): Promise<Ve
             .from('vendors')
             .select('*')
             .eq('category', category)
+            .eq('is_archived', false)
             .order('rating', { ascending: false });
 
         if (error || !data || data.length === 0) {
@@ -93,6 +107,7 @@ export async function getVendorsByCity(city: City): Promise<Vendor[]> {
         .from('vendors')
         .select('*')
         .eq('city', city)
+        .eq('is_archived', false)
         .order('rating', { ascending: false });
 
     if (error) {
@@ -112,6 +127,7 @@ export async function getVendorById(id: string): Promise<Vendor | null> {
         .from('vendors')
         .select('*')
         .eq('id', id)
+        .eq('is_archived', false)
         .single();
 
     if (error || !data) {
@@ -129,11 +145,22 @@ export async function getFeaturedVendors(limit: number = 6): Promise<Vendor[]> {
     const { data, error } = await supabase
         .from('vendors')
         .select('*')
+        .eq('is_archived', false)
+        .eq('is_featured', true)
         .order('rating', { ascending: false })
         .limit(limit);
 
     if (error || !data || data.length === 0) {
-        return [];
+        // Fallback: get any active vendors if no featured
+        const { data: fallbackData, error: fallbackError } = await supabase
+            .from('vendors')
+            .select('*')
+            .eq('is_archived', false)
+            .order('rating', { ascending: false })
+            .limit(limit);
+
+        if (fallbackError || !fallbackData) return [];
+        return fallbackData.map(toVendor);
     }
 
     return data.map(toVendor);
@@ -151,8 +178,8 @@ export async function searchVendors(query: string): Promise<Vendor[]> {
     const { data, error } = await supabase
         .from('vendors')
         .select('*')
-        .eq('is_active', true)
-        .or(`name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`)
+        .eq('is_archived', false)
+        .or(`name.ilike.%${searchTerm}%,full_name.ilike.%${searchTerm}%,description.ilike.%${searchTerm}%,category.ilike.%${searchTerm}%`)
         .order('rating', { ascending: false })
         .limit(20);
 
@@ -181,7 +208,8 @@ export async function filterVendors(filters: VendorFilters): Promise<Vendor[]> {
     try {
         let query = supabase
             .from('vendors')
-            .select('*');
+            .select('*')
+            .eq('is_archived', false);
 
         if (filters.category) {
             query = query.eq('category', filters.category);

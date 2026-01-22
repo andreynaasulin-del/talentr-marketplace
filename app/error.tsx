@@ -17,25 +17,25 @@ export default function Error({
     }, [error]);
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 flex items-center justify-center p-6">
+        <div className="min-h-screen bg-gradient-to-br from-gray-50 to-gray-100 dark:from-zinc-900 dark:to-black flex items-center justify-center p-6 transition-colors">
             <div className="max-w-md w-full text-center">
                 {/* Error Icon */}
-                <div className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-red-50 flex items-center justify-center">
+                <div className="w-20 h-20 mx-auto mb-8 rounded-3xl bg-red-50 dark:bg-red-500/10 flex items-center justify-center">
                     <AlertTriangle className="w-10 h-10 text-red-500" />
                 </div>
 
                 {/* Error Message */}
-                <h1 className="text-3xl font-black text-gray-900 mb-4">
+                <h1 className="text-3xl font-black text-gray-900 dark:text-white mb-4">
                     Oops! Something went wrong
                 </h1>
-                <p className="text-gray-500 mb-8 leading-relaxed">
+                <p className="text-gray-500 dark:text-zinc-400 mb-8 leading-relaxed">
                     We encountered an unexpected error. Don&apos;t worry, our team has been notified.
                 </p>
 
                 {/* Error Details (dev only) */}
                 {process.env.NODE_ENV === 'development' && (
-                    <div className="mb-8 p-4 bg-red-50 rounded-2xl text-left">
-                        <p className="text-xs font-mono text-red-600 break-all">
+                    <div className="mb-8 p-4 bg-red-50 dark:bg-red-500/10 rounded-2xl text-left border border-red-200 dark:border-red-500/20">
+                        <p className="text-xs font-mono text-red-600 dark:text-red-400 break-all">
                             {error.message}
                         </p>
                     </div>
@@ -52,7 +52,7 @@ export default function Error({
                     </button>
                     <Link
                         href="/"
-                        className="inline-flex items-center justify-center gap-2 px-6 py-4 bg-white border border-gray-200 text-gray-700 font-bold rounded-2xl hover:bg-gray-50 transition-all"
+                        className="inline-flex items-center justify-center gap-2 px-6 py-4 bg-white dark:bg-zinc-800 border border-gray-200 dark:border-zinc-700 text-gray-700 dark:text-zinc-300 font-bold rounded-2xl hover:bg-gray-50 dark:hover:bg-zinc-700 transition-all"
                     >
                         <Home className="w-5 h-5" />
                         Go Home

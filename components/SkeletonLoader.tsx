@@ -83,7 +83,7 @@ export function AuthFormSkeleton() {
 // Vendor Profile Page Skeleton
 export function VendorProfileSkeleton() {
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-white dark:bg-black transition-colors">
             {/* Hero Skeleton */}
             <div className="max-w-7xl mx-auto">
                 <Skeleton className="h-[400px] rounded-b-3xl" />
@@ -121,7 +121,7 @@ export function VendorProfileSkeleton() {
                     {/* Right Sidebar */}
                     <div className="lg:col-span-1">
                         <div className="sticky top-24">
-                            <div className="bg-zinc-900 border border-zinc-800 rounded-2xl shadow-lg p-6">
+                            <div className="bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl shadow-lg p-6">
                                 <Skeleton className="h-6 w-24 mb-1" />
                                 <Skeleton className="h-12 w-32 mb-6" />
                                 <Skeleton className="h-12 w-full rounded-xl mb-4" />
@@ -138,7 +138,7 @@ export function VendorProfileSkeleton() {
 // Page Loading Overlay
 export function PageLoader() {
     return (
-        <div className="fixed inset-0 bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
+        <div className="fixed inset-0 bg-white/80 dark:bg-black/80 backdrop-blur-sm flex items-center justify-center z-50">
             <div className="flex flex-col items-center gap-4">
                 <div className="relative w-16 h-16">
                     <div className="absolute inset-0 border-4 border-blue-900/50 rounded-full"></div>

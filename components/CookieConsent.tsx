@@ -61,7 +61,7 @@ export default function CookieConsent() {
                     exit={{ opacity: 0, y: 50 }}
                     transition={{ type: 'spring', damping: 25, stiffness: 300 }}
                 >
-                    <div className="bg-zinc-900 rounded-2xl shadow-2xl shadow-black/50 border border-zinc-800 p-4 backdrop-blur-sm">
+                    <div className="bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl shadow-black/10 dark:shadow-black/50 border border-zinc-200 dark:border-zinc-800 p-4 backdrop-blur-sm">
                         <div className="flex items-start gap-3">
                             {/* Cookie icon */}
                             <div className="w-10 h-10 rounded-xl bg-gradient-to-br from-amber-400 to-orange-500 flex items-center justify-center flex-shrink-0">
@@ -70,7 +70,7 @@ export default function CookieConsent() {
 
                             {/* Content */}
                             <div className="flex-1 min-w-0">
-                                <p className="text-sm text-zinc-300 leading-relaxed">
+                                <p className="text-sm text-zinc-600 dark:text-zinc-300 leading-relaxed">
                                     {t.text}{' '}
                                     <Link
                                         href="/privacy"
@@ -90,7 +90,7 @@ export default function CookieConsent() {
                                     </button>
                                     <button
                                         onClick={handleDecline}
-                                        className="px-4 py-2 bg-zinc-800 hover:bg-zinc-700 text-zinc-300 text-sm font-medium rounded-xl transition-colors border border-zinc-700"
+                                        className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-300 text-sm font-medium rounded-xl transition-colors border border-zinc-200 dark:border-zinc-700"
                                     >
                                         {t.decline}
                                     </button>
@@ -100,7 +100,7 @@ export default function CookieConsent() {
                             {/* Close button */}
                             <button
                                 onClick={handleDecline}
-                                className="p-1 text-zinc-500 hover:text-white transition-colors"
+                                className="p-1 text-zinc-400 dark:text-zinc-500 hover:text-zinc-600 dark:hover:text-white transition-colors"
                                 aria-label="Close"
                             >
                                 <X className="w-4 h-4" />

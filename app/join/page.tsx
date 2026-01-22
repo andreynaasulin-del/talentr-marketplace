@@ -255,10 +255,10 @@ export default function JoinPage() {
             >
                 {/* Question */}
                 <div className="text-center">
-                    <h2 className="text-2xl md:text-3xl font-black text-white mb-1">
+                    <h2 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white mb-1">
                         {stepInfo.title}
                     </h2>
-                    <p className="text-zinc-400">
+                    <p className="text-zinc-500 dark:text-zinc-400">
                         {stepInfo.subtitle}
                     </p>
                 </div>
@@ -273,7 +273,7 @@ export default function JoinPage() {
                                 value={formData.fullName}
                                 onChange={(e) => setFormData({ ...formData, fullName: e.target.value })}
                                 placeholder={t.namePlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -287,7 +287,7 @@ export default function JoinPage() {
                                 value={formData.email}
                                 onChange={(e) => setFormData({ ...formData, email: e.target.value })}
                                 placeholder={t.emailPlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -301,7 +301,7 @@ export default function JoinPage() {
                                 value={formData.password}
                                 onChange={(e) => setFormData({ ...formData, password: e.target.value })}
                                 placeholder={t.passwordPlaceholder}
-                                className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
+                                className="w-full h-14 ps-12 pe-4 bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                 autoFocus
                             />
                         </div>
@@ -317,7 +317,7 @@ export default function JoinPage() {
                                         "relative flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
                                         formData.category === cat.id
                                             ? "border-blue-600 bg-blue-600/10"
-                                            : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800"
+                                            : "border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                     )}
                                 >
                                     <span className="text-2xl">{cat.icon}</span>
@@ -325,7 +325,7 @@ export default function JoinPage() {
                                         "text-xs font-medium text-center",
                                         formData.category === cat.id
                                             ? "text-blue-500"
-                                            : "text-zinc-400"
+                                            : "text-zinc-600 dark:text-zinc-400"
                                     )}>
                                         {cat.label[language] || cat.label.en}
                                     </span>
@@ -347,7 +347,7 @@ export default function JoinPage() {
                                     "relative flex flex-col items-center gap-1 p-3 rounded-xl border-2 transition-all",
                                     formData.category === 'Other'
                                         ? "border-blue-600 bg-blue-600/10"
-                                        : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800"
+                                        : "border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                 )}
                             >
                                 <span className="text-2xl">✨</span>
@@ -355,7 +355,7 @@ export default function JoinPage() {
                                     "text-xs font-medium text-center",
                                     formData.category === 'Other'
                                         ? "text-blue-500"
-                                        : "text-zinc-400"
+                                        : "text-zinc-600 dark:text-zinc-400"
                                 )}>
                                     {language === 'he' ? 'אחר' : 'Another'}
                                 </span>
@@ -382,7 +382,7 @@ export default function JoinPage() {
                                         "flex items-center gap-2 p-3 rounded-xl border-2 transition-all",
                                         formData.city === city.id
                                             ? "border-blue-600 bg-blue-600/10"
-                                            : "border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800"
+                                            : "border-zinc-300 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-400 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800"
                                     )}
                                 >
                                     <MapPin className={cn(
@@ -393,7 +393,7 @@ export default function JoinPage() {
                                         "font-medium text-sm",
                                         formData.city === city.id
                                             ? "text-blue-500"
-                                            : "text-zinc-400"
+                                            : "text-zinc-600 dark:text-zinc-400"
                                     )}>
                                         {city.label[language] || city.label.en}
                                     </span>
@@ -413,10 +413,10 @@ export default function JoinPage() {
                                     <button
                                         type="button"
                                         onClick={() => setShowCountryDropdown(!showCountryDropdown)}
-                                        className="h-14 px-3 bg-zinc-900 border-2 border-zinc-800 rounded-2xl flex items-center gap-2 hover:border-zinc-700 transition-all text-white"
+                                        className="h-14 px-3 bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-800 rounded-2xl flex items-center gap-2 hover:border-zinc-400 dark:hover:border-zinc-700 transition-all text-zinc-900 dark:text-white"
                                     >
                                         <span className="text-lg">{currentCountry.flag}</span>
-                                        <span className="font-medium text-white">{currentCountry.code}</span>
+                                        <span className="font-medium text-zinc-900 dark:text-white">{currentCountry.code}</span>
                                         <ChevronDown className="w-4 h-4 text-zinc-500" />
                                     </button>
 
@@ -428,7 +428,7 @@ export default function JoinPage() {
                                                     initial={{ opacity: 0, y: -10 }}
                                                     animate={{ opacity: 1, y: 0 }}
                                                     exit={{ opacity: 0, y: -10 }}
-                                                    className="absolute start-0 top-full mt-2 w-48 bg-zinc-900 rounded-xl shadow-lg shadow-black/50 py-1 z-50 border-2 border-zinc-800"
+                                                    className="absolute start-0 top-full mt-2 w-48 bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/50 py-1 z-50 border-2 border-zinc-200 dark:border-zinc-800"
                                                 >
                                                     {countryCodes.map((country) => (
                                                         <button
@@ -439,8 +439,8 @@ export default function JoinPage() {
                                                                 setShowCountryDropdown(false);
                                                             }}
                                                             className={cn(
-                                                                "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-800 transition-colors",
-                                                                countryCode === country.code ? 'bg-blue-600/10 text-blue-500' : 'text-zinc-300'
+                                                                "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors",
+                                                                countryCode === country.code ? 'bg-blue-600/10 text-blue-500' : 'text-zinc-700 dark:text-zinc-300'
                                                             )}
                                                         >
                                                             <span className="text-lg">{country.flag}</span>
@@ -462,7 +462,7 @@ export default function JoinPage() {
                                         value={formData.phone}
                                         onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
                                         placeholder={t.phonePlaceholder}
-                                        className="w-full h-14 ps-12 pe-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
+                                        className="w-full h-14 ps-12 pe-4 bg-white dark:bg-zinc-900 border-2 border-zinc-300 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-blue-600 transition-all text-lg"
                                         autoFocus
                                     />
                                 </div>
@@ -472,7 +472,7 @@ export default function JoinPage() {
                             <button
                                 type="button"
                                 onClick={() => handleRegister(true)} // pass true to skip phone
-                                className="w-full py-2 text-sm font-medium text-zinc-500 hover:text-zinc-300 transition-colors"
+                                className="w-full py-2 text-sm font-medium text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 transition-colors"
                             >
                                 {language === 'he' ? 'הוסף אחר כך (דלג)' : 'Skip and add later'}
                             </button>
@@ -524,14 +524,14 @@ export default function JoinPage() {
             </div>
 
             {/* Right Side - Form */}
-            <div className="w-full lg:w-1/2 flex flex-col bg-black">
+            <div className="w-full lg:w-1/2 flex flex-col bg-white dark:bg-black transition-colors">
                 {/* Header */}
                 <div className="flex items-center justify-end p-4">
                     {/* Language Switcher */}
                     <div className="relative">
                         <button
                             onClick={() => setShowLangDropdown(!showLangDropdown)}
-                            className="flex items-center gap-1 px-3 py-2 text-sm font-bold text-white/90 hover:bg-white/10 rounded-xl transition-colors"
+                            className="flex items-center gap-1 px-3 py-2 text-sm font-bold text-zinc-700 dark:text-white/90 hover:bg-zinc-100 dark:hover:bg-white/10 rounded-xl transition-colors"
                         >
                             <span className="text-lg">{currentLang.flag}</span>
                             <ChevronDown className={cn("w-4 h-4 transition-transform", showLangDropdown && "rotate-180")} />
@@ -545,7 +545,7 @@ export default function JoinPage() {
                                         initial={{ opacity: 0, y: -10 }}
                                         animate={{ opacity: 1, y: 0 }}
                                         exit={{ opacity: 0, y: -10 }}
-                                        className="absolute end-0 mt-2 w-32 bg-zinc-900 rounded-xl shadow-lg shadow-black/50 py-1 z-50 border border-zinc-800"
+                                        className="absolute end-0 mt-2 w-32 bg-white dark:bg-zinc-900 rounded-xl shadow-lg shadow-black/10 dark:shadow-black/50 py-1 z-50 border border-zinc-200 dark:border-zinc-800"
                                     >
                                         {languages.map((lang) => (
                                             <button
@@ -555,8 +555,8 @@ export default function JoinPage() {
                                                     setShowLangDropdown(false);
                                                 }}
                                                 className={cn(
-                                                    "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-800 transition-colors",
-                                                    language === lang.code ? 'text-blue-500' : 'text-zinc-300'
+                                                    "w-full px-3 py-2.5 text-start flex items-center gap-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors",
+                                                    language === lang.code ? 'text-blue-500' : 'text-zinc-700 dark:text-zinc-300'
                                                 )}
                                             >
                                                 <span className="text-lg">{lang.flag}</span>
@@ -572,9 +572,9 @@ export default function JoinPage() {
 
                 {/* Progress Bar */}
                 <div className="px-4 py-3">
-                    <div className="h-2 bg-white/20 rounded-full overflow-hidden">
+                    <div className="h-2 bg-zinc-200 dark:bg-white/20 rounded-full overflow-hidden">
                         <motion.div
-                            className="h-full bg-white rounded-full"
+                            className="h-full bg-blue-600 dark:bg-white rounded-full"
                             initial={{ width: 0 }}
                             animate={{ width: `${progress}%` }}
                             transition={{ duration: 0.3 }}
@@ -590,8 +590,8 @@ export default function JoinPage() {
                                     step < currentStep
                                         ? "bg-blue-600 text-white"
                                         : step === currentStep
-                                            ? "bg-white text-blue-600 scale-110"
-                                            : "bg-white/10 text-white/30"
+                                            ? "bg-blue-600 dark:bg-white text-white dark:text-blue-600 scale-110"
+                                            : "bg-zinc-200 dark:bg-white/10 text-zinc-400 dark:text-white/30"
                                 )}
                             >
                                 {step < currentStep ? <Check className="w-4 h-4" /> : step + 1}
@@ -602,7 +602,7 @@ export default function JoinPage() {
 
                 {/* Main Content Card */}
                 <div className="flex-1 flex items-center justify-center p-4">
-                    <div className="w-full max-w-lg bg-zinc-900 border border-zinc-800 rounded-3xl p-6 shadow-2xl shadow-black/50">
+                    <div className="w-full max-w-lg bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-3xl p-6 shadow-2xl shadow-black/5 dark:shadow-black/50">
                         <AnimatePresence mode="wait">
                             {renderStepContent()}
                         </AnimatePresence>
@@ -612,7 +612,7 @@ export default function JoinPage() {
                             {currentStep > 0 && (
                                 <button
                                     onClick={prevStep}
-                                    className="flex items-center justify-center gap-2 px-5 py-3.5 bg-zinc-800 text-zinc-300 font-semibold rounded-xl hover:bg-zinc-700 transition-colors border border-zinc-700"
+                                    className="flex items-center justify-center gap-2 px-5 py-3.5 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 font-semibold rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors border border-zinc-300 dark:border-zinc-700"
                                 >
                                     <ArrowLeft className="w-5 h-5" />
                                     {t.back}
@@ -648,9 +648,9 @@ export default function JoinPage() {
                 </div>
 
                 {/* Footer */}
-                <div className="p-4 text-center text-sm text-white/70">
+                <div className="p-4 text-center text-sm text-zinc-500 dark:text-white/70">
                     {language === 'he' ? 'כבר שותף?' : 'Already a partner?'}{' '}
-                    <Link href="/signin" className="text-white font-semibold hover:underline">
+                    <Link href="/signin" className="text-zinc-900 dark:text-white font-semibold hover:underline">
                         {language === 'he' ? 'התחבר' : 'Sign in'}
                     </Link>
                 </div>

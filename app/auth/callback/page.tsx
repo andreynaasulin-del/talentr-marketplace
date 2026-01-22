@@ -44,11 +44,11 @@ export default function AuthCallbackPage() {
     }, [router]);
 
     return (
-        <div className="min-h-screen flex items-center justify-center bg-black">
+        <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black transition-colors">
             <div className="text-center">
                 <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto mb-4" />
-                <h2 className="text-xl font-bold text-white mb-2">{status}</h2>
-                <p className="text-zinc-400 text-sm">Please wait while we set up your session.</p>
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{status}</h2>
+                <p className="text-zinc-500 dark:text-zinc-400 text-sm">Please wait while we set up your session.</p>
             </div>
         </div>
     );

@@ -49,7 +49,7 @@ export default function FavoritesPage() {
     };
 
     return (
-        <div className="min-h-screen bg-gradient-to-br from-slate-50 via-white to-blue-50">
+        <div className="min-h-screen bg-white dark:bg-black transition-colors">
             <Navbar />
 
             <main className="max-w-7xl mx-auto px-6 pt-24 pb-12">
@@ -62,7 +62,7 @@ export default function FavoritesPage() {
                 >
                     <Link
                         href="/"
-                        className="inline-flex items-center gap-2 text-gray-500 hover:text-gray-700 mb-6 transition-colors"
+                        className="inline-flex items-center gap-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 mb-6 transition-colors"
                     >
                         <ArrowLeft className="w-4 h-4" />
                         {language === 'he' ? 'לדף הבית' : 'Back to Home'}
@@ -76,21 +76,21 @@ export default function FavoritesPage() {
                             <Heart className="w-8 h-8 text-white fill-white" />
                         </motion.div>
                         <div>
-                            <h1 className="text-4xl font-bold text-gray-900">{t.title}</h1>
-                            <p className="text-gray-500">{t.subtitle}</p>
+                            <h1 className="text-4xl font-bold text-zinc-900 dark:text-white">{t.title}</h1>
+                            <p className="text-zinc-500 dark:text-zinc-400">{t.subtitle}</p>
                         </div>
                     </div>
 
                     {/* Stats */}
                     {vendors.length > 0 && (
                         <motion.div
-                            className="inline-flex items-center gap-2 px-4 py-2 bg-white rounded-full shadow-sm border border-gray-100"
+                            className="inline-flex items-center gap-2 px-4 py-2 bg-zinc-50 dark:bg-zinc-900 rounded-full shadow-sm border border-zinc-200 dark:border-zinc-800"
                             initial={{ opacity: 0, scale: 0.8 }}
                             animate={{ opacity: 1, scale: 1 }}
                             transition={{ delay: 0.2 }}
                         >
-                            <span className="text-2xl font-bold text-gray-900">{vendors.length}</span>
-                            <span className="text-gray-500">{t.count}</span>
+                            <span className="text-2xl font-bold text-zinc-900 dark:text-white">{vendors.length}</span>
+                            <span className="text-zinc-500 dark:text-zinc-400">{t.count}</span>
                         </motion.div>
                     )}
                 </motion.div>
@@ -106,11 +106,11 @@ export default function FavoritesPage() {
                             exit={{ opacity: 0 }}
                         >
                             {[1, 2, 3].map(i => (
-                                <div key={i} className="bg-white rounded-2xl h-80 animate-pulse">
-                                    <div className="h-48 bg-gray-200 rounded-t-2xl" />
+                                <div key={i} className="bg-zinc-50 dark:bg-zinc-900 rounded-2xl h-80 animate-pulse border border-zinc-200 dark:border-zinc-800">
+                                    <div className="h-48 bg-zinc-200 dark:bg-zinc-800 rounded-t-2xl" />
                                     <div className="p-4 space-y-3">
-                                        <div className="h-4 bg-gray-200 rounded w-3/4" />
-                                        <div className="h-3 bg-gray-200 rounded w-1/2" />
+                                        <div className="h-4 bg-zinc-200 dark:bg-zinc-800 rounded w-3/4" />
+                                        <div className="h-3 bg-zinc-200 dark:bg-zinc-800 rounded w-1/2" />
                                     </div>
                                 </div>
                             ))}
@@ -124,7 +124,7 @@ export default function FavoritesPage() {
                             exit={{ opacity: 0, scale: 0.9 }}
                         >
                             <motion.div
-                                className="w-24 h-24 rounded-full bg-gray-100 flex items-center justify-center mb-6"
+                                className="w-24 h-24 rounded-full bg-zinc-100 dark:bg-zinc-900 flex items-center justify-center mb-6 border border-zinc-200 dark:border-zinc-800"
                                 animate={{
                                     scale: [1, 1.1, 1],
                                     rotate: [0, 5, -5, 0]
@@ -135,17 +135,17 @@ export default function FavoritesPage() {
                                     repeatType: "reverse"
                                 }}
                             >
-                                <Heart className="w-12 h-12 text-gray-300" />
+                                <Heart className="w-12 h-12 text-zinc-300 dark:text-zinc-700" />
                             </motion.div>
-                            <h2 className="text-2xl font-bold text-gray-900 mb-2">{t.empty}</h2>
-                            <p className="text-gray-500 max-w-md mb-8">{t.emptyDesc}</p>
+                            <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-2">{t.empty}</h2>
+                            <p className="text-zinc-500 dark:text-zinc-400 max-w-md mb-8">{t.emptyDesc}</p>
                             <motion.div
                                 whileHover={{ scale: 1.05 }}
                                 whileTap={{ scale: 0.95 }}
                             >
                                 <Link
                                     href="/"
-                                    className="inline-flex items-center gap-2 px-8 py-4 bg-gradient-to-r from-blue-600 to-indigo-600 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-shadow"
+                                    className="inline-flex items-center gap-2 px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl shadow-lg hover:shadow-xl transition-all"
                                 >
                                     <Search className="w-5 h-5" />
                                     {t.browse}

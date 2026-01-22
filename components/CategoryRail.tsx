@@ -153,14 +153,14 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
     };
 
     return (
-        <div className="py-8 md:py-12 bg-black">
+        <div className="py-8 md:py-12 bg-white dark:bg-black transition-colors">
             {/* Header */}
             <div className="max-w-7xl mx-auto px-4 md:px-6 mb-6 flex items-end justify-between">
                 <div>
-                    <h2 className="text-2xl md:text-3xl font-black text-white">
+                    <h2 className="text-2xl md:text-3xl font-black text-gray-900 dark:text-white">
                         {lang === 'he' ? 'מצאו כישרונות' : 'Find Talents'}
                     </h2>
-                    <p className="text-zinc-400 mt-1">
+                    <p className="text-gray-500 dark:text-zinc-400 mt-1">
                         {lang === 'he' ? 'בחרו קטגוריה' : 'Choose a category'}
                     </p>
                 </div>
@@ -169,7 +169,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                 <div className="hidden md:flex gap-2">
                     <motion.button
                         onClick={() => scroll('left')}
-                        className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 flex items-center justify-center transition-all border border-zinc-800 hover:border-blue-600"
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800 flex items-center justify-center transition-all border border-gray-200 dark:border-zinc-800 hover:border-blue-500 dark:hover:border-blue-600"
                         whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)' }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -177,7 +177,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                     </motion.button>
                     <motion.button
                         onClick={() => scroll('right')}
-                        className="w-10 h-10 rounded-full bg-zinc-900 hover:bg-zinc-800 flex items-center justify-center transition-all border border-zinc-800 hover:border-blue-600"
+                        className="w-10 h-10 rounded-full bg-gray-100 dark:bg-zinc-900 hover:bg-gray-200 dark:hover:bg-zinc-800 flex items-center justify-center transition-all border border-gray-200 dark:border-zinc-800 hover:border-blue-500 dark:hover:border-blue-600"
                         whileHover={{ scale: 1.1, boxShadow: '0 0 20px rgba(0, 212, 255, 0.2)' }}
                         whileTap={{ scale: 0.95 }}
                     >
@@ -203,7 +203,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                                 className={cn(
                                     "relative flex-shrink-0 w-32 h-32 md:w-40 md:h-40 rounded-3xl overflow-hidden group",
                                     "transition-all duration-300",
-                                    isActive && 'ring-4 ring-blue-500 ring-offset-4 dark:ring-offset-slate-900'
+                                    isActive && 'ring-4 ring-blue-500 ring-offset-4 ring-offset-white dark:ring-offset-slate-900'
                                 )}
                                 style={{ scrollSnapAlign: 'start' }}
                                 initial={{ opacity: 0, scale: 0.9 }}
@@ -260,7 +260,7 @@ export default function CategoryRail({ onCategoryChange }: CategoryRailProps) {
                     initial={{ opacity: 0, y: 10 }}
                     animate={{ opacity: 1, y: 0 }}
                 >
-                    <div className="flex items-center gap-3 p-4 bg-zinc-900/50 border border-zinc-800 rounded-2xl">
+                    <div className="flex items-center gap-3 p-4 bg-gray-50 dark:bg-zinc-900/50 border border-gray-200 dark:border-zinc-800 rounded-2xl">
                         <div className="w-10 h-10 rounded-xl bg-blue-500 flex items-center justify-center">
                             <svg className="w-5 h-5 text-white" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                                 <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />

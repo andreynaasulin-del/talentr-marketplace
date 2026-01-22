@@ -319,7 +319,7 @@ export default function HeroSection() {
                         initial={{ opacity: 0 }}
                         animate={{ opacity: 1 }}
                         exit={{ opacity: 0 }}
-                        className="fixed inset-0 z-50 bg-black"
+                        className="fixed inset-0 z-50 bg-white dark:bg-black"
                         style={{ direction: lang === 'he' ? 'rtl' : 'ltr' }}
                     >
                         {/* Close Button */}
@@ -329,13 +329,13 @@ export default function HeroSection() {
                                 setWizardStep(0);
                                 setWizardData({ city: '', date: '', eventType: '' });
                             }}
-                            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-zinc-900 hover:bg-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-800"
+                            className="absolute top-4 right-4 sm:top-6 sm:right-6 z-50 w-10 h-10 sm:w-12 sm:h-12 bg-zinc-100 dark:bg-zinc-900 hover:bg-zinc-200 dark:hover:bg-zinc-800 rounded-full flex items-center justify-center transition-all border border-zinc-200 dark:border-zinc-800"
                         >
-                            <X className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-400" />
+                            <X className="w-5 h-5 sm:w-6 sm:h-6 text-zinc-500 dark:text-zinc-400" />
                         </button>
 
                         {/* Progress Bar */}
-                        <div className="absolute top-0 left-0 right-0 h-1 bg-zinc-900">
+                        <div className="absolute top-0 left-0 right-0 h-1 bg-zinc-100 dark:bg-zinc-900">
                             <motion.div
                                 className="h-full bg-blue-600"
                                 initial={{ width: '0%' }}
@@ -358,13 +358,13 @@ export default function HeroSection() {
                                             className="space-y-8"
                                         >
                                             <div className="text-center">
-                                                <span className="text-blue-500 text-sm font-bold uppercase tracking-widest">
+                                                <span className="text-blue-600 dark:text-blue-500 text-sm font-bold uppercase tracking-widest">
                                                     {lang === 'he' ? 'שלב 1 מתוך 3' : 'Step 1 of 3'}
                                                 </span>
-                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mt-3">
+                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white mt-3">
                                                     {lang === 'he' ? 'איפה האירוע?' : 'Where is your event?'}
                                                 </h2>
-                                                <p className="text-zinc-400 mt-2 text-base sm:text-lg">
+                                                <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-base sm:text-lg">
                                                     {lang === 'he' ? 'בחר את העיר שלך' : 'Select your city'}
                                                 </p>
                                             </div>
@@ -379,11 +379,11 @@ export default function HeroSection() {
                                                         }}
                                                         className={`p-4 sm:p-5 rounded-2xl border-2 transition-all text-start ${wizardData.city === city.id
                                                             ? 'border-blue-500 bg-blue-500/10'
-                                                            : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800'
+                                                            : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                                             }`}
                                                     >
                                                         <span className="text-2xl sm:text-3xl mb-2 block">{city.icon}</span>
-                                                        <span className={`font-bold text-sm sm:text-base ${wizardData.city === city.id ? 'text-blue-400' : 'text-white'
+                                                        <span className={`font-bold text-sm sm:text-base ${wizardData.city === city.id ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-900 dark:text-white'
                                                             }`}>
                                                             {city.label[lang]}
                                                         </span>
@@ -403,13 +403,13 @@ export default function HeroSection() {
                                             className="space-y-8"
                                         >
                                             <div className="text-center">
-                                                <span className="text-blue-500 text-sm font-bold uppercase tracking-widest">
+                                                <span className="text-blue-600 dark:text-blue-500 text-sm font-bold uppercase tracking-widest">
                                                     {lang === 'he' ? 'שלב 2 מתוך 3' : 'Step 2 of 3'}
                                                 </span>
-                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mt-3">
+                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white mt-3">
                                                     {lang === 'he' ? 'מתי?' : 'When is it?'}
                                                 </h2>
-                                                <p className="text-zinc-400 mt-2 text-base sm:text-lg">
+                                                <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-base sm:text-lg">
                                                     {lang === 'he' ? 'בחר תאריך משוער' : 'Select approximate date'}
                                                 </p>
                                             </div>
@@ -420,7 +420,7 @@ export default function HeroSection() {
                                                     value={wizardData.date}
                                                     onChange={(e) => setWizardData({ ...wizardData, date: e.target.value })}
                                                     min={new Date().toISOString().split('T')[0]}
-                                                    className="w-full h-16 sm:h-20 px-6 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white text-lg sm:text-xl font-medium focus:outline-none focus:border-blue-500 transition-all scheme-dark"
+                                                    className="w-full h-16 sm:h-20 px-6 bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white text-lg sm:text-xl font-medium focus:outline-none focus:border-blue-500 transition-all scheme-light dark:scheme-dark"
                                                 />
 
                                                 {/* Quick Date Options */}
@@ -432,9 +432,9 @@ export default function HeroSection() {
                                                                 setWizardData({ ...wizardData, date: opt.value });
                                                                 setWizardStep(2);
                                                             }}
-                                                            className="p-4 rounded-2xl border-2 border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800 transition-all text-start"
+                                                            className="p-4 rounded-2xl border-2 border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-all text-start"
                                                         >
-                                                            <span className="text-zinc-400 text-sm">{opt.label[lang]}</span>
+                                                            <span className="text-zinc-600 dark:text-zinc-400 text-sm">{opt.label[lang]}</span>
                                                         </button>
                                                     ))}
                                                 </div>
@@ -461,13 +461,13 @@ export default function HeroSection() {
                                             className="space-y-8"
                                         >
                                             <div className="text-center">
-                                                <span className="text-blue-500 text-sm font-bold uppercase tracking-widest">
+                                                <span className="text-blue-600 dark:text-blue-500 text-sm font-bold uppercase tracking-widest">
                                                     {lang === 'he' ? 'שלב 3 מתוך 3' : 'Step 3 of 3'}
                                                 </span>
-                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-white mt-3">
+                                                <h2 className="text-3xl sm:text-4xl md:text-5xl font-black text-zinc-900 dark:text-white mt-3">
                                                     {lang === 'he' ? 'מה חוגגים?' : 'What are you celebrating?'}
                                                 </h2>
-                                                <p className="text-zinc-400 mt-2 text-base sm:text-lg">
+                                                <p className="text-zinc-500 dark:text-zinc-400 mt-2 text-base sm:text-lg">
                                                     {lang === 'he' ? 'בחר סוג אירוע' : 'Select event type'}
                                                 </p>
                                             </div>
@@ -487,11 +487,11 @@ export default function HeroSection() {
                                                         }}
                                                         className={`p-4 sm:p-5 rounded-2xl border-2 transition-all text-start ${wizardData.eventType === event.id
                                                             ? 'border-blue-500 bg-blue-500/10'
-                                                            : 'border-zinc-800 bg-zinc-900 hover:border-zinc-700 hover:bg-zinc-800'
+                                                            : 'border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 hover:border-zinc-300 dark:hover:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800'
                                                             }`}
                                                     >
                                                         <span className="text-2xl sm:text-3xl mb-2 block">{event.icon}</span>
-                                                        <span className={`font-bold text-sm sm:text-base ${wizardData.eventType === event.id ? 'text-blue-400' : 'text-white'
+                                                        <span className={`font-bold text-sm sm:text-base ${wizardData.eventType === event.id ? 'text-blue-600 dark:text-blue-400' : 'text-zinc-900 dark:text-white'
                                                             }`}>
                                                             {event.label[lang]}
                                                         </span>
@@ -514,16 +514,16 @@ export default function HeroSection() {
                                                 <div className="w-16 h-16 bg-blue-600/10 rounded-2xl flex items-center justify-center mx-auto mb-4">
                                                     <Sparkles className="w-8 h-8 text-blue-500" />
                                                 </div>
-                                                <h2 className="text-2xl sm:text-3xl font-black text-white">
+                                                <h2 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">
                                                     {lang === 'he' ? 'נהדר! עכשיו ספר לי עוד' : 'Great! Now tell me more'}
                                                 </h2>
-                                                <p className="text-zinc-400 mt-2">
+                                                <p className="text-zinc-500 dark:text-zinc-400 mt-2">
                                                     {lang === 'he' ? 'אני אעזור לך למצוא את הבידור המושלם' : "I'll help you find the perfect entertainment"}
                                                 </p>
                                             </div>
 
                                             {/* Chat Messages */}
-                                            <div className="flex-1 overflow-y-auto space-y-4 mb-4 bg-zinc-900/50 rounded-2xl p-4 custom-scrollbar">
+                                            <div className="flex-1 overflow-y-auto space-y-4 mb-4 bg-zinc-50 dark:bg-zinc-900/50 border border-zinc-200 dark:border-zinc-800 rounded-2xl p-4 custom-scrollbar">
                                                 {chatMessages.map((msg) => (
                                                     <div
                                                         key={msg.id}
@@ -531,8 +531,8 @@ export default function HeroSection() {
                                                     >
                                                         <div
                                                             className={`max-w-[85%] px-4 py-3 rounded-2xl ${msg.role === 'user'
-                                                                ? 'bg-blue-600 text-white rounded-br-md'
-                                                                : 'bg-zinc-800 text-zinc-200 rounded-bl-md'
+                                                                ? 'bg-blue-600 text-white rounded-br-md shadow-lg shadow-blue-600/20'
+                                                                : 'bg-white dark:bg-zinc-800 text-zinc-800 dark:text-zinc-200 border border-zinc-200 dark:border-zinc-700 rounded-bl-md shadow-sm'
                                                                 }`}
                                                         >
                                                             {msg.content}
@@ -542,10 +542,10 @@ export default function HeroSection() {
 
                                                 {isTyping && (
                                                     <div className="flex justify-start">
-                                                        <div className="bg-zinc-800 px-4 py-3 rounded-2xl rounded-bl-md flex items-center gap-1">
-                                                            <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
-                                                            <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
-                                                            <div className="w-2 h-2 bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
+                                                        <div className="bg-white dark:bg-zinc-800 px-4 py-3 rounded-2xl rounded-bl-md flex items-center gap-1 border border-zinc-200 dark:border-zinc-700 shadow-sm">
+                                                            <div className="w-2 h-2 bg-zinc-400 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '0ms' }} />
+                                                            <div className="w-2 h-2 bg-zinc-400 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '150ms' }} />
+                                                            <div className="w-2 h-2 bg-zinc-400 dark:bg-zinc-500 rounded-full animate-bounce" style={{ animationDelay: '300ms' }} />
                                                         </div>
                                                     </div>
                                                 )}
@@ -560,7 +560,7 @@ export default function HeroSection() {
                                                     onChange={(e) => setChatInput(e.target.value)}
                                                     onKeyPress={handleKeyPress}
                                                     placeholder={t.chatPlaceholder}
-                                                    className="flex-1 px-5 py-4 bg-zinc-900 border-2 border-zinc-800 rounded-2xl text-white text-base placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-all"
+                                                    className="flex-1 px-5 py-4 bg-white dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white text-base placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-all shadow-sm"
                                                     autoFocus
                                                 />
                                                 <button
@@ -584,7 +584,7 @@ export default function HeroSection() {
                             {wizardStep > 0 && wizardStep < 3 && (
                                 <button
                                     onClick={() => setWizardStep(wizardStep - 1)}
-                                    className="mt-6 text-zinc-500 hover:text-white font-medium text-sm transition-colors mx-auto"
+                                    className="mt-6 text-zinc-500 hover:text-zinc-700 dark:hover:text-white font-medium text-sm transition-colors mx-auto"
                                 >
                                     ← {lang === 'he' ? 'חזרה' : 'Back'}
                                 </button>

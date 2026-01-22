@@ -13,10 +13,10 @@ interface ThemeContextType {
 const ThemeContext = createContext<ThemeContextType | undefined>(undefined);
 
 export function ThemeProvider({ children }: { children: ReactNode }) {
-    const [theme, setThemeState] = useState<Theme>('light');
+    const [theme, setThemeState] = useState<Theme>('dark');
     const [mounted, setMounted] = useState(false);
 
-    // Initialize theme from localStorage (default to light)
+    // Initialize theme from localStorage (default to dark)
     useEffect(() => {
         setMounted(true);
         const savedTheme = localStorage.getItem('theme') as Theme | null;
@@ -24,9 +24,9 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
             setThemeState(savedTheme);
             document.documentElement.classList.toggle('dark', savedTheme === 'dark');
         } else {
-            // Default to light theme (ignore system preference)
-            setThemeState('light');
-            document.documentElement.classList.remove('dark');
+            // Default to dark theme (ignore system preference for now to force consistent start)
+            setThemeState('dark');
+            document.documentElement.classList.add('dark');
         }
     }, []);
 
@@ -51,11 +51,6 @@ export function ThemeProvider({ children }: { children: ReactNode }) {
     const setTheme = (newTheme: Theme) => {
         setThemeState(newTheme);
     };
-
-    // Prevent flash of wrong theme
-    if (!mounted) {
-        return null;
-    }
 
     return (
         <ThemeContext.Provider value={{ theme, toggleTheme, setTheme }}>

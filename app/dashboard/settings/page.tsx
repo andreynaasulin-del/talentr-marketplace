@@ -164,14 +164,14 @@ export default function SettingsPage() {
 
     if (loading) {
         return (
-            <div className="relative min-h-screen bg-black flex items-center justify-center overflow-hidden">
+            <div className="relative min-h-screen bg-white dark:bg-black flex items-center justify-center overflow-hidden transition-colors">
                 <Loader2 className="w-10 h-10 animate-spin text-blue-600" />
             </div>
         );
     }
 
     return (
-        <div className="min-h-screen bg-black text-white relative">
+        <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white relative transition-colors">
             <Navbar />
 
             <main className="relative max-w-4xl mx-auto px-4 md:px-6 pt-28 pb-14">
@@ -181,15 +181,15 @@ export default function SettingsPage() {
                     <div className="flex items-center gap-4">
                         <Link
                             href="/dashboard"
-                            className="p-3 rounded-xl border border-zinc-800 bg-zinc-900 text-zinc-400 hover:text-white hover:bg-zinc-800 transition-colors"
+                            className="p-3 rounded-xl border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                         >
                             <ArrowLeft className="w-5 h-5" />
                         </Link>
                         <div>
-                            <h1 className="text-3xl font-bold text-white">
+                            <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
                                 {language === 'he' ? 'הגדרות פרופיל' : 'Profile Settings'}
                             </h1>
-                            <p className="text-zinc-400 mt-1">
+                            <p className="text-zinc-500 dark:text-zinc-400 mt-1">
                                 {language === 'he' ? 'מלא את הפרטים כדי לקבל הזמנות' : 'Complete your profile to get bookings'}
                             </p>
                         </div>
@@ -205,7 +205,7 @@ export default function SettingsPage() {
                 </div>
 
                 {/* Progress Bar */}
-                <div className="rounded-2xl p-5 border border-zinc-800 bg-zinc-900 mb-8">
+                <div className="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 mb-8">
                     <div className="flex items-center justify-between mb-3">
                         <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
                             {language === 'he' ? 'השלמת פרופיל' : 'Profile Completion'}
@@ -214,7 +214,7 @@ export default function SettingsPage() {
                             {Math.round(progressPercent)}%
                         </span>
                     </div>
-                    <div className="h-2 bg-zinc-800 rounded-full overflow-hidden">
+                    <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                         <motion.div
                             initial={{ width: 0 }}
                             animate={{ width: `${progressPercent}%` }}
@@ -230,29 +230,29 @@ export default function SettingsPage() {
                     <motion.div
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
                             <UserIcon className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'מידע בסיסי' : 'Basic Information'}
                         </h2>
 
                         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     {language === 'he' ? 'שם מלא' : 'Full Name'}
                                 </label>
                                 <input
                                     type="text"
                                     value={formData.full_name}
                                     onChange={(e) => setFormData({ ...formData, full_name: e.target.value })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="John Doe"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     <Mail className="w-4 h-4 inline mr-1" />
                                     Email
                                 </label>
@@ -260,13 +260,13 @@ export default function SettingsPage() {
                                     type="email"
                                     value={formData.email}
                                     onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="your@email.com"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     <Phone className="w-4 h-4 inline mr-1" />
                                     {language === 'he' ? 'טלפון (WhatsApp)' : 'Phone (WhatsApp)'}
                                 </label>
@@ -274,13 +274,13 @@ export default function SettingsPage() {
                                     type="tel"
                                     value={formData.phone}
                                     onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="972501234567"
                                 />
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     <Camera className="w-4 h-4 inline mr-1" />
                                     {language === 'he' ? 'URL תמונת פרופיל' : 'Profile Photo URL'}
                                 </label>
@@ -288,7 +288,7 @@ export default function SettingsPage() {
                                     type="url"
                                     value={formData.avatar_url}
                                     onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="https://..."
                                 />
                             </div>
@@ -300,9 +300,9 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.1 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
                             <FileText className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'אודות' : 'About You'}
                             {formData.bio.length > 10 && <CheckCircle className="w-5 h-5 text-blue-500" />}
@@ -312,7 +312,7 @@ export default function SettingsPage() {
                             value={formData.bio}
                             onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
                             rows={5}
-                            className="w-full p-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all resize-none"
+                            className="w-full p-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all resize-none"
                             placeholder={language === 'he'
                                 ? 'ספר ללקוחות על הניסיון שלך, סגנון העבודה ולמה כדאי להזמין אותך...'
                                 : 'Tell clients about your experience, style, and why they should book you...'}
@@ -327,9 +327,9 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.2 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
                             <Tag className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'קטגוריה ומחירים' : 'Category & Pricing'}
                             {formData.price_from > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
@@ -337,13 +337,13 @@ export default function SettingsPage() {
 
                         <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     {language === 'he' ? 'קטגוריה' : 'Category'}
                                 </label>
                                 <select
                                     value={formData.category}
                                     onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:border-blue-600 focus:outline-none transition-all"
                                 >
                                     <option value="">Select...</option>
                                     {CATEGORIES.map(cat => (
@@ -353,14 +353,14 @@ export default function SettingsPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     <MapPin className="w-4 h-4 inline mr-1" />
                                     {language === 'he' ? 'עיר' : 'City'}
                                 </label>
                                 <select
                                     value={formData.city}
                                     onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:border-blue-600 focus:outline-none transition-all"
                                 >
                                     <option value="">Select...</option>
                                     {CITIES.map(city => (
@@ -370,14 +370,14 @@ export default function SettingsPage() {
                             </div>
 
                             <div>
-                                <label className="block text-sm font-medium text-zinc-400 mb-2">
+                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
                                     {language === 'he' ? 'מחיר החל מ (₪)' : 'Price from (₪)'}
                                 </label>
                                 <input
                                     type="number"
                                     value={formData.price_from || ''}
                                     onChange={(e) => setFormData({ ...formData, price_from: Number(e.target.value) })}
-                                    className="w-full h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                     placeholder="1500"
                                     min="0"
                                 />
@@ -390,9 +390,9 @@ export default function SettingsPage() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                         transition={{ delay: 0.3 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-800 bg-zinc-900"
+                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
                     >
-                        <h2 className="text-xl font-bold text-white mb-6 flex items-center gap-2">
+                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
                             <Camera className="w-5 h-5 text-blue-500" />
                             {language === 'he' ? 'גלריית עבודות' : 'Portfolio Gallery'}
                             {formData.portfolio_gallery.length > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
@@ -410,7 +410,7 @@ export default function SettingsPage() {
                                 type="url"
                                 value={newPhotoUrl}
                                 onChange={(e) => setNewPhotoUrl(e.target.value)}
-                                className="flex-1 h-12 px-4 bg-black border-2 border-zinc-800 rounded-xl text-white placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                className="flex-1 h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
                                 placeholder="https://images.unsplash.com/..."
                                 onKeyDown={(e) => e.key === 'Enter' && addPhotoToGallery()}
                             />
@@ -427,7 +427,7 @@ export default function SettingsPage() {
                         {formData.portfolio_gallery.length > 0 ? (
                             <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
                                 {formData.portfolio_gallery.map((url, index) => (
-                                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-zinc-800">
+                                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-zinc-200 dark:border-zinc-800">
                                         <Image
                                             src={url}
                                             alt={`Portfolio ${index + 1}`}
@@ -444,8 +444,8 @@ export default function SettingsPage() {
                                 ))}
                             </div>
                         ) : (
-                            <div className="text-center py-12 border-2 border-dashed border-zinc-800 rounded-xl">
-                                <Camera className="w-12 h-12 mx-auto mb-4 text-zinc-700" />
+                            <div className="text-center py-12 border-2 border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl">
+                                <Camera className="w-12 h-12 mx-auto mb-4 text-zinc-400 dark:text-zinc-700" />
                                 <p className="text-zinc-500">
                                     {language === 'he' ? 'אין עדיין תמונות בגלריה' : 'No photos in portfolio yet'}
                                 </p>

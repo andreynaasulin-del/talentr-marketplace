@@ -101,94 +101,32 @@ export default function Navbar() {
         if (!isMobileMenuOpen) return null;
 
         return (
-            <div
-                style={{
-                    position: 'fixed',
-                    top: 0,
-                    left: 0,
-                    right: 0,
-                    bottom: 0,
-                    width: '100vw',
-                    height: '100vh',
-                    backgroundColor: '#000000',
-                    zIndex: 9999,
-                    display: 'flex',
-                    flexDirection: 'column',
-                }}
-            >
+            <div className="fixed inset-0 w-screen h-screen bg-white dark:bg-black z-[9999] flex flex-col transition-colors">
                 {/* Header */}
-                <div
-                    style={{
-                        display: 'flex',
-                        alignItems: 'center',
-                        justifyContent: 'space-between',
-                        padding: '0 16px',
-                        height: '64px',
-                        borderBottom: '1px solid #27272a',
-                        flexShrink: 0,
-                    }}
-                >
+                <div className="flex items-center justify-between px-4 h-16 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
                     <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
                         <Logo size="lg" />
                     </Link>
                     <button
                         onClick={() => setIsMobileMenuOpen(false)}
-                        style={{
-                            padding: '8px',
-                            color: '#a1a1aa',
-                            background: 'transparent',
-                            border: 'none',
-                            cursor: 'pointer',
-                        }}
+                        className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
                     >
-                        <X style={{ width: '24px', height: '24px' }} />
+                        <X className="w-6 h-6" />
                     </button>
                 </div>
 
                 {/* Content */}
-                <div
-                    style={{
-                        flex: 1,
-                        overflowY: 'auto',
-                        padding: '24px 20px',
-                    }}
-                >
-                    <div style={{ display: 'flex', flexDirection: 'column', gap: '16px' }}>
+                <div className="flex-1 overflow-y-auto p-5">
+                    <div className="flex flex-col gap-4">
                         {/* User Profile */}
                         {user && (
-                            <div style={{
-                                display: 'flex',
-                                alignItems: 'center',
-                                gap: '12px',
-                                padding: '16px',
-                                backgroundColor: '#18181b',
-                                borderRadius: '16px',
-                                border: '1px solid #27272a',
-                            }}>
-                                <div style={{
-                                    width: '48px',
-                                    height: '48px',
-                                    borderRadius: '50%',
-                                    backgroundColor: '#2563eb',
-                                    display: 'flex',
-                                    alignItems: 'center',
-                                    justifyContent: 'center',
-                                    color: 'white',
-                                    fontWeight: 'bold',
-                                    fontSize: '18px',
-                                }}>
+                            <div className="flex items-center gap-3 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
                                     {user.email?.[0].toUpperCase() || 'U'}
                                 </div>
-                                <div style={{ flex: 1, minWidth: 0 }}>
-                                    <p style={{
-                                        color: 'white',
-                                        fontWeight: 600,
-                                        margin: 0,
-                                        overflow: 'hidden',
-                                        textOverflow: 'ellipsis',
-                                        whiteSpace: 'nowrap',
-                                    }}>{user.email}</p>
-                                    <p style={{ color: '#71717a', fontSize: '14px', margin: 0 }}>Logged in</p>
+                                <div className="flex-1 min-w-0">
+                                    <p className="text-zinc-900 dark:text-white font-semibold truncate">{user.email}</p>
+                                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">Logged in</p>
                                 </div>
                             </div>
                         )}
@@ -206,18 +144,7 @@ export default function Navbar() {
                                     window.location.href = '/';
                                 }
                             }}
-                            style={{
-                                width: '100%',
-                                padding: '16px',
-                                backgroundColor: '#2563eb',
-                                border: 'none',
-                                borderRadius: '16px',
-                                color: 'white',
-                                fontWeight: 'bold',
-                                fontSize: '18px',
-                                cursor: 'pointer',
-                                boxShadow: '0 10px 15px -3px rgba(37, 99, 235, 0.2)',
-                            }}
+                            className="w-full p-4 bg-blue-600 hover:bg-blue-500 rounded-2xl text-white font-bold text-lg transition-colors shadow-lg shadow-blue-600/20"
                         >
                             {t.findTalent}
                         </button>
@@ -228,35 +155,13 @@ export default function Navbar() {
                                 <Link
                                     href="/dashboard"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    style={{
-                                        display: 'block',
-                                        width: '100%',
-                                        padding: '16px',
-                                        backgroundColor: '#18181b',
-                                        border: '1px solid #27272a',
-                                        borderRadius: '16px',
-                                        color: 'white',
-                                        fontWeight: 600,
-                                        fontSize: '18px',
-                                        textAlign: 'center',
-                                        textDecoration: 'none',
-                                    }}
+                                    className="block w-full p-4 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-semibold text-lg text-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                                 >
                                     {t.dashboard}
                                 </Link>
                                 <button
                                     onClick={handleSignOut}
-                                    style={{
-                                        width: '100%',
-                                        padding: '16px',
-                                        backgroundColor: 'rgba(239, 68, 68, 0.1)',
-                                        border: '1px solid rgba(239, 68, 68, 0.3)',
-                                        borderRadius: '16px',
-                                        color: '#f87171',
-                                        fontWeight: 600,
-                                        fontSize: '18px',
-                                        cursor: 'pointer',
-                                    }}
+                                    className="w-full p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-2xl text-red-600 dark:text-red-400 font-semibold text-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"
                                 >
                                     {t.signOut}
                                 </button>
@@ -266,38 +171,14 @@ export default function Navbar() {
                                 <Link
                                     href="/signin"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    style={{
-                                        display: 'block',
-                                        width: '100%',
-                                        padding: '16px',
-                                        backgroundColor: '#18181b',
-                                        border: '1px solid #27272a',
-                                        borderRadius: '16px',
-                                        color: 'white',
-                                        fontWeight: 600,
-                                        fontSize: '18px',
-                                        textAlign: 'center',
-                                        textDecoration: 'none',
-                                    }}
+                                    className="block w-full p-4 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-2xl text-zinc-900 dark:text-white font-semibold text-lg text-center hover:bg-zinc-200 dark:hover:bg-zinc-800 transition-colors"
                                 >
                                     {t.signIn}
                                 </Link>
                                 <Link
                                     href="/join"
                                     onClick={() => setIsMobileMenuOpen(false)}
-                                    style={{
-                                        display: 'block',
-                                        width: '100%',
-                                        padding: '16px',
-                                        backgroundColor: 'transparent',
-                                        border: '1px solid #3f3f46',
-                                        borderRadius: '16px',
-                                        color: '#a1a1aa',
-                                        fontWeight: 600,
-                                        fontSize: '18px',
-                                        textAlign: 'center',
-                                        textDecoration: 'none',
-                                    }}
+                                    className="block w-full p-4 bg-transparent border border-zinc-300 dark:border-zinc-700 rounded-2xl text-zinc-600 dark:text-zinc-400 font-semibold text-lg text-center hover:bg-zinc-100 dark:hover:bg-zinc-800 transition-colors"
                                 >
                                     {t.becomeVendor}
                                 </Link>
@@ -305,61 +186,31 @@ export default function Navbar() {
                         )}
 
                         {/* Theme & Language Selector */}
-                        <div style={{
-                            marginTop: '24px',
-                            paddingTop: '24px',
-                            borderTop: '1px solid #27272a'
-                        }}>
+                        <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                             {/* Theme Toggle */}
-                            <p style={{
-                                color: '#71717a',
-                                marginBottom: '16px',
-                                textAlign: 'center',
-                                fontSize: '12px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.1em',
-                                fontWeight: 'bold'
-                            }}>Theme</p>
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px', marginBottom: '24px' }}>
+                            <p className="text-zinc-500 dark:text-zinc-400 text-center text-xs uppercase tracking-widest font-bold mb-4">Theme</p>
+                            <div className="flex justify-center gap-3 mb-6">
                                 <button
                                     onClick={() => toggleTheme()}
-                                    style={{
-                                        display: 'flex',
-                                        alignItems: 'center',
-                                        gap: '8px',
-                                        padding: '12px 24px',
-                                        borderRadius: '12px',
-                                        border: '1px solid #3b82f6',
-                                        backgroundColor: 'rgba(59, 130, 246, 0.1)',
-                                        color: '#60a5fa',
-                                        cursor: 'pointer',
-                                    }}
+                                    className="flex items-center gap-2 px-6 py-3 rounded-xl border border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold transition-colors hover:bg-blue-500/20"
                                 >
                                     {theme === 'dark' ? (
                                         <>
-                                            <Sun style={{ width: '20px', height: '20px' }} />
-                                            <span style={{ fontWeight: 600 }}>Light</span>
+                                            <Sun className="w-5 h-5" />
+                                            <span>Light</span>
                                         </>
                                     ) : (
                                         <>
-                                            <Moon style={{ width: '20px', height: '20px' }} />
-                                            <span style={{ fontWeight: 600 }}>Dark</span>
+                                            <Moon className="w-5 h-5" />
+                                            <span>Dark</span>
                                         </>
                                     )}
                                 </button>
                             </div>
 
                             {/* Language Selector */}
-                            <p style={{
-                                color: '#71717a',
-                                marginBottom: '16px',
-                                textAlign: 'center',
-                                fontSize: '12px',
-                                textTransform: 'uppercase',
-                                letterSpacing: '0.1em',
-                                fontWeight: 'bold'
-                            }}>Language</p>
-                            <div style={{ display: 'flex', justifyContent: 'center', gap: '12px' }}>
+                            <p className="text-zinc-500 dark:text-zinc-400 text-center text-xs uppercase tracking-widest font-bold mb-4">Language</p>
+                            <div className="flex justify-center gap-3">
                                 {languages.map((l) => (
                                     <button
                                         key={l.code}
@@ -367,20 +218,13 @@ export default function Navbar() {
                                             setLanguage(l.code);
                                             setIsMobileMenuOpen(false);
                                         }}
-                                        style={{
-                                            display: 'flex',
-                                            alignItems: 'center',
-                                            gap: '8px',
-                                            padding: '12px 20px',
-                                            borderRadius: '12px',
-                                            border: language === l.code ? '1px solid #3b82f6' : '1px solid #27272a',
-                                            backgroundColor: language === l.code ? 'rgba(59, 130, 246, 0.1)' : '#18181b',
-                                            color: language === l.code ? '#60a5fa' : '#a1a1aa',
-                                            cursor: 'pointer',
-                                        }}
+                                        className={`flex items-center gap-2 px-5 py-3 rounded-xl border transition-colors ${language === l.code
+                                            ? 'border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400'
+                                            : 'border-zinc-200 dark:border-zinc-800 bg-zinc-100 dark:bg-zinc-900 text-zinc-600 dark:text-zinc-400 hover:bg-zinc-200 dark:hover:bg-zinc-800'
+                                            }`}
                                     >
-                                        <span style={{ fontSize: '18px' }}>{l.flag}</span>
-                                        <span style={{ fontWeight: 600 }}>{l.label}</span>
+                                        <span className="text-lg">{l.flag}</span>
+                                        <span className="font-semibold">{l.label}</span>
                                     </button>
                                 ))}
                             </div>
@@ -394,11 +238,10 @@ export default function Navbar() {
     return (
         <>
             <nav
-                className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-200 ${
-                    theme === 'dark'
-                        ? 'bg-black/80 border-white/[0.08]'
-                        : 'bg-white/80 border-black/[0.08]'
-                }`}
+                className={`fixed top-0 left-0 right-0 z-50 backdrop-blur-md border-b transition-all duration-200 ${theme === 'dark'
+                    ? 'bg-black/80 border-white/[0.08]'
+                    : 'bg-white/80 border-black/[0.08]'
+                    }`}
                 style={{
                     boxShadow: isScrolled
                         ? theme === 'dark'
@@ -419,7 +262,7 @@ export default function Navbar() {
                             {/* Theme Toggle */}
                             <button
                                 onClick={toggleTheme}
-                                className="p-2 text-zinc-400 hover:text-white hover:bg-white/5 dark:hover:bg-white/10 rounded-lg transition-colors"
+                                className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/10 rounded-lg transition-colors"
                                 title={theme === 'dark' ? 'Switch to light mode' : 'Switch to dark mode'}
                             >
                                 {theme === 'dark' ? (
@@ -433,10 +276,10 @@ export default function Navbar() {
                             <div className="relative">
                                 <button
                                     onClick={() => setShowLangDropdown(!showLangDropdown)}
-                                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-400 hover:bg-white/5 rounded-lg transition-colors"
+                                    className="flex items-center gap-1.5 px-3 py-2 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                                 >
                                     <span>{currentLang.flag}</span>
-                                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-zinc-500 group-hover:text-white ${showLangDropdown ? 'rotate-180' : ''}`} />
+                                    <ChevronDown className={`w-4 h-4 transition-transform duration-200 text-zinc-500 ${showLangDropdown ? 'rotate-180' : ''}`} />
                                 </button>
 
                                 {showLangDropdown && (
@@ -445,7 +288,7 @@ export default function Navbar() {
                                             className="fixed inset-0 z-40"
                                             onClick={() => setShowLangDropdown(false)}
                                         />
-                                        <div className="absolute right-0 mt-2 w-32 py-1 bg-zinc-900 rounded-lg border border-zinc-800 shadow-xl z-50">
+                                        <div className="absolute right-0 mt-2 w-32 py-1 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-xl z-50">
                                             {languages.map((l) => (
                                                 <button
                                                     key={l.code}
@@ -453,7 +296,7 @@ export default function Navbar() {
                                                         setLanguage(l.code);
                                                         setShowLangDropdown(false);
                                                     }}
-                                                    className={`w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-white/5 transition-colors ${language === l.code ? 'text-blue-500 font-semibold' : 'text-zinc-400'
+                                                    className={`w-full px-4 py-2 text-left flex items-center gap-3 hover:bg-zinc-100 dark:hover:bg-white/5 transition-colors ${language === l.code ? 'text-blue-500 font-semibold' : 'text-zinc-600 dark:text-zinc-400'
                                                         }`}
                                                 >
                                                     <span>{l.flag}</span>
@@ -470,7 +313,7 @@ export default function Navbar() {
                                 <div className="relative">
                                     <button
                                         onClick={() => setShowProfileDropdown(!showProfileDropdown)}
-                                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-zinc-300 hover:text-white hover:bg-white/5 rounded-lg transition-colors border border-transparent hover:border-zinc-800"
+                                        className="flex items-center gap-2 px-3 py-2 text-sm font-semibold text-zinc-600 dark:text-zinc-300 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors border border-transparent hover:border-zinc-300 dark:hover:border-zinc-800"
                                     >
                                         <div className="w-6 h-6 rounded-full bg-blue-600 flex items-center justify-center text-xs text-white">
                                             {user.email?.[0].toUpperCase() || 'U'}
@@ -482,17 +325,17 @@ export default function Navbar() {
                                     {showProfileDropdown && (
                                         <>
                                             <div className="fixed inset-0 z-40" onClick={() => setShowProfileDropdown(false)} />
-                                            <div className="absolute right-0 mt-2 w-48 py-1 bg-zinc-900 rounded-lg border border-zinc-800 shadow-xl z-50">
+                                            <div className="absolute right-0 mt-2 w-48 py-1 bg-white dark:bg-zinc-900 rounded-lg border border-zinc-200 dark:border-zinc-800 shadow-xl z-50">
                                                 <Link
                                                     href="/dashboard"
                                                     onClick={() => setShowProfileDropdown(false)}
-                                                    className="block px-4 py-2 text-sm text-zinc-300 hover:bg-white/5 hover:text-white transition-colors"
+                                                    className="block px-4 py-2 text-sm text-zinc-600 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-white/5 hover:text-zinc-900 dark:hover:text-white transition-colors"
                                                 >
                                                     {t.dashboard}
                                                 </Link>
                                                 <button
                                                     onClick={handleSignOut}
-                                                    className="w-full text-start px-4 py-2 text-sm text-red-400 hover:bg-white/5 hover:text-red-300 transition-colors"
+                                                    className="w-full text-start px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-white/5 hover:text-red-700 dark:hover:text-red-300 transition-colors"
                                                 >
                                                     {t.signOut}
                                                 </button>
@@ -503,7 +346,7 @@ export default function Navbar() {
                             ) : (
                                 <Link
                                     href="/join"
-                                    className="px-4 py-2 text-sm font-semibold text-zinc-400 hover:text-white hover:bg-white/5 rounded-lg transition-colors"
+                                    className="px-4 py-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                                 >
                                     {t.becomeVendor}
                                 </Link>
@@ -535,7 +378,7 @@ export default function Navbar() {
 
                             <button
                                 onClick={() => setIsMobileMenuOpen(!isMobileMenuOpen)}
-                                className="p-2 text-zinc-400 hover:text-white transition-colors"
+                                className="p-2 text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white transition-colors"
                             >
                                 <Menu className="w-6 h-6" />
                             </button>

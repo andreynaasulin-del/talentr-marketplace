@@ -47,7 +47,7 @@ export default function VendorPage() {
 
     if (loading) {
         return (
-            <div className="min-h-screen bg-white">
+            <div className="min-h-screen bg-white dark:bg-black transition-colors">
                 <Navbar />
                 <VendorProfileSkeleton />
             </div>
@@ -56,11 +56,11 @@ export default function VendorPage() {
 
     if (!vendor) {
         return (
-            <div className="min-h-screen bg-black">
+            <div className="min-h-screen bg-white dark:bg-black transition-colors">
                 <Navbar />
                 <div className="max-w-7xl mx-auto px-6 py-20 text-center">
-                    <h1 className="text-4xl font-bold text-white mb-4">{t('Vendor not found')}</h1>
-                    <p className="text-zinc-400">{t("The vendor you're looking for doesn't exist.")}</p>
+                    <h1 className="text-4xl font-bold text-zinc-900 dark:text-white mb-4">{t('Vendor not found')}</h1>
+                    <p className="text-zinc-500 dark:text-zinc-400">{t("The vendor you're looking for doesn't exist.")}</p>
                     <Link href="/" className="inline-flex items-center gap-2 mt-6 text-blue-500 font-medium hover:text-blue-400">
                         <ChevronLeft className="w-4 h-4" />
                         Back to Home
@@ -84,7 +84,7 @@ export default function VendorPage() {
     ];
 
     return (
-        <div className="min-h-screen bg-black">
+        <div className="min-h-screen bg-white dark:bg-black transition-colors">
             <Navbar />
 
             {/* Hero Section - Full Width Premium */}
@@ -180,15 +180,15 @@ export default function VendorPage() {
                     <div className="lg:col-span-8 space-y-8">
 
                         {/* Highlights Grid */}
-                        <div className="bg-zinc-900 rounded-[24px] md:rounded-[32px] p-4 md:p-8 border border-zinc-800">
+                        <div className="bg-white dark:bg-zinc-900 rounded-[24px] md:rounded-[32px] p-4 md:p-8 border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none">
                             <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 md:gap-4">
                                 {highlights.map((item, index) => (
-                                    <div key={index} className="flex flex-row sm:flex-col items-center sm:text-center p-3 md:p-4 rounded-2xl bg-zinc-800/50 group hover:bg-blue-600/10 transition-colors gap-3 sm:gap-0 border border-zinc-700/50 hover:border-blue-500/30">
-                                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-black shadow-lg flex items-center justify-center sm:mb-4 group-hover:scale-110 transition-transform flex-shrink-0 border border-zinc-800">
-                                            <item.icon className="w-5 h-5 md:w-6 md:h-6 text-blue-500" />
+                                    <div key={index} className="flex flex-row sm:flex-col items-center sm:text-center p-3 md:p-4 rounded-2xl bg-zinc-50 dark:bg-zinc-800/50 group hover:bg-blue-600/10 transition-colors gap-3 sm:gap-0 border border-zinc-200 dark:border-zinc-700/50 hover:border-blue-500/30">
+                                        <div className="w-10 h-10 md:w-12 md:h-12 rounded-xl md:rounded-2xl bg-white dark:bg-black shadow-lg flex items-center justify-center sm:mb-4 group-hover:scale-110 transition-transform flex-shrink-0 border border-zinc-200 dark:border-zinc-800">
+                                            <item.icon className="w-5 h-5 md:w-6 md:h-6 text-blue-600 dark:text-blue-500" />
                                         </div>
                                         <div className="sm:text-center">
-                                            <p className="text-lg md:text-xl font-black text-white mb-0.5 md:mb-1">{item.value}</p>
+                                            <p className="text-lg md:text-xl font-black text-zinc-900 dark:text-white mb-0.5 md:mb-1">{item.value}</p>
                                             <p className="text-[10px] md:text-xs font-bold text-zinc-500 uppercase tracking-widest">{t(item.label)}</p>
                                         </div>
                                     </div>
@@ -197,14 +197,14 @@ export default function VendorPage() {
                         </div>
 
                         {/* Story Card */}
-                        <div className="bg-zinc-900 rounded-[24px] md:rounded-[32px] p-6 md:p-10 border border-zinc-800">
-                            <h2 className="text-2xl md:text-3xl font-black text-white mb-4 md:mb-6 tracking-tight">{t('About')}</h2>
-                            <p className="text-base md:text-xl text-zinc-300 leading-relaxed font-medium mb-6 md:mb-8">
+                        <div className="bg-white dark:bg-zinc-900 rounded-[24px] md:rounded-[32px] p-6 md:p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none">
+                            <h2 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white mb-4 md:mb-6 tracking-tight">{t('About')}</h2>
+                            <p className="text-base md:text-xl text-zinc-600 dark:text-zinc-300 leading-relaxed font-medium mb-6 md:mb-8">
                                 {t(vendor.description || `${vendor.name} is a highly experienced ${vendor.category.toLowerCase()} based in ${vendor.city}. With a passion for creating unforgettable moments, they bring creativity, professionalism, and attention to detail to every event.`)}
                             </p>
                             <div className="flex flex-wrap gap-3">
                                 {vendor.tags.map((tag) => (
-                                    <span key={tag} className="bg-zinc-800 text-zinc-400 px-5 py-2.5 rounded-2xl text-sm font-bold border border-zinc-700 hover:bg-zinc-700 hover:text-white transition-colors cursor-default">
+                                    <span key={tag} className="bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400 px-5 py-2.5 rounded-2xl text-sm font-bold border border-zinc-200 dark:border-zinc-700 hover:bg-black hover:text-white dark:hover:bg-zinc-700 dark:hover:text-white transition-colors cursor-default">
                                         # {t(tag)}
                                     </span>
                                 ))}
@@ -212,11 +212,11 @@ export default function VendorPage() {
                         </div>
 
                         {/* Portfolio Showcase */}
-                        <div className="bg-zinc-900 rounded-[32px] p-10 border border-zinc-800">
+                        <div className="bg-white dark:bg-zinc-900 rounded-[32px] p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none">
                             <div className="flex items-center justify-between mb-8">
-                                <h2 className="text-3xl font-black text-white tracking-tight">{t('Portfolio')}</h2>
+                                <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight">{t('Portfolio')}</h2>
                                 {hasPortfolio && (
-                                    <span className="text-sm font-bold text-blue-400 bg-blue-500/10 px-4 py-2 rounded-xl border border-blue-500/20">
+                                    <span className="text-sm font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-500/20">
                                         {portfolioImages.length} {t('Works')}
                                     </span>
                                 )}
@@ -225,7 +225,7 @@ export default function VendorPage() {
                             {hasPortfolio ? (
                                 <>
                                     {/* Main Active Visual */}
-                                    <div className="relative aspect-[16/9] rounded-[24px] overflow-hidden mb-6 bg-gray-50 group">
+                                    <div className="relative aspect-[16/9] rounded-[24px] overflow-hidden mb-6 bg-gray-50 dark:bg-zinc-800 group border border-zinc-200 dark:border-zinc-800">
                                         <Image
                                             src={portfolioImages[activeImage]}
                                             alt={`Portfolio ${activeImage + 1}`}
@@ -254,10 +254,10 @@ export default function VendorPage() {
                             ) : (
                                 /* Empty State */
                                 <div className="text-center py-12 px-6">
-                                    <div className="w-20 h-20 mx-auto mb-6 bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-700">
-                                        <Calendar className="w-10 h-10 text-zinc-500" />
+                                    <div className="w-20 h-20 mx-auto mb-6 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center border border-zinc-200 dark:border-zinc-700">
+                                        <Calendar className="w-10 h-10 text-zinc-400 dark:text-zinc-500" />
                                     </div>
-                                    <h4 className="text-xl font-bold text-white mb-2">
+                                    <h4 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">
                                         {language === 'he'
                                             ? 'הפורטפוליו יגיע בקרוב'
                                             : 'Portfolio coming soon'}
@@ -280,7 +280,7 @@ export default function VendorPage() {
                         <div className="sticky top-24 space-y-6">
 
                             {/* Main Booking Card */}
-                            <div className="bg-zinc-900 rounded-[32px] p-8 border border-zinc-800 relative overflow-hidden shadow-2xl shadow-black/50">
+                            <div className="bg-white dark:bg-zinc-900 rounded-[32px] p-8 border border-zinc-200 dark:border-zinc-800 relative overflow-hidden shadow-2xl shadow-black/5 dark:shadow-black/50">
                                 {/* Accent Gradient */}
                                 <div className="absolute top-0 right-0 w-32 h-32 bg-blue-500/5 blur-[40px] rounded-full -mr-10 -mt-10" />
 
@@ -312,18 +312,18 @@ export default function VendorPage() {
                                 </div>
 
                                 {/* Safety Trust Pill */}
-                                <div className="mt-8 p-4 bg-green-900/10 rounded-2xl border border-green-500/20 flex items-center gap-3">
-                                    <div className="w-10 h-10 rounded-xl bg-green-500/20 flex items-center justify-center flex-shrink-0">
-                                        <Shield className="w-6 h-6 text-green-500" />
+                                <div className="mt-8 p-4 bg-green-50 dark:bg-green-900/10 rounded-2xl border border-green-200 dark:border-green-500/20 flex items-center gap-3">
+                                    <div className="w-10 h-10 rounded-xl bg-green-100 dark:bg-green-500/20 flex items-center justify-center flex-shrink-0">
+                                        <Shield className="w-6 h-6 text-green-600 dark:text-green-500" />
                                     </div>
                                     <div>
-                                        <p className="text-sm font-black text-green-500 leading-none mb-0.5">{t('Safe Deal')}</p>
-                                        <p className="text-[10px] font-bold text-green-600 uppercase tracking-tighter">{t('100% Protection')}</p>
+                                        <p className="text-sm font-black text-green-600 dark:text-green-500 leading-none mb-0.5">{t('Safe Deal')}</p>
+                                        <p className="text-[10px] font-bold text-green-700 dark:text-green-600 uppercase tracking-tighter">{t('100% Protection')}</p>
                                     </div>
                                 </div>
 
                                 {/* Bullet Advantages */}
-                                <div className="mt-8 pt-8 border-t border-zinc-800 grid grid-cols-1 gap-4">
+                                <div className="mt-8 pt-8 border-t border-zinc-100 dark:border-zinc-800 grid grid-cols-1 gap-4">
                                     {[
                                         { text: 'Instant availability check', color: 'bg-blue-500' },
                                         { text: 'Free cancellation in 24h', color: 'bg-purple-500' },
@@ -332,7 +332,7 @@ export default function VendorPage() {
                                     ].map((item) => (
                                         <div key={item.text} className="flex items-center gap-3">
                                             <div className={`w-2 h-2 rounded-full ${item.color}`} />
-                                            <span className="text-xs font-bold text-zinc-400">{t(item.text)}</span>
+                                            <span className="text-xs font-bold text-zinc-600 dark:text-zinc-400">{t(item.text)}</span>
                                         </div>
                                     ))}
                                 </div>
@@ -345,15 +345,15 @@ export default function VendorPage() {
                             />
 
                             {/* Secondary Sidebar Content? */}
-                            <div className="bg-zinc-900 rounded-[32px] p-8 border border-zinc-800 shadow-sm">
-                                <h3 className="text-lg font-black text-white mb-6 flex items-center gap-2">
+                            <div className="bg-white dark:bg-zinc-900 rounded-[32px] p-8 border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-sm">
+                                <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
                                     <Sparkles className="w-5 h-5 text-blue-500" />
                                     {t('Why choose them?')}
                                     H</h3>
                                 <div className="space-y-4">
                                     <div className="flex gap-4">
                                         <div className="w-2 h-auto rounded-full bg-blue-500/30" />
-                                        <p className="text-sm font-medium text-zinc-400 leading-relaxed italic">
+                                        <p className="text-sm font-medium text-zinc-600 dark:text-zinc-400 leading-relaxed italic">
                                             "{t('Their attention to detail is unmatched in the industry today.')}"
                                         </p>
                                     </div>
@@ -365,7 +365,7 @@ export default function VendorPage() {
             </div>
 
             {/* Mobile Sticky CTA Glassmorphism Footer */}
-            <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 md:p-4 z-50 bg-black/80 backdrop-blur-2xl border-t border-zinc-800 safe-area-bottom shadow-2xl">
+            <div className="fixed bottom-0 inset-x-0 lg:hidden p-3 md:p-4 z-50 bg-white/80 dark:bg-black/80 backdrop-blur-2xl border-t border-zinc-200 dark:border-zinc-800 safe-area-bottom shadow-2xl">
                 <div className="max-w-xl mx-auto flex items-center justify-center gap-3 md:gap-6">
                     <button
                         onClick={() => setIsModalOpen(true)}

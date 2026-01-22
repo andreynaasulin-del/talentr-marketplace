@@ -104,13 +104,13 @@ export default function RootLayout({
     children: React.ReactNode;
 }>) {
     return (
-        <html lang="en" className={`${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
+        <html lang="en" className={`dark ${inter.variable} ${playfair.variable}`} suppressHydrationWarning>
             <head>
                 {/* Preconnect to external domains for performance */}
                 <link rel="preconnect" href="https://images.unsplash.com" />
                 <link rel="dns-prefetch" href="https://images.unsplash.com" />
             </head>
-            <body className={`${inter.className} antialiased`}>
+            <body className={`${inter.className} antialiased bg-white dark:bg-black text-zinc-900 dark:text-white transition-colors duration-200`}>
                 <ThemeProvider>
                     <LanguageProvider>
                         <FavoritesProvider>
