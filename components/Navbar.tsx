@@ -103,15 +103,15 @@ export default function Navbar() {
         return (
             <div className="fixed inset-0 w-screen h-screen bg-white dark:bg-black z-[9999] flex flex-col transition-colors">
                 {/* Header */}
-                <div className="flex items-center justify-between px-4 h-16 border-b border-zinc-200 dark:border-zinc-800 flex-shrink-0">
-                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)}>
+                <div className="flex items-center justify-between px-6 h-20 border-b border-zinc-100 dark:border-zinc-800/50 flex-shrink-0">
+                    <Link href="/" onClick={() => setIsMobileMenuOpen(false)} className="hover:opacity-80 transition-opacity">
                         <Logo size="lg" />
                     </Link>
                     <button
                         onClick={() => setIsMobileMenuOpen(false)}
-                        className="p-2 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-colors"
+                        className="w-10 h-10 flex items-center justify-center rounded-full bg-zinc-100 dark:bg-zinc-900 text-zinc-500 dark:text-zinc-400 hover:text-zinc-700 dark:hover:text-white transition-all active:scale-90"
                     >
-                        <X className="w-6 h-6" />
+                        <X className="w-5 h-5" />
                     </button>
                 </div>
 
@@ -120,13 +120,13 @@ export default function Navbar() {
                     <div className="flex flex-col gap-4">
                         {/* User Profile */}
                         {user && (
-                            <div className="flex items-center gap-3 p-4 bg-zinc-100 dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
-                                <div className="w-12 h-12 rounded-full bg-blue-600 flex items-center justify-center text-white font-bold text-lg">
+                            <div className="flex items-center gap-4 p-5 bg-zinc-50 dark:bg-zinc-900 border border-zinc-100 dark:border-zinc-800 rounded-3xl mb-2 shadow-sm">
+                                <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-blue-500 to-blue-700 flex items-center justify-center text-white font-black text-xl shadow-lg shadow-blue-500/20">
                                     {user.email?.[0].toUpperCase() || 'U'}
                                 </div>
                                 <div className="flex-1 min-w-0">
-                                    <p className="text-zinc-900 dark:text-white font-semibold truncate">{user.email}</p>
-                                    <p className="text-zinc-500 dark:text-zinc-400 text-sm">Logged in</p>
+                                    <p className="text-zinc-900 dark:text-white font-bold text-lg truncate">{user.email?.split('@')[0]}</p>
+                                    <p className="text-zinc-500 dark:text-zinc-400 text-sm font-medium">{user.email}</p>
                                 </div>
                             </div>
                         )}

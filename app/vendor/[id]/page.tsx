@@ -153,17 +153,17 @@ export default function VendorPage() {
                                     {vendor.name}
                                 </h1>
 
-                                <div className="flex flex-wrap items-center gap-6 text-white/90">
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-md rounded-xl border border-white/10">
-                                        <MapPin className="w-5 h-5 text-blue-400" />
-                                        <span className="font-bold text-lg">{t(vendor.city)}</span>
+                                <div className="flex flex-wrap items-center gap-4 md:gap-6 text-white/90">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/20 backdrop-blur-md rounded-xl border border-white/10">
+                                        <MapPin className="w-4 h-4 md:w-5 md:h-5 text-blue-400" />
+                                        <span className="font-bold text-sm md:text-lg">{t(vendor.city)}</span>
                                     </div>
-                                    <div className="flex items-center gap-2 px-4 py-2 bg-black/20 backdrop-blur-md rounded-xl border border-white/10">
+                                    <div className="flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-black/20 backdrop-blur-md rounded-xl border border-white/10">
                                         <div className="flex items-center gap-1">
-                                            <Star className="w-5 h-5 fill-amber-400 text-amber-400" />
-                                            <span className="font-black text-xl">{vendor.rating}</span>
+                                            <Star className="w-4 h-4 md:w-5 md:h-5 fill-amber-400 text-amber-400" />
+                                            <span className="font-black text-base md:text-xl">{vendor.rating}</span>
                                         </div>
-                                        <span className="text-white/60 font-medium">({vendor.reviewsCount} {t('reviews')})</span>
+                                        <span className="text-white/60 text-xs md:text-sm font-medium">({vendor.reviewsCount} {t('reviews')})</span>
                                     </div>
                                 </div>
                             </div>
@@ -349,7 +349,7 @@ export default function VendorPage() {
                                 <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
                                     <Sparkles className="w-5 h-5 text-blue-500" />
                                     {t('Why choose them?')}
-                                    H</h3>
+                                </h3>
                                 <div className="space-y-4">
                                     <div className="flex gap-4">
                                         <div className="w-2 h-auto rounded-full bg-blue-500/30" />

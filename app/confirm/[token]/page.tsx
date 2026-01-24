@@ -233,36 +233,36 @@ export default function ConfirmProfilePage() {
                     <div className="w-24 h-24 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
                         <Check className="w-12 h-12 text-green-500" />
                     </div>
-                    <h1 className="text-3xl font-bold text-zinc-900 dark:text-white mb-4">
+                    <h1 className="text-2xl md:text-3xl font-bold text-zinc-900 dark:text-white mb-3">
                         Добро пожаловать в Talentr! 🎉
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 mb-6">
+                    <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 mb-6">
                         Ваш профиль подтверждён и теперь виден клиентам!
                     </p>
 
                     {/* Magic Link Box */}
                     {editLink && (
-                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-6 mb-6 text-left">
-                            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold mb-3">
-                                <Shield className="w-5 h-5" />
+                        <div className="bg-blue-50 dark:bg-blue-900/20 border border-blue-200 dark:border-blue-800 rounded-2xl p-4 md:p-6 mb-6 text-left">
+                            <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-bold mb-3 text-sm md:text-base">
+                                <Shield className="w-5 h-5 flex-shrink-0" />
                                 Ваша личная ссылка для редактирования
                             </div>
-                            <p className="text-sm text-zinc-600 dark:text-zinc-400 mb-4">
+                            <p className="text-xs md:text-sm text-zinc-600 dark:text-zinc-400 mb-4 leading-relaxed">
                                 Сохраните эту ссылку! Она понадобится для редактирования вашего профиля в будущем.
                             </p>
-                            <div className="flex gap-2">
+                            <div className="flex flex-col sm:flex-row gap-2">
                                 <input
                                     type="text"
                                     value={editLink}
                                     readOnly
-                                    className="flex-1 px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm"
+                                    className="flex-1 px-4 py-3 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500"
                                 />
                                 <button
                                     onClick={() => {
                                         navigator.clipboard.writeText(editLink);
                                         alert('Ссылка скопирована!');
                                     }}
-                                    className="px-4 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700"
+                                    className="px-4 py-3 bg-blue-600 text-white rounded-xl font-bold hover:bg-blue-700 transition-colors whitespace-nowrap active:scale-95"
                                 >
                                     Копировать
                                 </button>
@@ -270,17 +270,17 @@ export default function ConfirmProfilePage() {
                         </div>
                     )}
 
-                    <div className="flex gap-4 justify-center">
+                    <div className="flex flex-col sm:flex-row gap-3 justify-center">
                         <a
                             href="/"
-                            className="px-6 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-white font-bold rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700"
+                            className="px-6 py-3 bg-zinc-200 dark:bg-zinc-800 text-zinc-700 dark:text-white font-bold rounded-xl hover:bg-zinc-300 dark:hover:bg-zinc-700 transition-colors text-center active:scale-95 order-2 sm:order-1"
                         >
                             На главную
                         </a>
                         {editLink && (
                             <a
                                 href={editLink}
-                                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700"
+                                className="px-6 py-3 bg-blue-600 text-white font-bold rounded-xl hover:bg-blue-700 transition-all text-center active:scale-95 shadow-lg shadow-blue-600/20 order-1 sm:order-2"
                             >
                                 Редактировать профиль
                             </a>
@@ -297,18 +297,18 @@ export default function ConfirmProfilePage() {
 
             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-16">
                 {/* Header */}
-                <div className="text-center mb-8 md:mb-12">
-                    <div className="inline-flex items-center gap-2 px-4 py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-sm font-bold mb-4">
-                        <Sparkles className="w-4 h-4" />
+                <div className="text-center mb-6 md:mb-12">
+                    <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-xs md:text-sm font-bold mb-3 md:mb-4">
+                        <Sparkles className="w-3 md:w-4 h-3 md:h-4 flex-shrink-0" />
                         Приглашение в Talentr
                     </div>
-                    <h1 className="text-3xl md:text-4xl font-black text-zinc-900 dark:text-white mb-4">
+                    <h1 className="text-2xl md:text-4xl font-black text-zinc-900 dark:text-white mb-3 md:mb-4 leading-tight">
                         Подтвердите ваш профиль
                     </h1>
-                    <p className="text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
+                    <p className="text-sm md:text-base text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto px-4 md:px-0">
                         {pending.description === 'QUICK_INVITE'
                             ? 'Добро пожаловать! Мы создали для вас черновик профиля. Пожалуйста, дополните информацию о себе, чтобы клиенты могли вас найти.'
-                            : `Мы нашли информацию о вас ${pending.source_type === 'instagram' ? 'в Instagram' : 'в интернете'} и создали для вас профиль. Проверьте данные и подтвердите, чтобы начать получать клиентов! ✨`}
+                            : `Мы нашли информацию о вас ${pending.source_type === 'instagram' ? 'в Instagram' : 'в интернете'} и создали профиль. Проверьте данные и подтвердите. ✨`}
                     </p>
                 </div>
 
@@ -351,14 +351,15 @@ export default function ConfirmProfilePage() {
                         </button>
 
                         {/* Name on Image */}
-                        <div className="absolute bottom-4 left-4 right-4">
-                            <h2 className="text-2xl md:text-3xl font-black text-white drop-shadow-lg">
+                        <div className="absolute bottom-4 left-4 right-4 flex flex-col gap-0.5">
+                            <h2 className="text-xl md:text-3xl font-black text-white drop-shadow-lg leading-tight">
                                 {formData.name || pending.name}
                             </h2>
                             {pending.instagram_followers && (
-                                <p className="text-white/80 text-sm">
-                                    {pending.instagram_followers.toLocaleString()} подписчиков
-                                </p>
+                                <div className="inline-flex items-center gap-1.5 text-white text-xs md:text-sm font-medium drop-shadow">
+                                    <Instagram className="w-3.5 h-3.5" />
+                                    <span>{pending.instagram_followers.toLocaleString()} подписчиков</span>
+                                </div>
                             )}
                         </div>
                     </div>
@@ -585,29 +586,29 @@ export default function ConfirmProfilePage() {
                     </div>
 
                     {/* Action Buttons */}
-                    <div className="p-6 md:p-8 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-800">
-                        <div className="flex flex-col md:flex-row gap-4">
+                    <div className="p-4 md:p-8 bg-zinc-50 dark:bg-zinc-800/50 border-t border-zinc-200 dark:border-zinc-800">
+                        <div className="flex flex-col sm:flex-row gap-3 md:gap-4">
                             <button
                                 onClick={handleConfirm}
                                 disabled={submitting}
-                                className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-black text-lg rounded-2xl transition-all active:scale-95 shadow-xl shadow-green-600/20"
+                                className="flex-1 flex items-center justify-center gap-3 px-6 py-4 bg-green-600 hover:bg-green-700 disabled:bg-green-400 text-white font-black text-base md:text-lg rounded-2xl transition-all active:scale-[0.98] shadow-lg shadow-green-600/20"
                             >
                                 {submitting ? (
-                                    <Loader2 className="w-6 h-6 animate-spin" />
+                                    <Loader2 className="w-5 md:w-6 h-5 md:h-6 animate-spin" />
                                 ) : (
-                                    <Check className="w-6 h-6" />
+                                    <Check className="w-5 md:w-6 h-5 md:h-6" />
                                 )}
                                 Подтвердить профиль
                             </button>
                             <button
                                 onClick={handleDecline}
                                 disabled={submitting}
-                                className="px-6 py-4 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 font-bold rounded-2xl transition-colors"
+                                className="px-6 py-4 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-700 dark:text-zinc-300 font-bold rounded-2xl transition-all active:scale-[0.98]"
                             >
                                 Отказаться
                             </button>
                         </div>
-                        <p className="text-center text-xs text-zinc-500 dark:text-zinc-400 mt-4">
+                        <p className="text-center text-[10px] md:text-xs text-zinc-500 dark:text-zinc-400 mt-4 leading-relaxed">
                             Подтверждая, вы соглашаетесь с{' '}
                             <a href="/terms" className="text-blue-500 hover:underline">условиями использования</a>
                         </p>

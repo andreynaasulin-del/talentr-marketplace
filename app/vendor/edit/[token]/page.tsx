@@ -2,6 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
+import Image from 'next/image';
 import { Check, X, Save, User, MapPin, Phone, Mail, Instagram, DollarSign, FileText, Camera, Loader2, ArrowLeft, Upload, RefreshCw } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
@@ -192,23 +193,23 @@ export default function EditVendorPage() {
 
             <div className="max-w-3xl mx-auto px-4 md:px-6 py-8 md:py-12">
                 {/* Header */}
-                <div className="flex items-center justify-between mb-8">
-                    <div>
+                <div className="flex flex-col sm:flex-row sm:items-center justify-between gap-4 mb-8">
+                    <div className="flex flex-col gap-1">
                         <button
                             onClick={() => router.push(`/vendor/${vendor?.id}`)}
-                            className="flex items-center gap-2 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 mb-2"
+                            className="inline-flex items-center gap-1.5 text-zinc-500 hover:text-zinc-700 dark:hover:text-zinc-300 text-sm font-medium transition-colors w-fit"
                         >
                             <ArrowLeft className="w-4 h-4" />
                             Назад к профилю
                         </button>
-                        <h1 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white">
+                        <h1 className="text-2xl md:text-3xl font-black text-zinc-900 dark:text-white leading-tight">
                             Редактирование профиля
                         </h1>
                     </div>
                     <button
                         onClick={handleSave}
                         disabled={saving}
-                        className="flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl disabled:opacity-50"
+                        className="hidden sm:flex items-center justify-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl disabled:opacity-50 transition-all active:scale-95 shadow-lg shadow-blue-600/20"
                     >
                         {saving ? (
                             <Loader2 className="w-5 h-5 animate-spin" />
@@ -238,23 +239,25 @@ export default function EditVendorPage() {
                 )}
 
                 {/* Edit Form */}
-                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6 md:p-8">
-                    <div className="space-y-6">
+                <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-5 md:p-8">
+                    <div className="space-y-6 md:space-y-8">
                         {/* Avatar URL */}
                         <div>
                             <label className="flex items-center gap-2 text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
                                 <Camera className="w-4 h-4" />
                                 Фото профиля (URL)
                             </label>
-                            <div className="flex items-center gap-4">
-                                <div className="w-20 h-20 rounded-xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex-shrink-0 border border-zinc-200 dark:border-zinc-700">
+                            <div className="flex flex-col sm:flex-row items-center sm:items-start gap-4">
+                                <div className="w-24 h-24 rounded-2xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex-shrink-0 border border-zinc-200 dark:border-zinc-700 shadow-sm relative group">
                                     {formData.avatar_url ? (
-                                        <img
+                                        <Image
                                             src={formData.avatar_url}
                                             alt="Avatar"
-                                            className="w-full h-full object-cover"
+                                            fill
+                                            className="object-cover"
                                             onError={(e) => {
-                                                e.currentTarget.style.display = 'none';
+                                                const target = e.target as HTMLImageElement;
+                                                target.style.display = 'none';
                                             }}
                                         />
                                     ) : (
@@ -262,31 +265,37 @@ export default function EditVendorPage() {
                                             <Camera className="w-8 h-8 text-zinc-400" />
                                         </div>
                                     )}
+                                    {uploading && (
+                                        <div className="absolute inset-0 bg-black/40 flex items-center justify-center backdrop-blur-[2px]">
+                                            <Loader2 className="w-8 h-8 text-white animate-spin" />
+                                        </div>
+                                    )}
                                 </div>
 
-                                <div className="flex-1 flex gap-2">
-                                    <input
-                                        type="url"
-                                        placeholder="https://... или загрузите файл"
-                                        value={formData.avatar_url}
-                                        onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                                        className="flex-1 px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm"
-                                    />
-                                    <label className={`flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm cursor-pointer hover:bg-blue-700 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
-                                        {uploading ? (
-                                            <RefreshCw className="w-4 h-4 animate-spin" />
-                                        ) : (
-                                            <Upload className="w-4 h-4" />
-                                        )}
-                                        <span className="hidden md:inline">Загрузить</span>
+                                <div className="flex-1 w-full flex flex-col gap-2">
+                                    <div className="flex gap-2">
                                         <input
-                                            type="file"
-                                            accept="image/*"
-                                            className="hidden"
-                                            disabled={uploading}
-                                            onChange={handleImageUpload}
+                                            type="url"
+                                            placeholder="https://... или загрузите файл"
+                                            value={formData.avatar_url}
+                                            onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
+                                            className="flex-1 px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm outline-none focus:ring-2 focus:ring-blue-500"
                                         />
-                                    </label>
+                                        <label className={`flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm cursor-pointer hover:bg-blue-700 transition-all active:scale-95 shadow-md shadow-blue-600/10 ${uploading ? 'opacity-50 cursor-not-allowed pointer-events-none' : ''}`}>
+                                            <Upload className="w-4 h-4" />
+                                            <span className="hidden md:inline">Загрузить</span>
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                disabled={uploading}
+                                                onChange={handleImageUpload}
+                                            />
+                                        </label>
+                                    </div>
+                                    <p className="text-[10px] md:text-xs text-zinc-500 text-center sm:text-left">
+                                        Рекомендуется квадратное фото, макс. 5MB
+                                    </p>
                                 </div>
                             </div>
                         </div>
