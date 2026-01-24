@@ -2,7 +2,7 @@
 
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
-import { Check, X, Save, User, MapPin, Phone, Mail, Instagram, DollarSign, FileText, Camera, Loader2, ArrowLeft } from 'lucide-react';
+import { Check, X, Save, User, MapPin, Phone, Mail, Instagram, DollarSign, FileText, Camera, Loader2, ArrowLeft, Upload, RefreshCw } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -39,6 +39,7 @@ export default function EditVendorPage() {
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -86,6 +87,41 @@ export default function EditVendorPage() {
             fetchVendor();
         }
     }, [editToken]);
+
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой. Максимум 5MB');
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const formDataUpload = new FormData();
+            formDataUpload.append('file', file);
+
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formDataUpload
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Ошибка загрузки');
+                return;
+            }
+
+            setFormData(prev => ({ ...prev, avatar_url: data.url }));
+        } catch (err) {
+            alert('Не удалось загрузить фото');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleSave = async () => {
         setSaving(true);
@@ -211,7 +247,7 @@ export default function EditVendorPage() {
                                 Фото профиля (URL)
                             </label>
                             <div className="flex items-center gap-4">
-                                <div className="w-20 h-20 rounded-xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex-shrink-0">
+                                <div className="w-20 h-20 rounded-xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex-shrink-0 border border-zinc-200 dark:border-zinc-700">
                                     {formData.avatar_url ? (
                                         <img
                                             src={formData.avatar_url}
@@ -223,17 +259,35 @@ export default function EditVendorPage() {
                                         />
                                     ) : (
                                         <div className="w-full h-full flex items-center justify-center">
-                                            <User className="w-8 h-8 text-zinc-400" />
+                                            <Camera className="w-8 h-8 text-zinc-400" />
                                         </div>
                                     )}
                                 </div>
-                                <input
-                                    type="url"
-                                    placeholder="https://..."
-                                    value={formData.avatar_url}
-                                    onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
-                                    className="flex-1 px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl"
-                                />
+
+                                <div className="flex-1 flex gap-2">
+                                    <input
+                                        type="url"
+                                        placeholder="https://... или загрузите файл"
+                                        value={formData.avatar_url}
+                                        onChange={(e) => setFormData({ ...formData, avatar_url: e.target.value })}
+                                        className="flex-1 px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm"
+                                    />
+                                    <label className={`flex items-center gap-2 px-4 py-3 bg-blue-600 text-white rounded-xl font-bold text-sm cursor-pointer hover:bg-blue-700 transition-colors ${uploading ? 'opacity-50 cursor-not-allowed' : ''}`}>
+                                        {uploading ? (
+                                            <RefreshCw className="w-4 h-4 animate-spin" />
+                                        ) : (
+                                            <Upload className="w-4 h-4" />
+                                        )}
+                                        <span className="hidden md:inline">Загрузить</span>
+                                        <input
+                                            type="file"
+                                            accept="image/*"
+                                            className="hidden"
+                                            disabled={uploading}
+                                            onChange={handleImageUpload}
+                                        />
+                                    </label>
+                                </div>
                             </div>
                         </div>
 
