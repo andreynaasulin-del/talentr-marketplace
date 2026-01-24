@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Check, X, Edit3, Instagram, Globe, MapPin, Phone, Mail, Sparkles, Shield, Loader2 } from 'lucide-react';
+import { Check, X, Edit3, Instagram, Globe, MapPin, Phone, Mail, Sparkles, Shield, Loader2, Camera, Upload } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -47,6 +47,7 @@ export default function ConfirmProfilePage() {
     const [isEditing, setIsEditing] = useState(false);
     const [submitting, setSubmitting] = useState(false);
     const [success, setSuccess] = useState(false);
+    const [uploading, setUploading] = useState(false);
 
     // Editable form state
     const [formData, setFormData] = useState({
@@ -56,7 +57,8 @@ export default function ConfirmProfilePage() {
         email: '',
         phone: '',
         description: '',
-        price_from: 0
+        price_from: 0,
+        image_url: ''
     });
 
     useEffect(() => {
@@ -80,7 +82,8 @@ export default function ConfirmProfilePage() {
                     email: data.pending.email || '',
                     phone: data.pending.phone || '',
                     description: isQuick ? '' : (data.pending.description || ''),
-                    price_from: data.pending.price_from || 0
+                    price_from: data.pending.price_from || 0,
+                    image_url: data.pending.image_url || ''
                 });
 
                 // Auto-enter edit mode if mandatory info is missing or it's a quick invite
@@ -100,6 +103,42 @@ export default function ConfirmProfilePage() {
     }, [token]);
 
     const [editLink, setEditLink] = useState<string | null>(null);
+
+    // Handle image upload
+    const handleImageUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        // Validate file size (5MB)
+        if (file.size > 5 * 1024 * 1024) {
+            alert('Файл слишком большой. Максимум 5MB');
+            return;
+        }
+
+        setUploading(true);
+        try {
+            const formDataUpload = new FormData();
+            formDataUpload.append('file', file);
+
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formDataUpload
+            });
+
+            const data = await res.json();
+
+            if (!res.ok) {
+                alert(data.error || 'Ошибка загрузки');
+                return;
+            }
+
+            setFormData(prev => ({ ...prev, image_url: data.url }));
+        } catch (err) {
+            alert('Не удалось загрузить фото');
+        } finally {
+            setUploading(false);
+        }
+    };
 
     const handleConfirm = async () => {
         setSubmitting(true);
@@ -277,10 +316,10 @@ export default function ConfirmProfilePage() {
                 <div className="bg-white dark:bg-zinc-900 rounded-3xl border border-zinc-200 dark:border-zinc-800 shadow-xl overflow-hidden">
                     {/* Header with Image */}
                     <div className="relative h-48 md:h-64 bg-gradient-to-br from-blue-500 to-purple-600">
-                        {pending.image_url && (
+                        {(formData.image_url || pending.image_url) && (
                             <Image
-                                src={pending.image_url}
-                                alt={pending.name}
+                                src={formData.image_url || pending.image_url || ''}
+                                alt={formData.name || pending.name}
                                 fill
                                 className="object-cover opacity-80"
                             />
@@ -328,93 +367,138 @@ export default function ConfirmProfilePage() {
                     <div className="p-6 md:p-8 space-y-6">
                         {isEditing ? (
                             /* Edit Form */
-                            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-                                <div>
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Имя / Название
+                            <div className="space-y-6">
+                                {/* Photo Upload Section */}
+                                <div className="flex flex-col items-center mb-6">
+                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-3 text-center">
+                                        Фото профиля
                                     </label>
-                                    <input
-                                        type="text"
-                                        value={formData.name}
-                                        onChange={(e) => setFormData({ ...formData, name: e.target.value })}
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
+                                    <div className="relative group">
+                                        <div className="w-32 h-32 rounded-2xl overflow-hidden bg-gradient-to-br from-blue-500 to-purple-600 shadow-lg">
+                                            {(formData.image_url || pending.image_url) ? (
+                                                <Image
+                                                    src={formData.image_url || pending.image_url || ''}
+                                                    alt="Profile"
+                                                    fill
+                                                    className="object-cover"
+                                                />
+                                            ) : (
+                                                <div className="w-full h-full flex items-center justify-center">
+                                                    <Camera className="w-12 h-12 text-white/60" />
+                                                </div>
+                                            )}
+                                        </div>
+                                        <label className="absolute inset-0 flex items-center justify-center bg-black/50 opacity-0 group-hover:opacity-100 transition-opacity cursor-pointer rounded-2xl">
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                onChange={handleImageUpload}
+                                                disabled={uploading}
+                                                className="hidden"
+                                            />
+                                            {uploading ? (
+                                                <Loader2 className="w-8 h-8 text-white animate-spin" />
+                                            ) : (
+                                                <div className="text-center">
+                                                    <Upload className="w-8 h-8 text-white mx-auto mb-1" />
+                                                    <span className="text-white text-xs font-medium">Загрузить</span>
+                                                </div>
+                                            )}
+                                        </label>
+                                    </div>
+                                    <p className="text-xs text-zinc-500 dark:text-zinc-400 mt-2">
+                                        Нажмите для загрузки (макс. 5MB)
+                                    </p>
                                 </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Категория
-                                    </label>
-                                    <select
-                                        value={formData.category}
-                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    >
-                                        <option value="">Выберите категорию</option>
-                                        {categories.map((cat) => (
-                                            <option key={cat} value={cat}>{cat}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Город
-                                    </label>
-                                    <select
-                                        value={formData.city}
-                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    >
-                                        <option value="">Выберите город</option>
-                                        {cities.map((city) => (
-                                            <option key={city} value={city}>{city}</option>
-                                        ))}
-                                    </select>
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Email
-                                    </label>
-                                    <input
-                                        type="email"
-                                        value={formData.email}
-                                        onChange={(e) => setFormData({ ...formData, email: e.target.value })}
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Телефон (WhatsApp)
-                                    </label>
-                                    <input
-                                        type="tel"
-                                        value={formData.phone}
-                                        onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
-                                        placeholder="+972..."
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-                                <div>
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Цена от (₪)
-                                    </label>
-                                    <input
-                                        type="number"
-                                        value={formData.price_from}
-                                        onChange={(e) => setFormData({ ...formData, price_from: parseInt(e.target.value) || 0 })}
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
-                                    />
-                                </div>
-                                <div className="md:col-span-2">
-                                    <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
-                                        Описание
-                                    </label>
-                                    <textarea
-                                        value={formData.description}
-                                        onChange={(e) => setFormData({ ...formData, description: e.target.value })}
-                                        rows={4}
-                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
-                                        placeholder="Расскажите о себе и своих услугах..."
-                                    />
+
+                                <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Имя / Название
+                                        </label>
+                                        <input
+                                            type="text"
+                                            value={formData.name}
+                                            onChange={(e) => setFormData({ ...formData, name: e.target.value })}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Категория
+                                        </label>
+                                        <select
+                                            value={formData.category}
+                                            onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        >
+                                            <option value="">Выберите категорию</option>
+                                            {categories.map((cat) => (
+                                                <option key={cat} value={cat}>{cat}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Город
+                                        </label>
+                                        <select
+                                            value={formData.city}
+                                            onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        >
+                                            <option value="">Выберите город</option>
+                                            {cities.map((city) => (
+                                                <option key={city} value={city}>{city}</option>
+                                            ))}
+                                        </select>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Email
+                                        </label>
+                                        <input
+                                            type="email"
+                                            value={formData.email}
+                                            onChange={(e) => setFormData({ ...formData, email: e.target.value })}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Телефон (WhatsApp)
+                                        </label>
+                                        <input
+                                            type="tel"
+                                            value={formData.phone}
+                                            onChange={(e) => setFormData({ ...formData, phone: e.target.value })}
+                                            placeholder="+972..."
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Цена от (₪)
+                                        </label>
+                                        <input
+                                            type="number"
+                                            value={formData.price_from}
+                                            onChange={(e) => setFormData({ ...formData, price_from: parseInt(e.target.value) || 0 })}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Описание
+                                        </label>
+                                        <textarea
+                                            value={formData.description}
+                                            onChange={(e) => setFormData({ ...formData, description: e.target.value })}
+                                            rows={4}
+                                            className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                            placeholder="Расскажите о себе и своих услугах..."
+                                        />
+                                    </div>
                                 </div>
                             </div>
                         ) : (
