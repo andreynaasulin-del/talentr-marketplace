@@ -145,6 +145,12 @@ const translations = {
         copyEmail: 'Copy for Email',
         inviteCopied: 'Invitation copied to clipboard!',
         close: 'Close',
+
+        // Quick Invite
+        quickInvite: '⚡️ Quick Invite',
+        quickInviteDesc: 'Only name, talent fills the rest',
+        enterNameOrInsta: 'Name or Instagram',
+        getInviteLink: 'Get Link',
     },
     ru: {
         // Header
@@ -277,6 +283,12 @@ const translations = {
         copyEmail: 'Скопировать для Email',
         inviteCopied: 'Приглашение скопировано!',
         close: 'Закрыть',
+
+        // Quick Invite
+        quickInvite: '⚡️ Экспресс инвайт',
+        quickInviteDesc: 'Только имя, остальное заполнит талант',
+        enterNameOrInsta: 'Имя или Instagram',
+        getInviteLink: 'Получить ссылку',
     }
 };
 
@@ -631,7 +643,17 @@ export default function AdminPage() {
     const generateMessage = (pending: PendingVendor, link: string, method: 'email' | 'instagram_dm' | 'whatsapp') => {
         const name = pending.name.split(' ')[0]; // First name only
 
+        const isQuick = pending.description === 'QUICK_INVITE';
+
         if (method === 'instagram_dm') {
+            if (isQuick) {
+                return `Hey ${name}! 👋 We found your profile and would love to feature you on Talentr - a platform connecting professionals with clients in Israel.
+
+We've started a profile for you. Just complete your details here to go live:
+${link}
+
+It's free and takes 2 minutes! 🎯`;
+            }
             return `Hey ${name}! 👋
 
 We found your amazing work on Instagram and would love to feature you on Talentr - a platform connecting talented professionals with clients in Israel.
@@ -643,6 +665,11 @@ It's free and takes 2 minutes! 🎯`;
         }
 
         if (method === 'whatsapp') {
+            if (isQuick) {
+                return `Hi ${name}! 👋 This is Talentr team. We started a profile for you on our platform. 
+
+Please complete it here: ${link} 🚀`;
+            }
             return `Hi ${name}! 👋
 
 This is Talentr team. We noticed your work and created a profile for you on our platform.
@@ -653,6 +680,19 @@ Free to join, takes 2 min! 🚀`;
         }
 
         // Email
+        if (isQuick) {
+            return `Hi ${name},
+
+We'd love to invite you to join Talentr - a platform that connects talented professionals with clients in Israel.
+
+We've started a profile for you. Please complete the setup here:
+${link}
+
+It's completely free and only takes a couple of minutes.
+
+Best regards,
+Talentr Team`;
+        }
         return `Hi ${name},
 
 We came across your work and were impressed! We'd love to feature you on Talentr - a platform that connects talented professionals with clients looking for services like yours.
@@ -1032,6 +1072,30 @@ Talentr Team`;
                                         </div>
                                     </button>
                                     <button
+                                        onClick={() => {
+                                            setCreateForm({
+                                                name: '',
+                                                category: '',
+                                                city: '',
+                                                email: '',
+                                                phone: '',
+                                                instagram_handle: '',
+                                                source_type: 'manual',
+                                                source_url: '',
+                                                description: 'QUICK_INVITE',
+                                                image_url: ''
+                                            });
+                                            setActiveTab('create');
+                                        }}
+                                        className="flex items-center gap-3 p-4 bg-purple-50 dark:bg-purple-900/10 rounded-xl hover:bg-purple-100 dark:hover:bg-purple-900/20 transition-colors"
+                                    >
+                                        <Sparkles className="w-6 h-6 text-purple-600" />
+                                        <div className="text-left">
+                                            <p className="font-bold text-zinc-900 dark:text-white">{t.quickInvite}</p>
+                                            <p className="text-xs text-zinc-500">{t.quickInviteDesc}</p>
+                                        </div>
+                                    </button>
+                                    <button
                                         onClick={() => setActiveTab('pending')}
                                         className="flex items-center gap-3 p-4 bg-amber-50 dark:bg-amber-900/10 rounded-xl hover:bg-amber-100 dark:hover:bg-amber-900/20 transition-colors"
                                     >
@@ -1362,7 +1426,7 @@ Talentr Team`;
 
                                                 <div className="flex gap-2">
                                                     <a
-                                                        href={`/vendors/${vendor.id}`}
+                                                        href={`/vendor/${vendor.id}`}
                                                         target="_blank"
                                                         className="flex-1 flex items-center justify-center gap-2 px-4 py-2.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-900 dark:text-white rounded-xl text-sm font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
                                                     >

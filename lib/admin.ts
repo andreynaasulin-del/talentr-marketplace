@@ -330,7 +330,7 @@ export async function sendInvitation(
             return { link: null, error: error.message };
         }
 
-        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.com';
+        const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
         const link = `${baseUrl}/confirm/${data.confirmation_token}`;
 
         return { link, error: null };

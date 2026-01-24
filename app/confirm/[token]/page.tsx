@@ -71,15 +71,22 @@ export default function ConfirmProfilePage() {
                 }
 
                 setPending(data.pending);
+                const isQuick = data.pending.description === 'QUICK_INVITE';
+
                 setFormData({
                     name: data.pending.name || '',
                     category: data.pending.category || '',
                     city: data.pending.city || '',
                     email: data.pending.email || '',
                     phone: data.pending.phone || '',
-                    description: data.pending.description || '',
+                    description: isQuick ? '' : (data.pending.description || ''),
                     price_from: data.pending.price_from || 0
                 });
+
+                // Auto-enter edit mode if mandatory info is missing or it's a quick invite
+                if (isQuick || !data.pending.category || !data.pending.description) {
+                    setIsEditing(true);
+                }
             } catch (err) {
                 setError('Failed to load profile');
             } finally {
@@ -260,8 +267,9 @@ export default function ConfirmProfilePage() {
                         Подтвердите ваш профиль
                     </h1>
                     <p className="text-zinc-500 dark:text-zinc-400 max-w-xl mx-auto">
-                        Мы нашли информацию о вас {pending.source_type === 'instagram' ? 'в Instagram' : 'в интернете'} и создали для вас профиль.
-                        Проверьте данные и подтвердите, чтобы начать получать клиентов! ✨
+                        {pending.description === 'QUICK_INVITE'
+                            ? 'Добро пожаловать! Мы создали для вас черновик профиля. Пожалуйста, дополните информацию о себе, чтобы клиенты могли вас найти.'
+                            : `Мы нашли информацию о вас ${pending.source_type === 'instagram' ? 'в Instagram' : 'в интернете'} и создали для вас профиль. Проверьте данные и подтвердите, чтобы начать получать клиентов! ✨`}
                     </p>
                 </div>
 

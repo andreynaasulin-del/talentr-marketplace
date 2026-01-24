@@ -133,7 +133,7 @@ export async function POST(request: NextRequest) {
             }
 
             // Generate the confirmation link
-            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.com';
+            const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
             const confirmLink = `${baseUrl}/confirm/${data!.confirmation_token}`;
 
             return NextResponse.json({
