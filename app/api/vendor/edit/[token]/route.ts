@@ -93,10 +93,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             );
         }
 
-        // Update the vendor - support both old and new field names
-        const updateData: Record<string, unknown> = {
-            updated_at: new Date().toISOString()
-        };
+        // Update the vendor - maintenance of updated_at is handled by DB triggers now
+        const updateData: Record<string, unknown> = {};
 
         // Handle name field (prefer 'name' but support 'full_name')
         if (body.full_name !== undefined) {
