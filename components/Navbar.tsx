@@ -16,6 +16,7 @@ export default function Navbar() {
     const [isScrolled, setIsScrolled] = useState(false);
     const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
     const [user, setUser] = useState<User | null>(null);
+    const [isVendor, setIsVendor] = useState(false);
     const [showProfileDropdown, setShowProfileDropdown] = useState(false);
     const [mounted, setMounted] = useState(false);
     const { language, setLanguage } = useLanguage();
@@ -38,10 +39,13 @@ export default function Navbar() {
         // Auth check
         supabase?.auth.getSession().then(({ data: { session } }) => {
             setUser(session?.user ?? null);
+            if (session?.user) checkVendorStatus(session.user.id);
         });
 
         const { data: { subscription } } = supabase?.auth.onAuthStateChange((_event: AuthChangeEvent, session: Session | null) => {
             setUser(session?.user ?? null);
+            if (session?.user) checkVendorStatus(session.user.id);
+            else setIsVendor(false);
         }) || { data: { subscription: { unsubscribe: () => { } } } };
 
         return () => {
@@ -62,10 +66,16 @@ export default function Navbar() {
         };
     }, [isMobileMenuOpen]);
 
+    const checkVendorStatus = async (userId: string) => {
+        const { data } = await supabase?.from('vendors').select('id').eq('owner_user_id', userId).single() || { data: null };
+        setIsVendor(!!data);
+    };
+
     const handleSignOut = async () => {
         await supabase?.auth.signOut();
         setShowProfileDropdown(false);
         setIsMobileMenuOpen(false);
+        setIsVendor(false);
         router.push('/');
     };
 
@@ -162,11 +172,11 @@ export default function Navbar() {
                                     {t.dashboard}
                                 </Link>
                                 <Link
-                                    href="/my-gigs"
+                                    href={isVendor ? "/my-gigs" : "/join"}
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className="block w-full p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-200 dark:border-purple-500/30 rounded-2xl text-purple-600 dark:text-purple-400 font-semibold text-lg text-center hover:from-purple-500/20 hover:to-blue-500/20 transition-colors"
                                 >
-                                    🎤 {t.myGigs}
+                                    {isVendor ? `🎤 ${t.myGigs}` : `✨ ${t.becomeVendor}`}
                                 </Link>
                                 <button
                                     onClick={handleSignOut}
@@ -343,11 +353,11 @@ export default function Navbar() {
                                                     {t.dashboard}
                                                 </Link>
                                                 <Link
-                                                    href="/my-gigs"
+                                                    href={isVendor ? "/my-gigs" : "/join"}
                                                     onClick={() => setShowProfileDropdown(false)}
                                                     className="block px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors font-medium"
                                                 >
-                                                    🎤 {t.myGigs}
+                                                    {isVendor ? `🎤 ${t.myGigs}` : `✨ ${t.becomeVendor}`}
                                                 </Link>
                                                 <button
                                                     onClick={handleSignOut}
@@ -362,7 +372,7 @@ export default function Navbar() {
                             ) : (
                                 <Link
                                     href="/join"
-                                    className="px-4 py-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors"
+                                    className="hidden lg:inline-block px-4 py-2 text-sm font-semibold text-zinc-600 dark:text-zinc-400 hover:text-zinc-900 dark:hover:text-white hover:bg-zinc-100 dark:hover:bg-white/5 rounded-lg transition-colors"
                                 >
                                     {t.becomeVendor}
                                 </Link>
