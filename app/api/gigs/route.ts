@@ -22,7 +22,7 @@ export async function POST(request: NextRequest) {
                 id: gigId,
                 owner_user_id: body.owner_user_id,
                 vendor_id: body.vendor_id,
-                title: body.title || 'Новый гиг',
+                title: body.title || 'Untitled Gig',
                 category_id: body.category_id || 'Other',
                 short_description: body.short_description || '',
                 template_id: body.template_id,

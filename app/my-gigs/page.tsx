@@ -9,7 +9,11 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GigBuilder from '@/components/GigBuilder';
 import { Gig } from '@/types/gig';
+import { User as UserIcon } from 'lucide-react';
 import { useLanguage } from '@/context/LanguageContext';
+import { supabase } from '@/lib/supabase';
+import { User } from '@supabase/supabase-js';
+import { toast } from 'sonner';
 
 export default function MyGigsPage() {
     const router = useRouter();
@@ -78,18 +82,42 @@ export default function MyGigsPage() {
 
     const t = content[lang] || content.en;
 
-    // Mock user data - in production get from auth
-    const mockVendorId = 'demo-vendor-id';
-    const mockOwnerId = 'demo-owner-id';
+    // State for auth
+    const [user, setUser] = useState<User | null>(null);
+    const [vendor, setVendor] = useState<any | null>(null);
 
     useEffect(() => {
-        loadGigs();
+        const init = async () => {
+            if (!supabase) return;
+            const { data: { user } } = await supabase.auth.getUser();
+            if (!user) {
+                router.push('/signin');
+                return;
+            }
+            setUser(user);
+
+            // Fetch vendor profile
+            // Try 'owner_user_id' first (standard), if fails we might need to adjust based on schema
+            const { data: vendorData, error } = await supabase
+                .from('vendors')
+                .select('*')
+                .eq('owner_user_id', user.id)
+                .single();
+
+            if (vendorData) {
+                setVendor(vendorData);
+                loadGigs(vendorData.id);
+            } else {
+                setLoading(false); // No vendor profile found
+            }
+        };
+        init();
     }, []);
 
-    const loadGigs = async () => {
+    const loadGigs = async (vendorId: string) => {
         setLoading(true);
         try {
-            const res = await fetch(`/api/gigs?vendor_id=${mockVendorId}`);
+            const res = await fetch(`/api/gigs?vendor_id=${vendorId}`);
             const data = await res.json();
             if (data.gigs) {
                 setGigs(data.gigs);
@@ -137,13 +165,13 @@ export default function MyGigsPage() {
     if (showBuilder) {
         return (
             <GigBuilder
-                vendorId={mockVendorId}
-                ownerId={mockOwnerId}
+                vendorId={vendor?.id}
+                ownerId={user?.id || ''}
                 existingGigId={editingGigId || undefined}
                 onClose={() => {
                     setShowBuilder(false);
                     setEditingGigId(null);
-                    loadGigs();
+                    if (vendor) loadGigs(vendor.id);
                 }}
             />
         );
@@ -162,8 +190,32 @@ export default function MyGigsPage() {
                     </div>
                 )}
 
-                {/* Empty state */}
-                {!loading && gigs.length === 0 && (
+                {/* Empty state / No Vendor */}
+                {!loading && !vendor && (
+                    <div className="text-center py-20">
+                        <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6">
+                            <UserIcon className="w-10 h-10 text-zinc-400" />
+                        </div>
+                        <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">
+                            {lang === 'he' ? 'אין פרופיל ספק' : 'No Vendor Profile'}
+                        </h2>
+                        <p className="text-zinc-500 dark:text-zinc-400 mb-6 max-w-md mx-auto">
+                            {lang === 'he'
+                                ? 'עליך ליצור פרופיל ספק כדי לפרסם גיגים'
+                                : 'You need to create a vendor profile to publish gigs'}
+                        </p>
+                        <Link
+                            href="/join"
+                            className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all"
+                        >
+                            <Plus className="w-5 h-5" />
+                            {lang === 'he' ? 'צור פרופיל' : 'Create Profile'}
+                        </Link>
+                    </div>
+                )}
+
+                {/* Empty state - Vendor exists but no gigs */}
+                {!loading && vendor && gigs.length === 0 && (
                     <div className="text-center py-20">
                         <div className="w-24 h-24 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-6">
                             <Plus className="w-10 h-10 text-zinc-400" />
