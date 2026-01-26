@@ -27,6 +27,7 @@ export default function DashboardPage() {
     const [user, setUser] = useState<User | null>(null);
     const [loading, setLoading] = useState(true);
     const [bookings, setBookings] = useState<Booking[]>([]);
+    const [isVendor, setIsVendor] = useState(false);
 
     const content = {
         en: {
@@ -70,9 +71,21 @@ export default function DashboardPage() {
                 }
                 setUser(currentUser);
 
-                // Fetch bookings
-                const vendorBookings = await getVendorBookings(currentUser.id);
-                setBookings(vendorBookings);
+                // Check if vendor
+                const { data: vendorData } = await supabase.from('vendors').select('id').eq('owner_user_id', currentUser.id).single();
+                const isVendorUser = !!vendorData;
+                setIsVendor(isVendorUser);
+
+                // Fetch bookings (logic differs for vendor vs user, for now reusing getVendorBookings but should be user specific later)
+                // For MVP: if vendor, show vendor bookings. If user, show... bookings made by user?
+                // Currently 'getVendorBookings' fetches bookings given a vendor_id (or user_id? naming is ambiguous in lib).
+                // Let's assume for now we only show stats if vendor.
+
+                if (isVendorUser) {
+                    const vendorBookings = await getVendorBookings(currentUser.id);
+                    setBookings(vendorBookings);
+                }
+
             } catch (err) {
                 router.push('/signin');
             } finally {
@@ -147,27 +160,29 @@ export default function DashboardPage() {
                     </div>
                 </div>
 
-                {/* Stats */}
-                <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
-                    <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
-                        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.pending}</p>
-                        <p className="text-3xl font-bold text-amber-500">
-                            {bookings.filter(b => b.status === 'pending').length}
-                        </p>
+                {/* Stats (Vendor Only) */}
+                {isVendor && (
+                    <div className="grid grid-cols-1 sm:grid-cols-3 gap-4 mb-8">
+                        <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.pending}</p>
+                            <p className="text-3xl font-bold text-amber-500">
+                                {bookings.filter(b => b.status === 'pending').length}
+                            </p>
+                        </div>
+                        <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.confirmed}</p>
+                            <p className="text-3xl font-bold text-green-500">
+                                {bookings.filter(b => b.status === 'confirmed').length}
+                            </p>
+                        </div>
+                        <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
+                            <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.completed}</p>
+                            <p className="text-3xl font-bold text-blue-500">
+                                {bookings.filter(b => b.status === 'completed').length}
+                            </p>
+                        </div>
                     </div>
-                    <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
-                        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.confirmed}</p>
-                        <p className="text-3xl font-bold text-green-500">
-                            {bookings.filter(b => b.status === 'confirmed').length}
-                        </p>
-                    </div>
-                    <div className="p-6 bg-zinc-50 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl hover:border-zinc-300 dark:hover:border-zinc-700 transition-all">
-                        <p className="text-xs font-medium text-zinc-500 uppercase tracking-wide mb-2">{t.completed}</p>
-                        <p className="text-3xl font-bold text-blue-500">
-                            {bookings.filter(b => b.status === 'completed').length}
-                        </p>
-                    </div>
-                </div>
+                )}
 
                 {/* Quick Actions */}
                 <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mb-8">
@@ -178,7 +193,10 @@ export default function DashboardPage() {
                         <Settings className="w-8 h-8 text-zinc-400 dark:text-zinc-500 group-hover:text-zinc-900 dark:group-hover:text-white mb-3 transition-colors" />
                         <h3 className="font-semibold text-zinc-900 dark:text-white mb-1">{t.settings}</h3>
                         <p className="text-sm text-zinc-500 dark:text-zinc-400">
-                            {lang === 'he' ? 'עדכן את הפרופיל שלך' : 'Update your profile'}
+                            {isVendor
+                                ? (lang === 'he' ? 'עדכן את הפרופיל שלך' : 'Update your business profile')
+                                : (lang === 'he' ? 'הגדרות חשבון' : 'Account settings')
+                            }
                         </p>
                     </Link>
                     <Link
