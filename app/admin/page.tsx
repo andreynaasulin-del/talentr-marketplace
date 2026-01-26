@@ -327,6 +327,7 @@ interface Vendor {
     status: 'active' | 'inactive'; // Added status
     rating: number;
     reviews_count: number;
+    edit_token?: string;
 }
 
 interface Stats {
@@ -1426,6 +1427,20 @@ Talentr Team`;
                                                 </div>
 
                                                 <div className="flex gap-2">
+                                                    {vendor.edit_token && (
+                                                        <button
+                                                            onClick={() => {
+                                                                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || window.location.origin;
+                                                                const link = `${baseUrl}/vendor/edit/${vendor.edit_token}`;
+                                                                navigator.clipboard.writeText(link);
+                                                                alert('Magic Edit Link copied! 🪄');
+                                                            }}
+                                                            className="p-2.5 bg-zinc-100 dark:bg-zinc-800 text-purple-600 rounded-xl hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                                            title="Copy Magic Edit Link"
+                                                        >
+                                                            <Sparkles className="w-4 h-4" />
+                                                        </button>
+                                                    )}
                                                     <a
                                                         href={`/vendor/${vendor.id}`}
                                                         target="_blank"
