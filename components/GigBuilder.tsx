@@ -18,11 +18,10 @@ import { toast } from 'sonner';
 
 interface GigBuilderProps {
     vendorId?: string;
-    ownerId: string;
+    ownerId?: string | null; // Made optional for Guest Vendors
     onClose: () => void;
     existingGigId?: string;
 }
-
 
 export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }: GigBuilderProps) {
     const router = useRouter();

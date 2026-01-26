@@ -12,6 +12,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
+import GigBuilder from '@/components/GigBuilder';
 
 interface Vendor {
     id: string;
@@ -57,6 +58,7 @@ export default function EditVendorPage() {
 
     const [currentStep, setCurrentStep] = useState(0);
     const [direction, setDirection] = useState(0);
+    const [showGigBuilder, setShowGigBuilder] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -163,8 +165,9 @@ export default function EditVendorPage() {
             if (!res.ok) throw new Error('Failed to save');
 
             toast.success('Profile completed successfully! 🎉');
-            // Redirect to home or dashboard after short delay
-            setTimeout(() => router.push('/'), 2000);
+            toast.success('Profile completed! Now create your first Service.');
+            // Move to Gig Builder instead of redirecting home
+            setShowGigBuilder(true);
         } catch (err) {
             toast.error('Failed to save profile');
             setSaving(false);
@@ -448,6 +451,21 @@ export default function EditVendorPage() {
                 );
         }
     };
+
+    if (showGigBuilder && vendor) {
+        return (
+            <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">
+                <Navbar />
+                <div className="max-w-4xl mx-auto px-4 py-24">
+                    <GigBuilder
+                        vendorId={vendor.id}
+                        ownerId={null}
+                        onClose={() => router.push('/')}
+                    />
+                </div>
+            </div>
+        );
+    }
 
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">

@@ -20,7 +20,7 @@ export interface GigAddon {
 
 export interface Gig {
     id: string;
-    owner_user_id: string;
+    owner_user_id?: string | null;
     vendor_id?: string;
 
     // Basic Info
