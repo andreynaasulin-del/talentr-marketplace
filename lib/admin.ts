@@ -304,6 +304,7 @@ export async function confirmPendingVendor(
 
         return { vendorId: vendor.id, editToken, error: null };
     } catch (err) {
+        console.error('Error in confirmPendingVendor:', err);
         return { vendorId: null, editToken: null, error: err instanceof Error ? err.message : 'Unknown error' };
     }
 }

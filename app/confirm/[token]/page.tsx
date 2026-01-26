@@ -3,7 +3,7 @@
 import { useState, useEffect } from 'react';
 import { useParams, useRouter } from 'next/navigation';
 import Image from 'next/image';
-import { Check, X, Edit3, Instagram, Globe, MapPin, Phone, Mail, Sparkles, Shield, Loader2, Camera, Upload } from 'lucide-react';
+import { Check, X, Edit3, Instagram, Globe, MapPin, Phone, Mail, Sparkles, Shield, Loader2, Camera, Upload, Users, TrendingUp, CheckCircle, MessageSquare } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -46,6 +46,7 @@ export default function ConfirmProfilePage() {
     const [error, setError] = useState<string | null>(null);
     const [isEditing, setIsEditing] = useState(false);
     const [submitting, setSubmitting] = useState(false);
+    const [submitError, setSubmitError] = useState<string | null>(null);
     const [success, setSuccess] = useState(false);
     const [uploading, setUploading] = useState(false);
 
@@ -155,7 +156,7 @@ export default function ConfirmProfilePage() {
             const data = await res.json();
 
             if (!res.ok) {
-                setError(data.error || 'Failed to confirm');
+                setSubmitError(data.error || 'Failed to confirm');
                 return;
             }
 
@@ -163,7 +164,7 @@ export default function ConfirmProfilePage() {
             setEditLink(data.editLink);
             // Don't redirect automatically - show success with edit link
         } catch (err) {
-            setError('Failed to confirm profile');
+            setSubmitError('Failed to confirm profile');
         } finally {
             setSubmitting(false);
         }
@@ -183,7 +184,7 @@ export default function ConfirmProfilePage() {
             });
             router.push('/');
         } catch (err) {
-            setError('Failed to decline');
+            setSubmitError('Failed to decline');
         } finally {
             setSubmitting(false);
         }
@@ -296,6 +297,17 @@ export default function ConfirmProfilePage() {
             <Navbar />
 
             <div className="max-w-4xl mx-auto px-4 md:px-6 py-8 md:py-16">
+                {/* Submit Error Message */}
+                {submitError && (
+                    <div className="mb-6 p-4 bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-2xl flex items-center gap-3 animate-shake">
+                        <X className="w-5 h-5 text-red-600" />
+                        <span className="text-red-700 dark:text-red-400 font-bold">{submitError}</span>
+                        <button onClick={() => setSubmitError(null)} className="ml-auto text-red-500 hover:text-red-700">
+                            <X className="w-4 h-4" />
+                        </button>
+                    </div>
+                )}
+
                 {/* Header */}
                 <div className="text-center mb-6 md:mb-12">
                     <div className="inline-flex items-center gap-2 px-3 py-1.5 md:px-4 md:py-2 bg-blue-100 dark:bg-blue-900/20 text-blue-600 dark:text-blue-400 rounded-full text-xs md:text-sm font-bold mb-3 md:mb-4">
@@ -612,6 +624,95 @@ export default function ConfirmProfilePage() {
                             Подтверждая, вы соглашаетесь с{' '}
                             <a href="/terms" className="text-blue-500 hover:underline">условиями использования</a>
                         </p>
+                    </div>
+                </div>
+
+                {/* Social Proof / Community Section */}
+                <div className="mt-12 md:mt-20 space-y-12 md:space-y-20">
+                    {/* Main Community Stats */}
+                    <div className="text-center">
+                        <div className="flex justify-center -space-x-3 mb-6">
+                            {[1, 2, 3, 4, 5, 6].map((i) => (
+                                <div key={i} className="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 border-white dark:border-zinc-900 overflow-hidden relative shadow-lg">
+                                    <Image
+                                        src={`https://i.pravatar.cc/150?u=talentr-${i}`}
+                                        alt="Member"
+                                        fill
+                                        className="object-cover"
+                                    />
+                                </div>
+                            ))}
+                            <div className="w-12 h-12 md:w-16 md:h-16 rounded-full border-4 border-white dark:border-zinc-900 bg-blue-600 flex items-center justify-center text-white text-xs md:text-sm font-black shadow-lg">
+                                +250
+                            </div>
+                        </div>
+                        <h2 className="text-xl md:text-3xl font-black text-zinc-900 dark:text-white mb-3">
+                            Присоединяйтесь к сообществу элиты
+                        </h2>
+                        <p className="text-sm md:text-lg text-zinc-500 dark:text-zinc-400 font-medium max-w-2xl mx-auto">
+                            Вы станете частью крупнейшей экосистемы профессионалов Израиля.
+                            Более 250 диджеев, фотографов и артистов уже находят клиентов через Talentr.
+                        </p>
+                    </div>
+
+                    {/* Trust Indicators Grid */}
+                    <div className="grid grid-cols-1 md:grid-cols-3 gap-4 md:gap-8">
+                        {[
+                            {
+                                icon: TrendingUp,
+                                title: "Реальный доход",
+                                desc: "В среднем вендоры получают 4-6 новых заказов в месяц через платформу.",
+                                color: "text-emerald-500",
+                                bg: "bg-emerald-500/10"
+                            },
+                            {
+                                icon: CheckCircle,
+                                title: "Быстрый старт",
+                                desc: "Ваш профиль готов к работе сразу после подтверждения. Никаких сложных настроек.",
+                                color: "text-blue-500",
+                                bg: "bg-blue-500/10"
+                            },
+                            {
+                                icon: MessageSquare,
+                                title: "Прямая связь",
+                                desc: "Клиенты пишут вам напрямую в WhatsApp. Никаких комиссий за контакты.",
+                                color: "text-purple-500",
+                                bg: "bg-purple-500/10"
+                            }
+                        ].map((item, idx) => (
+                            <div key={idx} className="bg-white dark:bg-zinc-900/50 p-6 md:p-8 rounded-[32px] border border-zinc-100 dark:border-zinc-800 shadow-xl shadow-black/[0.02]">
+                                <div className={`w-12 h-12 rounded-2xl ${item.bg} flex items-center justify-center mb-6`}>
+                                    <item.icon className={`w-6 h-6 ${item.color}`} />
+                                </div>
+                                <h3 className="text-lg font-black text-zinc-900 dark:text-white mb-3">{item.title}</h3>
+                                <p className="text-sm text-zinc-500 dark:text-zinc-400 leading-relaxed font-medium">{item.desc}</p>
+                            </div>
+                        ))}
+                    </div>
+
+                    {/* Recently Joined Tickers */}
+                    <div className="bg-zinc-100 dark:bg-zinc-900/80 rounded-[40px] p-6 md:p-10 border border-zinc-200 dark:border-zinc-800">
+                        <div className="flex items-center gap-2 text-blue-600 dark:text-blue-400 font-black uppercase tracking-widest text-xs mb-8">
+                            <span className="w-2 h-2 bg-blue-600 rounded-full animate-pulse" />
+                            Live Activity
+                        </div>
+                        <div className="space-y-4">
+                            {[
+                                { name: "DJ Ronen", action: "подтвердил профиль", time: "2 минуты назад" },
+                                { name: "Maria Photo", action: "получила новый отзыв", time: "15 минут назад" },
+                                { name: "Magic Dan", action: "присоединился к Talentr", time: "1 час назад" }
+                            ].map((activity, i) => (
+                                <div key={i} className="flex items-center justify-between p-4 bg-white dark:bg-black/40 rounded-2xl border border-zinc-100 dark:border-zinc-800 animate-slide-up" style={{ animationDelay: `${i * 200}ms` }}>
+                                    <div className="flex items-center gap-3">
+                                        <div className="w-8 h-8 rounded-full bg-zinc-100 dark:bg-zinc-800" />
+                                        <p className="text-sm font-bold text-zinc-900 dark:text-white">
+                                            {activity.name} <span className="text-zinc-500 dark:text-zinc-500 font-medium">{activity.action}</span>
+                                        </p>
+                                    </div>
+                                    <span className="text-[10px] font-bold text-zinc-400 uppercase">{activity.time}</span>
+                                </div>
+                            ))}
+                        </div>
                     </div>
                 </div>
             </div>
