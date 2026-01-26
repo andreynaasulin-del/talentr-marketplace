@@ -135,6 +135,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (body.instagram_handle !== undefined) updateData.instagram_handle = body.instagram_handle;
         if (body.website !== undefined) updateData.website = body.website;
         if (body.tags !== undefined) updateData.tags = body.tags;
+        if (body.portfolio_gallery !== undefined) updateData.portfolio_gallery = body.portfolio_gallery;
 
         const { data: vendor, error: updateError } = await supabase
             .from('vendors')
