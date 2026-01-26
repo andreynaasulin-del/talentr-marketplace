@@ -44,6 +44,7 @@ export default function SettingsPage() {
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [vendorId, setVendorId] = useState<string | null>(null);
+    const [isVendor, setIsVendor] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -77,6 +78,7 @@ export default function SettingsPage() {
                 .single();
 
             if (vendorData) {
+                setIsVendor(true);
                 setVendorId(vendorData.id);
                 setFormData({
                     full_name: vendorData.full_name || '',
@@ -89,6 +91,13 @@ export default function SettingsPage() {
                     phone: vendorData.phone || '',
                     portfolio_gallery: vendorData.portfolio_gallery || [],
                 });
+            } else {
+                // Not a vendor yet, just prefill from Auth
+                setFormData(prev => ({
+                    ...prev,
+                    full_name: user.user_metadata?.full_name || '',
+                    email: user.email || '',
+                }));
             }
 
             setUser(user);
@@ -187,10 +196,16 @@ export default function SettingsPage() {
                         </Link>
                         <div>
                             <h1 className="text-3xl font-bold text-zinc-900 dark:text-white">
-                                {language === 'he' ? 'הגדרות פרופיל' : 'Profile Settings'}
+                                {isVendor
+                                    ? (language === 'he' ? 'הגדרות פרופיל' : 'Profile Settings')
+                                    : (language === 'he' ? 'הגדרות חשבון' : 'Account Settings')
+                                }
                             </h1>
                             <p className="text-zinc-500 dark:text-zinc-400 mt-1">
-                                {language === 'he' ? 'מלא את הפרטים כדי לקבל הזמנות' : 'Complete your profile to get bookings'}
+                                {isVendor
+                                    ? (language === 'he' ? 'מלא את הפרטים כדי לקבל הזמנות' : 'Complete your profile to get bookings')
+                                    : (language === 'he' ? 'נהל פרטים אישיים' : 'Manage your personal details')
+                                }
                             </p>
                         </div>
                     </div>
@@ -204,24 +219,26 @@ export default function SettingsPage() {
                     </button>
                 </div>
 
-                {/* Progress Bar */}
-                <div className="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 mb-8">
-                    <div className="flex items-center justify-between mb-3">
-                        <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
-                            {language === 'he' ? 'השלמת פרופיל' : 'Profile Completion'}
-                        </span>
-                        <span className="text-lg font-bold text-blue-500">
-                            {Math.round(progressPercent)}%
-                        </span>
+                {/* Progress Bar (Vendor Only) */}
+                {isVendor && (
+                    <div className="rounded-2xl p-5 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900 mb-8">
+                        <div className="flex items-center justify-between mb-3">
+                            <span className="text-xs font-bold text-zinc-500 uppercase tracking-widest">
+                                {language === 'he' ? 'השלמת פרופיל' : 'Profile Completion'}
+                            </span>
+                            <span className="text-lg font-bold text-blue-500">
+                                {Math.round(progressPercent)}%
+                            </span>
+                        </div>
+                        <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
+                            <motion.div
+                                initial={{ width: 0 }}
+                                animate={{ width: `${progressPercent}%` }}
+                                className="h-full rounded-full bg-blue-600"
+                            />
+                        </div>
                     </div>
-                    <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
-                        <motion.div
-                            initial={{ width: 0 }}
-                            animate={{ width: `${progressPercent}%` }}
-                            className="h-full rounded-full bg-blue-600"
-                        />
-                    </div>
-                </div>
+                )}
 
                 {/* Form Sections */}
                 <div className="space-y-6">
@@ -295,163 +312,169 @@ export default function SettingsPage() {
                         </div>
                     </motion.div>
 
-                    {/* Bio */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.1 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
-                    >
-                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
-                            <FileText className="w-5 h-5 text-blue-500" />
-                            {language === 'he' ? 'אודות' : 'About You'}
-                            {formData.bio.length > 10 && <CheckCircle className="w-5 h-5 text-blue-500" />}
-                        </h2>
+                    {/* Bio (Vendor Only) */}
+                    {isVendor && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.1 }}
+                            className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
+                        >
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
+                                <FileText className="w-5 h-5 text-blue-500" />
+                                {language === 'he' ? 'אודות' : 'About You'}
+                                {formData.bio.length > 10 && <CheckCircle className="w-5 h-5 text-blue-500" />}
+                            </h2>
 
-                        <textarea
-                            value={formData.bio}
-                            onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
-                            rows={5}
-                            className="w-full p-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all resize-none"
-                            placeholder={language === 'he'
-                                ? 'ספר ללקוחות על הניסיון שלך, סגנון העבודה ולמה כדאי להזמין אותך...'
-                                : 'Tell clients about your experience, style, and why they should book you...'}
-                        />
-                        <p className="text-sm text-zinc-500 mt-2">
-                            {formData.bio.length}/500 {language === 'he' ? 'תווים' : 'characters'}
-                        </p>
-                    </motion.div>
-
-                    {/* Category & Pricing */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.2 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
-                    >
-                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
-                            <Tag className="w-5 h-5 text-blue-500" />
-                            {language === 'he' ? 'קטגוריה ומחירים' : 'Category & Pricing'}
-                            {formData.price_from > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
-                        </h2>
-
-                        <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
-                                    {language === 'he' ? 'קטגוריה' : 'Category'}
-                                </label>
-                                <select
-                                    value={formData.category}
-                                    onChange={(e) => setFormData({ ...formData, category: e.target.value })}
-                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:border-blue-600 focus:outline-none transition-all"
-                                >
-                                    <option value="">Select...</option>
-                                    {CATEGORIES.map(cat => (
-                                        <option key={cat} value={cat}>{t(cat)}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
-                                    <MapPin className="w-4 h-4 inline mr-1" />
-                                    {language === 'he' ? 'עיר' : 'City'}
-                                </label>
-                                <select
-                                    value={formData.city}
-                                    onChange={(e) => setFormData({ ...formData, city: e.target.value })}
-                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:border-blue-600 focus:outline-none transition-all"
-                                >
-                                    <option value="">Select...</option>
-                                    {CITIES.map(city => (
-                                        <option key={city} value={city}>{t(city)}</option>
-                                    ))}
-                                </select>
-                            </div>
-
-                            <div>
-                                <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
-                                    {language === 'he' ? 'מחיר החל מ (₪)' : 'Price from (₪)'}
-                                </label>
-                                <input
-                                    type="number"
-                                    value={formData.price_from || ''}
-                                    onChange={(e) => setFormData({ ...formData, price_from: Number(e.target.value) })}
-                                    className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
-                                    placeholder="1500"
-                                    min="0"
-                                />
-                            </div>
-                        </div>
-                    </motion.div>
-
-                    {/* Portfolio Gallery */}
-                    <motion.div
-                        initial={{ opacity: 0, y: 20 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        transition={{ delay: 0.3 }}
-                        className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
-                    >
-                        <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
-                            <Camera className="w-5 h-5 text-blue-500" />
-                            {language === 'he' ? 'גלריית עבודות' : 'Portfolio Gallery'}
-                            {formData.portfolio_gallery.length > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
-                        </h2>
-
-                        <p className="text-zinc-500 mb-6">
-                            {language === 'he'
-                                ? 'הוסף קישורים לעבודות הטובות שלך (URL של תמונות)'
-                                : 'Add URLs to your best work samples (image URLs)'}
-                        </p>
-
-                        {/* Add photo input */}
-                        <div className="flex gap-3 mb-6">
-                            <input
-                                type="url"
-                                value={newPhotoUrl}
-                                onChange={(e) => setNewPhotoUrl(e.target.value)}
-                                className="flex-1 h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
-                                placeholder="https://images.unsplash.com/..."
-                                onKeyDown={(e) => e.key === 'Enter' && addPhotoToGallery()}
+                            <textarea
+                                value={formData.bio}
+                                onChange={(e) => setFormData({ ...formData, bio: e.target.value })}
+                                rows={5}
+                                className="w-full p-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all resize-none"
+                                placeholder={language === 'he'
+                                    ? 'ספר ללקוחות על הניסיון שלך, סגנון העבודה ולמה כדאי להזמין אותך...'
+                                    : 'Tell clients about your experience, style, and why they should book you...'}
                             />
-                            <button
-                                onClick={addPhotoToGallery}
-                                className="px-6 h-12 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all flex items-center gap-2"
-                            >
-                                <Plus className="w-5 h-5" />
-                                {language === 'he' ? 'הוסף' : 'Add'}
-                            </button>
-                        </div>
+                            <p className="text-sm text-zinc-500 mt-2">
+                                {formData.bio.length}/500 {language === 'he' ? 'תווים' : 'characters'}
+                            </p>
+                        </motion.div>
+                    )}
 
-                        {/* Gallery Grid */}
-                        {formData.portfolio_gallery.length > 0 ? (
-                            <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
-                                {formData.portfolio_gallery.map((url, index) => (
-                                    <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-zinc-200 dark:border-zinc-800">
-                                        <Image
-                                            src={url}
-                                            alt={`Portfolio ${index + 1}`}
-                                            fill
-                                            className="object-cover"
-                                        />
-                                        <button
-                                            onClick={() => removePhotoFromGallery(index)}
-                                            className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
-                                        >
-                                            <X className="w-4 h-4" />
-                                        </button>
-                                    </div>
-                                ))}
+                    {/* Category & Pricing (Vendor Only) */}
+                    {isVendor && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.2 }}
+                            className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
+                        >
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
+                                <Tag className="w-5 h-5 text-blue-500" />
+                                {language === 'he' ? 'קטגוריה ומחירים' : 'Category & Pricing'}
+                                {formData.price_from > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
+                            </h2>
+
+                            <div className="grid grid-cols-1 md:grid-cols-3 gap-6">
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+                                        {language === 'he' ? 'קטגוריה' : 'Category'}
+                                    </label>
+                                    <select
+                                        value={formData.category}
+                                        onChange={(e) => setFormData({ ...formData, category: e.target.value })}
+                                        className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:border-blue-600 focus:outline-none transition-all"
+                                    >
+                                        <option value="">Select...</option>
+                                        {CATEGORIES.map(cat => (
+                                            <option key={cat} value={cat}>{t(cat)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+                                        <MapPin className="w-4 h-4 inline mr-1" />
+                                        {language === 'he' ? 'עיר' : 'City'}
+                                    </label>
+                                    <select
+                                        value={formData.city}
+                                        onChange={(e) => setFormData({ ...formData, city: e.target.value })}
+                                        className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white focus:border-blue-600 focus:outline-none transition-all"
+                                    >
+                                        <option value="">Select...</option>
+                                        {CITIES.map(city => (
+                                            <option key={city} value={city}>{t(city)}</option>
+                                        ))}
+                                    </select>
+                                </div>
+
+                                <div>
+                                    <label className="block text-sm font-medium text-zinc-600 dark:text-zinc-400 mb-2">
+                                        {language === 'he' ? 'מחיר החל מ (₪)' : 'Price from (₪)'}
+                                    </label>
+                                    <input
+                                        type="number"
+                                        value={formData.price_from || ''}
+                                        onChange={(e) => setFormData({ ...formData, price_from: Number(e.target.value) })}
+                                        className="w-full h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                        placeholder="1500"
+                                        min="0"
+                                    />
+                                </div>
                             </div>
-                        ) : (
-                            <div className="text-center py-12 border-2 border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl">
-                                <Camera className="w-12 h-12 mx-auto mb-4 text-zinc-400 dark:text-zinc-700" />
-                                <p className="text-zinc-500">
-                                    {language === 'he' ? 'אין עדיין תמונות בגלריה' : 'No photos in portfolio yet'}
-                                </p>
+                        </motion.div>
+                    )}
+
+                    {/* Portfolio Gallery (Vendor Only) */}
+                    {isVendor && (
+                        <motion.div
+                            initial={{ opacity: 0, y: 20 }}
+                            animate={{ opacity: 1, y: 0 }}
+                            transition={{ delay: 0.3 }}
+                            className="rounded-2xl p-6 md:p-8 border border-zinc-200 dark:border-zinc-800 bg-zinc-50 dark:bg-zinc-900"
+                        >
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-6 flex items-center gap-2">
+                                <Camera className="w-5 h-5 text-blue-500" />
+                                {language === 'he' ? 'גלריית עבודות' : 'Portfolio Gallery'}
+                                {formData.portfolio_gallery.length > 0 && <CheckCircle className="w-5 h-5 text-blue-500" />}
+                            </h2>
+
+                            <p className="text-zinc-500 mb-6">
+                                {language === 'he'
+                                    ? 'הוסף קישורים לעבודות הטובות שלך (URL של תמונות)'
+                                    : 'Add URLs to your best work samples (image URLs)'}
+                            </p>
+
+                            {/* Add photo input */}
+                            <div className="flex gap-3 mb-6">
+                                <input
+                                    type="url"
+                                    value={newPhotoUrl}
+                                    onChange={(e) => setNewPhotoUrl(e.target.value)}
+                                    className="flex-1 h-12 px-4 bg-white dark:bg-black border-2 border-zinc-300 dark:border-zinc-800 rounded-xl text-zinc-900 dark:text-white placeholder-zinc-400 dark:placeholder-zinc-600 focus:border-blue-600 focus:outline-none transition-all"
+                                    placeholder="https://images.unsplash.com/..."
+                                    onKeyDown={(e) => e.key === 'Enter' && addPhotoToGallery()}
+                                />
+                                <button
+                                    onClick={addPhotoToGallery}
+                                    className="px-6 h-12 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all flex items-center gap-2"
+                                >
+                                    <Plus className="w-5 h-5" />
+                                    {language === 'he' ? 'הוסף' : 'Add'}
+                                </button>
                             </div>
-                        )}
-                    </motion.div>
+
+                            {/* Gallery Grid */}
+                            {formData.portfolio_gallery.length > 0 ? (
+                                <div className="grid grid-cols-2 md:grid-cols-4 gap-4">
+                                    {formData.portfolio_gallery.map((url, index) => (
+                                        <div key={index} className="relative aspect-square rounded-xl overflow-hidden group border border-zinc-200 dark:border-zinc-800">
+                                            <Image
+                                                src={url}
+                                                alt={`Portfolio ${index + 1}`}
+                                                fill
+                                                className="object-cover"
+                                            />
+                                            <button
+                                                onClick={() => removePhotoFromGallery(index)}
+                                                className="absolute top-2 right-2 p-2 bg-red-600 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                            >
+                                                <X className="w-4 h-4" />
+                                            </button>
+                                        </div>
+                                    ))}
+                                </div>
+                            ) : (
+                                <div className="text-center py-12 border-2 border-dashed border-zinc-300 dark:border-zinc-800 rounded-xl">
+                                    <Camera className="w-12 h-12 mx-auto mb-4 text-zinc-400 dark:text-zinc-700" />
+                                    <p className="text-zinc-500">
+                                        {language === 'he' ? 'אין עדיין תמונות בגלריה' : 'No photos in portfolio yet'}
+                                    </p>
+                                </div>
+                            )}
+                        </motion.div>
+                    )}
 
                     {/* Save Button (Bottom) */}
                     <div className="flex justify-end pb-10">
