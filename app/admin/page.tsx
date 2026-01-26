@@ -351,7 +351,7 @@ export default function AdminPage() {
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
-    const [activeTab, setActiveTab] = useState<'dashboard' | 'pending' | 'vendors' | 'archive' | 'settings' | 'create'>('dashboard');
+    const [activeTab, setActiveTab] = useState<'dashboard' | 'pending' | 'vendors' | 'gigs' | 'archive' | 'settings' | 'create'>('dashboard');
 
     // Edit Modal State
     const [editingVendor, setEditingVendor] = useState<any>(null);
@@ -1008,6 +1008,7 @@ Talentr Team`;
                             { id: 'dashboard', label: t.dashboard, icon: BarChart3 },
                             { id: 'pending', label: t.pending, icon: Clock, count: stats?.pendingVendors },
                             { id: 'vendors', label: t.vendors, icon: Users, count: stats?.totalVendors },
+                            { id: 'gigs', label: 'Gigs', icon: Sparkles },
                             { id: 'archive', label: t.archive, icon: Archive },
                             { id: 'settings', label: t.settings, icon: Shield }
                         ].map((item) => (
@@ -1474,6 +1475,49 @@ Talentr Team`;
                                     </button>
                                 </div>
                             )}
+                        </div>
+                    )}
+
+                    {/* Gigs Tab */}
+                    {activeTab === 'gigs' && (
+                        <div className="mt-6">
+                            <div className="flex items-center justify-between mb-6">
+                                <div>
+                                    <h2 className="text-2xl font-black text-zinc-900 dark:text-white">
+                                        Все гиги
+                                    </h2>
+                                    <p className="text-zinc-500 text-sm">
+                                        Управление гигами всех вендоров
+                                    </p>
+                                </div>
+                            </div>
+
+                            {/* Gigs placeholder - will be loaded from API */}
+                            <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
+                                <div className="p-6">
+                                    <div className="text-center py-12">
+                                        <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
+                                            <Sparkles className="w-8 h-8 text-purple-500" />
+                                        </div>
+                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">
+                                            Гиги будут здесь
+                                        </h3>
+                                        <p className="text-zinc-500 text-sm max-w-md mx-auto">
+                                            Когда вендоры начнут создавать гиги через Gig Builder,
+                                            они появятся в этом разделе для модерации
+                                        </p>
+                                        <div className="mt-6 flex justify-center gap-4">
+                                            <a
+                                                href="/my-gigs"
+                                                target="_blank"
+                                                className="px-4 py-2 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all"
+                                            >
+                                                Открыть Gig Builder
+                                            </a>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
                         </div>
                     )}
 

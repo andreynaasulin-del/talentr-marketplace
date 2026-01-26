@@ -340,6 +340,13 @@ export default function Navbar() {
                                                 >
                                                     {t.dashboard}
                                                 </Link>
+                                                <Link
+                                                    href="/my-gigs"
+                                                    onClick={() => setShowProfileDropdown(false)}
+                                                    className="block px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors font-medium"
+                                                >
+                                                    🎤 Мои гиги
+                                                </Link>
                                                 <button
                                                     onClick={handleSignOut}
                                                     className="w-full text-start px-4 py-2 text-sm text-red-600 dark:text-red-400 hover:bg-red-50 dark:hover:bg-white/5 hover:text-red-700 dark:hover:text-red-300 transition-colors"
