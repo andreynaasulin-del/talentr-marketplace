@@ -1,4 +1,5 @@
 import { createClient, SupabaseClient } from '@supabase/supabase-js';
+import crypto from 'crypto';
 
 // Server-side Supabase client with service role key for admin operations
 const supabaseUrl = process.env.NEXT_PUBLIC_SUPABASE_URL;
@@ -228,7 +229,18 @@ export async function confirmPendingVendor(
         }
 
         if (pending.status === 'confirmed') {
-            return { vendorId: pending.converted_vendor_id || null, editToken: null, error: 'Already confirmed' };
+            // If already confirmed, try to find the vendor and its edit token
+            const { data: existingVendor } = await client
+                .from('vendors')
+                .select('id, edit_token')
+                .eq('id', pending.converted_vendor_id)
+                .single();
+
+            return {
+                vendorId: pending.converted_vendor_id || null,
+                editToken: existingVendor?.edit_token || null,
+                error: null
+            };
         }
 
         // If updates provided, apply them first
