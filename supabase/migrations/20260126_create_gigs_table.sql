@@ -14,7 +14,7 @@ CREATE TABLE IF NOT EXISTS gigs (
     tags TEXT[] DEFAULT '{}',
     short_description TEXT NOT NULL,
     full_description TEXT,
-    languages TEXT[] DEFAULT '{RU}',
+    languages TEXT[] DEFAULT '{HE}',
     
     -- Media
     photos JSONB DEFAULT '[]', -- [{url, order, type}]
