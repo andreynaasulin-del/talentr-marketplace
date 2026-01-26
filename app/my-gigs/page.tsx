@@ -9,15 +9,74 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import GigBuilder from '@/components/GigBuilder';
 import { Gig } from '@/types/gig';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function MyGigsPage() {
     const router = useRouter();
+    const { language } = useLanguage();
     const [gigs, setGigs] = useState<Gig[]>([]);
     const [loading, setLoading] = useState(true);
     const [showBuilder, setShowBuilder] = useState(false);
     const [editingGigId, setEditingGigId] = useState<string | null>(null);
     const [copied, setCopied] = useState<string | null>(null);
     const [menuOpen, setMenuOpen] = useState<string | null>(null);
+
+    const lang = language as 'en' | 'he';
+
+    const content = {
+        en: {
+            title: 'My Gigs',
+            subtitle: 'Manage your services',
+            createGig: 'Create Gig',
+            createFirst: 'Create your first gig',
+            noGigs: 'No gigs yet',
+            noGigsDesc: 'Create your first gig so clients can find and book you',
+            continue: 'Continue',
+            view: 'View',
+            share: 'Share',
+            copied: 'Copied',
+            edit: 'Edit',
+            delete: 'Delete',
+            deleteConfirm: 'Delete this gig?',
+            free: 'Free',
+            perHour: '/hr',
+            noTitle: 'Untitled',
+            noDesc: 'No description',
+            status: {
+                draft: 'Draft',
+                published: 'Published',
+                unlisted: 'Link Only',
+                archived: 'Archived'
+            }
+        },
+        he: {
+            title: 'הגיגים שלי',
+            subtitle: 'נהל את השירותים שלך',
+            createGig: 'צור גיג',
+            createFirst: 'צור את הגיג הראשון שלך',
+            noGigs: 'אין גיגים עדיין',
+            noGigsDesc: 'צור את הגיג הראשון שלך כדי שלקוחות יוכלו למצוא ולהזמין אותך',
+            continue: 'המשך',
+            view: 'צפה',
+            share: 'שתף',
+            copied: 'הועתק',
+            edit: 'ערוך',
+            delete: 'מחק',
+            deleteConfirm: 'למחוק את הגיג הזה?',
+            free: 'חינם',
+            perHour: '/שעה',
+            noTitle: 'ללא כותרת',
+            noDesc: 'אין תיאור',
+            status: {
+                draft: 'טיוטה',
+                published: 'פורסם',
+                unlisted: 'קישור בלבד',
+                archived: 'ארכיון'
+            }
+        }
+    };
+
+    const t = content[lang] || content.en;
 
     // Mock user data - in production get from auth
     const mockVendorId = 'demo-vendor-id';
@@ -43,7 +102,7 @@ export default function MyGigsPage() {
     };
 
     const deleteGig = async (id: string) => {
-        if (!confirm('Удалить гиг?')) return;
+        if (!confirm(t.deleteConfirm)) return;
         try {
             await fetch(`/api/gigs/${id}`, { method: 'DELETE' });
             setGigs(gigs.filter(g => g.id !== id));
@@ -67,15 +126,10 @@ export default function MyGigsPage() {
             unlisted: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600',
             archived: 'bg-red-100 dark:bg-red-900/30 text-red-600'
         };
-        const labels = {
-            draft: 'Черновик',
-            published: 'Опубликован',
-            unlisted: 'По ссылке',
-            archived: 'В архиве'
-        };
+
         return (
             <span className={`px-2 py-1 text-xs font-bold rounded-lg ${styles[status]}`}>
-                {labels[status]}
+                {t.status[status]}
             </span>
         );
     };
@@ -96,7 +150,7 @@ export default function MyGigsPage() {
     }
 
     return (
-        <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors">
+        <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir={lang === 'he' ? 'rtl' : 'ltr'}>
             <Navbar />
 
             <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
@@ -115,17 +169,17 @@ export default function MyGigsPage() {
                             <Plus className="w-10 h-10 text-zinc-400" />
                         </div>
                         <h2 className="text-2xl font-bold text-zinc-900 dark:text-white mb-3">
-                            У вас пока нет гигов
+                            {t.noGigs}
                         </h2>
                         <p className="text-zinc-500 dark:text-zinc-400 mb-6 max-w-md mx-auto">
-                            Создайте свой первый гиг, чтобы клиенты могли найти вас и забронировать
+                            {t.noGigsDesc}
                         </p>
                         <button
                             onClick={() => setShowBuilder(true)}
                             className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all"
                         >
                             <Plus className="w-5 h-5" />
-                            Создать первый гиг
+                            {t.createFirst}
                         </button>
                     </div>
                 )}
@@ -133,6 +187,16 @@ export default function MyGigsPage() {
                 {/* Gigs list */}
                 {!loading && gigs.length > 0 && (
                     <div className="space-y-4">
+                        <div className="flex items-center justify-between mb-4">
+                            <h2 className="text-xl font-bold text-zinc-900 dark:text-white">{t.title}</h2>
+                            <button
+                                onClick={() => setShowBuilder(true)}
+                                className="flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all text-sm"
+                            >
+                                <Plus className="w-4 h-4" />
+                                {t.createGig}
+                            </button>
+                        </div>
                         {gigs.map((gig) => (
                             <div
                                 key={gig.id}
@@ -152,7 +216,7 @@ export default function MyGigsPage() {
                                     </div>
 
                                     {/* Info */}
-                                    <div className="flex-1 p-4 md:p-5 flex flex-col">
+                                    <div className="flex-1 p-4 md:p-5 flex flex-col min-w-0">
                                         <div className="flex items-start justify-between gap-2">
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 flex-wrap mb-1">
@@ -162,24 +226,24 @@ export default function MyGigsPage() {
                                                     </span>
                                                 </div>
                                                 <h3 className="font-bold text-lg text-zinc-900 dark:text-white truncate">
-                                                    {gig.title || 'Без названия'}
+                                                    {gig.title || t.noTitle}
                                                 </h3>
                                                 <p className="text-sm text-zinc-500 dark:text-zinc-400 line-clamp-2 mt-1">
-                                                    {gig.short_description || 'Нет описания'}
+                                                    {gig.short_description || t.noDesc}
                                                 </p>
                                             </div>
 
                                             {/* Price */}
-                                            <div className="text-right flex-shrink-0">
+                                            <div className={`flex-shrink-0 ${lang === 'he' ? 'text-left' : 'text-right'}`}>
                                                 {gig.is_free ? (
-                                                    <span className="text-green-600 font-bold">Бесплатно</span>
+                                                    <span className="text-green-600 font-bold">{t.free}</span>
                                                 ) : gig.price_amount ? (
                                                     <div>
                                                         <span className="text-lg font-black text-zinc-900 dark:text-white">
                                                             ₪{gig.price_amount}
                                                         </span>
                                                         {gig.pricing_type === 'hourly' && (
-                                                            <span className="text-xs text-zinc-500">/час</span>
+                                                            <span className="text-xs text-zinc-500">{t.perHour}</span>
                                                         )}
                                                     </div>
                                                 ) : null}
@@ -197,7 +261,7 @@ export default function MyGigsPage() {
                                                     className="flex items-center gap-1.5 px-3 py-1.5 bg-blue-600 text-white text-sm font-bold rounded-lg"
                                                 >
                                                     <Edit3 className="w-4 h-4" />
-                                                    Продолжить
+                                                    {t.continue}
                                                 </button>
                                             )}
 
@@ -207,7 +271,7 @@ export default function MyGigsPage() {
                                                     className="flex items-center gap-1.5 px-3 py-1.5 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 text-sm font-medium rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700"
                                                 >
                                                     <Eye className="w-4 h-4" />
-                                                    Просмотр
+                                                    {t.view}
                                                 </Link>
                                             )}
 
@@ -219,18 +283,18 @@ export default function MyGigsPage() {
                                                     {copied === gig.id ? (
                                                         <>
                                                             <Check className="w-4 h-4 text-green-500" />
-                                                            Скопировано
+                                                            {t.copied}
                                                         </>
                                                     ) : (
                                                         <>
                                                             <Share2 className="w-4 h-4" />
-                                                            Поделиться
+                                                            {t.share}
                                                         </>
                                                     )}
                                                 </button>
                                             )}
 
-                                            <div className="relative ml-auto">
+                                            <div className={`relative ${lang === 'he' ? 'mr-auto' : 'ml-auto'}`}>
                                                 <button
                                                     onClick={() => setMenuOpen(menuOpen === gig.id ? null : gig.id)}
                                                     className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg"
@@ -244,7 +308,7 @@ export default function MyGigsPage() {
                                                             className="fixed inset-0 z-10"
                                                             onClick={() => setMenuOpen(null)}
                                                         />
-                                                        <div className="absolute right-0 mt-1 w-40 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg z-20 py-1">
+                                                        <div className={`absolute ${lang === 'he' ? 'left-0' : 'right-0'} mt-1 w-40 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl shadow-lg z-20 py-1`}>
                                                             <button
                                                                 onClick={() => {
                                                                     setEditingGigId(gig.id);
@@ -254,7 +318,7 @@ export default function MyGigsPage() {
                                                                 className="w-full px-4 py-2 text-left text-sm text-zinc-700 dark:text-zinc-300 hover:bg-zinc-100 dark:hover:bg-zinc-700 flex items-center gap-2"
                                                             >
                                                                 <Edit3 className="w-4 h-4" />
-                                                                Редактировать
+                                                                {t.edit}
                                                             </button>
                                                             <button
                                                                 onClick={() => {
@@ -264,7 +328,7 @@ export default function MyGigsPage() {
                                                                 className="w-full px-4 py-2 text-left text-sm text-red-600 hover:bg-red-50 dark:hover:bg-red-900/20 flex items-center gap-2"
                                                             >
                                                                 <Trash2 className="w-4 h-4" />
-                                                                Удалить
+                                                                {t.delete}
                                                             </button>
                                                         </div>
                                                     </>

@@ -129,68 +129,68 @@ export const GIG_WIZARD_STEPS: GigWizardStep[] = [
 ];
 
 export const GIG_STEP_CONFIG: Record<GigWizardStep, {
-    title: string;
-    subtitle: string;
+    title: Record<string, string>;
+    subtitle: Record<string, string>;
     icon: string;
     required: boolean;
 }> = {
     type: {
-        title: 'Какой гиг создаём?',
-        subtitle: 'Выбери шаблон или создай с нуля',
+        title: { en: 'What type of Gig?', he: 'איזה סוג גיג?' },
+        subtitle: { en: 'Choose a template or start from scratch', he: 'בחר תבנית או התחל מאפס' },
         icon: '✨',
         required: true
     },
     title: {
-        title: 'Название и категория',
-        subtitle: 'Как называется твой гиг?',
+        title: { en: 'Title & Category', he: 'כותרת וקטגוריה' },
+        subtitle: { en: 'What is your gig called?', he: 'איך קוראים לגיג שלך?' },
         icon: '📝',
         required: true
     },
     description: {
-        title: 'Описание',
-        subtitle: 'Расскажи о своём гиге',
+        title: { en: 'Description', he: 'תיאור' },
+        subtitle: { en: 'Tell us about your gig', he: 'ספר לנו על הגיג שלך' },
         icon: '💬',
         required: true
     },
     media: {
-        title: 'Фото и видео',
-        subtitle: 'Покажи свою работу',
+        title: { en: 'Photos & Videos', he: 'תמונות וסרטונים' },
+        subtitle: { en: 'Show your work', he: 'הראה את העבודה שלך' },
         icon: '📸',
         required: true
     },
     pricing: {
-        title: 'Цена',
-        subtitle: 'Сколько стоит твой гиг?',
+        title: { en: 'Pricing', he: 'תמחור' },
+        subtitle: { en: 'How much does it cost?', he: 'כמה זה עולה?' },
         icon: '💰',
         required: true
     },
     location: {
-        title: 'Локация',
-        subtitle: 'Где ты работаешь?',
+        title: { en: 'Location', he: 'מיקום' },
+        subtitle: { en: 'Where do you work?', he: 'איפה אתה עובד?' },
         icon: '📍',
         required: true
     },
     audience: {
-        title: 'Аудитория',
-        subtitle: 'Для кого подходит?',
+        title: { en: 'Audience', he: 'קהל יעד' },
+        subtitle: { en: 'Who is it for?', he: 'למי זה מתאים?' },
         icon: '👥',
         required: true
     },
     details: {
-        title: 'Детали',
-        subtitle: 'Дополнительная информация',
+        title: { en: 'Details', he: 'פרטים' },
+        subtitle: { en: 'Additional information', he: 'מידע נוסף' },
         icon: '📋',
         required: false
     },
     availability: {
-        title: 'Бронирование',
-        subtitle: 'Как тебя бронировать?',
+        title: { en: 'Booking', he: 'הזמנה' },
+        subtitle: { en: 'How to book you?', he: 'איך להזמין אותך?' },
         icon: '📅',
         required: false
     },
     publish: {
-        title: 'Публикация',
-        subtitle: 'Готово к запуску!',
+        title: { en: 'Publish', he: 'פרסום' },
+        subtitle: { en: 'Ready to launch!', he: 'מוכן להשקה!' },
         icon: '🚀',
         required: true
     }
@@ -198,36 +198,36 @@ export const GIG_STEP_CONFIG: Record<GigWizardStep, {
 
 // Event types for audience selection
 export const EVENT_TYPES = [
-    { id: 'birthday', label: 'День рождения', icon: '🎂' },
-    { id: 'wedding', label: 'Свадьба', icon: '💒' },
-    { id: 'corporate', label: 'Корпоратив', icon: '🏢' },
-    { id: 'kids', label: 'Детский праздник', icon: '🎈' },
-    { id: 'party', label: 'Домашняя вечеринка', icon: '🎉' },
-    { id: 'bar', label: 'Бар/Клуб', icon: '🍸' },
-    { id: 'restaurant', label: 'Ресторан', icon: '🍽️' },
-    { id: 'private', label: 'Частное мероприятие', icon: '🏠' },
-    { id: 'festival', label: 'Фестиваль', icon: '🎪' },
-    { id: 'graduation', label: 'Выпускной', icon: '🎓' },
-    { id: 'anniversary', label: 'Юбилей', icon: '🥂' },
-    { id: 'baby_shower', label: 'Baby Shower', icon: '👶' },
+    { id: 'birthday', label: { en: 'Birthday', he: 'יום הולדת' }, icon: '🎂' },
+    { id: 'wedding', label: { en: 'Wedding', he: 'חתונה' }, icon: '💒' },
+    { id: 'corporate', label: { en: 'Corporate', he: 'אירוע עסקי' }, icon: '🏢' },
+    { id: 'kids', label: { en: 'Kids Party', he: 'מסיבת ילדים' }, icon: '🎈' },
+    { id: 'party', label: { en: 'House Party', he: 'מסיבה פרטית' }, icon: '🎉' },
+    { id: 'bar', label: { en: 'Bar/Club', he: 'בר/מועדון' }, icon: '🍸' },
+    { id: 'restaurant', label: { en: 'Restaurant', he: 'מסעדה' }, icon: '🍽️' },
+    { id: 'private', label: { en: 'Private Event', he: 'אירוע פרטי' }, icon: '🏠' },
+    { id: 'festival', label: { en: 'Festival', he: 'פסטיבל' }, icon: '🎪' },
+    { id: 'graduation', label: { en: 'Graduation', he: 'מסיבת סיום' }, icon: '🎓' },
+    { id: 'anniversary', label: { en: 'Anniversary', he: 'יום נישואין' }, icon: '🥂' },
+    { id: 'baby_shower', label: { en: 'Baby Shower', he: 'מסיבת ברית/ה' }, icon: '👶' },
 ];
 
 // Categories for gigs
 export const GIG_CATEGORIES = [
-    { id: 'DJ', label: 'DJ', icon: '🎧' },
-    { id: 'Photographer', label: 'Фотограф', icon: '📸' },
-    { id: 'Videographer', label: 'Видеограф', icon: '🎬' },
-    { id: 'MC', label: 'Ведущий', icon: '🎤' },
-    { id: 'Magician', label: 'Фокусник', icon: '🎩' },
-    { id: 'Singer', label: 'Вокалист', icon: '🎵' },
-    { id: 'Musician', label: 'Музыкант', icon: '🎸' },
-    { id: 'Comedian', label: 'Комик', icon: '😂' },
-    { id: 'Dancer', label: 'Танцор', icon: '💃' },
-    { id: 'Bartender', label: 'Бармен', icon: '🍸' },
-    { id: 'Kids Animator', label: 'Аниматор', icon: '🎈' },
-    { id: 'Event Decor', label: 'Декор', icon: '🎨' },
-    { id: 'Chef', label: 'Шеф-повар', icon: '👨‍🍳' },
-    { id: 'Other', label: 'Другое', icon: '✨' },
+    { id: 'DJ', label: { en: 'DJ', he: 'די-ג׳יי' }, icon: '🎧' },
+    { id: 'Photographer', label: { en: 'Photographer', he: 'צלם' }, icon: '📸' },
+    { id: 'Videographer', label: { en: 'Videographer', he: 'וידאוגרף' }, icon: '🎬' },
+    { id: 'MC', label: { en: 'MC / Host', he: 'מנחה' }, icon: '🎤' },
+    { id: 'Magician', label: { en: 'Magician', he: 'קוסם' }, icon: '🎩' },
+    { id: 'Singer', label: { en: 'Singer', he: 'זמר' }, icon: '🎵' },
+    { id: 'Musician', label: { en: 'Musician', he: 'מוזיקאי' }, icon: '🎸' },
+    { id: 'Comedian', label: { en: 'Comedian', he: 'סטנדאפיסט' }, icon: '😂' },
+    { id: 'Dancer', label: { en: 'Dancer', he: 'רקדן' }, icon: '💃' },
+    { id: 'Bartender', label: { en: 'Bartender', he: 'ברמן' }, icon: '🍸' },
+    { id: 'Kids Animator', label: { en: 'Kids Animator', he: 'מפעיל ילדים' }, icon: '🎈' },
+    { id: 'Event Decor', label: { en: 'Decor', he: 'עיצוב' }, icon: '🎨' },
+    { id: 'Chef', label: { en: 'Chef', he: 'שף' }, icon: '👨‍🍳' },
+    { id: 'Other', label: { en: 'Other', he: 'אחר' }, icon: '✨' },
 ];
 
 // Cities in Israel

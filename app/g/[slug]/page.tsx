@@ -33,13 +33,13 @@ export default function GigBySlugPage() {
             const data = await res.json();
 
             if (!res.ok || !data.gig) {
-                setError('Гиг не найден');
+                setError('Gig not found');
                 return;
             }
 
             setGig(data.gig);
         } catch (err) {
-            setError('Ошибка загрузки');
+            setError('Loading error');
         } finally {
             setLoading(false);
         }
@@ -57,7 +57,10 @@ export default function GigBySlugPage() {
     };
 
     const getEventTypeLabel = (typeId: string) => {
-        return EVENT_TYPES.find(e => e.id === typeId)?.label || typeId;
+        const type = EVENT_TYPES.find(e => e.id === typeId);
+        // Default to English if no mapped label found or logic for language context could be added here
+        // Since this is a client page, we can use a simple check or default to EN
+        return (type?.label as any)['en'] || typeId;
     };
 
     if (loading) {
@@ -77,16 +80,16 @@ export default function GigBySlugPage() {
                         <Info className="w-12 h-12 text-zinc-400" />
                     </div>
                     <h1 className="text-3xl font-black text-zinc-900 dark:text-white mb-4">
-                        Гиг не найден
+                        Gig not found
                     </h1>
                     <p className="text-zinc-500 mb-8">
-                        Возможно, ссылка устарела или гиг был удалён
+                        The link might be outdated or the gig was deleted
                     </p>
                     <Link
                         href="/"
                         className="inline-flex items-center gap-2 px-6 py-3 bg-blue-600 text-white font-bold rounded-xl"
                     >
-                        На главную
+                        Go Home
                     </Link>
                 </div>
                 <Footer />
@@ -101,7 +104,7 @@ export default function GigBySlugPage() {
             {/* Unlisted badge */}
             {gig.status === 'unlisted' && (
                 <div className="bg-blue-600 text-white text-center py-2 text-sm font-medium">
-                    🔗 Этот гиг доступен только по ссылке
+                    🔗 This gig is accessible by link only
                 </div>
             )}
 
@@ -124,7 +127,7 @@ export default function GigBySlugPage() {
                         className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-lg text-white rounded-xl hover:bg-white/20 transition-all"
                     >
                         <ArrowLeft className="w-5 h-5" />
-                        Назад
+                        Back
                     </Link>
                 </div>
 
@@ -135,7 +138,7 @@ export default function GigBySlugPage() {
                         className="flex items-center gap-2 px-4 py-2 bg-white/10 backdrop-blur-lg text-white rounded-xl hover:bg-white/20 transition-all"
                     >
                         {copied ? <Check className="w-5 h-5" /> : <Share2 className="w-5 h-5" />}
-                        {copied ? 'Скопировано' : 'Поделиться'}
+                        {copied ? 'Copied' : 'Share'}
                     </button>
                 </div>
 
@@ -168,7 +171,7 @@ export default function GigBySlugPage() {
                         {/* Description */}
                         <section className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6">
                             <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
-                                Описание
+                                Description
                             </h2>
                             <p className="text-zinc-600 dark:text-zinc-400 leading-relaxed">
                                 {gig.short_description}
@@ -184,7 +187,7 @@ export default function GigBySlugPage() {
                         {gig.price_includes && (
                             <section className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6">
                                 <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
-                                    Что входит
+                                    What is included
                                 </h2>
                                 <p className="text-zinc-600 dark:text-zinc-400">
                                     {gig.price_includes}
@@ -195,16 +198,16 @@ export default function GigBySlugPage() {
                         {/* Details grid */}
                         <section className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6">
                             <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
-                                Детали
+                                Details
                             </h2>
                             <div className="grid grid-cols-2 gap-4">
                                 {gig.duration_minutes && (
                                     <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl">
                                         <Clock className="w-5 h-5 text-blue-500" />
                                         <div>
-                                            <p className="text-xs text-zinc-500">Длительность</p>
+                                            <p className="text-xs text-zinc-500">Duration</p>
                                             <p className="font-bold text-zinc-900 dark:text-white">
-                                                {gig.duration_minutes} мин
+                                                {gig.duration_minutes} min
                                             </p>
                                         </div>
                                     </div>
@@ -213,9 +216,9 @@ export default function GigBySlugPage() {
                                     <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl">
                                         <Users className="w-5 h-5 text-green-500" />
                                         <div>
-                                            <p className="text-xs text-zinc-500">Макс. гостей</p>
+                                            <p className="text-xs text-zinc-500">Max Guests</p>
                                             <p className="font-bold text-zinc-900 dark:text-white">
-                                                до {gig.max_guests}
+                                                up to {gig.max_guests}
                                             </p>
                                         </div>
                                     </div>
@@ -224,7 +227,7 @@ export default function GigBySlugPage() {
                                     <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl">
                                         <MapPin className="w-5 h-5 text-red-500" />
                                         <div>
-                                            <p className="text-xs text-zinc-500">Локация</p>
+                                            <p className="text-xs text-zinc-500">Location</p>
                                             <p className="font-bold text-zinc-900 dark:text-white">
                                                 {gig.base_city}
                                             </p>
@@ -235,9 +238,9 @@ export default function GigBySlugPage() {
                                     <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl">
                                         <Globe className="w-5 h-5 text-purple-500" />
                                         <div>
-                                            <p className="text-xs text-zinc-500">Формат</p>
+                                            <p className="text-xs text-zinc-500">Format</p>
                                             <p className="font-bold text-zinc-900 dark:text-white">
-                                                Онлайн
+                                                Online
                                             </p>
                                         </div>
                                     </div>
@@ -249,7 +252,7 @@ export default function GigBySlugPage() {
                         {gig.event_types && gig.event_types.length > 0 && (
                             <section className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 p-6">
                                 <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-4">
-                                    Подходит для
+                                    Suitable for
                                 </h2>
                                 <div className="flex flex-wrap gap-2">
                                     {gig.event_types.map((type) => (
@@ -272,19 +275,19 @@ export default function GigBySlugPage() {
                             <div className="mb-6">
                                 {gig.is_free ? (
                                     <div className="text-2xl font-black text-green-600">
-                                        Бесплатно
+                                        Free
                                     </div>
                                 ) : (
                                     <div>
                                         <div className="flex items-baseline gap-1">
                                             {gig.pricing_type === 'from' && (
-                                                <span className="text-zinc-500">от</span>
+                                                <span className="text-zinc-500">from</span>
                                             )}
                                             <span className="text-3xl font-black text-zinc-900 dark:text-white">
                                                 ₪{gig.price_amount}
                                             </span>
                                             {gig.pricing_type === 'hourly' && (
-                                                <span className="text-zinc-500">/час</span>
+                                                <span className="text-zinc-500">/hour</span>
                                             )}
                                         </div>
                                     </div>
@@ -303,16 +306,16 @@ export default function GigBySlugPage() {
                             {gig.lead_time_hours && (
                                 <div className="flex items-center gap-2 mb-6 text-sm text-zinc-500">
                                     <Calendar className="w-4 h-4" />
-                                    Бронирование за {gig.lead_time_hours >= 24
-                                        ? `${Math.floor(gig.lead_time_hours / 24)} дн.`
-                                        : `${gig.lead_time_hours} ч.`}
+                                    Book at least {gig.lead_time_hours >= 24
+                                        ? `${Math.floor(gig.lead_time_hours / 24)} days`
+                                        : `${gig.lead_time_hours} hours`} ahead
                                 </div>
                             )}
 
                             {/* CTA */}
                             <button className="w-full py-4 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/20">
                                 <MessageCircle className="w-5 h-5" />
-                                Написать
+                                Chat
                             </button>
 
                             {/* Kids badge */}
@@ -321,12 +324,12 @@ export default function GigBySlugPage() {
                                     {gig.suitable_for_kids ? (
                                         <>
                                             <Check className="w-4 h-4 text-green-500" />
-                                            <span className="text-zinc-600 dark:text-zinc-400">Подходит для детей</span>
+                                            <span className="text-zinc-600 dark:text-zinc-400">Suitable for kids</span>
                                         </>
                                     ) : (
                                         <>
                                             <Info className="w-4 h-4 text-orange-500" />
-                                            <span className="text-zinc-600 dark:text-zinc-400">Только для взрослых</span>
+                                            <span className="text-zinc-600 dark:text-zinc-400">18+ only</span>
                                         </>
                                     )}
                                 </div>

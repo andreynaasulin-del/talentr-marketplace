@@ -118,6 +118,7 @@ export async function checkDuplicateVendor(data: {
                 .select('id')
                 .eq('email', data.email.toLowerCase())
                 .single()
+                .then(res => res)
         );
     }
 
@@ -129,6 +130,7 @@ export async function checkDuplicateVendor(data: {
                 .select('id')
                 .eq('phone', cleaned)
                 .single()
+                .then(res => res)
         );
     }
 
@@ -140,22 +142,36 @@ export async function checkDuplicateVendor(data: {
                 .select('id')
                 .ilike('instagram_handle', cleaned)
                 .single()
+                .then(res => res)
         );
     }
 
     const results = await Promise.all(checks);
 
     // Check if any returned data (duplicate found)
-    for (let i = 0; i < results.length; i++) {
-        if (results[i].data) {
-            const fields = ['email', 'phone', 'instagram_handle'];
-            const field = [data.email, data.phone, data.instagram_handle][i];
-            return {
-                isDuplicate: true,
-                field: fields[i],
-                message: `A vendor with this ${fields[i]} already exists`
-            };
+    // We check results[i].data because Supabase .single() returns { data, error }
+    // If found, data is not null. If not found, data is null (and error is "Row not found" usually)
+    let checkIndex = 0;
+
+    if (data.email) {
+        if (results[checkIndex]?.data) {
+            return { isDuplicate: true, field: 'email', message: 'A vendor with this email already exists' };
         }
+        checkIndex++;
+    }
+
+    if (data.phone) {
+        if (results[checkIndex]?.data) {
+            return { isDuplicate: true, field: 'phone', message: 'A vendor with this phone already exists' };
+        }
+        checkIndex++;
+    }
+
+    if (data.instagram_handle) {
+        if (results[checkIndex]?.data) {
+            return { isDuplicate: true, field: 'instagram_handle', message: 'A vendor with this Instagram handle already exists' };
+        }
+        checkIndex++;
     }
 
     return { isDuplicate: false };
