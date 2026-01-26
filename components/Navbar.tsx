@@ -159,6 +159,13 @@ export default function Navbar() {
                                 >
                                     {t.dashboard}
                                 </Link>
+                                <Link
+                                    href="/my-gigs"
+                                    onClick={() => setIsMobileMenuOpen(false)}
+                                    className="block w-full p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-200 dark:border-purple-500/30 rounded-2xl text-purple-600 dark:text-purple-400 font-semibold text-lg text-center hover:from-purple-500/20 hover:to-blue-500/20 transition-colors"
+                                >
+                                    🎤 Мои гиги
+                                </Link>
                                 <button
                                     onClick={handleSignOut}
                                     className="w-full p-4 bg-red-50 dark:bg-red-500/10 border border-red-200 dark:border-red-500/30 rounded-2xl text-red-600 dark:text-red-400 font-semibold text-lg hover:bg-red-100 dark:hover:bg-red-500/20 transition-colors"

@@ -1,0 +1,917 @@
+'use client';
+
+import { useState, useEffect } from 'react';
+import { useRouter } from 'next/navigation';
+import Image from 'next/image';
+import { motion, AnimatePresence } from 'framer-motion';
+import {
+    ArrowLeft, ArrowRight, Sparkles, Check, X, Loader2,
+    Upload, Camera, Video, MapPin, Users, Clock, DollarSign,
+    Globe, Share2, Copy, ExternalLink, Plus, Trash2, GripVertical
+} from 'lucide-react';
+import {
+    Gig, GigTemplate, GigWizardStep, GIG_WIZARD_STEPS,
+    GIG_STEP_CONFIG, GIG_CATEGORIES, EVENT_TYPES, CITIES
+} from '@/types/gig';
+
+interface GigBuilderProps {
+    vendorId: string;
+    ownerId: string;
+    onClose: () => void;
+    existingGigId?: string;
+}
+
+export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }: GigBuilderProps) {
+    const router = useRouter();
+    const [currentStep, setCurrentStep] = useState(0);
+    const [loading, setLoading] = useState(false);
+    const [saving, setSaving] = useState(false);
+    const [templates, setTemplates] = useState<GigTemplate[]>([]);
+    const [selectedTemplate, setSelectedTemplate] = useState<GigTemplate | null>(null);
+    const [shareLink, setShareLink] = useState<string | null>(null);
+    const [copied, setCopied] = useState(false);
+
+    // Gig data state
+    const [gig, setGig] = useState<Partial<Gig>>({
+        vendor_id: vendorId,
+        owner_user_id: ownerId,
+        title: '',
+        category_id: '',
+        tags: [],
+        short_description: '',
+        full_description: '',
+        languages: ['RU'],
+        photos: [],
+        videos: [],
+        is_free: false,
+        currency: 'ILS',
+        pricing_type: 'fixed',
+        price_amount: undefined,
+        addons: [],
+        location_mode: 'city',
+        base_city: 'Tel Aviv',
+        suitable_for_kids: true,
+        age_limit: 'none',
+        event_types: [],
+        duration_minutes: 60,
+        booking_method: 'chat',
+        lead_time_hours: 24,
+        status: 'draft'
+    });
+
+    const step = GIG_WIZARD_STEPS[currentStep] as GigWizardStep;
+    const stepConfig = GIG_STEP_CONFIG[step];
+
+    // Load templates on mount
+    useEffect(() => {
+        loadTemplates();
+        if (existingGigId) {
+            loadExistingGig(existingGigId);
+        }
+    }, [existingGigId]);
+
+    const loadTemplates = async () => {
+        try {
+            const res = await fetch('/api/gigs/templates');
+            const data = await res.json();
+            if (data.templates) {
+                setTemplates(data.templates);
+            }
+        } catch (error) {
+            console.error('Error loading templates:', error);
+        }
+    };
+
+    const loadExistingGig = async (id: string) => {
+        setLoading(true);
+        try {
+            const res = await fetch(`/api/gigs/${id}`);
+            const data = await res.json();
+            if (data.gig) {
+                setGig(data.gig);
+                setCurrentStep(data.gig.current_step || 0);
+            }
+        } catch (error) {
+            console.error('Error loading gig:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const createDraft = async () => {
+        try {
+            const res = await fetch('/api/gigs', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    vendor_id: vendorId,
+                    owner_user_id: ownerId,
+                    template_id: selectedTemplate?.id,
+                    category_id: selectedTemplate?.category_id || gig.category_id || 'Other'
+                })
+            });
+            const data = await res.json();
+            if (data.gig) {
+                setGig(prev => ({ ...prev, id: data.gig.id, share_slug: data.gig.share_slug }));
+                return data.gig.id;
+            }
+        } catch (error) {
+            console.error('Error creating draft:', error);
+        }
+        return null;
+    };
+
+    const saveStep = async () => {
+        if (!gig.id) return;
+        setSaving(true);
+        try {
+            await fetch(`/api/gigs/${gig.id}`, {
+                method: 'PATCH',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
+                    ...gig,
+                    current_step: currentStep
+                })
+            });
+        } catch (error) {
+            console.error('Error saving step:', error);
+        } finally {
+            setSaving(false);
+        }
+    };
+
+    const handleNext = async () => {
+        // Create draft on first move from step 0
+        if (currentStep === 0 && !gig.id) {
+            setLoading(true);
+            const newId = await createDraft();
+            setLoading(false);
+            if (!newId) return;
+        }
+
+        // Save current step data
+        await saveStep();
+
+        if (currentStep < GIG_WIZARD_STEPS.length - 1) {
+            setCurrentStep(currentStep + 1);
+        }
+    };
+
+    const handleBack = () => {
+        if (currentStep > 0) {
+            setCurrentStep(currentStep - 1);
+        }
+    };
+
+    const handlePublish = async (asUnlisted = false) => {
+        if (!gig.id) return;
+
+        setLoading(true);
+        try {
+            const endpoint = asUnlisted
+                ? `/api/gigs/${gig.id}/unlist`
+                : `/api/gigs/${gig.id}/publish`;
+
+            const res = await fetch(endpoint, { method: 'POST' });
+            const data = await res.json();
+
+            if (data.success) {
+                if (asUnlisted && data.shareLink) {
+                    setShareLink(data.shareLink);
+                } else {
+                    // Move to success view
+                    setCurrentStep(GIG_WIZARD_STEPS.length);
+                }
+                setGig(prev => ({ ...prev, ...data.gig }));
+            }
+        } catch (error) {
+            console.error('Error publishing:', error);
+        } finally {
+            setLoading(false);
+        }
+    };
+
+    const copyLink = () => {
+        if (shareLink) {
+            navigator.clipboard.writeText(shareLink);
+            setCopied(true);
+            setTimeout(() => setCopied(false), 2000);
+        }
+    };
+
+    // Render step content
+    const renderStepContent = () => {
+        switch (step) {
+            case 'type':
+                return (
+                    <div className="space-y-6">
+                        <p className="text-zinc-500 dark:text-zinc-400 text-center">
+                            Выбери шаблон для быстрого старта или создай гиг с нуля
+                        </p>
+
+                        {/* From scratch option */}
+                        <button
+                            onClick={() => setSelectedTemplate(null)}
+                            className={`w-full p-4 rounded-2xl border-2 transition-all flex items-center gap-4 ${!selectedTemplate
+                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                    : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                                }`}
+                        >
+                            <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl">
+                                ✏️
+                            </div>
+                            <div className="text-left">
+                                <p className="font-bold text-zinc-900 dark:text-white">С нуля</p>
+                                <p className="text-sm text-zinc-500">Полная свобода настройки</p>
+                            </div>
+                            {!selectedTemplate && <Check className="w-5 h-5 text-blue-500 ml-auto" />}
+                        </button>
+
+                        {/* Templates grid */}
+                        <div className="grid grid-cols-2 gap-3">
+                            {templates.map((template) => (
+                                <button
+                                    key={template.id}
+                                    onClick={() => {
+                                        setSelectedTemplate(template);
+                                        setGig(prev => ({
+                                            ...prev,
+                                            category_id: template.category_id,
+                                            tags: template.suggested_tags || []
+                                        }));
+                                    }}
+                                    className={`p-4 rounded-2xl border-2 transition-all text-left ${selectedTemplate?.id === template.id
+                                            ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                            : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                                        }`}
+                                >
+                                    <div className="text-3xl mb-2">{template.icon}</div>
+                                    <p className="font-bold text-zinc-900 dark:text-white text-sm">{template.name}</p>
+                                    {template.suggested_price_min && (
+                                        <p className="text-xs text-zinc-500 mt-1">
+                                            от ₪{template.suggested_price_min}
+                                        </p>
+                                    )}
+                                </button>
+                            ))}
+                        </div>
+                    </div>
+                );
+
+            case 'title':
+                return (
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Название гига *
+                            </label>
+                            <input
+                                type="text"
+                                value={gig.title || ''}
+                                onChange={(e) => setGig(prev => ({ ...prev, title: e.target.value }))}
+                                placeholder="Например: DJ сет на свадьбу"
+                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Категория *
+                            </label>
+                            <div className="grid grid-cols-3 gap-2">
+                                {GIG_CATEGORIES.map((cat) => (
+                                    <button
+                                        key={cat.id}
+                                        onClick={() => setGig(prev => ({ ...prev, category_id: cat.id }))}
+                                        className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${gig.category_id === cat.id
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                                            }`}
+                                    >
+                                        <span className="text-xl">{cat.icon}</span>
+                                        <span className="text-xs font-medium text-zinc-700 dark:text-zinc-300">{cat.label}</span>
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'description':
+                return (
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Короткое описание * <span className="font-normal text-zinc-400">(макс. 150 символов)</span>
+                            </label>
+                            <textarea
+                                value={gig.short_description || ''}
+                                onChange={(e) => setGig(prev => ({ ...prev, short_description: e.target.value.slice(0, 150) }))}
+                                placeholder="Кратко опиши свой гиг..."
+                                rows={2}
+                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                            />
+                            <p className="text-xs text-zinc-400 mt-1">{(gig.short_description || '').length}/150</p>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Подробное описание <span className="font-normal text-zinc-400">(опционально)</span>
+                            </label>
+                            <textarea
+                                value={gig.full_description || ''}
+                                onChange={(e) => setGig(prev => ({ ...prev, full_description: e.target.value }))}
+                                placeholder="Расскажи подробнее: что входит, особенности, опыт..."
+                                rows={4}
+                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Языки
+                            </label>
+                            <div className="flex gap-2">
+                                {['RU', 'HE', 'EN'].map((lang) => (
+                                    <button
+                                        key={lang}
+                                        onClick={() => {
+                                            const langs = gig.languages || [];
+                                            if (langs.includes(lang)) {
+                                                setGig(prev => ({ ...prev, languages: langs.filter(l => l !== lang) }));
+                                            } else {
+                                                setGig(prev => ({ ...prev, languages: [...langs, lang] }));
+                                            }
+                                        }}
+                                        className={`px-4 py-2 rounded-xl border-2 font-medium transition-all ${(gig.languages || []).includes(lang)
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600'
+                                                : 'border-zinc-200 dark:border-zinc-700 text-zinc-600 dark:text-zinc-400'
+                                            }`}
+                                    >
+                                        {lang}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'media':
+                return (
+                    <div className="space-y-6">
+                        <p className="text-zinc-500 dark:text-zinc-400 text-sm">
+                            Загрузи минимум 1 видео или 3 фото для лучшей конверсии
+                        </p>
+
+                        <div className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-2xl p-8 text-center">
+                            <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
+                                <Upload className="w-8 h-8 text-zinc-400" />
+                            </div>
+                            <p className="text-zinc-600 dark:text-zinc-400 font-medium mb-2">
+                                Перетащи файлы сюда
+                            </p>
+                            <p className="text-xs text-zinc-400 mb-4">
+                                JPG, PNG до 5MB · MP4, MOV до 50MB
+                            </p>
+                            <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-bold cursor-pointer hover:bg-blue-700 transition-all">
+                                <Camera className="w-4 h-4" />
+                                Выбрать файлы
+                                <input type="file" className="hidden" accept="image/*,video/*" multiple />
+                            </label>
+                        </div>
+
+                        {/* Preview grid - placeholder */}
+                        {(gig.photos?.length || gig.videos?.length) ? (
+                            <div className="grid grid-cols-3 gap-2">
+                                {/* Media items would render here */}
+                            </div>
+                        ) : null}
+                    </div>
+                );
+
+            case 'pricing':
+                return (
+                    <div className="space-y-6">
+                        {/* Free toggle */}
+                        <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800 rounded-xl">
+                            <div>
+                                <p className="font-bold text-zinc-900 dark:text-white">Бесплатный гиг</p>
+                                <p className="text-sm text-zinc-500">Промо или благотворительность</p>
+                            </div>
+                            <button
+                                onClick={() => setGig(prev => ({ ...prev, is_free: !prev.is_free }))}
+                                className={`w-12 h-7 rounded-full transition-all ${gig.is_free ? 'bg-blue-600' : 'bg-zinc-300 dark:bg-zinc-600'
+                                    }`}
+                            >
+                                <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${gig.is_free ? 'translate-x-6' : 'translate-x-1'
+                                    }`} />
+                            </button>
+                        </div>
+
+                        {!gig.is_free && (
+                            <>
+                                {/* Price type */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                        Тип цены
+                                    </label>
+                                    <div className="flex gap-2">
+                                        {[
+                                            { id: 'fixed', label: 'Фикс', desc: 'за мероприятие' },
+                                            { id: 'hourly', label: 'Час', desc: 'почасовая' },
+                                            { id: 'from', label: 'От...', desc: 'минимум' }
+                                        ].map((type) => (
+                                            <button
+                                                key={type.id}
+                                                onClick={() => setGig(prev => ({ ...prev, pricing_type: type.id as Gig['pricing_type'] }))}
+                                                className={`flex-1 p-3 rounded-xl border-2 transition-all text-center ${gig.pricing_type === type.id
+                                                        ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                        : 'border-zinc-200 dark:border-zinc-700'
+                                                    }`}
+                                            >
+                                                <p className="font-bold text-zinc-900 dark:text-white">{type.label}</p>
+                                                <p className="text-xs text-zinc-500">{type.desc}</p>
+                                            </button>
+                                        ))}
+                                    </div>
+                                </div>
+
+                                {/* Price amount */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                        Сумма (₪) *
+                                    </label>
+                                    <div className="relative">
+                                        <DollarSign className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-zinc-400" />
+                                        <input
+                                            type="number"
+                                            value={gig.price_amount || ''}
+                                            onChange={(e) => setGig(prev => ({ ...prev, price_amount: Number(e.target.value) }))}
+                                            placeholder="2000"
+                                            className="w-full pl-12 pr-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                        />
+                                    </div>
+                                </div>
+
+                                {/* What's included */}
+                                <div>
+                                    <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                        Что входит в цену
+                                    </label>
+                                    <textarea
+                                        value={gig.price_includes || ''}
+                                        onChange={(e) => setGig(prev => ({ ...prev, price_includes: e.target.value }))}
+                                        placeholder="2 часа работы, оборудование, саундчек..."
+                                        rows={2}
+                                        className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
+                                    />
+                                </div>
+                            </>
+                        )}
+                    </div>
+                );
+
+            case 'location':
+                return (
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Где ты работаешь?
+                            </label>
+                            <div className="space-y-2">
+                                {[
+                                    { id: 'city', label: 'В моём городе', icon: '🏙️' },
+                                    { id: 'radius', label: 'В радиусе (км)', icon: '📍' },
+                                    { id: 'countrywide', label: 'Вся страна', icon: '🇮🇱' },
+                                    { id: 'online', label: 'Только онлайн', icon: '💻' }
+                                ].map((mode) => (
+                                    <button
+                                        key={mode.id}
+                                        onClick={() => setGig(prev => ({ ...prev, location_mode: mode.id as Gig['location_mode'] }))}
+                                        className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-3 ${gig.location_mode === mode.id
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                : 'border-zinc-200 dark:border-zinc-700'
+                                            }`}
+                                    >
+                                        <span className="text-2xl">{mode.icon}</span>
+                                        <span className="font-medium text-zinc-900 dark:text-white">{mode.label}</span>
+                                        {gig.location_mode === mode.id && <Check className="w-5 h-5 text-blue-500 ml-auto" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        {gig.location_mode !== 'online' && (
+                            <div>
+                                <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                    Базовый город
+                                </label>
+                                <select
+                                    value={gig.base_city || ''}
+                                    onChange={(e) => setGig(prev => ({ ...prev, base_city: e.target.value }))}
+                                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white"
+                                >
+                                    {CITIES.map((city) => (
+                                        <option key={city} value={city}>{city}</option>
+                                    ))}
+                                </select>
+                            </div>
+                        )}
+
+                        {gig.location_mode === 'radius' && (
+                            <div>
+                                <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                    Радиус: {gig.radius_km || 30} км
+                                </label>
+                                <input
+                                    type="range"
+                                    min="10"
+                                    max="150"
+                                    value={gig.radius_km || 30}
+                                    onChange={(e) => setGig(prev => ({ ...prev, radius_km: Number(e.target.value) }))}
+                                    className="w-full"
+                                />
+                            </div>
+                        )}
+                    </div>
+                );
+
+            case 'audience':
+                return (
+                    <div className="space-y-6">
+                        {/* Kids suitable */}
+                        <div className="flex items-center justify-between p-4 bg-zinc-50 dark:bg-zinc-800 rounded-xl">
+                            <div>
+                                <p className="font-bold text-zinc-900 dark:text-white">Подходит для детей</p>
+                                <p className="text-sm text-zinc-500">Семейный контент</p>
+                            </div>
+                            <button
+                                onClick={() => setGig(prev => ({ ...prev, suitable_for_kids: !prev.suitable_for_kids }))}
+                                className={`w-12 h-7 rounded-full transition-all ${gig.suitable_for_kids ? 'bg-blue-600' : 'bg-zinc-300 dark:bg-zinc-600'
+                                    }`}
+                            >
+                                <div className={`w-5 h-5 bg-white rounded-full shadow transition-transform ${gig.suitable_for_kids ? 'translate-x-6' : 'translate-x-1'
+                                    }`} />
+                            </button>
+                        </div>
+
+                        {!gig.suitable_for_kids && (
+                            <div>
+                                <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                    Возрастное ограничение
+                                </label>
+                                <div className="flex gap-2">
+                                    {['16+', '18+'].map((limit) => (
+                                        <button
+                                            key={limit}
+                                            onClick={() => setGig(prev => ({ ...prev, age_limit: limit as Gig['age_limit'] }))}
+                                            className={`flex-1 p-3 rounded-xl border-2 font-bold transition-all ${gig.age_limit === limit
+                                                    ? 'border-red-500 bg-red-50 dark:bg-red-900/20 text-red-600'
+                                                    : 'border-zinc-200 dark:border-zinc-700'
+                                                }`}
+                                        >
+                                            {limit}
+                                        </button>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
+
+                        {/* Event types */}
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Типы мероприятий
+                            </label>
+                            <div className="flex flex-wrap gap-2">
+                                {EVENT_TYPES.map((type) => {
+                                    const selected = (gig.event_types || []).includes(type.id);
+                                    return (
+                                        <button
+                                            key={type.id}
+                                            onClick={() => {
+                                                const types = gig.event_types || [];
+                                                if (selected) {
+                                                    setGig(prev => ({ ...prev, event_types: types.filter(t => t !== type.id) }));
+                                                } else {
+                                                    setGig(prev => ({ ...prev, event_types: [...types, type.id] }));
+                                                }
+                                            }}
+                                            className={`px-3 py-2 rounded-xl border-2 text-sm font-medium transition-all flex items-center gap-1 ${selected
+                                                    ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20 text-blue-600'
+                                                    : 'border-zinc-200 dark:border-zinc-700'
+                                                }`}
+                                        >
+                                            <span>{type.icon}</span>
+                                            {type.label}
+                                        </button>
+                                    );
+                                })}
+                            </div>
+                        </div>
+                    </div>
+                );
+
+            case 'details':
+                return (
+                    <div className="space-y-6">
+                        <div className="grid grid-cols-2 gap-4">
+                            <div>
+                                <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                    <Clock className="w-4 h-4 inline mr-1" />
+                                    Длительность (мин)
+                                </label>
+                                <input
+                                    type="number"
+                                    value={gig.duration_minutes || ''}
+                                    onChange={(e) => setGig(prev => ({ ...prev, duration_minutes: Number(e.target.value) }))}
+                                    placeholder="60"
+                                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl"
+                                />
+                            </div>
+                            <div>
+                                <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                    <Users className="w-4 h-4 inline mr-1" />
+                                    Макс. гостей
+                                </label>
+                                <input
+                                    type="number"
+                                    value={gig.max_guests || ''}
+                                    onChange={(e) => setGig(prev => ({ ...prev, max_guests: Number(e.target.value) }))}
+                                    placeholder="100"
+                                    className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl"
+                                />
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Требования к площадке
+                            </label>
+                            <textarea
+                                value={gig.requirements_text || ''}
+                                onChange={(e) => setGig(prev => ({ ...prev, requirements_text: e.target.value }))}
+                                placeholder="Розетка 220V, стол 2x1м, затемнённое помещение..."
+                                rows={2}
+                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl resize-none"
+                            />
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Что нужно от клиента
+                            </label>
+                            <textarea
+                                value={gig.what_client_needs || ''}
+                                onChange={(e) => setGig(prev => ({ ...prev, what_client_needs: e.target.value }))}
+                                placeholder="Список гостей, плейлист пожеланий, бриф..."
+                                rows={2}
+                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl resize-none"
+                            />
+                        </div>
+                    </div>
+                );
+
+            case 'availability':
+                return (
+                    <div className="space-y-6">
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Как тебя бронировать?
+                            </label>
+                            <div className="space-y-2">
+                                {[
+                                    { id: 'chat', label: 'Написать в чат', desc: 'Клиенты пишут напрямую', icon: '💬' },
+                                    { id: 'request_slot', label: 'Запросить слот', desc: 'Через календарь (скоро)', icon: '📅', disabled: true }
+                                ].map((method) => (
+                                    <button
+                                        key={method.id}
+                                        onClick={() => !method.disabled && setGig(prev => ({ ...prev, booking_method: method.id as Gig['booking_method'] }))}
+                                        disabled={method.disabled}
+                                        className={`w-full p-4 rounded-xl border-2 transition-all flex items-center gap-3 ${gig.booking_method === method.id
+                                                ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
+                                                : method.disabled
+                                                    ? 'border-zinc-100 dark:border-zinc-800 opacity-50'
+                                                    : 'border-zinc-200 dark:border-zinc-700'
+                                            }`}
+                                    >
+                                        <span className="text-2xl">{method.icon}</span>
+                                        <div className="text-left">
+                                            <p className="font-medium text-zinc-900 dark:text-white">{method.label}</p>
+                                            <p className="text-sm text-zinc-500">{method.desc}</p>
+                                        </div>
+                                        {gig.booking_method === method.id && <Check className="w-5 h-5 text-blue-500 ml-auto" />}
+                                    </button>
+                                ))}
+                            </div>
+                        </div>
+
+                        <div>
+                            <label className="block text-sm font-bold mb-2 text-zinc-700 dark:text-zinc-300">
+                                Минимум за сколько дней бронировать?
+                            </label>
+                            <select
+                                value={gig.lead_time_hours || 24}
+                                onChange={(e) => setGig(prev => ({ ...prev, lead_time_hours: Number(e.target.value) }))}
+                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl"
+                            >
+                                <option value={24}>1 день</option>
+                                <option value={48}>2 дня</option>
+                                <option value={72}>3 дня</option>
+                                <option value={168}>1 неделя</option>
+                                <option value={336}>2 недели</option>
+                            </select>
+                        </div>
+                    </div>
+                );
+
+            case 'publish':
+                return (
+                    <div className="space-y-6">
+                        {/* Preview card */}
+                        <div className="bg-white dark:bg-zinc-800 rounded-2xl border border-zinc-200 dark:border-zinc-700 overflow-hidden shadow-lg">
+                            <div className="h-32 bg-gradient-to-br from-blue-500 to-purple-600" />
+                            <div className="p-4">
+                                <h3 className="font-black text-lg text-zinc-900 dark:text-white">{gig.title || 'Название гига'}</h3>
+                                <p className="text-sm text-zinc-500 mt-1">{gig.short_description || 'Описание...'}</p>
+                                <div className="flex items-center gap-2 mt-3">
+                                    <span className="px-2 py-1 bg-blue-100 dark:bg-blue-900/30 text-blue-600 text-xs font-bold rounded-lg">
+                                        {gig.category_id || 'Категория'}
+                                    </span>
+                                    {!gig.is_free && gig.price_amount && (
+                                        <span className="text-sm font-bold text-green-600">
+                                            ₪{gig.price_amount}
+                                        </span>
+                                    )}
+                                </div>
+                            </div>
+                        </div>
+
+                        <p className="text-center text-zinc-500">Как публикуем?</p>
+
+                        {/* Publish options */}
+                        <div className="space-y-3">
+                            <button
+                                onClick={() => handlePublish(false)}
+                                disabled={loading}
+                                className="w-full p-4 bg-blue-600 hover:bg-blue-700 text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                            >
+                                {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : <Globe className="w-5 h-5" />}
+                                Публично в каталоге
+                            </button>
+
+                            <button
+                                onClick={() => handlePublish(true)}
+                                disabled={loading}
+                                className="w-full p-4 bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-900 dark:text-white rounded-2xl font-bold flex items-center justify-center gap-2 transition-all disabled:opacity-50"
+                            >
+                                <Share2 className="w-5 h-5" />
+                                Только по ссылке 🔗
+                            </button>
+                        </div>
+
+                        {/* Share link if unlisted */}
+                        {shareLink && (
+                            <div className="p-4 bg-green-50 dark:bg-green-900/20 border border-green-200 dark:border-green-800 rounded-2xl">
+                                <p className="text-sm font-bold text-green-700 dark:text-green-400 mb-2">
+                                    ✅ Ссылка создана!
+                                </p>
+                                <div className="flex gap-2">
+                                    <input
+                                        type="text"
+                                        value={shareLink}
+                                        readOnly
+                                        className="flex-1 px-3 py-2 bg-white dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-sm"
+                                    />
+                                    <button
+                                        onClick={copyLink}
+                                        className="px-4 py-2 bg-green-600 text-white rounded-xl font-bold flex items-center gap-1"
+                                    >
+                                        {copied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                        {copied ? 'Скопировано' : 'Копировать'}
+                                    </button>
+                                </div>
+                            </div>
+                        )}
+                    </div>
+                );
+
+            default:
+                return null;
+        }
+    };
+
+    // Success screen (after publish)
+    if (currentStep >= GIG_WIZARD_STEPS.length) {
+        return (
+            <div className="fixed inset-0 z-50 bg-white dark:bg-black flex items-center justify-center p-4">
+                <div className="text-center max-w-md">
+                    <div className="w-24 h-24 bg-green-100 dark:bg-green-900/20 rounded-full flex items-center justify-center mx-auto mb-6">
+                        <Check className="w-12 h-12 text-green-500" />
+                    </div>
+                    <h1 className="text-3xl font-black text-zinc-900 dark:text-white mb-3">
+                        Гиг создан! 🎉
+                    </h1>
+                    <p className="text-zinc-500 dark:text-zinc-400 mb-8">
+                        Твоё предложение теперь доступно клиентам
+                    </p>
+                    <div className="flex flex-col gap-3">
+                        <button
+                            onClick={() => router.push(`/gig/${gig.id}`)}
+                            className="w-full py-3 bg-blue-600 text-white rounded-xl font-bold flex items-center justify-center gap-2"
+                        >
+                            <ExternalLink className="w-5 h-5" />
+                            Посмотреть гиг
+                        </button>
+                        <button
+                            onClick={onClose}
+                            className="w-full py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-white rounded-xl font-bold"
+                        >
+                            Готово
+                        </button>
+                    </div>
+                </div>
+            </div>
+        );
+    }
+
+    return (
+        <div className="fixed inset-0 z-50 bg-white dark:bg-black overflow-y-auto">
+            {/* Header */}
+            <div className="sticky top-0 z-10 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800">
+                <div className="flex items-center justify-between px-4 py-3">
+                    <button onClick={onClose} className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl">
+                        <X className="w-6 h-6" />
+                    </button>
+                    <div className="text-center">
+                        <p className="text-xs text-zinc-500">Шаг {currentStep + 1} из {GIG_WIZARD_STEPS.length}</p>
+                        <p className="font-bold text-zinc-900 dark:text-white">{stepConfig.title}</p>
+                    </div>
+                    <div className="w-10" />
+                </div>
+
+                {/* Progress bar */}
+                <div className="h-1 bg-zinc-200 dark:bg-zinc-800">
+                    <div
+                        className="h-full bg-blue-600 transition-all"
+                        style={{ width: `${((currentStep + 1) / GIG_WIZARD_STEPS.length) * 100}%` }}
+                    />
+                </div>
+            </div>
+
+            {/* Content */}
+            <div className="max-w-lg mx-auto px-4 py-6">
+                {/* Step icon and subtitle */}
+                <div className="text-center mb-6">
+                    <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mx-auto mb-3 text-3xl">
+                        {stepConfig.icon}
+                    </div>
+                    <p className="text-zinc-500 dark:text-zinc-400">{stepConfig.subtitle}</p>
+                </div>
+
+                <AnimatePresence mode="wait">
+                    <motion.div
+                        key={currentStep}
+                        initial={{ opacity: 0, x: 20 }}
+                        animate={{ opacity: 1, x: 0 }}
+                        exit={{ opacity: 0, x: -20 }}
+                        transition={{ duration: 0.2 }}
+                    >
+                        {renderStepContent()}
+                    </motion.div>
+                </AnimatePresence>
+            </div>
+
+            {/* Footer navigation */}
+            <div className="fixed bottom-0 inset-x-0 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-t border-zinc-200 dark:border-zinc-800 p-4 safe-area-bottom">
+                <div className="max-w-lg mx-auto flex gap-3">
+                    {currentStep > 0 && (
+                        <button
+                            onClick={handleBack}
+                            className="px-6 py-3 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-white rounded-xl font-bold flex items-center gap-2"
+                        >
+                            <ArrowLeft className="w-5 h-5" />
+                            Назад
+                        </button>
+                    )}
+
+                    {step !== 'publish' && (
+                        <button
+                            onClick={handleNext}
+                            disabled={loading || saving}
+                            className="flex-1 py-3 bg-blue-600 hover:bg-blue-700 text-white rounded-xl font-bold flex items-center justify-center gap-2 disabled:opacity-50"
+                        >
+                            {loading || saving ? (
+                                <Loader2 className="w-5 h-5 animate-spin" />
+                            ) : (
+                                <>
+                                    Далее
+                                    <ArrowRight className="w-5 h-5" />
+                                </>
+                            )}
+                        </button>
+                    )}
+                </div>
+            </div>
+        </div>
+    );
+}
