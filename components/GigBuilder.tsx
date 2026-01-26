@@ -14,9 +14,10 @@ import {
     GIG_STEP_CONFIG, GIG_CATEGORIES, EVENT_TYPES, CITIES
 } from '@/types/gig';
 import { useLanguage } from '@/context/LanguageContext';
+import { toast } from 'sonner';
 
 interface GigBuilderProps {
-    vendorId: string;
+    vendorId?: string;
     ownerId: string;
     onClose: () => void;
     existingGigId?: string;
@@ -33,6 +34,7 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
     const [selectedTemplate, setSelectedTemplate] = useState<GigTemplate | null>(null);
     const [shareLink, setShareLink] = useState<string | null>(null);
     const [copied, setCopied] = useState(false);
+    const [errors, setErrors] = useState<{ [key: string]: boolean }>({});
 
     const lang = (language === 'he') ? 'he' : 'en';
 
@@ -334,15 +336,20 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
 
         if (step === 'title') {
             if (!gig.title || !gig.category_id) {
-                alert(lang === 'en' ? 'Please fill in Title and Category' : 'נא למלא כותרת וקטגוריה');
+                setErrors({
+                    title: !gig.title,
+                    category: !gig.category_id
+                });
+                toast.error(lang === 'en' ? 'Please fill in Title and Category' : 'נא למלא כותרת וקטגוריה');
                 return;
             }
+            setErrors({});
         }
 
         if (step === 'details') {
             // Basic validation check if needed, e.g. price
             if (!gig.is_free && !gig.price_amount) {
-                alert(lang === 'en' ? 'Please set a price amount' : 'נא להגדיר מחיר');
+                toast.error(lang === 'en' ? 'Please set a price amount' : 'נא להגדיר מחיר');
                 return;
             }
         }
@@ -354,7 +361,7 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
             setLoading(false);
 
             if (!newId) {
-                alert('Connection error: Could not create draft. Please try again.');
+                toast.error('Connection error: Could not create draft. Please try again.');
                 return;
             }
         }
@@ -480,7 +487,8 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                                 value={gig.title || ''}
                                 onChange={(e) => setGig(prev => ({ ...prev, title: e.target.value }))}
                                 placeholder={t.placeholderTitle}
-                                className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
+                                className={`w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none ${errors.title ? 'border-red-500 focus:ring-red-500' : 'border-zinc-200 dark:border-zinc-700'
+                                    }`}
                             />
                         </div>
 
@@ -492,10 +500,15 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                                 {GIG_CATEGORIES.map((cat) => (
                                     <button
                                         key={cat.id}
-                                        onClick={() => setGig(prev => ({ ...prev, category_id: cat.id }))}
+                                        onClick={() => {
+                                            setGig(prev => ({ ...prev, category_id: cat.id }));
+                                            if (errors.category) setErrors(prev => ({ ...prev, category: false }));
+                                        }}
                                         className={`p-3 rounded-xl border-2 transition-all flex flex-col items-center gap-1 ${gig.category_id === cat.id
                                             ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
-                                            : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
+                                            : errors.category
+                                                ? 'border-red-300 bg-red-50 dark:bg-red-900/10 hover:border-red-400'
+                                                : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                                             }`}
                                     >
                                         <span className="text-xl">{cat.icon}</span>
