@@ -101,21 +101,11 @@ export default function MyGigsPage() {
 
             <div className="max-w-4xl mx-auto px-4 py-8 md:py-12">
                 {/* Header */}
-                <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4 mb-8">
-                    <div className="flex-1 min-w-0">
-                        <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">Мои гиги</h1>
-                        <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm sm:text-base">
-                            Управляйте своими услугами
-                        </p>
-                    </div>
-                    <button
-                        onClick={() => setShowBuilder(true)}
-                        className="flex items-center justify-center gap-2 px-5 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl transition-all shadow-lg shadow-blue-600/20 whitespace-nowrap"
-                    >
-                        <Plus className="w-5 h-5" />
-                        <span className="hidden sm:inline">Создать гиг</span>
-                        <span className="sm:hidden">Создать</span>
-                    </button>
+                <div className="mb-8">
+                    <h1 className="text-2xl sm:text-3xl font-black text-zinc-900 dark:text-white">Мои гиги</h1>
+                    <p className="text-zinc-500 dark:text-zinc-400 mt-1 text-sm sm:text-base">
+                        Управляйте своими услугами
+                    </p>
                 </div>
 
                 {/* Loading */}
