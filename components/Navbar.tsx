@@ -82,6 +82,7 @@ export default function Navbar() {
             findTalent: 'Find Talent',
             becomeVendor: 'Partner with us',
             dashboard: 'Dashboard',
+            myGigs: 'My Gigs',
             signOut: 'Sign Out',
             signIn: 'Sign In'
         },
@@ -89,6 +90,7 @@ export default function Navbar() {
             findTalent: 'מצא כישרון',
             becomeVendor: 'הפוך לשותף',
             dashboard: 'לוח בקרה',
+            myGigs: 'הגיגים שלי',
             signOut: 'התנתק',
             signIn: 'התחבר'
         },
@@ -164,7 +166,7 @@ export default function Navbar() {
                                     onClick={() => setIsMobileMenuOpen(false)}
                                     className="block w-full p-4 bg-gradient-to-r from-purple-500/10 to-blue-500/10 border border-purple-200 dark:border-purple-500/30 rounded-2xl text-purple-600 dark:text-purple-400 font-semibold text-lg text-center hover:from-purple-500/20 hover:to-blue-500/20 transition-colors"
                                 >
-                                    🎤 Мои гиги
+                                    🎤 {t.myGigs}
                                 </Link>
                                 <button
                                     onClick={handleSignOut}
@@ -345,7 +347,7 @@ export default function Navbar() {
                                                     onClick={() => setShowProfileDropdown(false)}
                                                     className="block px-4 py-2 text-sm text-purple-600 dark:text-purple-400 hover:bg-purple-50 dark:hover:bg-purple-900/20 transition-colors font-medium"
                                                 >
-                                                    🎤 Мои гиги
+                                                    🎤 {t.myGigs}
                                                 </Link>
                                                 <button
                                                     onClick={handleSignOut}

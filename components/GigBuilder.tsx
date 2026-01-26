@@ -326,12 +326,37 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
     };
 
     const handleNext = async () => {
+        // Validation per step
+        if (currentStep === 0) {
+            // Step 0: Type/Template selection
+            // Logic handled by createDraft. If "From Scratch" selectedTemplate is null, which is fine.
+        }
+
+        if (step === 'title') {
+            if (!gig.title || !gig.category_id) {
+                alert(lang === 'en' ? 'Please fill in Title and Category' : 'נא למלא כותרת וקטגוריה');
+                return;
+            }
+        }
+
+        if (step === 'details') {
+            // Basic validation check if needed, e.g. price
+            if (!gig.is_free && !gig.price_amount) {
+                alert(lang === 'en' ? 'Please set a price amount' : 'נא להגדיר מחיר');
+                return;
+            }
+        }
+
         // Create draft on first move from step 0
         if (currentStep === 0 && !gig.id) {
             setLoading(true);
             const newId = await createDraft();
             setLoading(false);
-            if (!newId) return;
+
+            if (!newId) {
+                alert('Connection error: Could not create draft. Please try again.');
+                return;
+            }
         }
 
         // Save current step data
@@ -434,7 +459,7 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                                     <p className="font-bold text-zinc-900 dark:text-white text-sm">{template.name}</p>
                                     {template.suggested_price_min && (
                                         <p className="text-xs text-zinc-500 mt-1">
-                                            {t.startingFrom}₪{template.suggested_price_min}
+                                            {t.startingFrom}{template.suggested_price_min}
                                         </p>
                                     )}
                                 </button>
