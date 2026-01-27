@@ -233,6 +233,89 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
     const step = GIG_WIZARD_STEPS[currentStep] as GigWizardStep;
     const stepConfig = GIG_STEP_CONFIG[step];
 
+    // ================================================
+    // LOCAL STORAGE PERSISTENCE
+    // ================================================
+    const DRAFT_STORAGE_KEY = `gig-draft-${vendorId || 'guest'}`;
+    const [hasDraftRecovery, setHasDraftRecovery] = useState(false);
+    const [recoveredDraft, setRecoveredDraft] = useState<{ gig: Partial<Gig>; step: number; savedAt: string } | null>(null);
+
+    // Save to localStorage on gig changes (debounced)
+    useEffect(() => {
+        if (!gig.title && !gig.short_description && currentStep === 0) return; // Don't save empty drafts
+        if (existingGigId) return; // Don't overwrite if editing existing gig
+
+        const saveTimeout = setTimeout(() => {
+            const draftData = {
+                gig,
+                step: currentStep,
+                savedAt: new Date().toISOString()
+            };
+            try {
+                localStorage.setItem(DRAFT_STORAGE_KEY, JSON.stringify(draftData));
+            } catch (e) {
+                console.warn('Could not save draft to localStorage:', e);
+            }
+        }, 1000); // Debounce 1 second
+
+        return () => clearTimeout(saveTimeout);
+    }, [gig, currentStep, DRAFT_STORAGE_KEY, existingGigId]);
+
+    // Load from localStorage on mount
+    useEffect(() => {
+        if (existingGigId) return; // Don't recover if editing existing
+
+        try {
+            const saved = localStorage.getItem(DRAFT_STORAGE_KEY);
+            if (saved) {
+                const parsed = JSON.parse(saved);
+                // Check if draft is less than 7 days old
+                const savedDate = new Date(parsed.savedAt);
+                const daysSinceSave = (Date.now() - savedDate.getTime()) / (1000 * 60 * 60 * 24);
+
+                if (daysSinceSave < 7 && (parsed.gig.title || parsed.gig.short_description)) {
+                    setRecoveredDraft(parsed);
+                    setHasDraftRecovery(true);
+                } else {
+                    // Clear old draft
+                    localStorage.removeItem(DRAFT_STORAGE_KEY);
+                }
+            }
+        } catch (e) {
+            console.warn('Could not load draft from localStorage:', e);
+        }
+    }, [DRAFT_STORAGE_KEY, existingGigId]);
+
+    // Handle draft recovery
+    const recoverDraft = () => {
+        if (recoveredDraft) {
+            setGig(prev => ({ ...prev, ...recoveredDraft.gig }));
+            setCurrentStep(recoveredDraft.step);
+            setHasDraftRecovery(false);
+            setRecoveredDraft(null);
+            toast.success(lang === 'he' ? 'טיוטה שוחזרה!' : 'Draft recovered!');
+        }
+    };
+
+    const discardDraft = () => {
+        localStorage.removeItem(DRAFT_STORAGE_KEY);
+        setHasDraftRecovery(false);
+        setRecoveredDraft(null);
+    };
+
+    // Clear draft from localStorage after successful publish
+    const clearDraftStorage = () => {
+        try {
+            localStorage.removeItem(DRAFT_STORAGE_KEY);
+        } catch (e) {
+            console.warn('Could not clear draft from localStorage:', e);
+        }
+    };
+
+    // ================================================
+    // TEMPLATES & EXISTING GIG LOADING
+    // ================================================
+
     // Load templates on mount
     useEffect(() => {
         // Mock fetch templates
@@ -392,6 +475,9 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
             const data = await res.json();
 
             if (data.success) {
+                // Clear localStorage draft after successful publish
+                clearDraftStorage();
+
                 if (asUnlisted && data.shareLink) {
                     setShareLink(data.shareLink);
                 } else {
@@ -579,13 +665,142 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                 );
 
             case 'media':
+                // Media upload handlers with retry logic
+                const handleMediaUpload = async (files: FileList | null) => {
+                    if (!files || files.length === 0) return;
+
+                    const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
+                    const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
+                    const MAX_RETRIES = 3;
+
+                    for (let i = 0; i < files.length; i++) {
+                        const file = files[i];
+                        const isVideo = file.type.startsWith('video/');
+                        const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_PHOTO_SIZE;
+
+                        if (file.size > maxSize) {
+                            toast.error(
+                                lang === 'he'
+                                    ? `הקובץ ${file.name} גדול מדי`
+                                    : `File ${file.name} is too large`
+                            );
+                            continue;
+                        }
+
+                        // Add placeholder for progress
+                        const tempId = `temp-${Date.now()}-${i}`;
+                        if (isVideo) {
+                            setGig(prev => ({
+                                ...prev,
+                                videos: [...(prev.videos || []), { url: '', order: (prev.videos?.length || 0), uploading: true, tempId }]
+                            }));
+                        } else {
+                            setGig(prev => ({
+                                ...prev,
+                                photos: [...(prev.photos || []), { url: '', order: (prev.photos?.length || 0), uploading: true, tempId }]
+                            }));
+                        }
+
+                        // Upload with retry
+                        let attempts = 0;
+                        let uploadSuccess = false;
+
+                        while (attempts < MAX_RETRIES && !uploadSuccess) {
+                            try {
+                                const formData = new FormData();
+                                formData.append('file', file);
+
+                                const res = await fetch('/api/upload', {
+                                    method: 'POST',
+                                    body: formData
+                                });
+
+                                if (!res.ok) throw new Error('Upload failed');
+
+                                const data = await res.json();
+
+                                if (data.url) {
+                                    // Update with real URL
+                                    if (isVideo) {
+                                        setGig(prev => ({
+                                            ...prev,
+                                            videos: prev.videos?.map(v =>
+                                                v.tempId === tempId
+                                                    ? { url: data.url, order: v.order, duration: 0 }
+                                                    : v
+                                            ) || []
+                                        }));
+                                    } else {
+                                        setGig(prev => ({
+                                            ...prev,
+                                            photos: prev.photos?.map(p =>
+                                                p.tempId === tempId
+                                                    ? { url: data.url, order: p.order }
+                                                    : p
+                                            ) || []
+                                        }));
+                                    }
+                                    uploadSuccess = true;
+                                }
+                            } catch (error) {
+                                attempts++;
+                                if (attempts >= MAX_RETRIES) {
+                                    // Remove failed upload
+                                    if (isVideo) {
+                                        setGig(prev => ({
+                                            ...prev,
+                                            videos: prev.videos?.filter(v => v.tempId !== tempId) || []
+                                        }));
+                                    } else {
+                                        setGig(prev => ({
+                                            ...prev,
+                                            photos: prev.photos?.filter(p => p.tempId !== tempId) || []
+                                        }));
+                                    }
+                                    toast.error(
+                                        lang === 'he'
+                                            ? `נכשל בהעלאת ${file.name}`
+                                            : `Failed to upload ${file.name}`
+                                    );
+                                } else {
+                                    // Wait before retry
+                                    await new Promise(r => setTimeout(r, 1000 * attempts));
+                                }
+                            }
+                        }
+                    }
+                };
+
+                const removeMedia = (type: 'photo' | 'video', index: number) => {
+                    if (type === 'photo') {
+                        setGig(prev => ({
+                            ...prev,
+                            photos: prev.photos?.filter((_, i) => i !== index) || []
+                        }));
+                    } else {
+                        setGig(prev => ({
+                            ...prev,
+                            videos: prev.videos?.filter((_, i) => i !== index) || []
+                        }));
+                    }
+                };
+
                 return (
                     <div className="space-y-6">
                         <p className="text-zinc-500 dark:text-zinc-400 text-sm">
                             {t.mediaHint}
                         </p>
 
-                        <div className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-2xl p-8 text-center">
+                        <div
+                            className="border-2 border-dashed border-zinc-300 dark:border-zinc-600 rounded-2xl p-8 text-center hover:border-blue-400 transition-colors"
+                            onDragOver={(e) => { e.preventDefault(); e.currentTarget.classList.add('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20'); }}
+                            onDragLeave={(e) => { e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20'); }}
+                            onDrop={(e) => {
+                                e.preventDefault();
+                                e.currentTarget.classList.remove('border-blue-500', 'bg-blue-50', 'dark:bg-blue-900/20');
+                                handleMediaUpload(e.dataTransfer.files);
+                            }}
+                        >
                             <div className="w-16 h-16 bg-zinc-100 dark:bg-zinc-800 rounded-full flex items-center justify-center mx-auto mb-4">
                                 <Upload className="w-8 h-8 text-zinc-400" />
                             </div>
@@ -598,16 +813,67 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                             <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 text-white rounded-xl font-bold cursor-pointer hover:bg-blue-700 transition-all">
                                 <Camera className="w-4 h-4" />
                                 {t.selectFiles}
-                                <input type="file" className="hidden" accept="image/*,video/*" multiple />
+                                <input
+                                    type="file"
+                                    className="hidden"
+                                    accept="image/*,video/*"
+                                    multiple
+                                    onChange={(e) => handleMediaUpload(e.target.files)}
+                                />
                             </label>
                         </div>
 
-                        {/* Preview grid - placeholder */}
-                        {(gig.photos?.length || gig.videos?.length) ? (
+                        {/* Preview grid */}
+                        {((gig.photos?.length || 0) > 0 || (gig.videos?.length || 0) > 0) && (
                             <div className="grid grid-cols-3 gap-2">
-                                {/* Media items would render here */}
+                                {/* Photos */}
+                                {gig.photos?.map((photo, idx) => (
+                                    <div key={`photo-${idx}`} className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 group">
+                                        {photo.uploading ? (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                                            </div>
+                                        ) : photo.url ? (
+                                            <>
+                                                <Image src={photo.url} alt="" fill className="object-cover" />
+                                                <button
+                                                    onClick={() => removeMedia('photo', idx)}
+                                                    className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <Trash2 className="w-3 h-3" />
+                                                </button>
+                                                <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/50 rounded text-white text-xs">
+                                                    📷
+                                                </div>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                ))}
+                                {/* Videos */}
+                                {gig.videos?.map((video, idx) => (
+                                    <div key={`video-${idx}`} className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 group">
+                                        {video.uploading ? (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <Loader2 className="w-6 h-6 text-blue-600 animate-spin" />
+                                            </div>
+                                        ) : video.url ? (
+                                            <>
+                                                <video src={video.url} className="w-full h-full object-cover" muted />
+                                                <button
+                                                    onClick={() => removeMedia('video', idx)}
+                                                    className="absolute top-1 right-1 p-1.5 bg-red-500 text-white rounded-lg opacity-0 group-hover:opacity-100 transition-opacity"
+                                                >
+                                                    <Trash2 className="w-3 h-3" />
+                                                </button>
+                                                <div className="absolute bottom-1 left-1 px-1.5 py-0.5 bg-black/50 rounded text-white text-xs flex items-center gap-1">
+                                                    <Video className="w-3 h-3" />
+                                                </div>
+                                            </>
+                                        ) : null}
+                                    </div>
+                                ))}
                             </div>
-                        ) : null}
+                        )}
                     </div>
                 );
 
@@ -1061,6 +1327,45 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
 
     return (
         <div className="fixed inset-0 z-50 bg-white dark:bg-black overflow-y-auto">
+            {/* Draft Recovery Modal */}
+            {hasDraftRecovery && recoveredDraft && (
+                <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
+                    <motion.div
+                        initial={{ opacity: 0, scale: 0.95 }}
+                        animate={{ opacity: 1, scale: 1 }}
+                        className="bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-sm w-full shadow-2xl"
+                    >
+                        <div className="w-16 h-16 bg-blue-100 dark:bg-blue-900/20 rounded-2xl flex items-center justify-center mx-auto mb-4">
+                            <Sparkles className="w-8 h-8 text-blue-600" />
+                        </div>
+                        <h3 className="text-xl font-black text-center text-zinc-900 dark:text-white mb-2">
+                            {lang === 'he' ? 'נמצאה טיוטה שמורה!' : 'Unsaved Draft Found!'}
+                        </h3>
+                        <p className="text-center text-zinc-500 mb-1">
+                            {recoveredDraft.gig.title || (lang === 'he' ? 'ללא כותרת' : 'Untitled')}
+                        </p>
+                        <p className="text-center text-xs text-zinc-400 mb-6">
+                            {lang === 'he' ? 'נשמר ב-' : 'Saved '}
+                            {new Date(recoveredDraft.savedAt).toLocaleDateString()}
+                        </p>
+                        <div className="flex gap-3">
+                            <button
+                                onClick={discardDraft}
+                                className="flex-1 py-3 px-4 bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 rounded-xl font-bold transition-all hover:bg-zinc-200 dark:hover:bg-zinc-700"
+                            >
+                                {lang === 'he' ? 'התחל מחדש' : 'Start Fresh'}
+                            </button>
+                            <button
+                                onClick={recoverDraft}
+                                className="flex-1 py-3 px-4 bg-blue-600 text-white rounded-xl font-bold transition-all hover:bg-blue-700"
+                            >
+                                {lang === 'he' ? 'שחזר' : 'Recover'}
+                            </button>
+                        </div>
+                    </motion.div>
+                </div>
+            )}
+
             {/* Header */}
             <div className="sticky top-0 z-10 bg-white/80 dark:bg-black/80 backdrop-blur-xl border-b border-zinc-200 dark:border-zinc-800">
                 <div className="flex items-center justify-between px-4 py-3">

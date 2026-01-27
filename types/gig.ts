@@ -4,6 +4,9 @@ export interface GigPhoto {
     url: string;
     order: number;
     type?: string;
+    // Upload state (client-side only)
+    uploading?: boolean;
+    tempId?: string;
 }
 
 export interface GigVideo {
@@ -11,6 +14,9 @@ export interface GigVideo {
     duration?: number;
     order: number;
     thumbnail?: string;
+    // Upload state (client-side only)
+    uploading?: boolean;
+    tempId?: string;
 }
 
 export interface GigAddon {
