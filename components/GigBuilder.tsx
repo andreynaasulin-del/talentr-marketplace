@@ -15,6 +15,7 @@ import {
 } from '@/types/gig';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
+import { compressImage, validateVideo } from '@/lib/imageCompression';
 
 interface GigBuilderProps {
     vendorId?: string;
@@ -665,25 +666,45 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                 );
 
             case 'media':
-                // Media upload handlers with retry logic
+                // Media upload handlers with compression and retry logic
                 const handleMediaUpload = async (files: FileList | null) => {
                     if (!files || files.length === 0) return;
 
-                    const MAX_PHOTO_SIZE = 5 * 1024 * 1024; // 5MB
-                    const MAX_VIDEO_SIZE = 50 * 1024 * 1024; // 50MB
                     const MAX_RETRIES = 3;
 
                     for (let i = 0; i < files.length; i++) {
-                        const file = files[i];
+                        let file = files[i];
                         const isVideo = file.type.startsWith('video/');
-                        const maxSize = isVideo ? MAX_VIDEO_SIZE : MAX_PHOTO_SIZE;
 
-                        if (file.size > maxSize) {
-                            toast.error(
-                                lang === 'he'
-                                    ? `הקובץ ${file.name} גדול מדי`
-                                    : `File ${file.name} is too large`
-                            );
+                        // Validate and process file
+                        if (isVideo) {
+                            const validation = await validateVideo(file);
+                            if (!validation.valid) {
+                                toast.error(validation.error || 'Invalid video');
+                                continue;
+                            }
+                        } else if (file.type.startsWith('image/')) {
+                            // Compress image before upload
+                            try {
+                                toast.loading(
+                                    lang === 'he' ? `מכווץ ${file.name}...` : `Compressing ${file.name}...`,
+                                    { id: `compress-${i}` }
+                                );
+                                file = await compressImage(file, {
+                                    maxWidth: 1920,
+                                    maxHeight: 1080,
+                                    quality: 0.85,
+                                    outputType: 'image/webp',
+                                    maxSizeMB: 2
+                                });
+                                toast.dismiss(`compress-${i}`);
+                            } catch (err) {
+                                console.error('Compression failed:', err);
+                                toast.dismiss(`compress-${i}`);
+                                // Continue with original file if compression fails
+                            }
+                        } else {
+                            toast.error(lang === 'he' ? 'סוג קובץ לא נתמך' : 'Unsupported file type');
                             continue;
                         }
 
@@ -715,7 +736,10 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                                     body: formData
                                 });
 
-                                if (!res.ok) throw new Error('Upload failed');
+                                if (!res.ok) {
+                                    const errorData = await res.json().catch(() => ({}));
+                                    throw new Error(errorData.error || 'Upload failed');
+                                }
 
                                 const data = await res.json();
 

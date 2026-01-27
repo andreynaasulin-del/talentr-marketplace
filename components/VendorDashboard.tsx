@@ -13,6 +13,7 @@ import { Gig } from '@/types/gig';
 import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import GigBuilder from './GigBuilder';
+import { compressImage } from '@/lib/imageCompression';
 
 interface Vendor {
     id: string;
@@ -50,6 +51,7 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
     const [copied, setCopied] = useState(false);
     const [editingProfile, setEditingProfile] = useState(false);
     const [saving, setSaving] = useState(false);
+    const [uploadingAvatar, setUploadingAvatar] = useState(false);
 
     // Form state for profile editing
     const [formData, setFormData] = useState({
@@ -173,6 +175,40 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
         setCopied(true);
         toast.success(t.copied);
         setTimeout(() => setCopied(false), 2000);
+    };
+
+    const handleAvatarUpload = async (e: React.ChangeEvent<HTMLInputElement>) => {
+        const file = e.target.files?.[0];
+        if (!file) return;
+
+        setUploadingAvatar(true);
+        try {
+            // Compress image before upload
+            const compressedFile = await compressImage(file, {
+                maxWidth: 400,
+                maxHeight: 400,
+                quality: 0.9,
+                outputType: 'image/webp'
+            });
+
+            const formData = new FormData();
+            formData.append('file', compressedFile);
+
+            const res = await fetch('/api/upload', {
+                method: 'POST',
+                body: formData
+            });
+
+            if (!res.ok) throw new Error('Upload failed');
+
+            const data = await res.json();
+            setFormData(prev => ({ ...prev, avatar_url: data.url }));
+            toast.success(lang === 'he' ? 'התמונה עודכנה!' : 'Photo updated!');
+        } catch (error) {
+            toast.error(lang === 'he' ? 'שגיאה בהעלאת תמונה' : 'Error uploading photo');
+        } finally {
+            setUploadingAvatar(false);
+        }
     };
 
     const getStatusBadge = (status: Gig['status']) => {
@@ -304,6 +340,42 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                                     </div>
                                 )}
                             </div>
+
+                            {/* Avatar upload section */}
+                            {editingProfile && (
+                                <div className="flex items-center gap-4 mb-6 p-4 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
+                                    <div className="relative w-20 h-20 rounded-full overflow-hidden bg-zinc-200 dark:bg-zinc-800 flex-shrink-0">
+                                        {formData.avatar_url ? (
+                                            <Image src={formData.avatar_url} alt="Avatar" fill className="object-cover" />
+                                        ) : (
+                                            <div className="w-full h-full flex items-center justify-center">
+                                                <User className="w-8 h-8 text-zinc-400" />
+                                            </div>
+                                        )}
+                                        {uploadingAvatar && (
+                                            <div className="absolute inset-0 bg-black/50 flex items-center justify-center">
+                                                <Loader2 className="w-6 h-6 text-white animate-spin" />
+                                            </div>
+                                        )}
+                                    </div>
+                                    <div className="flex-1">
+                                        <label className="inline-flex items-center gap-2 px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-medium rounded-xl cursor-pointer transition-colors">
+                                            <Camera className="w-4 h-4" />
+                                            {lang === 'he' ? 'החלף תמונה' : 'Change Photo'}
+                                            <input
+                                                type="file"
+                                                accept="image/*"
+                                                className="hidden"
+                                                onChange={handleAvatarUpload}
+                                                disabled={uploadingAvatar}
+                                            />
+                                        </label>
+                                        <p className="text-xs text-zinc-500 mt-1">
+                                            {lang === 'he' ? 'JPG, PNG עד 5MB' : 'JPG, PNG up to 5MB'}
+                                        </p>
+                                    </div>
+                                </div>
+                            )}
 
                             {/* Profile fields */}
                             <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
