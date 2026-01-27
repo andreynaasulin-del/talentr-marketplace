@@ -323,24 +323,24 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
         setTemplates([
             {
                 id: 'dj-set',
-                name: lang === 'he' ? 'DJ Set' : 'DJ Set',
+                name: lang === 'he' ? 'DJ / תקליטן' : 'DJ Set',
                 category_id: 'DJ',
                 icon: '🎧',
                 description_blocks: [],
                 required_fields: ['short_description', 'duration_minutes'],
-                suggested_tags: ['wedding', 'party'],
+                suggested_tags: lang === 'he' ? ['חתונה', 'מסיבה', 'אירוע'] : ['wedding', 'party', 'event'],
                 suggested_price_min: 2000,
                 is_active: true,
                 sort_order: 1
             },
             {
                 id: 'photographer',
-                name: lang === 'he' ? 'Photographer' : 'Photographer',
+                name: lang === 'he' ? 'צלם אירועים' : 'Event Photographer',
                 category_id: 'Photographer',
                 icon: '📸',
                 description_blocks: [],
                 required_fields: ['short_description'],
-                suggested_tags: ['wedding', 'event'],
+                suggested_tags: lang === 'he' ? ['חתונה', 'בוק', 'אירוע עסקי'] : ['wedding', 'photoshoot', 'corporate'],
                 suggested_price_min: 1000,
                 is_active: true,
                 sort_order: 2
