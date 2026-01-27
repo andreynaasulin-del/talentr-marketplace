@@ -252,11 +252,14 @@ export default function EditVendorPage() {
     // ==================
     if (mode === 'dashboard' && vendor) {
         return (
-            <VendorDashboard
-                vendor={vendor}
-                editToken={editToken}
-                onLogout={() => router.push('/')}
-            />
+            <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">
+                <Navbar />
+                <VendorDashboard
+                    vendor={vendor}
+                    editToken={editToken}
+                    onLogout={() => router.push('/')}
+                />
+            </div>
         );
     }
 
