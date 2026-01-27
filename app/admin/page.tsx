@@ -24,6 +24,7 @@ const translations = {
         dashboard: 'Dashboard',
         pending: 'Pending',
         vendors: 'Vendors',
+        gigs: 'Gigs',
         archive: 'Archive',
         settings: 'Settings',
 
@@ -31,7 +32,7 @@ const translations = {
         archiveTitle: 'Archive',
         archiveDescription: 'Hidden test profiles and inactive vendors',
         moveToArchive: 'Move to Archive',
-        restoreFromArchive: 'Restore from Archive',
+        restoreFromArchive: 'Restore From Archive',
         noArchivedProfiles: 'No archived profiles',
         archiveConfirm: 'Are you sure you want to archive this vendor?',
         unarchiveConfirm: 'Restore this vendor from archive?',
@@ -151,148 +152,191 @@ const translations = {
         quickInviteDesc: 'Only name, talent fills the rest',
         enterNameOrInsta: 'Name or Instagram',
         getInviteLink: 'Get Link',
+
+        // Gigs
+        gigsTitle: 'All Gigs',
+        gigsSubtitle: 'Vendor gigs moderation',
+        refresh: 'Refresh',
+        filterAll: 'All',
+        filterPending: 'Pending',
+        filterApproved: 'Approved',
+        filterRejected: 'Rejected',
+        noGigs: 'No gigs yet',
+        noGigsDesc: 'When vendors create gigs, they will appear here.',
+        openBuilder: 'Open Gig Builder',
+        statusDraft: 'Draft',
+        statusPublished: 'Published',
+        statusUnlisted: 'Unlisted',
+        statusArchived: 'Archived',
+        approve: 'Approve',
+        reject: 'Reject',
+        reset: 'Reset',
+        view: 'View',
+        loading: 'Loading...'
     },
-    ru: {
+    he: {
         // Header
-        adminTitle: 'Talentr Admin',
-        toSite: 'На сайт',
-        logout: 'Выход',
+        adminTitle: 'ניהול Talentr',
+        toSite: 'לאתר',
+        logout: 'התנתק',
 
         // Tabs
-        dashboard: 'Дашборд',
-        pending: 'Ожидание',
-        vendors: 'Вендоры',
-        archive: 'Архив',
-        settings: 'Настройки',
+        dashboard: 'לוח בקרה',
+        pending: 'ממתינים',
+        vendors: 'ספקים',
+        gigs: 'גיגים',
+        archive: 'ארכיון',
+        settings: 'הגדרות',
 
         // Archive
-        archiveTitle: 'Архив',
-        archiveDescription: 'Скрытые тестовые профили и неактивные вендоры',
-        moveToArchive: 'В архив',
-        restoreFromArchive: 'Восстановить из архива',
-        noArchivedProfiles: 'В архиве нет профилей',
-        archiveConfirm: 'Вы уверены, что хотите архивировать этого вендора?',
-        unarchiveConfirm: 'Восстановить вендора из архива?',
+        archiveTitle: 'ארכיון',
+        archiveDescription: 'פרופילים מוסתרים וספקים לא פעילים',
+        moveToArchive: 'העבר לארכיון',
+        restoreFromArchive: 'שחזר מהארכיון',
+        noArchivedProfiles: 'אין פרופילים בארכיון',
+        archiveConfirm: 'האם אתה בטוח שברצונך להעביר ספק זה לארכיון?',
+        unarchiveConfirm: 'לשחזר ספק זה מהארכיון?',
 
         // Stats
-        totalVendors: 'Всего вендоров',
-        active: 'Активных',
-        pendingCount: 'Ожидающих',
-        invited: 'Приглашено',
-        confirmedThisMonth: 'Подтв. за месяц',
-        bookings: 'Бронирований',
+        totalVendors: 'סה״כ ספקים',
+        active: 'פעילים',
+        pendingCount: 'ממתינים',
+        invited: 'הוזמנו',
+        confirmedThisMonth: 'אושר החודש',
+        bookings: 'הזמנות',
 
         // Quick Actions
-        quickActions: 'Быстрые действия',
-        addTalent: 'Добавить таланта',
-        createPreliminaryProfile: 'Создать предварительный профиль',
-        sendInvitations: 'Отправить приглашения',
-        awaiting: 'ожидают',
-        profiles: 'профилей',
+        quickActions: 'פעולות מהירות',
+        addTalent: 'הוסף טאלנט',
+        createPreliminaryProfile: 'צור פרופיל ראשוני',
+        sendInvitations: 'שלח הזמנות',
+        awaiting: 'ממתינים',
+        profiles: 'פרופילים',
 
         // Filters
-        searchPlaceholder: 'Поиск по имени, email, Instagram...',
-        searchVendors: 'Поиск вендоров...',
-        allStatuses: 'Все статусы',
-        statusPending: 'Ожидает',
-        statusInvited: 'Приглашён',
-        statusViewed: 'Просмотрел',
-        statusConfirmed: 'Подтверждён',
-        statusDeclined: 'Отклонено',
-        allCategories: 'Все категории',
+        searchPlaceholder: 'חיפוש לפי שם, אימייל, אינסטגרם...',
+        searchVendors: 'חפש ספקים...',
+        allStatuses: 'כל הסטטוסים',
+        statusPending: 'ממתין',
+        statusInvited: 'הוזמן',
+        statusViewed: 'נצפה',
+        statusConfirmed: 'מאושר',
+        statusDeclined: 'נדחה',
+        allCategories: 'כל הקטגוריות',
 
         // Categories
-        catPhotographer: 'Фотограф',
-        catVideographer: 'Видеограф',
-        catDJ: 'DJ',
-        catMC: 'Ведущий',
-        catSinger: 'Певец',
-        catMusician: 'Музыкант',
-        catDancer: 'Танцор',
-        catModel: 'Модель',
-        catInfluencer: 'Блогер',
-        catOther: 'Другое',
+        catPhotographer: 'צלם',
+        catVideographer: 'צלם וידאו',
+        catDJ: 'די-ג׳יי',
+        catMC: 'מנחה',
+        catSinger: 'זמר',
+        catMusician: 'מוזיקאי',
+        catDancer: 'רקדן',
+        catModel: 'דוגמן',
+        catInfluencer: 'משפיען',
+        catOther: 'אחר',
 
         // Pending list
-        noPendingProfiles: 'Нет ожидающих профилей',
-        createFirst: 'Создать первый',
-        created: 'Создан',
-        followers: 'подписчиков',
-        copyLink: 'Скопировать ссылку',
-        send: 'Отправить',
-        linkCopied: 'Ссылка скопирована!',
-        messageCopied: 'Сообщение скопировано! ✓',
+        noPendingProfiles: 'אין פרופילים ממתינים',
+        createFirst: 'צור ראשון',
+        created: 'נוצר',
+        followers: 'עוקבים',
+        copyLink: 'העתק קישור',
+        send: 'שלח',
+        linkCopied: 'הקישור הועתק!',
+        messageCopied: 'ההודעה הועתקה! ✓',
 
         // Vendors
-        activeStatus: 'Активен',
-        inactiveStatus: 'Неактивен',
-        reviews: 'отзывов',
-        openProfile: 'Открыть профиль',
+        activeStatus: 'פעיל',
+        inactiveStatus: 'לא פעיל',
+        reviews: 'ביקורות',
+        openProfile: 'פתח פרופיל',
 
         // Pagination
-        back: 'Назад',
-        next: 'Далее',
-        page: 'Страница',
-        of: 'из',
+        back: 'הקודם',
+        next: 'הבא',
+        page: 'עמוד',
+        of: 'מתוך',
 
         // Create form
-        createTalentProfile: 'Создать профиль таланта',
-        fillBasedOn: 'Заполните данные на основе Instagram или Google',
-        source: 'Источник',
-        sourceUrl: 'URL источника',
-        manualEntry: 'Ручной ввод',
-        nameTitle: 'Имя / Название',
-        namePlaceholder: 'Имя таланта или название бизнеса',
-        category: 'Категория',
-        selectCategory: 'Выберите категорию',
-        city: 'Город',
-        selectCity: 'Выберите город',
-        phoneWhatsApp: 'Телефон (WhatsApp)',
-        optional: '(опционально)',
-        profilePhotoUrl: 'URL фото профиля',
-        descriptionBio: 'Описание (из био)',
-        copyDescriptionPlaceholder: 'Скопируйте описание из профиля...',
-        creating: 'Создание...',
-        createAndGetLink: 'Создать и получить ссылку',
-        profileCreated: '✓ Профиль создан! Ссылка для подтверждения:',
+        createTalentProfile: 'יצירת פרופיל טאלנט',
+        fillBasedOn: 'מלא פרטים על בסיס אינסטגרם או גוגל',
+        source: 'מקור',
+        sourceUrl: 'כתובת מקור',
+        manualEntry: 'הזנה ידנית',
+        nameTitle: 'שם / כותרת',
+        namePlaceholder: 'שם הטאלנט או העסק',
+        category: 'קטגוריה',
+        selectCategory: 'בחר קטגוריה',
+        city: 'עיר',
+        selectCity: 'בחר עיר',
+        phoneWhatsApp: 'טלפון (וואטסאפ)',
+        optional: '(אופציונלי)',
+        profilePhotoUrl: 'כתובת תמונת פרופיל',
+        descriptionBio: 'תיאור (מהביו)',
+        copyDescriptionPlaceholder: 'העתק תיאור מהפרופיל...',
+        creating: 'יוצר...',
+        createAndGetLink: 'צור וקבל קישור',
+        profileCreated: '✓ הפרופיל נוצר! קישור לאישור:',
 
         // Access denied
-        accessDenied: 'Доступ запрещён',
-        noAdminRights: 'У вас нет прав администратора',
+        accessDenied: 'הגישה נדחתה',
+        noAdminRights: 'אין לך הרשאות ניהול',
 
         // Actions & UI
-        edit: 'Редактировать',
-        delete: 'Удалить',
-        save: 'Сохранить',
-        cancel: 'Отменить',
-        actions: 'Действия',
-        confirmDelete: 'Вы уверены, что хотите удалить этот профиль?',
-        verified: 'Верифицирован',
-        featured: 'В топе',
-        status: 'Статус',
-        saveChanges: 'Сохранить изменения',
-        profileDetails: 'Детали профиля',
+        edit: 'ערוך',
+        delete: 'מחק',
+        save: 'שמור',
+        cancel: 'ביטול',
+        actions: 'פעולות',
+        confirmDelete: 'האם אתה בטוח שברצונך למחוק פרופיל זה?',
+        verified: 'מאומת',
+        featured: 'מודגש',
+        status: 'סטטוס',
+        saveChanges: 'שמור שינויים',
+        profileDetails: 'פרטי פרופיל',
 
         // Invite modal
-        inviteModalTitle: 'Отправить приглашение',
-        inviteReady: 'Сообщение готово!',
-        inviteVia: 'Отправить через',
-        copyMessageBtn: 'Скопировать сообщение',
-        openInstagramDM: 'Открыть Instagram DM',
-        openWhatsApp: 'Открыть WhatsApp',
-        copyEmail: 'Скопировать для Email',
-        inviteCopied: 'Приглашение скопировано!',
-        close: 'Закрыть',
+        inviteModalTitle: 'שלח הזמנה',
+        inviteReady: 'ההודעה מוכנה!',
+        inviteVia: 'שלח דרך',
+        copyMessageBtn: 'העתק הודעה',
+        openInstagramDM: 'פתח אינסטגרם DM',
+        openWhatsApp: 'פתח וואטסאפ',
+        copyEmail: 'העתק לאימייל',
+        inviteCopied: 'ההזמנה הועתקה ללוח!',
+        close: 'סגור',
 
         // Quick Invite
-        quickInvite: '⚡️ Экспресс инвайт',
-        quickInviteDesc: 'Только имя, остальное заполнит талант',
-        enterNameOrInsta: 'Имя или Instagram',
-        getInviteLink: 'Получить ссылку',
+        quickInvite: '⚡️ הזמנה מהירה',
+        quickInviteDesc: 'רק שם, הטאלנט ימלא את השאר',
+        enterNameOrInsta: 'שם או אינסטגרם',
+        getInviteLink: 'קבל קישור',
+
+        // Gigs
+        gigsTitle: 'כל הגיגים',
+        gigsSubtitle: 'ניהול גיגים של ספקים',
+        refresh: 'רענן',
+        filterAll: 'הכל',
+        filterPending: 'ממתינים',
+        filterApproved: 'מאושרים',
+        filterRejected: 'נדחים',
+        noGigs: 'אין עדיין גיגים',
+        noGigsDesc: 'כאשר ספקים יצרו גיגים, הם יופיעו כאן.',
+        openBuilder: 'פתח בונה גיגים',
+        statusDraft: 'טיוטה',
+        statusPublished: 'פורסם',
+        statusUnlisted: 'לא רשום',
+        statusArchived: 'בארכיון',
+        approve: 'אשר',
+        reject: 'דחה',
+        reset: 'אפס',
+        view: 'צפה',
+        loading: 'טוען...'
     }
 };
 
-type Lang = 'en' | 'ru';
+type Lang = 'en' | 'he';
 
 interface PendingVendor {
     id: string;
@@ -359,20 +403,20 @@ export default function AdminPage() {
     const [isSaving, setIsSaving] = useState(false);
 
     // Language state
-    const [lang, setLang] = useState<Lang>('ru');
+    const [lang, setLang] = useState<Lang>('he');
     const t = translations[lang];
 
     // Load saved language preference
     useEffect(() => {
         const savedLang = localStorage.getItem('adminLang') as Lang;
-        if (savedLang && (savedLang === 'en' || savedLang === 'ru')) {
+        if (savedLang && (savedLang === 'en' || savedLang === 'he')) {
             setLang(savedLang);
         }
     }, []);
 
     // Save language preference
     const toggleLanguage = () => {
-        const newLang = lang === 'ru' ? 'en' : 'ru';
+        const newLang = lang === 'he' ? 'en' : 'he';
         setLang(newLang);
         localStorage.setItem('adminLang', newLang);
     };
@@ -1078,7 +1122,7 @@ Talentr Team`;
                                 title="Switch language"
                             >
                                 <Languages className="w-4 h-4" />
-                                <span className="hidden md:inline">{lang === 'ru' ? 'RU' : 'EN'}</span>
+                                <span className="hidden md:inline">{lang === 'he' ? 'HE' : 'EN'}</span>
                             </button>
                             <button
                                 onClick={() => { fetchStats(); fetchPending(); fetchVendors(); }}
@@ -1329,7 +1373,7 @@ Talentr Team`;
                                                             </div>
 
                                                             <p className="text-[10px] text-zinc-400 mt-2 font-medium">
-                                                                {t.created.toUpperCase()}: {new Date(pending.created_at).toLocaleDateString(lang === 'ru' ? 'ru-RU' : 'en-US')}
+                                                                {t.created.toUpperCase()}: {new Date(pending.created_at).toLocaleDateString(lang === 'he' ? 'he-IL' : 'en-US')}
                                                             </p>
                                                         </div>
 
@@ -1602,36 +1646,33 @@ Talentr Team`;
                         <div className="mt-6">
                             <div className="flex items-center justify-between mb-6">
                                 <div>
-                                    <h2 className="text-2xl font-black text-zinc-900 dark:text-white">
-                                        {lang === 'ru' ? 'Все гиги' : 'All Gigs'}
-                                    </h2>
-                                    <p className="text-zinc-500 text-sm">
-                                        {lang === 'ru' ? 'Модерация гигов вендоров' : 'Vendor gigs moderation'}
-                                    </p>
+                                    <h2 className="text-xl font-bold dark:text-white">{t.gigsTitle}</h2>
+                                    <p className="text-zinc-500 text-sm">{t.gigsSubtitle}</p>
                                 </div>
                                 <button
                                     onClick={fetchGigs}
-                                    className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-sm font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
+                                    className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-xl transition-colors text-zinc-500"
+                                    title={t.refresh}
                                 >
-                                    {lang === 'ru' ? 'Обновить' : 'Refresh'}
+                                    <RefreshCw className={`w-5 h-5 ${gigsLoading ? 'animate-spin' : ''}`} />
                                 </button>
                             </div>
 
-                            {/* Filter tabs */}
-                            <div className="flex gap-2 mb-6 flex-wrap">
+                            {/* Filter Tabs */}
+                            <div className="flex items-center gap-2 p-1 bg-zinc-100 dark:bg-zinc-800/50 rounded-xl mb-6 w-fit">
                                 {(['all', 'pending', 'approved', 'rejected'] as const).map((filter) => (
                                     <button
                                         key={filter}
                                         onClick={() => setGigsFilter(filter)}
-                                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${gigsFilter === filter
-                                            ? 'bg-purple-600 text-white'
-                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                                        className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${gigsFilter === filter
+                                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
+                                                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
                                             }`}
                                     >
-                                        {filter === 'all' && (lang === 'ru' ? 'Все' : 'All')}
-                                        {filter === 'pending' && (lang === 'ru' ? 'На модерации' : 'Pending')}
-                                        {filter === 'approved' && (lang === 'ru' ? 'Одобрены' : 'Approved')}
-                                        {filter === 'rejected' && (lang === 'ru' ? 'Отклонены' : 'Rejected')}
+                                        {filter === 'all' && t.filterAll}
+                                        {filter === 'pending' && t.filterPending}
+                                        {filter === 'approved' && t.filterApproved}
+                                        {filter === 'rejected' && t.filterRejected}
                                     </button>
                                 ))}
                             </div>
@@ -1639,15 +1680,15 @@ Talentr Team`;
                             {/* Gigs list */}
                             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
                                 {gigsLoading ? (
-                                    <div className="p-12 text-center">
-                                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-500 mb-4" />
-                                        <p className="text-zinc-500">{lang === 'ru' ? 'Загрузка...' : 'Loading...'}</p>
+                                    <div className="flex flex-col items-center justify-center py-12 text-center bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                                        <Loader2 className="w-8 h-8 text-blue-600 animate-spin mb-4" />
+                                        <p className="text-zinc-500">{t.loading}</p>
                                     </div>
                                 ) : adminGigs.length === 0 ? (
                                     <div className="p-12 text-center">
                                         <Sparkles className="w-12 h-12 text-purple-500 mx-auto mb-4" />
                                         <p className="text-zinc-500 font-medium">
-                                            {lang === 'ru' ? 'Гигов пока нет' : 'No gigs yet'}
+                                            {t.noGigs}
                                         </p>
                                     </div>
                                 ) : (
@@ -1696,35 +1737,38 @@ Talentr Team`;
                                                     <a
                                                         href={`/g/${gig.share_slug}`}
                                                         target="_blank"
-                                                        className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
-                                                        title={lang === 'ru' ? 'Открыть' : 'View'}
+                                                        rel="noopener noreferrer"
+                                                        className="p-2 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors text-zinc-500 hover:text-blue-600"
+                                                        title={t.view}
                                                     >
-                                                        <ExternalLink className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                                                        <ExternalLink className="w-5 h-5" />
                                                     </a>
+
                                                     {gig.moderation_status === 'pending' && (
                                                         <>
                                                             <button
                                                                 onClick={() => moderateGig(gig.id, 'approved')}
-                                                                className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400 transition-colors"
-                                                                title={lang === 'ru' ? 'Одобрить' : 'Approve'}
+                                                                className="p-2 hover:bg-green-50 dark:hover:bg-green-900/20 rounded-lg transition-colors text-zinc-400 hover:text-green-600"
+                                                                title={t.approve}
                                                             >
-                                                                <Check className="w-4 h-4" />
+                                                                <Check className="w-5 h-5" />
                                                             </button>
                                                             <button
                                                                 onClick={() => moderateGig(gig.id, 'rejected')}
-                                                                className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 transition-colors"
-                                                                title={lang === 'ru' ? 'Отклонить' : 'Reject'}
+                                                                className="p-2 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition-colors text-zinc-400 hover:text-red-600"
+                                                                title={t.reject}
                                                             >
-                                                                <X className="w-4 h-4" />
+                                                                <X className="w-5 h-5" />
                                                             </button>
                                                         </>
                                                     )}
+
                                                     {gig.moderation_status !== 'pending' && (
                                                         <button
                                                             onClick={() => moderateGig(gig.id, 'pending')}
-                                                            className="px-3 py-1 text-xs font-medium rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 transition-colors"
+                                                            className="px-3 py-1 text-xs font-medium bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 rounded-lg transition-colors"
                                                         >
-                                                            {lang === 'ru' ? 'На модерацию' : 'Reset'}
+                                                            {t.reset}
                                                         </button>
                                                     )}
                                                 </div>

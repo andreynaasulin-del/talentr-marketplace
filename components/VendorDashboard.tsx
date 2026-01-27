@@ -43,7 +43,9 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
     const { language } = useLanguage();
     const lang = language as 'en' | 'he';
 
-    const [activeTab, setActiveTab] = useState<'profile' | 'gigs' | 'settings'>('profile');
+    const [activeTab, setActiveTab] = useState<'profile' | 'gigs' | 'requests' | 'settings'>('profile');
+    const [requests, setRequests] = useState<any[]>([]);
+    const [loadingRequests, setLoadingRequests] = useState(false);
     const [gigs, setGigs] = useState<Gig[]>([]);
     const [loadingGigs, setLoadingGigs] = useState(true);
     const [showGigBuilder, setShowGigBuilder] = useState(false);
@@ -70,6 +72,7 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             welcome: 'Welcome back',
             profile: 'My Profile',
             gigs: 'My Gigs',
+            requests: 'Requests',
             settings: 'Settings',
             editProfile: 'Edit Profile',
             saveChanges: 'Save Changes',
@@ -99,6 +102,7 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             welcome: 'ברוך הבא',
             profile: 'הפרופיל שלי',
             gigs: 'הגיגים שלי',
+            requests: 'בקשות',
             settings: 'הגדרות',
             editProfile: 'ערוך פרופיל',
             saveChanges: 'שמור שינויים',
@@ -132,6 +136,28 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
     useEffect(() => {
         loadGigs();
     }, [vendor.id]);
+
+    // Fetch requests when tab is active
+    useEffect(() => {
+        if (activeTab === 'requests' && requests.length === 0) {
+            const fetchRequests = async () => {
+                setLoadingRequests(true);
+                try {
+                    const res = await fetch(`/api/vendor/bookings/${editToken}`);
+                    const data = await res.json();
+                    if (res.ok) {
+                        setRequests(data.bookings || []);
+                    }
+                } catch (err) {
+                    console.error('Error fetching requests:', err);
+                    toast.error(lang === 'he' ? 'שגיאה בטעינת בקשות' : 'Error loading requests');
+                } finally {
+                    setLoadingRequests(false);
+                }
+            };
+            fetchRequests();
+        }
+    }, [activeTab, editToken, requests.length, lang]);
 
     const loadGigs = async () => {
         setLoadingGigs(true);
@@ -287,7 +313,7 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
 
                     {/* Tabs */}
                     <div className="flex gap-1 mt-4 -mb-4">
-                        {(['profile', 'gigs', 'settings'] as const).map((tab) => (
+                        {(['profile', 'gigs', 'requests', 'settings'] as const).map((tab) => (
                             <button
                                 key={tab}
                                 onClick={() => setActiveTab(tab)}
@@ -298,6 +324,7 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                             >
                                 {tab === 'profile' && t.profile}
                                 {tab === 'gigs' && t.gigs}
+                                {tab === 'requests' && t.requests}
                                 {tab === 'settings' && t.settings}
                             </button>
                         ))}
@@ -585,6 +612,90 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                                 </button>
                             )}
                         </div>
+                    </div>
+                )}
+
+                {/* Requests Tab */}
+                {activeTab === 'requests' && (
+                    <div className="space-y-6">
+                        <div className="flex items-center justify-between">
+                            <h2 className="text-lg font-bold text-zinc-900 dark:text-white">{t.requests}</h2>
+                        </div>
+
+                        {loadingRequests ? (
+                            <div className="p-12 text-center">
+                                <Loader2 className="w-8 h-8 animate-spin mx-auto text-blue-500 mb-4" />
+                                <p className="text-zinc-500">Loading requests...</p>
+                            </div>
+                        ) : requests.length === 0 ? (
+                            <div className="p-12 text-center bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800">
+                                <Mail className="w-12 h-12 mx-auto text-zinc-300 mb-4" />
+                                <h3 className="text-lg font-medium text-zinc-900 dark:text-white mb-2">{lang === 'he' ? 'אין בקשות עדיין' : 'No requests yet'}</h3>
+                                <p className="text-zinc-500">{lang === 'he' ? 'כאשר לקוחות יפנו אליך, הם יופיעו כאן' : 'When clients book you, requests will appear here'}</p>
+                            </div>
+                        ) : (
+                            <div className="grid gap-4">
+                                {requests.map((request) => (
+                                    <div key={request.id} className="bg-white dark:bg-zinc-900 rounded-2xl p-6 border border-zinc-200 dark:border-zinc-800 shadow-sm hover:shadow-md transition-shadow">
+                                        <div className="flex flex-col md:flex-row gap-4 md:items-center justify-between">
+                                            <div className="flex items-start gap-4">
+                                                <div className={`p-3 rounded-xl flex-shrink-0 ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-700' :
+                                                    request.status === 'confirmed' ? 'bg-green-100 text-green-700' :
+                                                        request.status === 'rejected' ? 'bg-red-100 text-red-700' :
+                                                            'bg-zinc-100 text-zinc-700'
+                                                    }`}>
+                                                    <Mail className="w-6 h-6" />
+                                                </div>
+                                                <div>
+                                                    <div className="flex items-center gap-2 mb-1">
+                                                        <span className="font-bold text-lg text-zinc-900 dark:text-white">{request.client_name}</span>
+                                                        <span className={`px-2 py-0.5 text-xs rounded-full font-medium uppercase ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
+                                                            request.status === 'confirmed' ? 'bg-green-100 text-green-800' :
+                                                                request.status === 'rejected' ? 'bg-red-100 text-red-800' :
+                                                                    'bg-zinc-100 text-zinc-800'
+                                                            }`}>
+                                                            {request.status}
+                                                        </span>
+                                                    </div>
+                                                    <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-2">{request.gig?.title}</p>
+
+                                                    <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="opacity-70">📅</span>
+                                                            {new Date(request.event_date).toLocaleDateString()}
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="opacity-70">📍</span>
+                                                            {request.event_city || 'No location'}
+                                                        </div>
+                                                        <div className="flex items-center gap-1">
+                                                            <span className="opacity-70">👥</span>
+                                                            {request.guests_count || '?'} guests
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div>
+
+                                            <div className="flex flex-col gap-2 min-w-[140px]">
+                                                <div className="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl text-sm">
+                                                    <p className="font-medium mb-1 text-zinc-900 dark:text-zinc-200">Contact:</p>
+                                                    <p>{request.client_email}</p>
+                                                    <p>{request.client_phone}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+
+                                        {request.message && (
+                                            <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                                                <p className="text-sm text-zinc-600 dark:text-zinc-400 italic">
+                                                    "{request.message}"
+                                                </p>
+                                            </div>
+                                        )}
+                                    </div>
+                                ))}
+                            </div>
+                        )}
                     </div>
                 )}
             </div>

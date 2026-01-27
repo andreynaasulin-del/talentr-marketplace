@@ -15,6 +15,7 @@ import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { Gig, EVENT_TYPES, GIG_CATEGORIES } from '@/types/gig';
 import { useLanguage } from '@/context/LanguageContext';
+import BookingRequestModal from '@/components/BookingRequestModal';
 
 interface Vendor {
     id: string;
@@ -39,6 +40,10 @@ export default function GigBySlugPage() {
     const [galleryOpen, setGalleryOpen] = useState(false);
     const [currentImageIndex, setCurrentImageIndex] = useState(0);
     const [liked, setLiked] = useState(false);
+    const [bookingModalOpen, setBookingModalOpen] = useState(false);
+
+    // Dynamic translations based on context if needed, or use static t object
+    // ...
 
     const t = {
         en: {
