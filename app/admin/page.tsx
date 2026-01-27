@@ -9,7 +9,7 @@ import {
     BarChart3, TrendingUp, Calendar, RefreshCw, ChevronDown,
     Mail, MessageCircle, Phone, Sparkles, Shield, AlertCircle,
     ChevronLeft, ChevronRight, Languages, Trash2, Edit3, Star, X, Check,
-    Camera, Upload, Archive
+    Camera, Upload, Archive, Loader2
 } from 'lucide-react';
 
 // Localization
@@ -418,6 +418,24 @@ export default function AdminPage() {
         image_url: ''
     });
 
+    // Gigs state for admin management
+    const [adminGigs, setAdminGigs] = useState<{
+        id: string;
+        title: string;
+        category_id: string;
+        status: string;
+        moderation_status: string;
+        vendor_id: string;
+        share_slug: string;
+        price_amount: number;
+        photos: { url: string }[];
+        created_at: string;
+        view_count: number;
+        vendor_name?: string;
+    }[]>([]);
+    const [gigsLoading, setGigsLoading] = useState(false);
+    const [gigsFilter, setGigsFilter] = useState<'all' | 'pending' | 'approved' | 'rejected'>('all');
+
     // Photo upload state
     const [uploadingPhoto, setUploadingPhoto] = useState(false);
 
@@ -578,6 +596,67 @@ export default function AdminPage() {
         }
     }, [authToken, categoryFilter, search, page, activeTab]);
 
+    // Fetch gigs for admin moderation
+    const fetchGigs = useCallback(async () => {
+        if (!authToken) return;
+        setGigsLoading(true);
+        try {
+            const client = supabase;
+            if (!client) return;
+
+            let query = client
+                .from('gigs')
+                .select('id, title, category_id, status, moderation_status, vendor_id, share_slug, price_amount, photos, created_at, view_count');
+
+            // Apply moderation filter
+            if (gigsFilter !== 'all') {
+                query = query.eq('moderation_status', gigsFilter);
+            }
+
+            const { data, error } = await query
+                .order('created_at', { ascending: false })
+                .limit(50);
+
+            if (data) {
+                // Fetch vendor names for each gig
+                const vendorIds = [...new Set(data.filter(g => g.vendor_id).map(g => g.vendor_id))];
+                let vendorMap: Record<string, string> = {};
+
+                if (vendorIds.length > 0) {
+                    const { data: vendorsData } = await client
+                        .from('vendors')
+                        .select('id, name, full_name')
+                        .in('id', vendorIds);
+
+                    if (vendorsData) {
+                        vendorMap = vendorsData.reduce((acc, v) => {
+                            acc[v.id] = v.full_name || v.name || 'Unknown';
+                            return acc;
+                        }, {} as Record<string, string>);
+                    }
+                }
+
+                setAdminGigs(data.map(g => ({
+                    ...g,
+                    vendor_name: g.vendor_id ? vendorMap[g.vendor_id] : 'No Vendor'
+                })));
+            } else if (error) {
+                console.error('Failed to fetch gigs:', error);
+            }
+        } catch (err) {
+            console.error('Failed to fetch gigs:', err);
+        } finally {
+            setGigsLoading(false);
+        }
+    }, [authToken, gigsFilter]);
+
+    // Load gigs when gigs tab is active
+    useEffect(() => {
+        if (authToken && activeTab === 'gigs') {
+            fetchGigs();
+        }
+    }, [authToken, activeTab, fetchGigs]);
+
     useEffect(() => {
         if (authToken) {
             fetchStats();
@@ -630,6 +709,31 @@ export default function AdminPage() {
             console.error('Failed to create pending:', err);
         } finally {
             setCreating(false);
+        }
+    };
+
+    // Moderate gig (approve or reject)
+    const moderateGig = async (gigId: string, action: 'approved' | 'rejected' | 'pending') => {
+        if (!authToken) return;
+        try {
+            const client = supabase;
+            if (!client) return;
+
+            const { error } = await client
+                .from('gigs')
+                .update({ moderation_status: action })
+                .eq('id', gigId);
+
+            if (error) {
+                console.error('Failed to moderate gig:', error);
+                alert('Failed to update gig status');
+                return;
+            }
+
+            // Refresh gigs list
+            fetchGigs();
+        } catch (err) {
+            console.error('Moderation error:', err);
         }
     };
 
@@ -1499,39 +1603,135 @@ Talentr Team`;
                             <div className="flex items-center justify-between mb-6">
                                 <div>
                                     <h2 className="text-2xl font-black text-zinc-900 dark:text-white">
-                                        Все гиги
+                                        {lang === 'ru' ? 'Все гиги' : 'All Gigs'}
                                     </h2>
                                     <p className="text-zinc-500 text-sm">
-                                        Управление гигами всех вендоров
+                                        {lang === 'ru' ? 'Модерация гигов вендоров' : 'Vendor gigs moderation'}
                                     </p>
                                 </div>
+                                <button
+                                    onClick={fetchGigs}
+                                    className="px-4 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-xl text-sm font-bold hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-all"
+                                >
+                                    {lang === 'ru' ? 'Обновить' : 'Refresh'}
+                                </button>
                             </div>
 
-                            {/* Gigs placeholder - will be loaded from API */}
+                            {/* Filter tabs */}
+                            <div className="flex gap-2 mb-6 flex-wrap">
+                                {(['all', 'pending', 'approved', 'rejected'] as const).map((filter) => (
+                                    <button
+                                        key={filter}
+                                        onClick={() => setGigsFilter(filter)}
+                                        className={`px-4 py-2 rounded-xl text-sm font-bold transition-all ${gigsFilter === filter
+                                            ? 'bg-purple-600 text-white'
+                                            : 'bg-zinc-100 dark:bg-zinc-800 text-zinc-700 dark:text-zinc-300 hover:bg-zinc-200 dark:hover:bg-zinc-700'
+                                            }`}
+                                    >
+                                        {filter === 'all' && (lang === 'ru' ? 'Все' : 'All')}
+                                        {filter === 'pending' && (lang === 'ru' ? 'На модерации' : 'Pending')}
+                                        {filter === 'approved' && (lang === 'ru' ? 'Одобрены' : 'Approved')}
+                                        {filter === 'rejected' && (lang === 'ru' ? 'Отклонены' : 'Rejected')}
+                                    </button>
+                                ))}
+                            </div>
+
+                            {/* Gigs list */}
                             <div className="bg-white dark:bg-zinc-900 rounded-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden">
-                                <div className="p-6">
-                                    <div className="text-center py-12">
-                                        <div className="w-16 h-16 bg-purple-100 dark:bg-purple-900/20 rounded-full flex items-center justify-center mx-auto mb-4">
-                                            <Sparkles className="w-8 h-8 text-purple-500" />
-                                        </div>
-                                        <h3 className="text-lg font-bold text-zinc-900 dark:text-white mb-2">
-                                            Гиги будут здесь
-                                        </h3>
-                                        <p className="text-zinc-500 text-sm max-w-md mx-auto">
-                                            Когда вендоры начнут создавать гиги через Gig Builder,
-                                            они появятся в этом разделе для модерации
-                                        </p>
-                                        <div className="mt-6 flex justify-center gap-4">
-                                            <a
-                                                href="/my-gigs"
-                                                target="_blank"
-                                                className="px-4 py-2 bg-purple-600 text-white font-bold rounded-xl hover:bg-purple-700 transition-all"
-                                            >
-                                                Открыть Gig Builder
-                                            </a>
-                                        </div>
+                                {gigsLoading ? (
+                                    <div className="p-12 text-center">
+                                        <Loader2 className="w-8 h-8 animate-spin mx-auto text-purple-500 mb-4" />
+                                        <p className="text-zinc-500">{lang === 'ru' ? 'Загрузка...' : 'Loading...'}</p>
                                     </div>
-                                </div>
+                                ) : adminGigs.length === 0 ? (
+                                    <div className="p-12 text-center">
+                                        <Sparkles className="w-12 h-12 text-purple-500 mx-auto mb-4" />
+                                        <p className="text-zinc-500 font-medium">
+                                            {lang === 'ru' ? 'Гигов пока нет' : 'No gigs yet'}
+                                        </p>
+                                    </div>
+                                ) : (
+                                    <div className="divide-y divide-zinc-100 dark:divide-zinc-800">
+                                        {adminGigs.map((gig) => (
+                                            <div key={gig.id} className="p-4 flex items-center gap-4 hover:bg-zinc-50 dark:hover:bg-zinc-800/50 transition-colors">
+                                                {/* Thumbnail */}
+                                                <div className="w-16 h-16 rounded-xl bg-zinc-100 dark:bg-zinc-800 overflow-hidden flex-shrink-0">
+                                                    {gig.photos?.[0]?.url ? (
+                                                        <img src={gig.photos[0].url} alt="" className="w-full h-full object-cover" />
+                                                    ) : (
+                                                        <div className="w-full h-full flex items-center justify-center text-2xl">✨</div>
+                                                    )}
+                                                </div>
+
+                                                {/* Info */}
+                                                <div className="flex-1 min-w-0">
+                                                    <h3 className="font-bold text-zinc-900 dark:text-white truncate">
+                                                        {gig.title}
+                                                    </h3>
+                                                    <p className="text-sm text-zinc-500 truncate">
+                                                        {gig.vendor_name} • {gig.category_id}
+                                                    </p>
+                                                    <div className="flex items-center gap-2 mt-1">
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${gig.status === 'published' ? 'bg-green-100 text-green-700 dark:bg-green-900/30 dark:text-green-400' :
+                                                            gig.status === 'draft' ? 'bg-zinc-100 text-zinc-600 dark:bg-zinc-800 dark:text-zinc-400' :
+                                                                'bg-yellow-100 text-yellow-700 dark:bg-yellow-900/30 dark:text-yellow-400'
+                                                            }`}>
+                                                            {gig.status}
+                                                        </span>
+                                                        <span className={`text-xs px-2 py-0.5 rounded-full font-medium ${gig.moderation_status === 'approved' ? 'bg-blue-100 text-blue-700 dark:bg-blue-900/30 dark:text-blue-400' :
+                                                            gig.moderation_status === 'rejected' ? 'bg-red-100 text-red-700 dark:bg-red-900/30 dark:text-red-400' :
+                                                                'bg-orange-100 text-orange-700 dark:bg-orange-900/30 dark:text-orange-400'
+                                                            }`}>
+                                                            {gig.moderation_status}
+                                                        </span>
+                                                        {gig.price_amount && (
+                                                            <span className="text-xs text-zinc-500">₪{gig.price_amount}</span>
+                                                        )}
+                                                        <span className="text-xs text-zinc-400">👁 {gig.view_count || 0}</span>
+                                                    </div>
+                                                </div>
+
+                                                {/* Actions */}
+                                                <div className="flex items-center gap-2 flex-shrink-0">
+                                                    <a
+                                                        href={`/g/${gig.share_slug}`}
+                                                        target="_blank"
+                                                        className="p-2 rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors"
+                                                        title={lang === 'ru' ? 'Открыть' : 'View'}
+                                                    >
+                                                        <ExternalLink className="w-4 h-4 text-zinc-600 dark:text-zinc-400" />
+                                                    </a>
+                                                    {gig.moderation_status === 'pending' && (
+                                                        <>
+                                                            <button
+                                                                onClick={() => moderateGig(gig.id, 'approved')}
+                                                                className="p-2 rounded-lg bg-green-100 dark:bg-green-900/30 hover:bg-green-200 dark:hover:bg-green-900/50 text-green-700 dark:text-green-400 transition-colors"
+                                                                title={lang === 'ru' ? 'Одобрить' : 'Approve'}
+                                                            >
+                                                                <Check className="w-4 h-4" />
+                                                            </button>
+                                                            <button
+                                                                onClick={() => moderateGig(gig.id, 'rejected')}
+                                                                className="p-2 rounded-lg bg-red-100 dark:bg-red-900/30 hover:bg-red-200 dark:hover:bg-red-900/50 text-red-700 dark:text-red-400 transition-colors"
+                                                                title={lang === 'ru' ? 'Отклонить' : 'Reject'}
+                                                            >
+                                                                <X className="w-4 h-4" />
+                                                            </button>
+                                                        </>
+                                                    )}
+                                                    {gig.moderation_status !== 'pending' && (
+                                                        <button
+                                                            onClick={() => moderateGig(gig.id, 'pending')}
+                                                            className="px-3 py-1 text-xs font-medium rounded-lg bg-zinc-100 dark:bg-zinc-800 hover:bg-zinc-200 dark:hover:bg-zinc-700 text-zinc-600 dark:text-zinc-400 transition-colors"
+                                                        >
+                                                            {lang === 'ru' ? 'На модерацию' : 'Reset'}
+                                                        </button>
+                                                    )}
+                                                </div>
+                                            </div>
+                                        ))}
+                                    </div>
+                                )}
                             </div>
                         </div>
                     )}
