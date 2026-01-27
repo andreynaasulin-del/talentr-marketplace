@@ -14,6 +14,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { toast } from 'sonner';
 import GigBuilder from './GigBuilder';
 import { compressImage } from '@/lib/imageCompression';
+import { GIG_CATEGORIES } from '@/types/gig';
 
 interface Vendor {
     id: string;
@@ -91,6 +92,10 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             email: 'Email',
             instagram: 'Instagram',
             logout: 'Logout',
+            editGig: 'Edit',
+            viewGig: 'View',
+            untitled: 'Untitled Gig',
+            noDescription: 'No description',
             status: {
                 draft: 'Draft',
                 published: 'Live',
@@ -108,12 +113,12 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             saveChanges: 'שמור שינויים',
             cancel: 'ביטול',
             createGig: 'צור גיג',
-            noGigs: 'אין גיגים עדיין',
+            noGigs: 'עדיין אין גיגים',
             noGigsDesc: 'צור את הגיג הראשון שלך כדי להתחיל לקבל הזמנות',
-            viewProfile: 'צפה בפרופיל הציבורי',
+            viewProfile: 'צפה בפרופיל ציבורי',
             shareProfile: 'שתף פרופיל',
-            copied: 'הקישור הועתק!',
-            name: 'שם העסק',
+            copied: 'הועתק!',
+            name: 'שם העסק / Artist Name',
             category: 'קטגוריה',
             city: 'עיר',
             bio: 'אודות',
@@ -121,11 +126,15 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             email: 'אימייל',
             instagram: 'אינסטגרם',
             logout: 'התנתק',
+            editGig: 'ערוך',
+            viewGig: 'צפה',
+            untitled: 'ללא כותרת',
+            noDescription: 'אין תיאור',
             status: {
                 draft: 'טיוטה',
                 published: 'פעיל',
-                unlisted: 'קישור בלבד',
-                archived: 'ארכיון'
+                unlisted: 'לינק בלבד',
+                archived: 'בארכיון'
             }
         }
     };
@@ -548,13 +557,15 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                                             <div className="flex-1 min-w-0">
                                                 <div className="flex items-center gap-2 flex-wrap mb-1">
                                                     {getStatusBadge(gig.status)}
-                                                    <span className="text-xs text-zinc-400">{gig.category_id}</span>
+                                                    <span className="text-xs text-zinc-400">
+                                                        {(GIG_CATEGORIES.find(c => c.id === gig.category_id)?.label as any)?.[lang] || gig.category_id}
+                                                    </span>
                                                 </div>
                                                 <h3 className="font-bold text-zinc-900 dark:text-white truncate">
-                                                    {gig.title || 'Untitled'}
+                                                    {gig.title || t.untitled}
                                                 </h3>
                                                 <p className="text-sm text-zinc-500 line-clamp-1 mt-0.5">
-                                                    {gig.short_description || 'No description'}
+                                                    {gig.short_description || t.noDescription}
                                                 </p>
                                             </div>
                                             <div className="flex-shrink-0 text-right">
@@ -576,15 +587,16 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                                                 className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                                             >
                                                 <Edit3 className="w-4 h-4" />
-                                                Edit
+                                                {t.editGig}
                                             </button>
                                             {gig.status === 'published' && (
                                                 <Link
-                                                    href={`/gig/${gig.id}`}
+                                                    href={`/g/${gig.share_slug}`}
+                                                    target="_blank"
                                                     className="flex items-center gap-1.5 px-3 py-1.5 text-sm font-medium text-zinc-600 dark:text-zinc-400 hover:bg-zinc-100 dark:hover:bg-zinc-800 rounded-lg transition-colors"
                                                 >
                                                     <Eye className="w-4 h-4" />
-                                                    View
+                                                    {t.viewGig}
                                                 </Link>
                                             )}
                                         </div>
