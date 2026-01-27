@@ -13,6 +13,7 @@ import Footer from '@/components/Footer';
 import { motion, AnimatePresence } from 'framer-motion';
 import { toast } from 'sonner';
 import GigBuilder from '@/components/GigBuilder';
+import VendorDashboard from '@/components/VendorDashboard';
 
 interface Vendor {
     id: string;
@@ -26,6 +27,8 @@ interface Vendor {
     instagram_handle?: string;
     price_from: number;
     portfolio_gallery: string[];
+    onboarding_completed?: boolean;
+    status?: string;
 }
 
 const CATEGORIES = [
@@ -37,7 +40,7 @@ const CATEGORIES = [
 
 const CITIES = ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat', 'Rishon LeZion', 'Netanya', 'Ashdod'];
 
-const STEPS = [
+const ONBOARDING_STEPS = [
     { id: 'intro', title: 'Welcome' },
     { id: 'profile', title: 'Basic Info' },
     { id: 'portfolio', title: 'Media & Contact' }
@@ -48,15 +51,19 @@ export default function EditVendorPage() {
     const router = useRouter();
     const editToken = params.token as string;
 
+    // Core state
     const [vendor, setVendor] = useState<Vendor | null>(null);
     const [loading, setLoading] = useState(true);
     const [saving, setSaving] = useState(false);
     const [error, setError] = useState<string | null>(null);
     const [uploading, setUploading] = useState(false);
 
+    // Mode: 'onboarding' for new vendors, 'dashboard' for existing
+    const [mode, setMode] = useState<'loading' | 'onboarding' | 'dashboard' | 'gig-builder'>('loading');
+
+    // Onboarding wizard state
     const [currentStep, setCurrentStep] = useState(0);
     const [direction, setDirection] = useState(0);
-    const [showGigBuilder, setShowGigBuilder] = useState(false);
 
     const [formData, setFormData] = useState({
         full_name: '',
@@ -73,6 +80,7 @@ export default function EditVendorPage() {
 
     const [newPhotoUrl, setNewPhotoUrl] = useState('');
 
+    // Fetch vendor and determine mode
     useEffect(() => {
         const fetchVendor = async () => {
             try {
@@ -81,22 +89,35 @@ export default function EditVendorPage() {
 
                 if (!res.ok) {
                     setError(data.error || 'Invalid link');
+                    setMode('loading');
                     return;
                 }
 
-                setVendor(data.vendor);
+                const v = data.vendor;
+                setVendor(v);
                 setFormData({
-                    full_name: data.vendor.full_name || '',
-                    category: data.vendor.category || '',
-                    city: data.vendor.city || '',
-                    bio: data.vendor.bio || '',
-                    avatar_url: data.vendor.avatar_url || '',
-                    phone: data.vendor.phone || '',
-                    email: data.vendor.email || '',
-                    instagram_handle: data.vendor.instagram_handle || '',
-                    price_from: data.vendor.price_from || 0,
-                    portfolio_gallery: data.vendor.portfolio_gallery || []
+                    full_name: v.full_name || '',
+                    category: v.category || '',
+                    city: v.city || '',
+                    bio: v.bio || '',
+                    avatar_url: v.avatar_url || '',
+                    phone: v.phone || '',
+                    email: v.email || '',
+                    instagram_handle: v.instagram_handle || '',
+                    price_from: v.price_from || 0,
+                    portfolio_gallery: v.portfolio_gallery || []
                 });
+
+                // ============================================
+                // SMART ROUTING: Determine mode based on status
+                // ============================================
+                if (v.onboarding_completed === true || v.status === 'active') {
+                    // Existing vendor → Dashboard
+                    setMode('dashboard');
+                } else {
+                    // New vendor → Onboarding Wizard
+                    setMode('onboarding');
+                }
             } catch (err) {
                 setError('Failed to load profile');
             } finally {
@@ -151,33 +172,38 @@ export default function EditVendorPage() {
         }));
     };
 
-    const handleSave = async () => {
+    const handleOnboardingComplete = async () => {
         setSaving(true);
         try {
+            // Save profile data
             const res = await fetch(`/api/vendor/edit/${editToken}`, {
                 method: 'POST',
                 headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify(formData)
+                body: JSON.stringify({
+                    ...formData,
+                    onboarding_completed: true // Mark as completed!
+                })
             });
 
             if (!res.ok) throw new Error('Failed to save');
 
             toast.success('Profile completed successfully! 🎉');
-            toast.success('Profile completed! Now create your first Service.');
-            // Move to Gig Builder instead of redirecting home
-            setShowGigBuilder(true);
+
+            // Move to Gig Builder as next step
+            setMode('gig-builder');
         } catch (err) {
             toast.error('Failed to save profile');
+        } finally {
             setSaving(false);
         }
     };
 
     const nextStep = () => {
-        if (currentStep < STEPS.length - 1) {
+        if (currentStep < ONBOARDING_STEPS.length - 1) {
             setDirection(1);
             setCurrentStep(c => c + 1);
         } else {
-            handleSave();
+            handleOnboardingComplete();
         }
     };
 
@@ -194,7 +220,10 @@ export default function EditVendorPage() {
         exit: (direction: number) => ({ x: direction > 0 ? -50 : 50, opacity: 0 })
     };
 
-    if (loading) {
+    // ==================
+    // LOADING STATE
+    // ==================
+    if (loading || mode === 'loading') {
         return (
             <div className="min-h-screen bg-zinc-50 dark:bg-black flex items-center justify-center">
                 <Loader2 className="w-12 h-12 text-blue-600 animate-spin" />
@@ -202,6 +231,9 @@ export default function EditVendorPage() {
         );
     }
 
+    // ==================
+    // ERROR STATE
+    // ==================
     if (error) {
         return (
             <div className="min-h-screen bg-zinc-50 dark:bg-black flex flex-col items-center justify-center p-6 text-center">
@@ -215,8 +247,45 @@ export default function EditVendorPage() {
         );
     }
 
-    const renderStep = () => {
-        switch (STEPS[currentStep].id) {
+    // ==================
+    // DASHBOARD MODE (Existing Vendors)
+    // ==================
+    if (mode === 'dashboard' && vendor) {
+        return (
+            <VendorDashboard
+                vendor={vendor}
+                editToken={editToken}
+                onLogout={() => router.push('/')}
+            />
+        );
+    }
+
+    // ==================
+    // GIG BUILDER MODE (After Onboarding)
+    // ==================
+    if (mode === 'gig-builder' && vendor) {
+        return (
+            <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">
+                <Navbar />
+                <div className="max-w-4xl mx-auto px-4 py-24">
+                    <GigBuilder
+                        vendorId={vendor.id}
+                        ownerId={null}
+                        onClose={() => {
+                            // After creating first gig, go to dashboard
+                            setMode('dashboard');
+                        }}
+                    />
+                </div>
+            </div>
+        );
+    }
+
+    // ==================
+    // ONBOARDING MODE (New Vendors)
+    // ==================
+    const renderOnboardingStep = () => {
+        switch (ONBOARDING_STEPS[currentStep].id) {
             case 'intro':
                 return (
                     <div className="text-center py-10">
@@ -400,21 +469,6 @@ export default function EditVendorPage() {
         }
     };
 
-    if (showGigBuilder && vendor) {
-        return (
-            <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">
-                <Navbar />
-                <div className="max-w-4xl mx-auto px-4 py-24">
-                    <GigBuilder
-                        vendorId={vendor.id}
-                        ownerId={null}
-                        onClose={() => router.push('/')}
-                    />
-                </div>
-            </div>
-        );
-    }
-
     return (
         <div className="min-h-screen bg-zinc-50 dark:bg-black transition-colors" dir="ltr">
             <Navbar />
@@ -423,14 +477,14 @@ export default function EditVendorPage() {
                 {/* Progress */}
                 <div className="mb-8">
                     <div className="flex justify-between text-xs font-bold text-zinc-400 uppercase tracking-widest mb-3">
-                        <span>Step {currentStep + 1} of {STEPS.length}</span>
-                        <span>{STEPS[currentStep].title}</span>
+                        <span>Step {currentStep + 1} of {ONBOARDING_STEPS.length}</span>
+                        <span>{ONBOARDING_STEPS[currentStep].title}</span>
                     </div>
                     <div className="h-2 bg-zinc-200 dark:bg-zinc-800 rounded-full overflow-hidden">
                         <motion.div
                             className="h-full bg-blue-600"
                             initial={{ width: 0 }}
-                            animate={{ width: `${((currentStep + 1) / STEPS.length) * 100}%` }}
+                            animate={{ width: `${((currentStep + 1) / ONBOARDING_STEPS.length) * 100}%` }}
                         />
                     </div>
                 </div>
@@ -447,7 +501,7 @@ export default function EditVendorPage() {
                             transition={{ type: "spring", stiffness: 300, damping: 30 }}
                             className="flex-1"
                         >
-                            {renderStep()}
+                            {renderOnboardingStep()}
                         </motion.div>
                     </AnimatePresence>
 
@@ -471,8 +525,8 @@ export default function EditVendorPage() {
                                 <Loader2 className="w-5 h-5 animate-spin" />
                             ) : (
                                 <>
-                                    {currentStep === STEPS.length - 1 ? 'Finish & Launch' : 'Next'}
-                                    {currentStep !== STEPS.length - 1 && <ChevronRight className="w-5 h-5" />}
+                                    {currentStep === ONBOARDING_STEPS.length - 1 ? 'Finish & Launch' : 'Next'}
+                                    {currentStep !== ONBOARDING_STEPS.length - 1 && <ChevronRight className="w-5 h-5" />}
                                 </>
                             )}
                         </button>

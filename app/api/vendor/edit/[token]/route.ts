@@ -51,7 +51,10 @@ export async function GET(request: NextRequest, { params }: RouteParams) {
             reviews_count: vendor.reviews_count || 0,
             instagram_handle: vendor.instagram_handle || '',
             website: vendor.website || '',
-            tags: vendor.tags || []
+            tags: vendor.tags || [],
+            // Smart routing fields
+            onboarding_completed: vendor.onboarding_completed || false,
+            status: vendor.status || 'pending'
         };
 
         return NextResponse.json({ vendor: normalizedVendor });
@@ -136,6 +139,9 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         if (body.website !== undefined) updateData.website = body.website;
         if (body.tags !== undefined) updateData.tags = body.tags;
         if (body.portfolio_gallery !== undefined) updateData.portfolio_gallery = body.portfolio_gallery;
+
+        // Onboarding completion flag
+        if (body.onboarding_completed !== undefined) updateData.onboarding_completed = body.onboarding_completed;
 
         const { data: vendor, error: updateError } = await supabase
             .from('vendors')
