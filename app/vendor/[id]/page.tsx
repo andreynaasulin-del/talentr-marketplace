@@ -7,11 +7,12 @@ import { useParams } from 'next/navigation';
 import { useState, useEffect } from 'react';
 import Image from 'next/image';
 import Link from 'next/link';
-import { Star, MapPin, Shield, Heart, Share2, ChevronLeft, Calendar, Clock, Award, Sparkles } from 'lucide-react';
+import { Star, MapPin, Shield, Heart, Share2, ChevronLeft, Calendar, Clock, Award, Sparkles, Briefcase } from 'lucide-react';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 import { getVendorById } from '@/lib/vendors';
 import { Vendor } from '@/types';
+import { Gig } from '@/types/gig';
 import { useLanguage } from '@/context/LanguageContext';
 import { VendorProfileSkeleton } from '@/components/SkeletonLoader';
 
@@ -25,6 +26,7 @@ export default function VendorPage() {
     const [loading, setLoading] = useState(true);
     const [isLiked, setIsLiked] = useState(false);
     const [activeImage, setActiveImage] = useState(0);
+    const [vendorGigs, setVendorGigs] = useState<Gig[]>([]);
 
     useEffect(() => {
         const fetchVendor = async () => {
@@ -42,6 +44,15 @@ export default function VendorPage() {
 
         if (vendorId) {
             fetchVendor();
+            // Fetch vendor gigs
+            fetch(`/api/gigs?vendor_id=${vendorId}`)
+                .then(res => res.json())
+                .then(data => {
+                    if (data.gigs) {
+                        setVendorGigs(data.gigs.filter((g: Gig) => g.status === 'published'));
+                    }
+                })
+                .catch(console.error);
         }
     }, [vendorId]);
 
@@ -270,6 +281,73 @@ export default function VendorPage() {
                                 </div>
                             )}
                         </div>
+
+                        {/* Vendor Gigs Section */}
+                        {vendorGigs.length > 0 && (
+                            <div className="bg-white dark:bg-zinc-900 rounded-[32px] p-10 border border-zinc-200 dark:border-zinc-800 shadow-xl dark:shadow-none">
+                                <div className="flex items-center justify-between mb-8">
+                                    <h2 className="text-3xl font-black text-zinc-900 dark:text-white tracking-tight flex items-center gap-3">
+                                        <Briefcase className="w-8 h-8 text-blue-600" />
+                                        {language === 'he' ? 'שירותים' : 'Services'}
+                                    </h2>
+                                    <span className="text-sm font-bold text-blue-500 dark:text-blue-400 bg-blue-50 dark:bg-blue-500/10 px-4 py-2 rounded-xl border border-blue-100 dark:border-blue-500/20">
+                                        {vendorGigs.length} {language === 'he' ? 'גיגים' : 'Gigs'}
+                                    </span>
+                                </div>
+                                <div className="grid gap-4">
+                                    {vendorGigs.map((gig) => (
+                                        <Link
+                                            key={gig.id}
+                                            href={`/g/${gig.share_slug}`}
+                                            className="group flex items-center gap-4 p-4 rounded-2xl border border-zinc-200 dark:border-zinc-800 hover:border-blue-500 hover:bg-blue-50/50 dark:hover:bg-blue-900/10 transition-all"
+                                        >
+                                            <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
+                                                {gig.photos?.[0] ? (
+                                                    <Image
+                                                        src={gig.photos[0].url}
+                                                        alt={gig.title}
+                                                        fill
+                                                        className="object-cover group-hover:scale-110 transition-transform duration-300"
+                                                    />
+                                                ) : (
+                                                    <div className="w-full h-full flex items-center justify-center text-3xl">
+                                                        ✨
+                                                    </div>
+                                                )}
+                                            </div>
+                                            <div className="flex-1 min-w-0">
+                                                <h3 className="font-bold text-zinc-900 dark:text-white group-hover:text-blue-600 transition-colors truncate">
+                                                    {gig.title}
+                                                </h3>
+                                                <p className="text-sm text-zinc-500 line-clamp-1 mt-1">
+                                                    {gig.short_description}
+                                                </p>
+                                                <div className="flex items-center gap-3 mt-2">
+                                                    {gig.is_free ? (
+                                                        <span className="text-green-600 font-bold text-sm">
+                                                            {language === 'he' ? 'חינם' : 'Free'}
+                                                        </span>
+                                                    ) : (
+                                                        <span className="text-zinc-900 dark:text-white font-bold text-sm">
+                                                            {gig.pricing_type === 'from' && (language === 'he' ? 'החל מ' : 'from ')}
+                                                            ₪{gig.price_amount?.toLocaleString()}
+                                                            {gig.pricing_type === 'hourly' && (language === 'he' ? '/שעה' : '/hr')}
+                                                        </span>
+                                                    )}
+                                                    {gig.duration_minutes && (
+                                                        <span className="text-xs text-zinc-400 flex items-center gap-1">
+                                                            <Clock className="w-3 h-3" />
+                                                            {gig.duration_minutes} min
+                                                        </span>
+                                                    )}
+                                                </div>
+                                            </div>
+                                            <ChevronLeft className="w-5 h-5 text-zinc-400 group-hover:text-blue-500 transition-colors rotate-180 rtl:rotate-0" />
+                                        </Link>
+                                    ))}
+                                </div>
+                            </div>
+                        )}
 
                         {/* Reviews Section */}
                         <ReviewsSection vendorId={vendorId} vendorName={vendor.name} />
