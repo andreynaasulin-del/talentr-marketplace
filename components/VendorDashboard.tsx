@@ -266,6 +266,7 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             <GigBuilder
                 vendorId={vendor.id}
                 ownerId={null}
+                editToken={editToken}
                 existingGigId={editingGigId || undefined}
                 onClose={() => {
                     setShowGigBuilder(false);

@@ -1,13 +1,13 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { validateVendorToken, validateGigOwnership } from '@/lib/auth';
 
 interface RouteParams {
     params: Promise<{ id: string }>;
 }
 
 // POST - Regenerate share_slug for unlisted gigs
-// This invalidates the old link and creates a new one
 export async function POST(request: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
@@ -16,12 +16,24 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             return NextResponse.json({ error: 'Gig ID required' }, { status: 400 });
         }
 
+        // Validate vendor token
+        const { vendorId, error: tokenError } = await validateVendorToken(request);
+        if (tokenError || !vendorId) {
+            return NextResponse.json({ error: tokenError || 'Unauthorized' }, { status: 401 });
+        }
+
+        // Validate gig ownership
+        const { valid, error: ownerError } = await validateGigOwnership(id, vendorId);
+        if (!valid) {
+            return NextResponse.json({ error: ownerError || 'Unauthorized' }, { status: 403 });
+        }
+
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
-        // First check if gig exists and get current status
+        // First check if gig exists
         const { data: existingGig, error: fetchError } = await supabase
             .from('gigs')
             .select('id, status, share_slug')
@@ -60,7 +72,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             oldSlug: existingGig.share_slug,
             newSlug: newSlug,
             shareLink: newShareLink,
-            message: 'Link regenerated successfully. Old link is now invalid.'
+            message: 'הקישור חודש בהצלחה. הקישור הישן כבר לא פעיל.'
         });
     } catch (error) {
         console.error('Regenerate slug error:', error);

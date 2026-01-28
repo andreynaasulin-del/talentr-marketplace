@@ -1,11 +1,18 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
+import { validateVendorToken } from '@/lib/auth';
 
-// POST - Create new gig (draft)
+// POST - Create new gig (draft) - requires vendor token
 export async function POST(request: NextRequest) {
     try {
         const body = await request.json();
+
+        // Validate vendor token
+        const { vendorId, error: tokenError } = await validateVendorToken(request);
+        if (tokenError || !vendorId) {
+            return NextResponse.json({ error: tokenError || 'Unauthorized' }, { status: 401 });
+        }
 
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -21,7 +28,7 @@ export async function POST(request: NextRequest) {
             .insert({
                 id: gigId,
                 owner_user_id: body.owner_user_id,
-                vendor_id: body.vendor_id,
+                vendor_id: vendorId, // Use validated vendor ID
                 title: body.title || 'Untitled Gig',
                 category_id: body.category_id || 'Other',
                 short_description: body.short_description || '',
@@ -46,12 +53,11 @@ export async function POST(request: NextRequest) {
     }
 }
 
-// GET - List gigs for user/vendor
+// GET - List gigs for vendor (requires token) or public listing
 export async function GET(request: NextRequest) {
     try {
         const { searchParams } = new URL(request.url);
         const vendorId = searchParams.get('vendor_id');
-        const ownerId = searchParams.get('owner_id');
         const status = searchParams.get('status');
 
         const supabase = createClient(
@@ -59,14 +65,37 @@ export async function GET(request: NextRequest) {
             process.env.SUPABASE_SERVICE_ROLE_KEY!
         );
 
+        // If vendor_id provided, verify token ownership
+        if (vendorId) {
+            const { vendorId: tokenVendorId, error: tokenError } = await validateVendorToken(request);
+
+            // If token provided but doesn't match, reject
+            if (request.headers.get('x-vendor-token') && tokenVendorId !== vendorId) {
+                return NextResponse.json({ error: 'Unauthorized' }, { status: 403 });
+            }
+
+            // If no token and requesting vendor's gigs, only return published
+            if (!request.headers.get('x-vendor-token')) {
+                let query = supabase
+                    .from('gigs')
+                    .select('*')
+                    .eq('vendor_id', vendorId)
+                    .eq('status', 'published')
+                    .order('created_at', { ascending: false });
+
+                const { data: gigs, error } = await query;
+                if (error) {
+                    return NextResponse.json({ error: error.message }, { status: 400 });
+                }
+                return NextResponse.json({ gigs });
+            }
+        }
+
+        // For authenticated vendor requests
         let query = supabase.from('gigs').select('*');
 
         if (vendorId) {
             query = query.eq('vendor_id', vendorId);
-        }
-
-        if (ownerId) {
-            query = query.eq('owner_user_id', ownerId);
         }
 
         if (status) {

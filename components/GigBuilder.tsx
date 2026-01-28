@@ -20,11 +20,12 @@ import { compressImage, validateVideo } from '@/lib/imageCompression';
 interface GigBuilderProps {
     vendorId?: string;
     ownerId?: string | null; // Made optional for Guest Vendors
+    editToken?: string; // Vendor edit token for API authorization
     onClose: () => void;
     existingGigId?: string;
 }
 
-export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }: GigBuilderProps) {
+export default function GigBuilder({ vendorId, ownerId, editToken, onClose, existingGigId }: GigBuilderProps) {
     const router = useRouter();
     const { language } = useLanguage();
     const [currentStep, setCurrentStep] = useState(0);
@@ -370,9 +371,12 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
 
     const createDraft = async () => {
         try {
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (editToken) headers['x-vendor-token'] = editToken;
+
             const res = await fetch('/api/gigs', {
                 method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({
                     vendor_id: vendorId,
                     owner_user_id: ownerId,
@@ -395,9 +399,12 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
         if (!gig.id) return;
         setSaving(true);
         try {
+            const headers: Record<string, string> = { 'Content-Type': 'application/json' };
+            if (editToken) headers['x-vendor-token'] = editToken;
+
             await fetch(`/api/gigs/${gig.id}`, {
                 method: 'PATCH',
-                headers: { 'Content-Type': 'application/json' },
+                headers,
                 body: JSON.stringify({
                     ...gig,
                     current_step: currentStep
@@ -472,7 +479,10 @@ export default function GigBuilder({ vendorId, ownerId, onClose, existingGigId }
                 ? `/api/gigs/${gig.id}/unlist`
                 : `/api/gigs/${gig.id}/publish`;
 
-            const res = await fetch(endpoint, { method: 'POST' });
+            const headers: Record<string, string> = {};
+            if (editToken) headers['x-vendor-token'] = editToken;
+
+            const res = await fetch(endpoint, { method: 'POST', headers });
             const data = await res.json();
 
             if (data.success) {

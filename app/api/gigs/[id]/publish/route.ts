@@ -1,15 +1,27 @@
 import { NextRequest, NextResponse } from 'next/server';
 import { createClient } from '@supabase/supabase-js';
-import crypto from 'crypto';
+import { validateVendorToken, validateGigOwnership } from '@/lib/auth';
 
 interface RouteParams {
     params: Promise<{ id: string }>;
 }
 
-// POST - Publish gig
+// POST - Publish gig (requires vendor token)
 export async function POST(request: NextRequest, { params }: RouteParams) {
     try {
         const { id } = await params;
+
+        // Validate vendor token
+        const { vendorId, error: tokenError } = await validateVendorToken(request);
+        if (tokenError || !vendorId) {
+            return NextResponse.json({ error: tokenError || 'Unauthorized' }, { status: 401 });
+        }
+
+        // Validate gig ownership
+        const { valid, error: ownerError } = await validateGigOwnership(id, vendorId);
+        if (!valid) {
+            return NextResponse.json({ error: ownerError || 'Unauthorized' }, { status: 403 });
+        }
 
         const supabase = createClient(
             process.env.NEXT_PUBLIC_SUPABASE_URL!,
@@ -36,7 +48,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
         return NextResponse.json({
             gig,
             success: true,
-            message: 'Гиг опубликован!'
+            message: 'הגיג פורסם בהצלחה!'
         });
     } catch (error) {
         console.error('Publish gig error:', error);
