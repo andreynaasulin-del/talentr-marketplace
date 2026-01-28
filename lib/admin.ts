@@ -328,23 +328,49 @@ export async function sendInvitation(
 ): Promise<{ link: string | null; error: string | null }> {
     try {
         const client = getAdminClient();
-        const { data, error } = await client
+
+        // First get pending vendor info for email
+        const { data: pending, error: fetchError } = await client
+            .from('pending_vendors')
+            .select('name, email, confirmation_token')
+            .eq('id', pendingId)
+            .single();
+
+        if (fetchError || !pending) {
+            return { link: null, error: 'Pending vendor not found' };
+        }
+
+        // Update status
+        const { error: updateError } = await client
             .from('pending_vendors')
             .update({
                 status: 'invited',
                 invitation_sent_at: new Date().toISOString(),
                 invitation_method: method
             })
-            .eq('id', pendingId)
-            .select('confirmation_token')
-            .single();
+            .eq('id', pendingId);
 
-        if (error) {
-            return { link: null, error: error.message };
+        if (updateError) {
+            return { link: null, error: updateError.message };
         }
 
         const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
-        const link = `${baseUrl}/confirm/${data.confirmation_token}`;
+        const link = `${baseUrl}/confirm/${pending.confirmation_token}`;
+
+        // Send actual email if method is email and we have an email address
+        if (method === 'email' && pending.email) {
+            try {
+                const { sendInviteEmail } = await import('@/lib/email');
+                await sendInviteEmail({
+                    vendorName: pending.name || 'Vendor',
+                    vendorEmail: pending.email,
+                    confirmLink: link
+                });
+            } catch (emailError) {
+                console.error('Failed to send invitation email:', emailError);
+                // Don't fail - the invitation was marked, just email didn't send
+            }
+        }
 
         return { link, error: null };
     } catch (err) {
