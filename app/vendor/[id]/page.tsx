@@ -304,7 +304,7 @@ export default function VendorPage() {
                                             <div className="relative w-20 h-20 rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800 flex-shrink-0">
                                                 {gig.photos?.[0] ? (
                                                     <Image
-                                                        src={gig.photos[0].url}
+                                                        src={typeof gig.photos[0] === 'string' ? gig.photos[0] : gig.photos[0].url}
                                                         alt={gig.title}
                                                         fill
                                                         className="object-cover group-hover:scale-110 transition-transform duration-300"

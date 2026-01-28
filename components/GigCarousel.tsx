@@ -3,31 +3,107 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
-import { packages, Package } from '@/lib/gigs';
-import { memo } from 'react';
+import Link from 'next/link';
+import { memo, useEffect, useState } from 'react';
+import { MapPin, Clock, Users } from 'lucide-react';
+
+interface Gig {
+    id: string;
+    title: string;
+    category_id: string;
+    short_description?: string;
+    photos?: string[];
+    is_free?: boolean;
+    pricing_type?: string;
+    price_amount?: number;
+    currency?: string;
+    base_city?: string;
+    duration_minutes?: number;
+    max_guests?: number;
+    share_slug?: string;
+    vendor?: {
+        name?: string;
+        avatar_url?: string;
+    };
+}
 
 export default function GigCarousel() {
     const { language } = useLanguage();
     const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
+    const [gigs, setGigs] = useState<Gig[]>([]);
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        const fetchGigs = async () => {
+            try {
+                const res = await fetch('/api/gigs/public?limit=24');
+                const data = await res.json();
+                if (data.gigs) {
+                    setGigs(data.gigs);
+                }
+            } catch (error) {
+                console.error('Failed to fetch gigs:', error);
+            } finally {
+                setLoading(false);
+            }
+        };
+        fetchGigs();
+    }, []);
 
     const content = {
         en: {
             title: 'The Collection',
-            subtitle: 'Curated artistic experiences, encased in digital crystal.',
+            subtitle: 'Browse premium experiences from top vendors',
+            viewAll: 'View All',
+            noGigs: 'No gigs yet',
+            noGigsDesc: 'Be the first to publish your service',
+            free: 'Free',
+            from: 'from'
         },
         he: {
             title: 'האוסף',
-            subtitle: 'חוויות אמנותיות נבחרות, עטופות בקריסטל דיגיטלי.',
+            subtitle: 'גלו חוויות פרימיום מהספקים הטובים ביותר',
+            viewAll: 'צפה בהכל',
+            noGigs: 'אין גיגים עדיין',
+            noGigsDesc: 'היו הראשונים לפרסם את השירות שלכם',
+            free: 'חינם',
+            from: 'החל מ'
         },
     };
 
     const t = content[lang];
 
-    // Show all packages
-    const filtered = packages;
-    const mid = Math.ceil(filtered.length / 2);
-    const topRow = filtered.slice(0, mid);
-    const bottomRow = filtered.slice(mid);
+    // Show skeleton while loading
+    if (loading) {
+        return (
+            <section className="gig-carousel-section">
+                <div className="gig-header" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                    <h2 className="gig-title">{t.title}</h2>
+                    <p className="gig-subtitle">{t.subtitle}</p>
+                </div>
+                <div className="flex gap-4 px-4 overflow-hidden">
+                    {[1, 2, 3, 4, 5].map(i => (
+                        <div key={i} className="w-[280px] h-[280px] bg-zinc-100 dark:bg-zinc-800 rounded-2xl animate-pulse flex-shrink-0" />
+                    ))}
+                </div>
+            </section>
+        );
+    }
+
+    // No gigs state
+    if (gigs.length === 0) {
+        return (
+            <section className="py-16 text-center">
+                <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{t.noGigs}</h2>
+                <p className="text-zinc-500">{t.noGigsDesc}</p>
+            </section>
+        );
+    }
+
+    // Split for two rows
+    const mid = Math.ceil(gigs.length / 2);
+    const topRow = gigs.slice(0, mid);
+    const bottomRow = gigs.slice(mid);
 
     return (
         <section className="gig-carousel-section">
@@ -39,7 +115,6 @@ export default function GigCarousel() {
                     viewport={{ once: true }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                    <span className="gig-eyebrow">Exclusive</span>
                     <h2 className="gig-title">{t.title}</h2>
                     <p className="gig-subtitle">{t.subtitle}</p>
                 </motion.div>
@@ -50,31 +125,32 @@ export default function GigCarousel() {
                 {/* ROW 1 */}
                 <div className="gig-row">
                     <div className="gig-track gig-track-left">
-                        {[...topRow, ...topRow].map((pkg, i) => (
-                            <GigCard key={`r1-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        {[...topRow, ...topRow].map((gig, i) => (
+                            <GigCard key={`r1-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
                         ))}
                     </div>
-                    {/* Duplicate track for loop */}
                     <div className="gig-track gig-track-left" aria-hidden="true">
-                        {[...topRow, ...topRow].map((pkg, i) => (
-                            <GigCard key={`r1-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
+                        {[...topRow, ...topRow].map((gig, i) => (
+                            <GigCard key={`r1-dup-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
                         ))}
                     </div>
                 </div>
 
                 {/* ROW 2 */}
-                <div className="gig-row">
-                    <div className="gig-track gig-track-right">
-                        {[...bottomRow, ...bottomRow].map((pkg, i) => (
-                            <GigCard key={`r2-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
-                        ))}
+                {bottomRow.length > 0 && (
+                    <div className="gig-row">
+                        <div className="gig-track gig-track-right">
+                            {[...bottomRow, ...bottomRow].map((gig, i) => (
+                                <GigCard key={`r2-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
+                            ))}
+                        </div>
+                        <div className="gig-track gig-track-right" aria-hidden="true">
+                            {[...bottomRow, ...bottomRow].map((gig, i) => (
+                                <GigCard key={`r2-dup-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
+                            ))}
+                        </div>
                     </div>
-                    <div className="gig-track gig-track-right" aria-hidden="true">
-                        {[...bottomRow, ...bottomRow].map((pkg, i) => (
-                            <GigCard key={`r2-dup-${pkg.id}-${i}`} pkg={pkg} lang={lang} />
-                        ))}
-                    </div>
-                </div>
+                )}
             </div>
 
             <style jsx global>{`
@@ -94,10 +170,6 @@ export default function GigCarousel() {
                     max-width: 1200px;
                     margin: 0 auto 32px;
                     padding: 0 16px;
-                }
-
-                .gig-eyebrow {
-                    display: none;
                 }
 
                 .gig-title {
@@ -124,7 +196,7 @@ export default function GigCarousel() {
                     z-index: 10;
                     display: flex;
                     flex-direction: column;
-                    gap: 40px;
+                    gap: 24px;
                     width: 100%;
                     max-width: 100vw;
                     overflow: hidden !important;
@@ -141,7 +213,7 @@ export default function GigCarousel() {
 
                 .gig-track {
                     display: flex;
-                    gap: 20px;
+                    gap: 16px;
                     padding: 10px 16px;
                     flex-shrink: 0;
                     width: max-content;
@@ -149,14 +221,12 @@ export default function GigCarousel() {
                 }
 
                 .gig-track-left {
-                    animation: scroll-left 150s linear infinite;
+                    animation: scroll-left 120s linear infinite;
                 }
 
                 .gig-track-right {
-                    animation: scroll-right 160s linear infinite;
+                    animation: scroll-right 130s linear infinite;
                 }
-
-
 
                 @keyframes scroll-left {
                     0% { transform: translateX(0); }
@@ -191,10 +261,10 @@ export default function GigCarousel() {
                         padding: 8px 12px;
                     }
                     .gig-track-left {
-                        animation: scroll-left 100s linear infinite;
+                        animation: scroll-left 80s linear infinite;
                     }
                     .gig-track-right {
-                        animation: scroll-right 105s linear infinite;
+                        animation: scroll-right 85s linear infinite;
                     }
                 }
             `}</style>
@@ -202,59 +272,122 @@ export default function GigCarousel() {
     );
 }
 
-// Separate component for performance
-const GigCard = memo(function GigCard({ pkg, lang }: { pkg: Package; lang: 'en' | 'he' }) {
+// Gig Card Component
+const GigCard = memo(function GigCard({
+    gig,
+    lang,
+    t
+}: {
+    gig: Gig;
+    lang: 'en' | 'he';
+    t: { free: string; from: string };
+}) {
     const isHebrew = lang === 'he';
+    const photo = gig.photos?.[0] || '/placeholder-gig.jpg';
+    const link = gig.share_slug ? `/g/${gig.share_slug}` : `/gig/${gig.id}`;
+
+    const formatPrice = () => {
+        if (gig.is_free) return t.free;
+        if (!gig.price_amount) return null;
+        const symbol = gig.currency === 'USD' ? '$' : '₪';
+        if (gig.pricing_type === 'from') {
+            return `${t.from} ${symbol}${gig.price_amount.toLocaleString()}`;
+        }
+        return `${symbol}${gig.price_amount.toLocaleString()}`;
+    };
 
     return (
-        <div
-            className="gig-card-wrapper"
-            style={{
-                direction: isHebrew ? 'rtl' : 'ltr'
-            }}
+        <Link
+            href={link}
+            className="gig-card-wrapper group"
+            style={{ direction: isHebrew ? 'rtl' : 'ltr' }}
         >
-            <div className="block overflow-hidden rounded-xl sm:rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 hover:border-blue-500/50 dark:hover:border-blue-600/30 transition-colors shadow-md dark:shadow-none">
+            <div className="relative overflow-hidden rounded-2xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 group-hover:border-blue-500/50 dark:group-hover:border-blue-500/30 transition-all shadow-md dark:shadow-none group-hover:shadow-lg">
                 {/* IMAGE */}
-                <div className="gig-card-image relative overflow-hidden">
+                <div className="relative h-[160px] overflow-hidden">
                     <Image
-                        src={pkg.image}
-                        alt={pkg.title[lang]}
+                        src={photo}
+                        alt={gig.title}
                         fill
-                        className="object-cover"
-                        sizes="(max-width: 640px) 240px, 300px"
+                        className="object-cover group-hover:scale-105 transition-transform duration-500"
+                        sizes="280px"
                     />
+                    {/* Price Badge */}
+                    {formatPrice() && (
+                        <div className="absolute bottom-3 left-3 px-3 py-1 bg-black/70 backdrop-blur-sm rounded-full">
+                            <span className="text-white text-sm font-semibold">{formatPrice()}</span>
+                        </div>
+                    )}
                 </div>
 
                 {/* CONTENT */}
-                <div className="p-3 sm:p-4">
+                <div className="p-4">
                     {/* Category */}
-                    <p className="text-zinc-400 dark:text-zinc-500 text-[10px] sm:text-xs font-medium uppercase tracking-wide mb-1">
-                        {pkg.category}
+                    <p className="text-blue-600 dark:text-blue-400 text-xs font-medium uppercase tracking-wide mb-1">
+                        {gig.category_id}
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-zinc-900 dark:text-white font-bold text-sm sm:text-base leading-snug line-clamp-2">
-                        {pkg.title[lang]}
+                    <h3 className="text-zinc-900 dark:text-white font-bold text-base leading-snug line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                        {gig.title}
                     </h3>
+
+                    {/* Meta */}
+                    <div className="flex items-center gap-3 text-xs text-zinc-500">
+                        {gig.base_city && (
+                            <span className="flex items-center gap-1">
+                                <MapPin className="w-3 h-3" />
+                                {gig.base_city}
+                            </span>
+                        )}
+                        {gig.duration_minutes && (
+                            <span className="flex items-center gap-1">
+                                <Clock className="w-3 h-3" />
+                                {gig.duration_minutes} min
+                            </span>
+                        )}
+                        {gig.max_guests && (
+                            <span className="flex items-center gap-1">
+                                <Users className="w-3 h-3" />
+                                {gig.max_guests}
+                            </span>
+                        )}
+                    </div>
+
+                    {/* Vendor */}
+                    {gig.vendor?.name && (
+                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
+                            {gig.vendor.avatar_url ? (
+                                <Image
+                                    src={gig.vendor.avatar_url}
+                                    alt={gig.vendor.name}
+                                    width={24}
+                                    height={24}
+                                    className="rounded-full object-cover"
+                                />
+                            ) : (
+                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
+                                    {gig.vendor.name[0]}
+                                </div>
+                            )}
+                            <span className="text-xs text-zinc-600 dark:text-zinc-400 truncate">
+                                {gig.vendor.name}
+                            </span>
+                        </div>
+                    )}
                 </div>
             </div>
             <style jsx>{`
                 .gig-card-wrapper {
-                    width: 240px;
+                    width: 280px;
                     flex-shrink: 0;
-                }
-                .gig-card-image {
-                    height: 140px;
                 }
                 @media (max-width: 640px) {
                     .gig-card-wrapper {
-                        width: 200px;
-                    }
-                    .gig-card-image {
-                        height: 120px;
+                        width: 240px;
                     }
                 }
             `}</style>
-        </div>
+        </Link>
     );
 });
