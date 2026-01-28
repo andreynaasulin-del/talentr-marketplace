@@ -76,6 +76,21 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
             const editLink = `${baseUrl}/vendor/edit/${editToken}`;
 
+            // Send magic link email to vendor
+            if (updates?.email) {
+                try {
+                    const { sendMagicLinkEmail } = await import('@/lib/email');
+                    await sendMagicLinkEmail({
+                        vendorName: updates?.name || 'Vendor',
+                        vendorEmail: updates.email,
+                        editLink
+                    });
+                } catch (emailError) {
+                    console.error('Failed to send magic link email:', emailError);
+                    // Don't fail the confirmation if email fails
+                }
+            }
+
             return NextResponse.json({
                 success: true,
                 vendorId,

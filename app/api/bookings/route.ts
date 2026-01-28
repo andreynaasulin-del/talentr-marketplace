@@ -82,8 +82,44 @@ export async function POST(request: NextRequest) {
             );
         }
 
-        // TODO: Send email notification to vendor
-        // await sendBookingNotificationEmail(vendor_id, booking);
+        // Send email notification to vendor
+        try {
+            // Get vendor details for email
+            const { data: vendor } = await supabase
+                .from('vendors')
+                .select('name, email, edit_token')
+                .eq('id', vendor_id)
+                .single();
+
+            // Get gig title
+            const { data: gig } = await supabase
+                .from('gigs')
+                .select('title')
+                .eq('id', gig_id)
+                .single();
+
+            if (vendor?.email) {
+                const { sendBookingNotificationEmail } = await import('@/lib/email');
+                const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
+
+                await sendBookingNotificationEmail({
+                    vendorName: vendor.name || 'Vendor',
+                    vendorEmail: vendor.email,
+                    clientName: client_name,
+                    clientEmail: client_email,
+                    clientPhone: client_phone,
+                    gigTitle: gig?.title || 'Gig',
+                    eventDate: event_date,
+                    eventType: event_type,
+                    guestsCount: guests_count,
+                    message: message,
+                    dashboardLink: `${baseUrl}/vendor/edit/${vendor.edit_token}`
+                });
+            }
+        } catch (emailError) {
+            console.error('Failed to send booking notification email:', emailError);
+            // Don't fail the request if email fails
+        }
 
         return NextResponse.json({
             success: true,

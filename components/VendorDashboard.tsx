@@ -7,7 +7,7 @@ import Link from 'next/link';
 import {
     User, MapPin, Phone, Mail, Instagram, Camera, Edit3,
     Plus, Eye, Share2, Copy, Check, ExternalLink, Loader2,
-    LayoutGrid, Settings, LogOut, ChevronRight, Sparkles
+    LayoutGrid, Settings, LogOut, ChevronRight, Sparkles, X
 } from 'lucide-react';
 import { Gig } from '@/types/gig';
 import { useLanguage } from '@/context/LanguageContext';
@@ -664,35 +664,48 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                                                         <span className={`px-2 py-0.5 text-xs rounded-full font-medium uppercase ${request.status === 'pending' ? 'bg-yellow-100 text-yellow-800' :
                                                             request.status === 'confirmed' ? 'bg-green-100 text-green-800' :
                                                                 request.status === 'rejected' ? 'bg-red-100 text-red-800' :
-                                                                    'bg-zinc-100 text-zinc-800'
+                                                                    request.status === 'viewed' ? 'bg-blue-100 text-blue-800' :
+                                                                        'bg-zinc-100 text-zinc-800'
                                                             }`}>
-                                                            {request.status}
+                                                            {request.status === 'pending' ? (lang === 'he' ? 'ממתין' : 'Pending') :
+                                                                request.status === 'confirmed' ? (lang === 'he' ? 'אושר' : 'Confirmed') :
+                                                                    request.status === 'rejected' ? (lang === 'he' ? 'נדחה' : 'Rejected') :
+                                                                        request.status === 'viewed' ? (lang === 'he' ? 'נצפה' : 'Viewed') :
+                                                                            request.status}
                                                         </span>
                                                     </div>
                                                     <p className="text-zinc-600 dark:text-zinc-400 text-sm mb-2">{request.gig?.title}</p>
 
                                                     <div className="flex flex-wrap gap-4 text-sm text-zinc-500">
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="opacity-70">📅</span>
-                                                            {new Date(request.event_date).toLocaleDateString()}
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="opacity-70">📍</span>
-                                                            {request.event_city || 'No location'}
-                                                        </div>
-                                                        <div className="flex items-center gap-1">
-                                                            <span className="opacity-70">👥</span>
-                                                            {request.guests_count || '?'} guests
-                                                        </div>
+                                                        {request.event_date && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="opacity-70">📅</span>
+                                                                {new Date(request.event_date).toLocaleDateString()}
+                                                            </div>
+                                                        )}
+                                                        {request.event_city && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="opacity-70">📍</span>
+                                                                {request.event_city}
+                                                            </div>
+                                                        )}
+                                                        {request.guests_count && (
+                                                            <div className="flex items-center gap-1">
+                                                                <span className="opacity-70">👥</span>
+                                                                {request.guests_count} {lang === 'he' ? 'אורחים' : 'guests'}
+                                                            </div>
+                                                        )}
                                                     </div>
                                                 </div>
                                             </div>
 
-                                            <div className="flex flex-col gap-2 min-w-[140px]">
+                                            <div className="flex flex-col gap-2 min-w-[160px]">
                                                 <div className="p-3 bg-zinc-50 dark:bg-zinc-800 rounded-xl text-sm">
-                                                    <p className="font-medium mb-1 text-zinc-900 dark:text-zinc-200">Contact:</p>
-                                                    <p>{request.client_email}</p>
-                                                    <p>{request.client_phone}</p>
+                                                    <p className="font-medium mb-1 text-zinc-900 dark:text-zinc-200">{lang === 'he' ? 'פרטי התקשרות:' : 'Contact:'}</p>
+                                                    <a href={`mailto:${request.client_email}`} className="text-blue-600 hover:underline block">{request.client_email}</a>
+                                                    {request.client_phone && (
+                                                        <a href={`tel:${request.client_phone}`} className="text-blue-600 hover:underline block">{request.client_phone}</a>
+                                                    )}
                                                 </div>
                                             </div>
                                         </div>
@@ -702,6 +715,72 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                                                 <p className="text-sm text-zinc-600 dark:text-zinc-400 italic">
                                                     "{request.message}"
                                                 </p>
+                                            </div>
+                                        )}
+
+                                        {/* Accept/Reject buttons for pending/viewed requests */}
+                                        {(request.status === 'pending' || request.status === 'viewed') && (
+                                            <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800 flex gap-3">
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            const res = await fetch(`/api/vendor/bookings/${editToken}/${request.id}`, {
+                                                                method: 'PATCH',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({ action: 'confirm' })
+                                                            });
+                                                            if (res.ok) {
+                                                                toast.success(lang === 'he' ? 'ההזמנה אושרה!' : 'Booking confirmed!');
+                                                                setRequests(prev => prev.map(r =>
+                                                                    r.id === request.id ? { ...r, status: 'confirmed' } : r
+                                                                ));
+                                                            } else {
+                                                                toast.error(lang === 'he' ? 'שגיאה באישור' : 'Error confirming');
+                                                            }
+                                                        } catch {
+                                                            toast.error(lang === 'he' ? 'שגיאה' : 'Error');
+                                                        }
+                                                    }}
+                                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-green-600 hover:bg-green-700 text-white font-medium rounded-xl transition-colors"
+                                                >
+                                                    <Check className="w-4 h-4" />
+                                                    {lang === 'he' ? 'אשר הזמנה' : 'Accept'}
+                                                </button>
+                                                <button
+                                                    onClick={async () => {
+                                                        try {
+                                                            const res = await fetch(`/api/vendor/bookings/${editToken}/${request.id}`, {
+                                                                method: 'PATCH',
+                                                                headers: { 'Content-Type': 'application/json' },
+                                                                body: JSON.stringify({ action: 'reject' })
+                                                            });
+                                                            if (res.ok) {
+                                                                toast.success(lang === 'he' ? 'ההזמנה נדחתה' : 'Booking rejected');
+                                                                setRequests(prev => prev.map(r =>
+                                                                    r.id === request.id ? { ...r, status: 'rejected' } : r
+                                                                ));
+                                                            } else {
+                                                                toast.error(lang === 'he' ? 'שגיאה בדחייה' : 'Error rejecting');
+                                                            }
+                                                        } catch {
+                                                            toast.error(lang === 'he' ? 'שגיאה' : 'Error');
+                                                        }
+                                                    }}
+                                                    className="flex-1 flex items-center justify-center gap-2 py-3 bg-zinc-200 dark:bg-zinc-700 hover:bg-zinc-300 dark:hover:bg-zinc-600 text-zinc-900 dark:text-white font-medium rounded-xl transition-colors"
+                                                >
+                                                    <X className="w-4 h-4" />
+                                                    {lang === 'he' ? 'דחה' : 'Decline'}
+                                                </button>
+                                            </div>
+                                        )}
+
+                                        {/* Show response for confirmed/rejected */}
+                                        {request.vendor_response && (request.status === 'confirmed' || request.status === 'rejected') && (
+                                            <div className="mt-4 pt-4 border-t border-zinc-100 dark:border-zinc-800">
+                                                <p className="text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-1">
+                                                    {lang === 'he' ? 'התגובה שלך:' : 'Your response:'}
+                                                </p>
+                                                <p className="text-sm text-zinc-500">"{request.vendor_response}"</p>
                                             </div>
                                         )}
                                     </div>
