@@ -34,7 +34,15 @@ const categories = [
     'Model', 'Influencer', 'Other'
 ];
 
-const cities = ['Tel Aviv', 'Haifa', 'Jerusalem', 'Eilat', 'Rishon LeZion', 'Netanya', 'Ashdod'];
+const cities = [
+    'Tel Aviv', 'Jerusalem', 'Haifa', 'Rishon LeZion', 'Petah Tikva', 'Ashdod',
+    'Netanya', 'Beersheba', 'Holon', 'Bnei Brak', 'Ramat Gan', 'Ashkelon',
+    'Rehovot', 'Bat Yam', 'Herzliya', 'Kfar Saba', 'Hadera', 'Modi\'in',
+    'Nazareth', 'Lod', 'Ramla', 'Eilat', 'Acre', 'Nahariya', 'Tiberias',
+    'Rosh HaAyin', 'Givatayim', 'Raanana', 'Hod HaSharon', 'Kiryat Ata',
+    'Kiryat Gat', 'Kiryat Motzkin', 'Kiryat Yam', 'Kiryat Bialik', 'Kiryat Ono',
+    'Ma\'ale Adumim', 'Or Yehuda', 'Zichron Yaakov', 'Caesarea', 'Other'
+];
 
 export default function ConfirmProfilePage() {
     const params = useParams();
@@ -59,8 +67,14 @@ export default function ConfirmProfilePage() {
         phone: '',
         description: '',
         price_from: 0,
-        image_url: ''
+        image_url: '',
+        instagram_handle: '',
+        website: '',
+        tags: [] as string[],
+        portfolio_gallery: [] as string[]
     });
+
+    const [newPortfolioUrl, setNewPortfolioUrl] = useState('');
 
     useEffect(() => {
         const fetchPendingVendor = async () => {
@@ -84,7 +98,11 @@ export default function ConfirmProfilePage() {
                     phone: data.pending.phone || '',
                     description: isQuick ? '' : (data.pending.description || ''),
                     price_from: data.pending.price_from || 0,
-                    image_url: data.pending.image_url || ''
+                    image_url: data.pending.image_url || '',
+                    instagram_handle: data.pending.instagram_handle || '',
+                    website: data.pending.website || '',
+                    tags: data.pending.tags || [],
+                    portfolio_gallery: data.pending.portfolio_urls || []
                 });
 
                 // Auto-enter edit mode if mandatory info is missing or it's a quick invite
@@ -500,6 +518,37 @@ export default function ConfirmProfilePage() {
                                             className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none"
                                         />
                                     </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Instagram
+                                        </label>
+                                        <div className="flex items-center gap-2 px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl">
+                                            <Instagram className="w-5 h-5 text-pink-500" />
+                                            <span className="text-zinc-500">@</span>
+                                            <input
+                                                type="text"
+                                                value={formData.instagram_handle}
+                                                onChange={(e) => setFormData({ ...formData, instagram_handle: e.target.value.replace('@', '') })}
+                                                placeholder="username"
+                                                className="flex-1 bg-transparent text-zinc-900 dark:text-white outline-none"
+                                            />
+                                        </div>
+                                    </div>
+                                    <div>
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
+                                            Website
+                                        </label>
+                                        <div className="flex items-center gap-2 px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl">
+                                            <Globe className="w-5 h-5 text-blue-500" />
+                                            <input
+                                                type="url"
+                                                value={formData.website}
+                                                onChange={(e) => setFormData({ ...formData, website: e.target.value })}
+                                                placeholder="https://..."
+                                                className="flex-1 bg-transparent text-zinc-900 dark:text-white outline-none"
+                                            />
+                                        </div>
+                                    </div>
                                     <div className="md:col-span-2">
                                         <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-2">
                                             Описание
@@ -511,6 +560,58 @@ export default function ConfirmProfilePage() {
                                             className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white focus:ring-2 focus:ring-blue-500 outline-none resize-none"
                                             placeholder="Расскажите о себе и своих услугах..."
                                         />
+                                    </div>
+                                    <div className="md:col-span-2">
+                                        <label className="block text-sm font-bold text-zinc-700 dark:text-zinc-300 mb-3">
+                                            <div className="flex items-center gap-2">
+                                                <Camera className="w-4 h-4" />
+                                                Портфолио ({formData.portfolio_gallery.length} фото)
+                                            </div>
+                                        </label>
+                                        <div className="flex gap-2 mb-3">
+                                            <input
+                                                type="url"
+                                                value={newPortfolioUrl}
+                                                onChange={(e) => setNewPortfolioUrl(e.target.value)}
+                                                placeholder="https://image-url.com"
+                                                className="flex-1 px-4 py-2 text-sm bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-lg text-zinc-900 dark:text-white outline-none focus:ring-2 focus:ring-blue-500"
+                                            />
+                                            <button
+                                                type="button"
+                                                onClick={() => {
+                                                    if (newPortfolioUrl.trim()) {
+                                                        setFormData(prev => ({
+                                                            ...prev,
+                                                            portfolio_gallery: [...prev.portfolio_gallery, newPortfolioUrl.trim()]
+                                                        }));
+                                                        setNewPortfolioUrl('');
+                                                    }
+                                                }}
+                                                className="px-4 py-2 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-lg text-sm transition-colors">
+                                                Добавить
+                                            </button>
+                                        </div>
+                                        {formData.portfolio_gallery.length > 0 && (
+                                            <div className="grid grid-cols-3 sm:grid-cols-4 gap-2">
+                                                {formData.portfolio_gallery.map((url, i) => (
+                                                    <div key={i} className="relative aspect-square rounded-lg overflow-hidden group border border-zinc-200 dark:border-zinc-700">
+                                                        <Image src={url} alt={`Portfolio ${i + 1}`} fill className="object-cover" />
+                                                        <button
+                                                            type="button"
+                                                            onClick={() => {
+                                                                setFormData(prev => ({
+                                                                    ...prev,
+                                                                    portfolio_gallery: prev.portfolio_gallery.filter((_, idx) => idx !== i)
+                                                                }));
+                                                            }}
+                                                            className="absolute top-1 right-1 p-1.5 bg-red-500 hover:bg-red-600 text-white rounded-md opacity-0 group-hover:opacity-100 transition-opacity"
+                                                        >
+                                                            <X className="w-3 h-3" />
+                                                        </button>
+                                                    </div>
+                                                ))}
+                                            </div>
+                                        )}
                                     </div>
                                 </div>
                             </div>
@@ -550,7 +651,49 @@ export default function ConfirmProfilePage() {
                                             <span className="text-sm text-zinc-600 dark:text-zinc-300">{formData.phone}</span>
                                         </div>
                                     )}
+                                    {formData.instagram_handle && (
+                                        <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
+                                            <Instagram className="w-5 h-5 text-pink-500" />
+                                            <a
+                                                href={`https://instagram.com/${formData.instagram_handle}`}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-pink-500 transition-colors"
+                                            >
+                                                @{formData.instagram_handle}
+                                            </a>
+                                        </div>
+                                    )}
+                                    {formData.website && (
+                                        <div className="flex items-center gap-3 p-3 bg-zinc-50 dark:bg-zinc-800/50 rounded-xl">
+                                            <Globe className="w-5 h-5 text-blue-500" />
+                                            <a
+                                                href={formData.website}
+                                                target="_blank"
+                                                rel="noopener noreferrer"
+                                                className="text-sm text-zinc-600 dark:text-zinc-300 hover:text-blue-500 transition-colors truncate"
+                                            >
+                                                {formData.website}
+                                            </a>
+                                        </div>
+                                    )}
                                 </div>
+
+                                {formData.portfolio_gallery.length > 0 && (
+                                    <div className="pt-4">
+                                        <h3 className="font-bold text-zinc-900 dark:text-white mb-3 flex items-center gap-2">
+                                            <Camera className="w-4 h-4" />
+                                            Портфолио ({formData.portfolio_gallery.length})
+                                        </h3>
+                                        <div className="grid grid-cols-3 md:grid-cols-4 gap-2">
+                                            {formData.portfolio_gallery.map((url, i) => (
+                                                <div key={i} className="relative aspect-square rounded-xl overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                                                    <Image src={url} alt={`Portfolio ${i + 1}`} fill className="object-cover" />
+                                                </div>
+                                            ))}
+                                        </div>
+                                    </div>
+                                )}
 
                                 {formData.price_from > 0 && (
                                     <div className="p-4 bg-green-50 dark:bg-green-900/10 rounded-xl border border-green-200 dark:border-green-500/20">
