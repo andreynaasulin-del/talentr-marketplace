@@ -55,69 +55,108 @@ export default function GigCarousel() {
 
     const MOCK_GIGS: Gig[] = [
         {
-            id: 'mock-1',
-            title: 'Professional Wedding DJ & MC',
-            category_id: 'DJ',
-            photos: ['/talentr/unnamed.jpg'],
-            price_amount: 1500,
+            id: 'pkg-1',
+            title: 'חווית שף פרטי', // Private Chef Experience
+            category_id: 'PRIVATE CHEF',
+            photos: ['/talentr/Private Chef.jpg'],
+            price_amount: 2500,
             currency: 'ILS',
             pricing_type: 'starting',
             base_city: 'Tel Aviv',
-            duration_minutes: 240,
-            max_guests: 500,
-            vendor: { name: 'Alex Beat', avatar_url: '' }
+            duration_minutes: 180,
+            max_guests: 20,
+            vendor: { name: 'Chef Mario', avatar_url: '' }
         },
         {
-            id: 'mock-2',
-            title: 'Cinematic Event Photography',
-            category_id: 'Photographer',
-            photos: ['/talentr/Gemini_Generated_Image_l9kf74l9kf74l9kf.png'],
-            price_amount: 800,
-            currency: 'ILS',
-            pricing_type: 'hourly',
-            base_city: 'Herzliya',
-            duration_minutes: 60,
-            max_guests: 1000,
-            vendor: { name: 'Sarah Lens', avatar_url: '' }
-        },
-        {
-            id: 'mock-3',
-            title: 'Live Jazz Trio for Receptions',
-            category_id: 'Musician',
-            photos: ['/placeholder-gig.jpg'],
-            price_amount: 2500,
-            currency: 'ILS',
-            pricing_type: 'fixed',
-            base_city: 'Jerusalem',
-            duration_minutes: 120,
-            max_guests: 200,
-            vendor: { name: 'Smooth Vibes', avatar_url: '' }
-        },
-        {
-            id: 'mock-4',
-            title: 'Close-up Magic for Cocktails',
-            category_id: 'Magician',
-            photos: ['/placeholder-gig.jpg'],
+            id: 'pkg-2',
+            title: 'שירותי בר ומחזמר', // Bar Services
+            category_id: 'BARTENDER',
+            photos: ['/talentr/Bartender.jpg'],
             price_amount: 1200,
             currency: 'ILS',
-            pricing_type: 'hourly',
-            base_city: 'Rishon LeZion',
-            duration_minutes: 60,
-            max_guests: 100,
-            vendor: { name: 'Magic Mike', avatar_url: '' }
+            pricing_type: 'event',
+            base_city: 'Herzliya',
+            duration_minutes: 240,
+            max_guests: 50,
+            vendor: { name: 'Mixology Pro', avatar_url: '' }
         },
         {
-            id: 'mock-5',
-            title: 'Gourmet Chef Station - Italian',
-            category_id: 'Chef',
-            photos: ['/placeholder-gig.jpg'],
+            id: 'pkg-3',
+            title: 'מופע סטנד-אפ', // Stand-up Show
+            category_id: 'STAND-UP COMEDIAN',
+            photos: ['/talentr/Stand-up Comedian.jpg'],
             price_amount: 3000,
             currency: 'ILS',
-            pricing_type: 'per_person',
-            base_city: 'Haifa',
+            pricing_type: 'fixed',
+            base_city: 'TLV / Center',
+            duration_minutes: 45,
+            max_guests: 200,
+            vendor: { name: 'Comedy Club', avatar_url: '' }
+        },
+        {
+            id: 'pkg-4',
+            title: 'מאמן רולרבלייד', // Rollerblade Coach
+            category_id: 'ROLLERBLADE COACH',
+            photos: ['/talentr/Rollerblade Coach.jpg'],
+            price_amount: 250,
+            currency: 'ILS',
+            pricing_type: 'session',
+            base_city: 'Yarkon Park',
+            duration_minutes: 60,
+            max_guests: 5,
+            vendor: { name: 'Roll With It', avatar_url: '' }
+        },
+        {
+            id: 'pkg-5',
+            title: 'די-ג׳יי לאירועים', // Event DJ
+            category_id: 'DJ SET',
+            photos: ['/talentr/DJ.jpg'],
+            price_amount: 1800,
+            currency: 'ILS',
+            pricing_type: 'event',
+            base_city: 'Nationwide',
+            duration_minutes: 300,
+            max_guests: 500,
+            vendor: { name: 'Beat Master', avatar_url: '' }
+        },
+        {
+            id: 'pkg-6',
+            title: 'אמן אשליות', // Illusionist
+            category_id: 'ILLUSIONIST',
+            photos: ['/talentr/Illusionist.jpg'],
+            price_amount: 1500,
+            currency: 'ILS',
+            pricing_type: 'show',
+            base_city: 'Jerusalem',
+            duration_minutes: 45,
+            max_guests: 100,
+            vendor: { name: 'Magic Touch', avatar_url: '' }
+        },
+        {
+            id: 'pkg-7',
+            title: 'מוזיקה חיה', // Live Music
+            category_id: 'LIVE MUSICIAN',
+            photos: ['/talentr/Live Musician .jpg'],
+            price_amount: 1000,
+            currency: 'ILS',
+            pricing_type: 'hourly',
+            base_city: 'Tel Aviv',
+            duration_minutes: 90,
+            max_guests: 150,
+            vendor: { name: 'Acoustic Duo', avatar_url: '' }
+        },
+        {
+            id: 'pkg-8',
+            title: 'שולחן פוקר לאירועים', // Poker Table
+            category_id: 'POKER CROUPIER',
+            photos: ['/talentr/Poker Croupier .jpg'],
+            price_amount: 2200,
+            currency: 'ILS',
+            pricing_type: 'table',
+            base_city: 'Center',
             duration_minutes: 180,
-            max_guests: 50,
-            vendor: { name: 'Chef Mario', avatar_url: '' }
+            max_guests: 10,
+            vendor: { name: 'Casino Royale Events', avatar_url: '' }
         }
     ];
 
