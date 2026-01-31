@@ -408,12 +408,7 @@ const GigCard = memo(function GigCard({
                         className="object-cover group-hover:scale-105 transition-transform duration-500"
                         sizes="280px"
                     />
-                    {/* Price Badge */}
-                    {formatPrice() && (
-                        <div className="absolute bottom-3 left-3 px-3 py-1 bg-black/70 backdrop-blur-sm rounded-full">
-                            <span className="text-white text-sm font-semibold">{formatPrice()}</span>
-                        </div>
-                    )}
+
                 </div>
 
                 {/* CONTENT */}
