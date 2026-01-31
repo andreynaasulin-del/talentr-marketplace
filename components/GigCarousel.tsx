@@ -34,23 +34,9 @@ export default function GigCarousel() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchGigs = async () => {
-            try {
-                const res = await fetch('/api/gigs/public?limit=24');
-                const data = await res.json();
-                if (data.gigs && data.gigs.length > 0) {
-                    setGigs(data.gigs);
-                } else {
-                    setGigs(MOCK_GIGS);
-                }
-            } catch (error) {
-                console.error('Failed to fetch gigs:', error);
-                setGigs(MOCK_GIGS);
-            } finally {
-                setLoading(false);
-            }
-        };
-        fetchGigs();
+        // Force mock data mode
+        setGigs(MOCK_GIGS);
+        setLoading(false);
     }, []);
 
     const MOCK_GIGS: Gig[] = [
