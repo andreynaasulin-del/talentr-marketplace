@@ -49,7 +49,8 @@ export interface PendingVendor {
     website?: string;
     description?: string;
     image_url?: string;
-    portfolio_urls?: string[];
+    portfolio_urls?: string[]; // Legacy
+    portfolio_gallery?: string[]; // New standard
     price_from?: number;
     tags?: string[];
     instagram_followers?: number;
@@ -254,34 +255,47 @@ export async function confirmPendingVendor(
         // Generate unique edit token for magic link
         const editToken = crypto.randomUUID();
 
-        // Create the real vendor
+        // Create the real vendor with SAFETY defaults
         // Support both old field names (full_name, bio, avatar_url) and new (name, description, image_url)
         const vendorId = crypto.randomUUID();
-        const vendorName = updates?.name || pending.name;
+        const vendorName = updates?.name || pending.name || 'Unknown Vendor';
         const vendorDescription = updates?.description || pending.description || '';
-        const vendorImage = updates?.image_url || pending.image_url;
+        const vendorImage = updates?.image_url || pending.image_url || null;
+        const vendorCategory = updates?.category || pending.category || 'Other';
+        const vendorCity = updates?.city || pending.city || 'Tel Aviv';
+        const vendorPhone = updates?.phone || pending.phone || null;
+        const vendorEmail = updates?.email || pending.email || null;
+        const vendorPrice = Number(updates?.price_from || pending.price_from || 0);
+
+        // Ensure portfolio is a valid array of strings, filter out empty strings
+        const rawPortfolio = updates?.portfolio_gallery || pending.portfolio_urls || [];
+        const vendorPortfolio = Array.isArray(rawPortfolio)
+            ? rawPortfolio.filter(url => typeof url === 'string' && url.length > 0)
+            : [];
+
+        const vendorTags = Array.isArray(pending.tags) ? pending.tags : [];
 
         const { data: vendor, error } = await client
             .from('vendors')
             .insert({
                 id: vendorId,
-                user_id: userId || null,
+                user_id: userId || null, // Can be null for initial invite
                 // Both old and new field names for compatibility
                 name: vendorName,
                 full_name: vendorName,
-                category: updates?.category || pending.category || 'Other',
-                city: updates?.city || pending.city || 'Tel Aviv',
+                category: vendorCategory,
+                city: vendorCity,
                 description: vendorDescription,
                 bio: vendorDescription,
                 image_url: vendorImage,
                 avatar_url: vendorImage,
-                phone: updates?.phone || pending.phone,
-                email: updates?.email || pending.email,
-                instagram_handle: pending.instagram_handle,
-                website: pending.website,
-                price_from: updates?.price_from || pending.price_from || 0,
-                portfolio_gallery: pending.portfolio_urls || [],
-                tags: pending.tags || [],
+                phone: vendorPhone,
+                email: vendorEmail,
+                instagram_handle: pending.instagram_handle || null,
+                website: pending.website || null,
+                price_from: isNaN(vendorPrice) ? 0 : vendorPrice,
+                portfolio_gallery: vendorPortfolio,
+                tags: vendorTags,
                 rating: 0,
                 reviews_count: 0,
                 edit_token: editToken, // Magic link token

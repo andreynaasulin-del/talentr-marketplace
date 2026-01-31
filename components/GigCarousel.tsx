@@ -38,17 +38,88 @@ export default function GigCarousel() {
             try {
                 const res = await fetch('/api/gigs/public?limit=24');
                 const data = await res.json();
-                if (data.gigs) {
+                if (data.gigs && data.gigs.length > 0) {
                     setGigs(data.gigs);
+                } else {
+                    setGigs(MOCK_GIGS);
                 }
             } catch (error) {
                 console.error('Failed to fetch gigs:', error);
+                setGigs(MOCK_GIGS);
             } finally {
                 setLoading(false);
             }
         };
         fetchGigs();
     }, []);
+
+    const MOCK_GIGS: Gig[] = [
+        {
+            id: 'mock-1',
+            title: 'Professional Wedding DJ & MC',
+            category_id: 'DJ',
+            photos: ['/talentr/unnamed.jpg'],
+            price_amount: 1500,
+            currency: 'ILS',
+            pricing_type: 'starting',
+            base_city: 'Tel Aviv',
+            duration_minutes: 240,
+            max_guests: 500,
+            vendor: { name: 'Alex Beat', avatar_url: '' }
+        },
+        {
+            id: 'mock-2',
+            title: 'Cinematic Event Photography',
+            category_id: 'Photographer',
+            photos: ['/talentr/Gemini_Generated_Image_l9kf74l9kf74l9kf.png'],
+            price_amount: 800,
+            currency: 'ILS',
+            pricing_type: 'hourly',
+            base_city: 'Herzliya',
+            duration_minutes: 60,
+            max_guests: 1000,
+            vendor: { name: 'Sarah Lens', avatar_url: '' }
+        },
+        {
+            id: 'mock-3',
+            title: 'Live Jazz Trio for Receptions',
+            category_id: 'Musician',
+            photos: ['/placeholder-gig.jpg'],
+            price_amount: 2500,
+            currency: 'ILS',
+            pricing_type: 'fixed',
+            base_city: 'Jerusalem',
+            duration_minutes: 120,
+            max_guests: 200,
+            vendor: { name: 'Smooth Vibes', avatar_url: '' }
+        },
+        {
+            id: 'mock-4',
+            title: 'Close-up Magic for Cocktails',
+            category_id: 'Magician',
+            photos: ['/placeholder-gig.jpg'],
+            price_amount: 1200,
+            currency: 'ILS',
+            pricing_type: 'hourly',
+            base_city: 'Rishon LeZion',
+            duration_minutes: 60,
+            max_guests: 100,
+            vendor: { name: 'Magic Mike', avatar_url: '' }
+        },
+        {
+            id: 'mock-5',
+            title: 'Gourmet Chef Station - Italian',
+            category_id: 'Chef',
+            photos: ['/placeholder-gig.jpg'],
+            price_amount: 3000,
+            currency: 'ILS',
+            pricing_type: 'per_person',
+            base_city: 'Haifa',
+            duration_minutes: 180,
+            max_guests: 50,
+            vendor: { name: 'Chef Mario', avatar_url: '' }
+        }
+    ];
 
     const content = {
         en: {
