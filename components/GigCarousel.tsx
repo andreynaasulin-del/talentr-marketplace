@@ -5,7 +5,7 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { memo, useEffect, useState } from 'react';
-import { MapPin, Clock, Users } from 'lucide-react';
+// Removed: MapPin, Clock, Users - not needed for cleaner cards
 
 interface Gig {
     id: string;
@@ -17,14 +17,7 @@ interface Gig {
     pricing_type?: string;
     price_amount?: number;
     currency?: string;
-    base_city?: string;
-    duration_minutes?: number;
-    max_guests?: number;
     share_slug?: string;
-    vendor?: {
-        name?: string;
-        avatar_url?: string;
-    };
 }
 
 export default function GigCarousel() {
@@ -419,53 +412,9 @@ const GigCard = memo(function GigCard({
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-zinc-900 dark:text-white font-bold text-base leading-snug line-clamp-2 mb-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
+                    <h3 className="text-zinc-900 dark:text-white font-bold text-base leading-snug line-clamp-2 group-hover:text-blue-600 dark:group-hover:text-blue-400 transition-colors">
                         {gig.title}
                     </h3>
-
-                    {/* Meta */}
-                    <div className="flex items-center gap-3 text-xs text-zinc-500">
-                        {gig.base_city && (
-                            <span className="flex items-center gap-1">
-                                <MapPin className="w-3 h-3" />
-                                {gig.base_city}
-                            </span>
-                        )}
-                        {gig.duration_minutes && (
-                            <span className="flex items-center gap-1">
-                                <Clock className="w-3 h-3" />
-                                {gig.duration_minutes} min
-                            </span>
-                        )}
-                        {gig.max_guests && (
-                            <span className="flex items-center gap-1">
-                                <Users className="w-3 h-3" />
-                                {gig.max_guests}
-                            </span>
-                        )}
-                    </div>
-
-                    {/* Vendor */}
-                    {gig.vendor?.name && (
-                        <div className="flex items-center gap-2 mt-3 pt-3 border-t border-zinc-100 dark:border-zinc-800">
-                            {gig.vendor.avatar_url ? (
-                                <Image
-                                    src={gig.vendor.avatar_url}
-                                    alt={gig.vendor.name}
-                                    width={24}
-                                    height={24}
-                                    className="rounded-full object-cover"
-                                />
-                            ) : (
-                                <div className="w-6 h-6 rounded-full bg-gradient-to-br from-blue-500 to-purple-500 flex items-center justify-center text-white text-xs font-bold">
-                                    {gig.vendor.name[0]}
-                                </div>
-                            )}
-                            <span className="text-xs text-zinc-600 dark:text-zinc-400 truncate">
-                                {gig.vendor.name}
-                            </span>
-                        </div>
-                    )}
                 </div>
             </div>
             <style jsx>{`
