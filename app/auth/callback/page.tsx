@@ -2,12 +2,12 @@
 
 export const dynamic = 'force-dynamic';
 
-import { useEffect, useState } from 'react';
+import { useEffect, useState, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { Loader2 } from 'lucide-react';
 
-export default function AuthCallbackPage() {
+function AuthCallbackContent() {
     const router = useRouter();
     const [status, setStatus] = useState('Verifying authentication...');
 
@@ -53,5 +53,17 @@ export default function AuthCallbackPage() {
                 <p className="text-zinc-500 dark:text-zinc-400 text-sm">Please wait while we set up your session.</p>
             </div>
         </div>
+    );
+}
+
+export default function AuthCallbackPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
+                <Loader2 className="w-12 h-12 text-blue-600 animate-spin mx-auto" />
+            </div>
+        }>
+            <AuthCallbackContent />
+        </Suspense>
     );
 }
