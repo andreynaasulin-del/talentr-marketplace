@@ -44,6 +44,8 @@ export interface Vendor {
     isVerified?: boolean;
     isFeatured?: boolean;
     portfolioGallery?: string[]; // Array of image URLs
+    status?: 'invited' | 'gig_created_profile_missing' | 'profile_filled_pending_review' | 'approved' | 'rejected' | 'active' | 'inactive';
+    status_reason?: string;
 }
 
 export type BookingStatus = 'pending' | 'confirmed' | 'declined' | 'completed';

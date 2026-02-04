@@ -73,7 +73,7 @@ export interface Gig {
     lead_time_hours: number;
 
     // Visibility
-    status: 'draft' | 'published' | 'unlisted' | 'archived';
+    status: 'draft' | 'pending_review' | 'active' | 'hidden' | 'archived' | 'published' | 'unlisted'; // Keeping published for legacy if needed
     share_slug?: string;
     moderation_status: 'pending' | 'approved' | 'rejected';
 

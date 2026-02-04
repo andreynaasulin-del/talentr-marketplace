@@ -32,44 +32,22 @@ export default function CookieConsent() {
     const t = content[lang] || content.en;
 
     useEffect(() => {
-        // Initialize GTM consent state
-        const savedConsent = localStorage.getItem(COOKIE_CONSENT_KEY);
-
-        if (savedConsent) {
-            updateGtmConsent(savedConsent === 'accepted');
-        } else {
-            // Default to denied until user accepts
-            updateGtmConsent(false);
-            // Show banner after delay
+        // Check if user already made a choice
+        const consent = localStorage.getItem(COOKIE_CONSENT_KEY);
+        if (!consent) {
+            // Small delay for better UX
             const timer = setTimeout(() => setIsVisible(true), 1500);
             return () => clearTimeout(timer);
         }
     }, []);
 
-    const updateGtmConsent = (granted: boolean) => {
-        if (typeof window !== 'undefined' && window.dataLayer) {
-            window.dataLayer.push({
-                event: 'consent_update',
-                consent_status: granted ? 'granted' : 'denied'
-            });
-
-            // If utilizing Google's Consent Mode v2:
-            // window.gtag('consent', 'update', {
-            //   'ad_storage': granted ? 'granted' : 'denied',
-            //   'analytics_storage': granted ? 'granted' : 'denied'
-            // });
-        }
-    };
-
     const handleAccept = () => {
         localStorage.setItem(COOKIE_CONSENT_KEY, 'accepted');
-        updateGtmConsent(true);
         setIsVisible(false);
     };
 
     const handleDecline = () => {
         localStorage.setItem(COOKIE_CONSENT_KEY, 'declined');
-        updateGtmConsent(false);
         setIsVisible(false);
     };
 

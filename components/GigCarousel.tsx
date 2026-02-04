@@ -12,7 +12,7 @@ interface Gig {
     title: string;
     category_id: string;
     short_description?: string;
-    photos?: string[];
+    photos?: any[]; // string[] for Mocks, GigPhoto[] for Real DB
     is_free?: boolean;
     pricing_type?: string;
     price_amount?: number;
@@ -27,115 +27,85 @@ export default function GigCarousel() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        // Force mock data mode
-        setGigs(MOCK_GIGS);
-        setLoading(false);
+        const fetchGigs = async () => {
+            try {
+                const res = await fetch('/api/gigs?status=active');
+                if (res.ok) {
+                    const data = await res.json();
+                    if (data.gigs && data.gigs.length > 0) {
+                        setGigs(data.gigs);
+                    } else {
+                        setGigs(MOCK_GIGS);
+                    }
+                } else {
+                    setGigs(MOCK_GIGS);
+                }
+            } catch (err) {
+                console.error('Failed to fetch gigs:', err);
+                setGigs(MOCK_GIGS);
+            } finally {
+                setLoading(false);
+            }
+        };
+
+        fetchGigs();
     }, []);
 
     const MOCK_GIGS: Gig[] = [
         {
             id: 'pkg-1',
-            title: 'חווית שף פרטי', // Private Chef Experience
-            category_id: 'PRIVATE CHEF',
-            photos: ['/talentr/Private Chef.jpg'],
+            title: 'Private Chef Experience',
+            category_id: 'Private Chef',
+            photos: ['https://images.unsplash.com/photo-1556910103-1c02745a30bf?auto=format&fit=crop&w=800&q=80'],
             price_amount: 2500,
             currency: 'ILS',
-            pricing_type: 'starting',
-            base_city: 'Tel Aviv',
-            duration_minutes: 180,
-            max_guests: 20,
-            vendor: { name: 'Chef Mario', avatar_url: '' }
+            pricing_type: 'fixed',
+            short_description: 'Exclusive culinary journey in your home',
+            share_slug: 'demo-chef'
         },
         {
             id: 'pkg-2',
-            title: 'שירותי בר ומחזמר', // Bar Services
-            category_id: 'BARTENDER',
-            photos: ['/talentr/Bartender.jpg'],
+            title: 'Cocktail Bar & Mixology',
+            category_id: 'Bartender',
+            photos: ['https://images.unsplash.com/photo-1514362545857-3bc16549766b?auto=format&fit=crop&w=800&q=80'],
             price_amount: 1200,
             currency: 'ILS',
             pricing_type: 'event',
-            base_city: 'Herzliya',
-            duration_minutes: 240,
-            max_guests: 50,
-            vendor: { name: 'Mixology Pro', avatar_url: '' }
+            short_description: 'Premium bar service for private events',
+            share_slug: 'demo-bar'
         },
         {
             id: 'pkg-3',
-            title: 'מופע סטנד-אפ', // Stand-up Show
-            category_id: 'STAND-UP COMEDIAN',
-            photos: ['/talentr/Stand-up Comedian.jpg'],
+            title: 'Live Stand-up Comedy',
+            category_id: 'Stand-up',
+            photos: ['https://images.unsplash.com/photo-1585672922736-242636e788ad?auto=format&fit=crop&w=800&q=80'],
             price_amount: 3000,
             currency: 'ILS',
-            pricing_type: 'fixed',
-            base_city: 'TLV / Center',
-            duration_minutes: 45,
-            max_guests: 200,
-            vendor: { name: 'Comedy Club', avatar_url: '' }
+            pricing_type: 'show',
+            short_description: 'Hilarious performance for your guests',
+            share_slug: 'demo-comedy'
         },
         {
             id: 'pkg-4',
-            title: 'מאמן רולרבלייד', // Rollerblade Coach
-            category_id: 'ROLLERBLADE COACH',
-            photos: ['/talentr/Rollerblade Coach.jpg'],
-            price_amount: 250,
+            title: 'Wedding DJ Set',
+            category_id: 'DJ',
+            photos: ['https://images.unsplash.com/photo-1516035069371-29a1b244cc32?auto=format&fit=crop&w=800&q=80'],
+            price_amount: 4500,
             currency: 'ILS',
-            pricing_type: 'session',
-            base_city: 'Yarkon Park',
-            duration_minutes: 60,
-            max_guests: 5,
-            vendor: { name: 'Roll With It', avatar_url: '' }
+            pricing_type: 'event',
+            short_description: 'Unforgettable party vibes',
+            share_slug: 'demo-dj'
         },
         {
             id: 'pkg-5',
-            title: 'די-ג׳יי לאירועים', // Event DJ
-            category_id: 'DJ SET',
-            photos: ['/talentr/DJ.jpg'],
-            price_amount: 1800,
+            title: 'Live Jazz Band',
+            category_id: 'Band',
+            photos: ['https://images.unsplash.com/photo-1511192336575-5a79af67a629?auto=format&fit=crop&w=800&q=80'],
+            price_amount: 6000,
             currency: 'ILS',
-            pricing_type: 'event',
-            base_city: 'Nationwide',
-            duration_minutes: 300,
-            max_guests: 500,
-            vendor: { name: 'Beat Master', avatar_url: '' }
-        },
-        {
-            id: 'pkg-6',
-            title: 'אמן אשליות', // Illusionist
-            category_id: 'ILLUSIONIST',
-            photos: ['/talentr/Illusionist.jpg'],
-            price_amount: 1500,
-            currency: 'ILS',
-            pricing_type: 'show',
-            base_city: 'Jerusalem',
-            duration_minutes: 45,
-            max_guests: 100,
-            vendor: { name: 'Magic Touch', avatar_url: '' }
-        },
-        {
-            id: 'pkg-7',
-            title: 'מוזיקה חיה', // Live Music
-            category_id: 'LIVE MUSICIAN',
-            photos: ['/talentr/Live Musician .jpg'],
-            price_amount: 1000,
-            currency: 'ILS',
-            pricing_type: 'hourly',
-            base_city: 'Tel Aviv',
-            duration_minutes: 90,
-            max_guests: 150,
-            vendor: { name: 'Acoustic Duo', avatar_url: '' }
-        },
-        {
-            id: 'pkg-8',
-            title: 'שולחן פוקר לאירועים', // Poker Table
-            category_id: 'POKER CROUPIER',
-            photos: ['/talentr/Poker Croupier .jpg'],
-            price_amount: 2200,
-            currency: 'ILS',
-            pricing_type: 'table',
-            base_city: 'Center',
-            duration_minutes: 180,
-            max_guests: 10,
-            vendor: { name: 'Casino Royale Events', avatar_url: '' }
+            pricing_type: 'band',
+            short_description: 'Classy atmosphere for receptions',
+            share_slug: 'demo-jazz'
         }
     ];
 
@@ -372,7 +342,13 @@ const GigCard = memo(function GigCard({
     t: { free: string; from: string };
 }) {
     const isHebrew = lang === 'he';
-    const photo = gig.photos?.[0] || '/placeholder-gig.jpg';
+
+    // Handle both string[] (mock) and { url: string }[] (real)
+    const firstPhoto = gig.photos?.[0];
+    const photo = typeof firstPhoto === 'string'
+        ? firstPhoto
+        : firstPhoto?.url || '/placeholder-gig.jpg';
+
     const link = gig.share_slug ? `/g/${gig.share_slug}` : `/gig/${gig.id}`;
 
     const formatPrice = () => {

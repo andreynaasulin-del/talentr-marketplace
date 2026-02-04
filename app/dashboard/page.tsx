@@ -72,8 +72,22 @@ export default function DashboardPage() {
                 setUser(currentUser);
 
                 // Check if vendor
-                const { data: vendorData } = await supabase.from('vendors').select('id').eq('owner_user_id', currentUser.id).single();
+                const { data: vendorData } = await supabase.from('vendors').select('id, status').eq('owner_user_id', currentUser.id).single();
                 const isVendorUser = !!vendorData;
+
+                // Redirect logic for onboarding flow
+                if (vendorData) {
+                    if (vendorData.status === 'invited' || vendorData.status === 'gig_created_profile_missing' || (vendorData.status === 'pending' && !vendorData.id)) {
+                        // Check if they have a draft gig
+                        router.push('/onboarding');
+                        return;
+                    }
+                } else {
+                    // No vendor profile yet -> Onboarding
+                    router.push('/onboarding');
+                    return;
+                }
+
                 setIsVendor(isVendorUser);
 
                 // Fetch bookings (logic differs for vendor vs user, for now reusing getVendorBookings but should be user specific later)

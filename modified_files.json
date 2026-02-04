@@ -1,0 +1,22 @@
+[
+    {
+        "type": "file",
+        "path": "app/onboarding/steps/GigStep.tsx"
+    },
+    {
+        "type": "file",
+        "path": "app/onboarding/steps/ProfileStep.tsx"
+    },
+    {
+        "type": "file",
+        "path": "types/index.ts"
+    },
+    {
+        "type": "file",
+        "path": "SQL_MIGRATION_V2.sql"
+    },
+    {
+        "type": "file",
+        "path": "app/admin/page.tsx"
+    }
+]

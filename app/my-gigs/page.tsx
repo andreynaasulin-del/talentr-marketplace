@@ -50,7 +50,10 @@ export default function MyGigsPage() {
                 draft: 'Draft',
                 published: 'Published',
                 unlisted: 'Link Only',
-                archived: 'Archived'
+                archived: 'Archived',
+                active: 'Active',
+                pending_review: 'In Review',
+                hidden: 'Hidden'
             }
         },
         he: {
@@ -75,7 +78,10 @@ export default function MyGigsPage() {
                 draft: 'טיוטה',
                 published: 'פורסם',
                 unlisted: 'קישור בלבד',
-                archived: 'ארכיון'
+                archived: 'ארכיון',
+                active: 'פעיל',
+                pending_review: 'בבדיקה',
+                hidden: 'מוסתר'
             }
         }
     };
@@ -97,8 +103,7 @@ export default function MyGigsPage() {
             setUser(user);
 
             // Fetch vendor profile
-            // Try 'owner_user_id' first (standard), if fails we might need to adjust based on schema
-            const { data: vendorData, error } = await supabase
+            const { data: vendorData } = await supabase
                 .from('vendors')
                 .select('*')
                 .eq('owner_user_id', user.id)
@@ -108,7 +113,7 @@ export default function MyGigsPage() {
                 setVendor(vendorData);
                 loadGigs(vendorData.id);
             } else {
-                setLoading(false); // No vendor profile found
+                setLoading(false);
             }
         };
         init();
@@ -148,16 +153,21 @@ export default function MyGigsPage() {
     };
 
     const getStatusBadge = (status: Gig['status']) => {
-        const styles = {
+        const styles: Record<string, string> = {
             draft: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600 dark:text-zinc-400',
             published: 'bg-green-100 dark:bg-green-900/30 text-green-600',
             unlisted: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600',
-            archived: 'bg-red-100 dark:bg-red-900/30 text-red-600'
+            archived: 'bg-red-100 dark:bg-red-900/30 text-red-600',
+            active: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600',
+            pending_review: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600',
+            hidden: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
         };
 
+        const label = t.status[status as keyof typeof t.status] || status;
+
         return (
-            <span className={`px-2 py-1 text-xs font-bold rounded-lg ${styles[status]}`}>
-                {t.status[status]}
+            <span className={`px-2 py-1 text-xs font-bold rounded-lg ${styles[status] || styles.draft}`}>
+                {label}
             </span>
         );
     };

@@ -109,7 +109,7 @@ export async function checkDuplicateVendor(data: {
     );
 
     // Check in vendors table
-    const checks: Promise<any>[] = [];
+    const checks: PromiseLike<any>[] = [];
 
     if (data.email) {
         checks.push(

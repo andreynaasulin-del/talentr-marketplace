@@ -1,0 +1,46 @@
+type GtmEvent = {
+  event: string;
+  [key: string]: any;
+};
+
+// Declare the dataLayer on the window object
+declare global {
+  interface Window {
+    dataLayer: GtmEvent[];
+  }
+}
+
+export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXX';
+
+export const pageview = (url: string) => {
+  if (typeof window.dataLayer !== 'undefined') {
+    window.dataLayer.push({
+      event: 'page_view',
+      page_path: url,
+    });
+  }
+};
+
+export const trackEvent = (eventName: string, params: Record<string, any> = {}) => {
+  if (typeof window.dataLayer !== 'undefined') {
+    window.dataLayer.push({
+      event: eventName,
+      ...params,
+    });
+    
+    // Log for debugging
+    if (process.env.NODE_ENV === 'development') {
+      console.log('📊 Analytics Event:', eventName, params);
+    }
+  }
+};
+
+// Standard Events for Funnel
+export const AnalyticsEvents = {
+  INVITE_OPENED: 'invite_opened',
+  GIG_CREATE_START: 'gig_create_start',
+  GIG_CREATE_SUBMIT: 'gig_create_submit',
+  PROFILE_FILL_START: 'profile_fill_start',
+  PROFILE_FILL_SUBMIT: 'profile_fill_submit',
+  GIG_PUBLISH_REQUEST: 'gig_publish_request',
+};

@@ -122,46 +122,6 @@ export async function POST(request: NextRequest) {
         const body = await request.json();
         const { action } = body;
 
-        const supabase = createClient(
-            process.env.NEXT_PUBLIC_SUPABASE_URL!,
-            process.env.SUPABASE_SERVICE_ROLE_KEY!
-        );
-
-        if (action === 'moderate_gig') {
-            const { gigId, moderation_status } = body;
-
-            // 1. Update Gig Status
-            const { data: gig, error: gigError } = await supabase
-                .from('gigs')
-                .update({
-                    moderation_status,
-                    // If approved, set status to active immediately for MVP
-                    status: moderation_status === 'approved' ? 'active' : 'hidden'
-                })
-                .eq('id', gigId)
-                .select('vendor_id')
-                .single();
-
-            if (gigError) return NextResponse.json({ error: gigError.message }, { status: 400 });
-
-            // 2. Cascade Approve Vendor if Gig Approved
-            if (moderation_status === 'approved' && gig?.vendor_id) {
-                // Check if vendor is in 'pending_review' state to avoid re-approving auto-approved ones
-                // Or just force set to 'active' to be safe.
-                await supabase
-                    .from('vendors')
-                    .update({
-                        status: 'active',
-                        is_active: true,
-                        is_verified: true,
-                        status_reason: 'Gig Approved by Admin'
-                    })
-                    .eq('id', gig.vendor_id);
-            }
-
-            return NextResponse.json({ success: true });
-        }
-
         if (action === 'create_pending') {
             const { data, error } = await createPendingVendor(
                 body.data,
@@ -224,6 +184,12 @@ export async function POST(request: NextRequest) {
 
         if (action === 'update_pending') {
             const { pendingId, data } = body;
+
+            // Update pending vendor in database
+            const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!
+            );
 
             const { data: updated, error } = await supabase
                 .from('pending_vendors')

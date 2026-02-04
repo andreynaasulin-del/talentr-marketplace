@@ -62,6 +62,8 @@ const translations = {
         statusViewed: 'Viewed',
         statusConfirmed: 'Confirmed',
         statusDeclined: 'Declined',
+        statusWaitingProfile: 'No Profile',
+        statusPendingReview: 'Needs Review',
         allCategories: 'All Categories',
 
         // Categories
@@ -222,6 +224,8 @@ const translations = {
         statusViewed: 'נצפה',
         statusConfirmed: 'מאושר',
         statusDeclined: 'נדחה',
+        statusWaitingProfile: 'חסר פרופיל',
+        statusPendingReview: 'ממתין לבדיקה',
         allCategories: 'כל הקטגוריות',
 
         // Categories
@@ -760,22 +764,31 @@ export default function AdminPage() {
     const moderateGig = async (gigId: string, action: 'approved' | 'rejected' | 'pending') => {
         if (!authToken) return;
         try {
-            const client = supabase;
-            if (!client) return;
+            const res = await fetch('/api/admin', {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`
+                },
+                body: JSON.stringify({
+                    action: 'moderate_gig',
+                    gigId,
+                    moderation_status: action
+                })
+            });
 
-            const { error } = await client
-                .from('gigs')
-                .update({ moderation_status: action })
-                .eq('id', gigId);
-
-            if (error) {
-                console.error('Failed to moderate gig:', error);
+            if (!res.ok) {
+                const json = await res.json();
+                console.error('Failed to moderate gig:', json.error);
                 alert('Failed to update gig status');
                 return;
             }
 
             // Refresh gigs list
             fetchGigs();
+            // Refresh pending/vendors if needed (since vendor status might change)
+            fetchPending();
+            fetchVendors();
         } catch (err) {
             console.error('Moderation error:', err);
         }
@@ -1665,8 +1678,8 @@ Talentr Team`;
                                         key={filter}
                                         onClick={() => setGigsFilter(filter)}
                                         className={`px-4 py-2 rounded-lg text-sm font-medium transition-all ${gigsFilter === filter
-                                                ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
-                                                : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
+                                            ? 'bg-white dark:bg-zinc-800 text-zinc-900 dark:text-white shadow-sm'
+                                            : 'text-zinc-500 hover:text-zinc-900 dark:hover:text-zinc-300'
                                             }`}
                                     >
                                         {filter === 'all' && t.filterAll}

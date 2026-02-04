@@ -100,7 +100,10 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                 draft: 'Draft',
                 published: 'Live',
                 unlisted: 'Link Only',
-                archived: 'Archived'
+                archived: 'Archived',
+                active: 'Active',
+                pending_review: 'In Review',
+                hidden: 'Hidden'
             }
         },
         he: {
@@ -134,7 +137,10 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
                 draft: 'טיוטה',
                 published: 'פעיל',
                 unlisted: 'לינק בלבד',
-                archived: 'בארכיון'
+                archived: 'בארכיון',
+                active: 'פעיל',
+                pending_review: 'בבדיקה',
+                hidden: 'מוסתר'
             }
         }
     };
@@ -251,7 +257,10 @@ export default function VendorDashboard({ vendor, editToken, onLogout }: VendorD
             draft: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-600',
             published: 'bg-green-100 dark:bg-green-900/30 text-green-600',
             unlisted: 'bg-blue-100 dark:bg-blue-900/30 text-blue-600',
-            archived: 'bg-red-100 dark:bg-red-900/30 text-red-600'
+            archived: 'bg-red-100 dark:bg-red-900/30 text-red-600',
+            active: 'bg-emerald-100 dark:bg-emerald-900/30 text-emerald-600',
+            pending_review: 'bg-yellow-100 dark:bg-yellow-900/30 text-yellow-600',
+            hidden: 'bg-zinc-100 dark:bg-zinc-800 text-zinc-400'
         };
         return (
             <span className={`px-2 py-0.5 text-xs font-bold rounded-lg ${styles[status]}`}>
