@@ -9,6 +9,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import CookieConsent from '@/components/CookieConsent';
 import GoogleTagManager from '@/components/analytics/GoogleTagManager';
+import { Suspense } from 'react';
 
 
 // Optimize font loading
@@ -116,8 +117,10 @@ export default function RootLayout({
                     <LanguageProvider>
                         <FavoritesProvider>
                             {children}
-                            <CookieConsent />
-                            <GoogleTagManager />
+                            <Suspense fallback={null}>
+                                <CookieConsent />
+                                <GoogleTagManager />
+                            </Suspense>
                         </FavoritesProvider>
                     </LanguageProvider>
                 </ThemeProvider>
