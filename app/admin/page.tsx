@@ -1,6 +1,6 @@
 'use client';
 
-import { useState, useEffect, useCallback } from 'react';
+import { useState, useEffect, useCallback, Suspense } from 'react';
 import { useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import {
@@ -396,7 +396,7 @@ const statusColors: Record<string, { bg: string; text: string; icon: React.Compo
     expired: { bg: 'bg-zinc-100 dark:bg-zinc-800', text: 'text-zinc-500', icon: Clock }
 };
 
-export default function AdminPage() {
+function AdminContent() {
     const router = useRouter();
     const [isAdmin, setIsAdmin] = useState(false);
     const [loading, setLoading] = useState(true);
@@ -2543,5 +2543,17 @@ Talentr Team`;
                 )}
             </div>
         </>
+    );
+}
+
+export default function AdminPage() {
+    return (
+        <Suspense fallback={
+            <div className="min-h-screen flex items-center justify-center bg-zinc-50 dark:bg-black">
+                <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        }>
+            <AdminContent />
+        </Suspense>
     );
 }
