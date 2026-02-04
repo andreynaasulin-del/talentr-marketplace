@@ -496,7 +496,10 @@ export default function GigBySlugPage() {
                             </div>
 
                             {/* CTA */}
-                            <button className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/30 mb-3">
+                            <button
+                                onClick={() => setBookingModalOpen(true)}
+                                className="w-full py-4 bg-gradient-to-r from-blue-600 to-blue-700 hover:from-blue-700 hover:to-blue-800 text-white font-bold rounded-xl flex items-center justify-center gap-2 transition-all shadow-lg shadow-blue-600/30 mb-3"
+                            >
                                 <MessageCircle className="w-5 h-5" />
                                 {t.chat}
                             </button>
@@ -565,6 +568,24 @@ export default function GigBySlugPage() {
             </div>
 
             <Footer />
+
+            {/* Booking Modal */}
+            {gig && (
+                <BookingRequestModal
+                    isOpen={bookingModalOpen}
+                    onClose={() => setBookingModalOpen(false)}
+                    gig={{
+                        id: gig.id,
+                        title: gig.title,
+                        vendor_id: gig.vendor_id || '',
+                        price_amount: gig.price_amount,
+                        pricing_type: gig.pricing_type,
+                        duration_minutes: gig.duration_minutes
+                    }}
+                    vendorName={vendor?.name}
+                    language={lang}
+                />
+            )}
 
             {/* Fullscreen Gallery Modal */}
             <AnimatePresence>
