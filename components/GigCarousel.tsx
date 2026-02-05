@@ -251,7 +251,7 @@ export default function GigCarousel() {
     );
 }
 
-// Gig Card Component
+// Gig Card Component - Minimalist Dark Version
 const GigCard = memo(function GigCard({
     gig,
     lang,
@@ -267,19 +267,9 @@ const GigCard = memo(function GigCard({
     const firstPhoto = gig.photos?.[0];
     const photo = typeof firstPhoto === 'string'
         ? firstPhoto
-        : firstPhoto?.url || 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80'; // Fallback abstract image
+        : firstPhoto?.url || 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80';
 
     const link = gig.share_slug ? `/g/${gig.share_slug}` : `/gig/${gig.id}`;
-
-    const formatPrice = () => {
-        if (gig.is_free) return t.free;
-        if (!gig.price_amount) return null;
-        const symbol = gig.currency === 'USD' ? '$' : '₪';
-        if (gig.pricing_type === 'from') {
-            return `${t.from} ${symbol}${gig.price_amount.toLocaleString()}`;
-        }
-        return `${symbol}${gig.price_amount.toLocaleString()}`;
-    };
 
     return (
         <Link
@@ -287,43 +277,29 @@ const GigCard = memo(function GigCard({
             className="gig-card-wrapper group"
             style={{ direction: isHebrew ? 'rtl' : 'ltr' }}
         >
-            <div className="relative overflow-hidden rounded-xl bg-white dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 shadow-sm transition-all duration-300 hover:shadow-lg hover:-translate-y-1">
+            <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md hover:shadow-xl hover:border-zinc-700 transition-all duration-300">
                 {/* IMAGE */}
-                <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-100 dark:bg-zinc-800">
+                <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-800">
                     <Image
                         src={photo}
                         alt={gig.title}
                         fill
-                        className="object-cover transition-transform duration-500 group-hover:scale-105"
+                        className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 240px, 280px"
                     />
-
-                    {/* Price Tag */}
-                    <div className={`absolute top-3 ${isHebrew ? 'right-3' : 'left-3'} bg-white/90 dark:bg-black/80 backdrop-blur px-2 py-1 rounded-md shadow-sm`}>
-                        <p className="text-xs font-bold text-zinc-900 dark:text-white">
-                            {formatPrice() || t.free}
-                        </p>
-                    </div>
                 </div>
 
-                {/* CONTENT */}
-                <div className="p-4">
+                {/* CONTENT - Minimal, No Prices, No Description */}
+                <div className="p-5 text-center">
                     {/* Category */}
-                    <p className="text-blue-600 dark:text-blue-400 text-[11px] font-semibold uppercase tracking-wider mb-2">
+                    <p className="text-blue-500 text-[11px] font-bold uppercase tracking-widest mb-2">
                         {gig.category_id}
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-zinc-900 dark:text-white font-bold text-base leading-snug line-clamp-2 h-[42px] mb-1">
+                    <h3 className="text-white font-bold text-lg leading-snug line-clamp-2">
                         {gig.title}
                     </h3>
-
-                    {/* Short Desc */}
-                    {gig.short_description && (
-                        <p className="text-zinc-500 dark:text-zinc-400 text-sm line-clamp-1">
-                            {gig.short_description}
-                        </p>
-                    )}
                 </div>
             </div>
             <style jsx>{`
