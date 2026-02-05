@@ -4,7 +4,7 @@ import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
-import { memo, useEffect, useState, useRef } from 'react';
+import { memo, useEffect, useState } from 'react';
 
 interface Gig {
     id: string;
@@ -24,7 +24,6 @@ export default function GigCarousel() {
     const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
     const [gigs, setGigs] = useState<Gig[]>([]);
     const [loading, setLoading] = useState(true);
-    const scrollRef = useRef<HTMLDivElement>(null);
 
     useEffect(() => {
         const fetchGigs = async () => {
@@ -56,7 +55,7 @@ export default function GigCarousel() {
             id: 'pkg-1',
             title: 'Private Chef Experience',
             category_id: 'Private Chef',
-            photos: ['https://images.unsplash.com/photo-1577106263724-828ed8a9229c?auto=format&fit=crop&w=800&q=80'],
+            photos: ['/categories/private-chef.jpg'],
             price_amount: 2500,
             currency: 'ILS',
             pricing_type: 'fixed',
@@ -67,7 +66,7 @@ export default function GigCarousel() {
             id: 'pkg-2',
             title: 'Cocktail Bar & Mixology',
             category_id: 'Bartender',
-            photos: ['https://images.unsplash.com/photo-1525268323814-badab8b40969?auto=format&fit=crop&w=800&q=80'],
+            photos: ['/categories/Bartender.jpg'],
             price_amount: 1200,
             currency: 'ILS',
             pricing_type: 'event',
@@ -78,7 +77,7 @@ export default function GigCarousel() {
             id: 'pkg-3',
             title: 'Live Stand-up Comedy',
             category_id: 'Stand-up',
-            photos: ['https://images.unsplash.com/photo-1563823439050-7389c9225875?auto=format&fit=crop&w=800&q=80'],
+            photos: ['/categories/stand-up-comedian.jpg'],
             price_amount: 3000,
             currency: 'ILS',
             pricing_type: 'show',
@@ -89,7 +88,7 @@ export default function GigCarousel() {
             id: 'pkg-4',
             title: 'Wedding DJ Set',
             category_id: 'DJ',
-            photos: ['https://images.unsplash.com/photo-1558450143-6d0937a07092?auto=format&fit=crop&w=800&q=80'],
+            photos: ['/categories/DJ.jpg'],
             price_amount: 4500,
             currency: 'ILS',
             pricing_type: 'event',
@@ -100,7 +99,7 @@ export default function GigCarousel() {
             id: 'pkg-5',
             title: 'Live Jazz Band',
             category_id: 'Band',
-            photos: ['https://images.unsplash.com/photo-1460723237483-7a6dc9d0b212?auto=format&fit=crop&w=800&q=80'],
+            photos: ['/categories/live-musician.jpg'],
             price_amount: 6000,
             currency: 'ILS',
             pricing_type: 'band',
@@ -140,9 +139,9 @@ export default function GigCarousel() {
                     <h2 className="gig-title">{t.title}</h2>
                     <p className="gig-subtitle">{t.subtitle}</p>
                 </div>
-                <div className="flex gap-4 px-4 overflow-hidden relative" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                <div className="flex gap-4 px-4 overflow-hidden">
                     {[1, 2, 3, 4, 5].map(i => (
-                        <div key={i} className="w-[280px] h-[340px] bg-zinc-100 dark:bg-zinc-800 rounded-2xl animate-pulse flex-shrink-0" />
+                        <div key={i} className="w-[280px] h-[280px] bg-zinc-100 dark:bg-zinc-800 rounded-2xl animate-pulse flex-shrink-0" />
                     ))}
                 </div>
             </section>
@@ -159,6 +158,14 @@ export default function GigCarousel() {
         );
     }
 
+    // Split for two rows
+    const mid = Math.ceil(gigs.length / 2);
+    const topRow = gigs.slice(0, mid);
+    const bottomRow = gigs.slice(mid);
+
+    // If not enough items for two rows, just duplicate topRow to bottom or similar logic
+    // But for marquee we need at least some items.
+
     return (
         <section className="gig-carousel-section">
             {/* Header */}
@@ -174,15 +181,31 @@ export default function GigCarousel() {
                 </motion.div>
             </div>
 
-            {/* Single Row Carousel */}
-            <div
-                className="gig-carousel-container"
-                ref={scrollRef}
-                dir={lang === 'he' ? 'rtl' : 'ltr'}
-            >
-                {gigs.map((gig, i) => (
-                    <GigCard key={`${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
-                ))}
+            {/* Carousel Rows */}
+            <div className="gig-rows" dir="ltr">
+                {/* ROW 1 */}
+                <div className="gig-row">
+                    <div className="gig-track gig-track-left">
+                        {[...topRow, ...topRow, ...topRow, ...topRow].map((gig, i) => (
+                            <GigCard key={`r1-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* ROW 2 - Only if enough items, otherwise show topRow reversed or similar */}
+                {/* For visual density, let's just show bottomRow if exists, else topRow again but different speed */}
+                <div className="gig-row">
+                    <div className="gig-track gig-track-right">
+                        {[...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow].length > 0 ?
+                            [...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow].map((gig, i) => (
+                                <GigCard key={`r2-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
+                            )) :
+                            [...topRow, ...topRow, ...topRow, ...topRow].map((gig, i) => ( // Fallback to topRow if bottom empty
+                                <GigCard key={`r2-dup-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
+                            ))
+                        }
+                    </div>
+                </div>
             </div>
 
             <style jsx global>{`
@@ -192,7 +215,7 @@ export default function GigCarousel() {
                     background: var(--bg-primary);
                     width: 100%;
                     max-width: 100vw;
-                    overflow: hidden;
+                    overflow: hidden !important;
                 }
 
                 .gig-header {
@@ -200,7 +223,7 @@ export default function GigCarousel() {
                     z-index: 10;
                     max-width: 1200px;
                     margin: 0 auto 32px;
-                    padding: 0 24px;
+                    padding: 0 16px;
                 }
 
                 .gig-title {
@@ -220,29 +243,62 @@ export default function GigCarousel() {
                     line-height: 1.5;
                 }
 
-                .gig-carousel-container {
+                .gig-rows {
+                    position: relative;
+                    z-index: 10;
+                    display: flex;
+                    flex-direction: column;
+                    gap: 24px;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    direction: ltr !important;
+                    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
+                }
+
+                .gig-row {
+                    display: flex;
+                    width: 100%;
+                    max-width: 100vw;
+                    overflow: hidden !important;
+                    white-space: nowrap;
+                }
+
+                .gig-track {
                     display: flex;
                     gap: 16px;
-                    overflow-x: auto;
-                    scroll-snap-type: x mandatory;
-                    padding: 4px 24px 24px; /* Bottom padding for shadow */
-                    -webkit-overflow-scrolling: touch;
-                    scrollbar-width: none; /* Firefox */
+                    padding: 4px 0;
+                    flex-shrink: 0;
+                    width: max-content;
+                    will-change: transform;
                 }
-                
-                .gig-carousel-container::-webkit-scrollbar {
-                    display: none; /* Safari and Chrome */
+
+                .gig-track-left {
+                    animation: scroll-left 60s linear infinite;
+                }
+
+                .gig-track-right {
+                    animation: scroll-right 70s linear infinite;
+                }
+
+                @keyframes scroll-left {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); } 
+                }
+
+                @keyframes scroll-right {
+                    0% { transform: translateX(-50%); } 
+                    100% { transform: translateX(0); }
                 }
 
                 @media (max-width: 768px) {
                     .gig-carousel-section {
                         padding: 24px 0 32px;
                     }
-                    .gig-header {
-                        padding: 0 16px;
+                    .gig-rows {
+                        gap: 16px;
                     }
-                    .gig-carousel-container {
-                        padding: 4px 16px 24px;
+                    .gig-track {
                         gap: 12px;
                     }
                 }
@@ -251,7 +307,7 @@ export default function GigCarousel() {
     );
 }
 
-// Gig Card Component - Minimalist Dark Version
+// Gig Card Component - Minimalist Dark Version (Strictly as requested)
 const GigCard = memo(function GigCard({
     gig,
     lang,
@@ -267,7 +323,7 @@ const GigCard = memo(function GigCard({
     const firstPhoto = gig.photos?.[0];
     const photo = typeof firstPhoto === 'string'
         ? firstPhoto
-        : firstPhoto?.url || 'https://images.unsplash.com/photo-1557683316-973673baf926?auto=format&fit=crop&w=800&q=80';
+        : firstPhoto?.url || '/logo.jpg'; // Ultimate Fallback
 
     const link = gig.share_slug ? `/g/${gig.share_slug}` : `/gig/${gig.id}`;
 
@@ -306,11 +362,10 @@ const GigCard = memo(function GigCard({
                 .gig-card-wrapper {
                     width: 280px;
                     flex-shrink: 0;
-                    scroll-snap-align: start;
                 }
                 @media (max-width: 640px) {
                     .gig-card-wrapper {
-                        width: 260px;
+                        width: 240px;
                     }
                 }
             `}</style>
