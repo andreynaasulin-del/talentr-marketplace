@@ -46,9 +46,28 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         }
 
         // Validate gig ownership
+        // Validate gig ownership
         const { valid, error: ownerError } = await validateGigOwnership(id, vendorId);
+
+        let isClaimingOrphan = false;
+
         if (!valid) {
-            return NextResponse.json({ error: ownerError || 'Unauthorized' }, { status: 403 });
+            // Special Case: Allow claiming an orphan gig (vendor_id is null)
+            const supabase = createClient(
+                process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                process.env.SUPABASE_SERVICE_ROLE_KEY!
+            );
+            const { data: orphanGig } = await supabase
+                .from('gigs')
+                .select('vendor_id')
+                .eq('id', id)
+                .single();
+
+            if (orphanGig && orphanGig.vendor_id === null) {
+                isClaimingOrphan = true;
+            } else {
+                return NextResponse.json({ error: ownerError || 'Unauthorized' }, { status: 403 });
+            }
         }
 
         const supabase = createClient(

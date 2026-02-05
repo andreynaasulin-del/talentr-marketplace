@@ -18,6 +18,9 @@ function OnboardingContent() {
     const [gigId, setGigId] = useState<string | null>(null);
     const [loading, setLoading] = useState(true);
     const [userId, setUserId] = useState<string | undefined>(undefined);
+    const [inviteToken, setInviteToken] = useState<string | null>(null);
+    const [pendingVendor, setPendingVendor] = useState<any>(null);
+    const [editLink, setEditLink] = useState<string | null>(null);
 
     useEffect(() => {
         checkUserAndState();
@@ -58,6 +61,20 @@ function OnboardingContent() {
                 // New Session
                 trackEvent(AnalyticsEvents.GIG_CREATE_START);
             }
+
+            // 3. Check for Invite Token
+            const invite = searchParams.get('invite');
+            if (invite) {
+                setInviteToken(invite);
+                // Fetch pending vendor
+                const res = await fetch(`/api/confirm/${invite}`);
+                if (res.ok) {
+                    const data = await res.json();
+                    setPendingVendor(data.pending);
+                    // If we have an invite, we might want to skip the user check or treat them as "guest" until step 2
+                    // So we don't redirect away
+                }
+            }
         } catch (e) {
             console.error(e);
         } finally {
@@ -73,9 +90,10 @@ function OnboardingContent() {
         trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId: gig.id });
     };
 
-    const handleProfileSuccess = () => {
+    const handleProfileSuccess = (link?: string) => {
         setStep(3);
-        trackEvent(AnalyticsEvents.INVITE_OPENED, { status: 'completed' }); // Or custom event
+        if (link) setEditLink(link);
+        trackEvent(AnalyticsEvents.INVITE_OPENED, { status: 'completed' });
     };
 
     if (loading) {
@@ -106,6 +124,7 @@ function OnboardingContent() {
                             key="step1"
                             onSuccess={handleGigSuccess}
                             userId={userId}
+                            inviteToken={inviteToken}
                         />
                     )}
 
@@ -114,6 +133,8 @@ function OnboardingContent() {
                             key="step2"
                             gigId={gigId}
                             onSuccess={handleProfileSuccess}
+                            inviteToken={inviteToken}
+                            pendingVendor={pendingVendor}
                         />
                     )}
 
@@ -133,33 +154,69 @@ function OnboardingContent() {
                                 Your profile is active and your gig is under review.
                             </p>
 
-                            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
-                                <button
-                                    onClick={() => {
-                                        setStep(1);
-                                        setGigId(null);
-                                        router.push('/onboarding');
-                                    }}
-                                    className="p-4 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex flex-col items-center gap-2 font-bold"
-                                >
-                                    <Plus className="w-6 h-6" />
-                                    Create Another Gig
-                                </button>
+                            {editLink && (
+                                <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-6 rounded-2xl text-left space-y-3">
+                                    <p className="font-bold text-yellow-800 dark:text-yellow-500 flex items-center gap-2">
+                                        <Sparkles className="w-5 h-5" />
+                                        IMPORTANT: SAVE THIS LINK
+                                    </p>
+                                    <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                                        This is your personal dashboard link. Use it to edit your profile and manage gigs anytime. You do NOT need a password.
+                                    </p>
+                                    <div className="flex items-center gap-2 mt-2">
+                                        <input
+                                            readOnly
+                                            value={editLink}
+                                            className="flex-1 p-2 bg-white dark:bg-black border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm font-mono text-zinc-600 dark:text-zinc-400 select-all"
+                                        />
+                                        <button
+                                            onClick={() => {
+                                                navigator.clipboard.writeText(editLink);
+                                                // Could add toast here
+                                            }}
+                                            className="p-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg text-yellow-700 transition-colors"
+                                        >
+                                            Copy
+                                        </button>
+                                    </div>
+                                    <button
+                                        onClick={() => window.open(editLink, '_self')}
+                                        className="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-xl mt-4 text-center block transition-all shadow-lg shadow-yellow-400/20"
+                                    >
+                                        Go to My Dashboard
+                                    </button>
+                                </div>
+                            )}
 
-                                <button
-                                    onClick={() => router.push('/dashboard')}
-                                    className="p-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-all flex flex-col items-center gap-2 font-bold shadow-lg shadow-blue-600/20"
-                                >
-                                    <LayoutDashboard className="w-6 h-6" />
-                                    Go to Dashboard
-                                </button>
-                            </div>
+                            {!editLink && (
+                                <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 mt-8">
+                                    <button
+                                        onClick={() => {
+                                            setStep(1);
+                                            setGigId(null);
+                                            router.push('/onboarding');
+                                        }}
+                                        className="p-4 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex flex-col items-center gap-2 font-bold"
+                                    >
+                                        <Plus className="w-6 h-6" />
+                                        Create Another Gig
+                                    </button>
+
+                                    <button
+                                        onClick={() => router.push('/dashboard')}
+                                        className="p-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-all flex flex-col items-center gap-2 font-bold shadow-lg shadow-blue-600/20"
+                                    >
+                                        <LayoutDashboard className="w-6 h-6" />
+                                        Go to Dashboard
+                                    </button>
+                                </div>
+                            )}
                         </motion.div>
                     )}
 
                 </AnimatePresence>
             </main>
-        </div>
+        </div >
     );
 }
 

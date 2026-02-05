@@ -173,13 +173,14 @@ export async function POST(request: NextRequest) {
             }
 
             // Generate the confirmation link
+            // CHANGED: Direct to Onboarding Flow as per "Gig-First" requirement
             const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
-            const confirmLink = `${baseUrl}/confirm/${data!.confirmation_token}`;
+            const confirmLink = `${baseUrl}/onboarding?invite=${data!.confirmation_token}`;
 
             return NextResponse.json({
                 success: true,
                 pending: data,
-                confirmLink
+                confirmLink // Frontend expects this key, keeping it for compatibility
             });
         }
 

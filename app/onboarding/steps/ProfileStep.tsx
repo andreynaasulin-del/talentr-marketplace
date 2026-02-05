@@ -22,10 +22,12 @@ type ProfileSchema = z.infer<typeof profileSchema>;
 
 interface ProfileStepProps {
     gigId: string;
-    onSuccess: () => void;
+    onSuccess: (link?: string) => void;
+    inviteToken?: string | null;
+    pendingVendor?: any;
 }
 
-export default function ProfileStep({ gigId, onSuccess }: ProfileStepProps) {
+export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVendor }: ProfileStepProps) {
     const [loading, setLoading] = useState(false);
     const router = useRouter();
 
@@ -35,6 +37,11 @@ export default function ProfileStep({ gigId, onSuccess }: ProfileStepProps) {
         formState: { errors },
     } = useForm<ProfileSchema>({
         resolver: zodResolver(profileSchema),
+        defaultValues: {
+            full_name: pendingVendor?.name || '',
+            phone: pendingVendor?.phone || '',
+            bio: pendingVendor?.description || '',
+        }
     });
 
     const onSubmit = async (data: ProfileSchema) => {
@@ -42,6 +49,56 @@ export default function ProfileStep({ gigId, onSuccess }: ProfileStepProps) {
         trackEvent(AnalyticsEvents.PROFILE_FILL_SUBMIT, data);
 
         try {
+            // ============================================
+            // INVITE FLOW (Guest/Anonymous)
+            // ============================================
+            if (inviteToken) {
+                // 1. Confirm Pending Vendor -> Create Real Vendor
+                const confirmRes = await fetch(`/api/confirm/${inviteToken}`, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({
+                        action: 'confirm',
+                        updates: {
+                            name: data.full_name,
+                            phone: data.phone,
+                            description: data.bio,
+                            email: pendingVendor?.email // Keep original email
+                        }
+                    })
+                });
+
+                if (!confirmRes.ok) throw new Error('Failed to confirm profile');
+                const { editLink, vendorId } = await confirmRes.json();
+
+                // Extract token for authentication
+                const editToken = editLink.split('/').pop();
+
+                // 2. Link Gig to New Vendor
+                const gigRes = await fetch(`/api/gigs/${gigId}`, { // Ensure this route exists and handles PATCH/PUT
+                    method: 'PATCH',
+                    headers: {
+                        'Content-Type': 'application/json',
+                        'x-vendor-token': editToken
+                    },
+                    body: JSON.stringify({
+                        vendor_id: vendorId,
+                        status: 'pending_review',
+                        moderation_status: 'pending',
+                        wizard_completed: true
+                    })
+                });
+
+                // If gig update fails, we still succeeded in creating the vendor, so we proceed but log valid warning.
+                if (!gigRes.ok) console.error('Failed to link gig');
+
+                onSuccess(editLink);
+                return;
+            }
+
+            // ============================================
+            // STANDARD FLOW (Authenticated)
+            // ============================================
             if (!supabase) throw new Error('Supabase client not initialized');
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No authenticated user found');

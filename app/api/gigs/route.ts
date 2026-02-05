@@ -27,8 +27,17 @@ export async function POST(request: NextRequest) {
             vendorId = tokenVendorId;
         }
 
-        // 2. If no vendor token, we expect User ID for "Onboarding Draft"
-        if (!vendorId && !ownerUserId) {
+        // 2. Check for Invite Token (Anonymous Onboarding)
+        if (body.invite_token) {
+            const { getPendingVendorByToken } = await import('@/lib/admin');
+            const pending = await getPendingVendorByToken(body.invite_token);
+            if (!pending) {
+                return NextResponse.json({ error: 'Invalid invite token' }, { status: 401 });
+            }
+            // Valid token, proceed.
+        }
+        // 3. If no vendor token and no invite token, we expect User ID
+        else if (!vendorId && !ownerUserId) {
             return NextResponse.json({ error: 'Unauthorized: Missing User ID or Vendor Token' }, { status: 401 });
         }
 

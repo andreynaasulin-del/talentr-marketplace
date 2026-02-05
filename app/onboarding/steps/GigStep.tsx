@@ -27,9 +27,10 @@ interface GigStepProps {
     onSuccess: (gigData: any) => void;
     userId?: string;
     initialData?: any;
+    inviteToken?: string | null;
 }
 
-export default function GigStep({ onSuccess, userId, initialData }: GigStepProps) {
+export default function GigStep({ onSuccess, userId, initialData, inviteToken }: GigStepProps) {
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
 
@@ -86,6 +87,7 @@ export default function GigStep({ onSuccess, userId, initialData }: GigStepProps
             const payload = {
                 ...data,
                 owner_user_id: userId,
+                invite_token: inviteToken, // Pass the token to bypass auth check
                 status: 'draft',
                 // We will store the media in the 'photos' array structure on the backend if needed,
                 // or just pass as a temp field. For MVP, assuming backend handles 'photos' or we map it.
