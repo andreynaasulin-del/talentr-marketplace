@@ -39,7 +39,7 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
 
   const ctaText = pageType === 'book'
     ? { en: 'Book now', he: 'הזמן עכשיו' }
-    : { en: 'Create your gig', he: 'צור את הגיג שלך' };
+    : { en: 'Get Started', he: 'תקבל' };
 
   const ctaLink = pageType === 'book' ? '/' : '/join';
 
@@ -92,18 +92,23 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
               {content.h1}
             </h1>
 
-            <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8 sm:mb-10">
+            <p className="text-base sm:text-lg md:text-xl text-zinc-600 dark:text-zinc-400 max-w-2xl mx-auto leading-relaxed mb-8">
               {content.heroDescription}
             </p>
 
-            <Link
-              href={ctaLink}
-              onClick={handleCtaClick}
-              className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl shadow-xl shadow-blue-600/20 hover:shadow-blue-500/30 transition-all active:scale-95"
-            >
-              {ctaText[lang]}
-              <ArrowRight className="w-5 h-5" />
-            </Link>
+            {/* CTA Button - Only for Become pages */}
+            {pageType === 'become' && (
+              <div className="flex justify-center">
+                <Link
+                  href={ctaLink}
+                  onClick={handleCtaClick}
+                  className="px-8 py-4 bg-blue-600 hover:bg-blue-500 text-white text-lg font-bold rounded-2xl shadow-lg shadow-blue-600/20 transition-all hover:scale-105 active:scale-95 flex items-center gap-2"
+                >
+                  {ctaText[lang]}
+                  <ArrowRight className="w-5 h-5" />
+                </Link>
+              </div>
+            )}
           </motion.div>
         </div>
       </section>
@@ -294,32 +299,6 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
           >
             {content.crossLinkText}
             <ArrowRight className="w-4 h-4 sm:w-5 sm:h-5 group-hover:translate-x-1 transition-transform" />
-          </Link>
-        </div>
-      </section>
-
-      {/* ===== CTA FINAL ===== */}
-      <section className="py-16 sm:py-24 bg-zinc-950 dark:bg-zinc-900/50">
-        <div className="max-w-3xl mx-auto text-center px-4">
-          <h2 className="text-2xl sm:text-3xl md:text-4xl font-black text-white mb-4 sm:mb-6">
-            {pageType === 'book'
-              ? lang === 'he' ? 'מוכן להזמין?' : 'Ready to book?'
-              : lang === 'he' ? 'מוכן להתחיל?' : 'Ready to get started?'
-            }
-          </h2>
-          <p className="text-zinc-400 text-base sm:text-lg mb-8 sm:mb-10 max-w-xl mx-auto">
-            {pageType === 'book'
-              ? lang === 'he' ? 'מצא את המבצע המושלם לאירוע שלך בכמה קליקים' : 'Find the perfect performer for your event in just a few clicks'
-              : lang === 'he' ? 'צור את הפרופיל שלך והתחל לקבל הזמנות היום' : 'Create your profile and start getting bookings today'
-            }
-          </p>
-          <Link
-            href={ctaLink}
-            onClick={handleCtaClick}
-            className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl shadow-xl shadow-blue-600/30 transition-all active:scale-95"
-          >
-            {ctaText[lang]}
-            <ArrowRight className="w-5 h-5" />
           </Link>
         </div>
       </section>
