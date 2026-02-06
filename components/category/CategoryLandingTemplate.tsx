@@ -50,6 +50,21 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
       page_type: pageType,
       source: 'category_landing',
     });
+
+    // Fire funnel start events
+    if (pageType === 'book') {
+      trackEvent('start_booking', {
+        category: category.slug,
+        category_type: category.type,
+        source: 'category_landing',
+      });
+    } else {
+      trackEvent('create_gig_start', {
+        category: category.slug,
+        category_type: category.type,
+        source: 'category_landing',
+      });
+    }
   };
 
   // Cross-link

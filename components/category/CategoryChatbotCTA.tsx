@@ -16,9 +16,14 @@ export default function CategoryChatbotCTA({ category, pageType, categoryLabel }
   const lang = language as 'en' | 'he';
 
   const handleClick = () => {
+    const currentUrl = typeof window !== 'undefined' ? window.location.pathname : `/${pageType}/${category}`;
+
+    // Track with all required context fields
     trackEvent('chatbot_opened', {
       category,
       page_type: pageType,
+      url: currentUrl,
+      language: lang,
       source: 'category_landing',
     });
 
@@ -31,15 +36,30 @@ export default function CategoryChatbotCTA({ category, pageType, categoryLabel }
         ? `משתמש בעמוד /become/${category} ורוצה ליצור גיג ${categoryLabel}`
         : `User is on /become/${category} page and wants to create a ${categoryLabel} gig`;
 
+    // Build structured context for the chatbot
+    const chatContext = {
+      page_type: pageType,
+      category: category,
+      url: currentUrl,
+      language: lang,
+      auto_message: contextMessage,
+    };
+
     // Find the chat trigger on the page (from HeroSection) or open chat modal
     const chatTrigger = document.querySelector('[data-chat-trigger]') as HTMLButtonElement;
     if (chatTrigger) {
+      // Store context in sessionStorage for the chatbot to pick up
+      try {
+        sessionStorage.setItem('talentr_chat_context', JSON.stringify(chatContext));
+      } catch (e) {
+        // ignore
+      }
+
       chatTrigger.click();
       // Set context after a short delay to let chat open
       setTimeout(() => {
         const chatInput = document.querySelector('input[placeholder]') as HTMLInputElement;
         if (chatInput) {
-          // Set value using native input value setter to trigger React's onChange
           const nativeInputValueSetter = Object.getOwnPropertyDescriptor(window.HTMLInputElement.prototype, 'value')?.set;
           if (nativeInputValueSetter) {
             nativeInputValueSetter.call(chatInput, contextMessage);
@@ -49,7 +69,7 @@ export default function CategoryChatbotCTA({ category, pageType, categoryLabel }
       }, 500);
     } else {
       // Fallback: redirect to home with chat context
-      window.location.href = `/?chat=open&context=${encodeURIComponent(contextMessage)}`;
+      window.location.href = `/?chat=open&page_type=${pageType}&category=${category}&lang=${lang}&context=${encodeURIComponent(contextMessage)}`;
     }
   };
 

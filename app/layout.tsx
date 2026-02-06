@@ -9,6 +9,7 @@ import { Analytics } from '@vercel/analytics/react';
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import CookieConsent from '@/components/CookieConsent';
 import GoogleTagManager from '@/components/analytics/GoogleTagManager';
+import MetaPixel from '@/components/analytics/MetaPixel';
 import { Suspense } from 'react';
 
 
@@ -120,6 +121,7 @@ export default function RootLayout({
                             <Suspense fallback={null}>
                                 <CookieConsent />
                                 <GoogleTagManager />
+                                <MetaPixel />
                             </Suspense>
                         </FavoritesProvider>
                     </LanguageProvider>
