@@ -8,7 +8,7 @@ import { useState, useEffect } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import type { CategoryContent, PageType } from '@/lib/category-landing-data';
 import { HOW_IT_WORKS } from '@/lib/category-landing-data';
-import CategoryChatbotCTA from './CategoryChatbotCTA';
+import CategoryChat from './CategoryChat';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -279,11 +279,10 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
         </div>
       </section>
 
-      {/* ===== 6. CHATBOT CTA ===== */}
-      <CategoryChatbotCTA
+      {/* ===== 6. CHATBOT CTA + FULLSCREEN CHAT ===== */}
+      <CategoryChat
         category={category.slug}
         pageType={pageType}
-        categoryLabel={category.slug.replace(/-/g, ' ')}
       />
 
       {/* ===== 7. CROSS LINKS ===== */}

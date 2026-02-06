@@ -5,6 +5,7 @@ import { Vendor, VendorCategory, City } from '@/types';
 import { rateLimit, getClientIP, RATE_LIMITS } from '@/lib/rate-limit';
 import { chatMessageSchema } from '@/lib/validations';
 import { packages, Package } from '@/lib/gigs';
+import { resolveIntentFromUrl, FALLBACK_INTENT, type ChatIntent } from '@/lib/chat-intents';
 
 // ===== OPENAI INITIALIZATION =====
 let openai: OpenAI | null = null;
@@ -116,7 +117,7 @@ async function findVendors(
 }
 
 // ===== AI SYSTEM PROMPT - CONCIERGE SERVICE =====
-const SYSTEM_PROMPT = `You are the intelligent Concierge Service on the Talentr platform. Your role is to be a personal manager for two types of users: Vendors (partners providing services) and Clients (customers).
+const BASE_SYSTEM_PROMPT = `You are the intelligent Concierge Service on the Talentr platform. Your role is to be a personal manager for two types of users: Vendors (partners providing services) and Clients (customers).
 
 ## Communication Goals
 
@@ -147,12 +148,6 @@ const SYSTEM_PROMPT = `You are the intelligent Concierge Service on the Talentr 
 - Structured (use lists and paragraphs for clarity)
 - No fluff, no technical information about how AI works
 
-## Response Templates
-
-**Client question:** "I'll help you find the best specialist for your needs. Tell me, what exactly are you looking for?"
-
-**Vendor question:** "Happy to help with your account setup. To attract more clients, I recommend filling out the section..."
-
 ## Available Packages
 - Romantic Acoustic - 45 min live guitar & vocals
 - Magic Chaos - 60 min close-up magic
@@ -177,15 +172,39 @@ const SYSTEM_PROMPT = `You are the intelligent Concierge Service on the Talentr 
 3. Never mention specific prices or currency
 4. Never discuss programming, tech stack, or internal development
 5. Don't mention other startups or go off-topic
-6. Respond in PLAIN TEXT only, no formatting symbols
+6. Respond in PLAIN TEXT only, no formatting symbols`;
 
-## Context
-[CONTEXT]`;
+// Build system prompt with intent context
+function buildSystemPrompt(intent: ChatIntent, vendorContext: string): string {
+    let prompt = BASE_SYSTEM_PROMPT;
+
+    // Add intent-specific instructions
+    if (intent.intent !== 'general') {
+        prompt += `\n\n## LANDING PAGE INTENT CONTEXT
+The user came from a category landing page. Their intent is already known:
+- Intent: ${intent.intent}
+- Category: ${intent.category}
+- Tone: ${intent.tone}
+- ${intent.systemContext}
+
+IMPORTANT: Since the user's intent is already known from the landing page, do NOT ask "what are you looking for?" or generic discovery questions. Instead, jump straight to collecting event details (date, location, guest count, specific preferences). The user already knows what they want — help them get it faster.`;
+    }
+
+    prompt += `\n\n## Context\n${vendorContext || '[No specific match]'}`;
+
+    return prompt;
+}
 
 // ===== GENERATE SUGGESTIONS =====
-function generateSuggestions(category?: VendorCategory, language: string = 'en'): string[] {
+function generateSuggestions(intent: ChatIntent, category?: VendorCategory, language: string = 'en'): string[] {
     const lang = language as 'en' | 'he';
 
+    // If we have intent-specific suggestions, use those
+    if (intent.intent !== 'general') {
+        return intent.suggestedQuestions[lang] || intent.suggestedQuestions.en;
+    }
+
+    // Legacy category-based suggestions
     const suggestions: Record<string, Record<string, string[]>> = {
         'Musician': {
             en: ['Romantic acoustic?', 'DJ for a party?', 'Live jazz?'],
@@ -218,25 +237,26 @@ async function generateAIResponse(
     conversationHistory: { role: 'user' | 'assistant'; content: string }[],
     pkgs: Package[],
     vendors: Vendor[],
-    language: string
+    language: string,
+    intent: ChatIntent
 ): Promise<string> {
     const client = getOpenAI();
     if (!client) return generateFallbackResponse(pkgs, language);
 
     try {
         const pkgNames = pkgs.map(p => `${p.title[language as 'en' | 'he']}`).join(', ');
-        let context = '';
+        let vendorContext = '';
         if (pkgs.length > 0) {
-            context = `[Matching packages: ${pkgNames}]`;
+            vendorContext = `[Matching packages: ${pkgNames}]`;
         }
         if (vendors.length > 0) {
-            context += `\n[Found ${vendors.length} verified professionals]`;
+            vendorContext += `\n[Found ${vendors.length} verified professionals]`;
         }
 
-        const systemPrompt = SYSTEM_PROMPT.replace('[CONTEXT]', context || '[No specific match]');
+        const systemPrompt = buildSystemPrompt(intent, vendorContext);
 
         const completion = await client.chat.completions.create({
-            model: 'gpt-4o', // Flagship model for maximum uniqueness and intelligence
+            model: 'gpt-4o',
             messages: [
                 { role: 'system', content: systemPrompt },
                 ...conversationHistory.slice(-4).map(msg => ({ role: msg.role as 'user' | 'assistant', content: msg.content })),
@@ -289,33 +309,45 @@ export async function POST(request: NextRequest) {
 
         const { message, language } = validation.data;
         const conversationHistory = body.conversationHistory || [];
+
+        // Resolve intent from source page URL (if provided)
+        const sourcePage = body.source_page || body.sourcePage || '';
+        const intent = sourcePage ? resolveIntentFromUrl(sourcePage) : FALLBACK_INTENT;
+
+        // Use intent category if available, otherwise extract from message
         const extracted = extractFromMessage(message);
+        const effectiveCategory = (intent.category as VendorCategory) || extracted.category;
 
         // Find matching packages
-        const matchedPackages = findPackagesByKeywords(extracted.keywords, extracted.category);
+        const matchedPackages = findPackagesByKeywords(
+            extracted.keywords.length > 0 ? extracted.keywords : (intent.category ? [intent.category.toLowerCase()] : []),
+            effectiveCategory
+        );
 
-        // Find vendors if specific category detected
-        const vendors = extracted.category
-            ? await findVendors(extracted.category, extracted.city, 3)
+        // Find vendors
+        const vendors = effectiveCategory
+            ? await findVendors(effectiveCategory, extracted.city, 3)
             : [];
 
-        // Generate AI response
+        // Generate AI response with intent context
         const response = await generateAIResponse(
             message,
             conversationHistory,
             matchedPackages,
             vendors,
-            language
+            language,
+            intent
         );
 
-        // Smart suggestions
-        const suggestions = generateSuggestions(extracted.category, language);
+        // Smart suggestions based on intent
+        const suggestions = generateSuggestions(intent, extracted.category, language);
 
         return NextResponse.json({
             response,
             vendors,
             packages: matchedPackages,
             suggestions: suggestions.slice(0, 3),
+            intent: intent.intent, // Return intent for client-side analytics
         });
     } catch (error) {
         return NextResponse.json({
