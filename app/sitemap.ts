@@ -1,7 +1,8 @@
 import { MetadataRoute } from 'next';
+import { getAllCategorySlugs } from '@/lib/category-landing-data';
 
 export default function sitemap(): MetadataRoute.Sitemap {
-    const baseUrl = 'https://event-marketplace-mvp.vercel.app';
+    const baseUrl = 'https://talentr.co.il';
 
     // Static pages
     const staticPages = [
@@ -13,6 +14,9 @@ export default function sitemap(): MetadataRoute.Sitemap {
 
     // Generate vendor pages dynamically (using mock IDs for now)
     const vendorIds = ['1', '2', '3', '4', '5', '6', '7', '8', '9', '10'];
+
+    // Category landing pages
+    const categorySlugs = getAllCategorySlugs();
 
     const staticRoutes: MetadataRoute.Sitemap = staticPages.map((route) => ({
         url: `${baseUrl}${route}`,
@@ -28,5 +32,21 @@ export default function sitemap(): MetadataRoute.Sitemap {
         priority: 0.7,
     }));
 
-    return [...staticRoutes, ...vendorRoutes];
+    // Book category pages
+    const bookRoutes: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+        url: `${baseUrl}/book/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.9,
+    }));
+
+    // Become category pages
+    const becomeRoutes: MetadataRoute.Sitemap = categorySlugs.map((slug) => ({
+        url: `${baseUrl}/become/${slug}`,
+        lastModified: new Date(),
+        changeFrequency: 'weekly',
+        priority: 0.9,
+    }));
+
+    return [...staticRoutes, ...vendorRoutes, ...bookRoutes, ...becomeRoutes];
 }

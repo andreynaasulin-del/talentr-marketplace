@@ -107,4 +107,13 @@ export const AnalyticsEvents = {
   PROFILE_FILL_START: 'profile_fill_start',
   PROFILE_FILL_SUBMIT: 'profile_fill_submit',
   GIG_PUBLISH_REQUEST: 'gig_publish_request',
+
+  // Category Landing Page Events
+  PAGE_VIEW_CATEGORY: 'page_view_category',
+  CLICK_BOOK: 'click_book',
+  START_BOOKING: 'start_booking',
+  SUBMIT_BOOKING: 'submit_booking',
+  CLICK_BECOME: 'click_become',
+  CREATE_GIG_START: 'create_gig_start',
+  CHATBOT_OPENED: 'chatbot_opened',
 };
