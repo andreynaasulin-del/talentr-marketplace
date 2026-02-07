@@ -3,8 +3,32 @@
 import { useState, useEffect } from 'react';
 import { Accessibility, Type, Eye, X, RotateCcw, MousePointer2 } from 'lucide-react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { useLanguage } from '@/context/LanguageContext';
 
 export default function AccessibilityWidget() {
+    const { language } = useLanguage();
+    const isHebrew = language === 'he';
+
+    // Translation dictionary
+    const t = {
+        en: {
+            title: 'Accessibility',
+            textSize: 'Text Size',
+            contrast: 'High Contrast',
+            links: 'Highlight Links',
+            font: 'Readable Font',
+            reset: 'Reset Settings'
+        },
+        he: {
+            title: 'נגישות',
+            textSize: 'גודל טקסט',
+            contrast: 'ניגודיות גבוהה',
+            links: 'הדגשת קישורים',
+            font: 'גופן קריא',
+            reset: 'איפוס הגדרות'
+        }
+    }[isHebrew ? 'he' : 'en'];
+
     const [isOpen, setIsOpen] = useState(false);
     const [fontSize, setFontSize] = useState(100);
     const [contrast, setContrast] = useState(false);
@@ -69,7 +93,7 @@ export default function AccessibilityWidget() {
     if (!mounted) return null;
 
     return (
-        <div className="fixed bottom-6 left-6 z-[9999] font-sans">
+        <div className={`fixed bottom-4 z-[9999] font-sans ${isHebrew ? 'right-4' : 'left-4'}`}>
             {/* Global Styles for Accessibility Modes */}
             <style jsx global>{`
                 .high-contrast-mode {
@@ -94,13 +118,14 @@ export default function AccessibilityWidget() {
                         initial={{ opacity: 0, scale: 0.9, y: 20 }}
                         animate={{ opacity: 1, scale: 1, y: 0 }}
                         exit={{ opacity: 0, scale: 0.9, y: 20 }}
-                        className="absolute bottom-16 left-0 w-80 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden"
+                        className={`absolute bottom-16 w-[calc(100vw-32px)] sm:w-80 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden ${isHebrew ? 'right-0' : 'left-0'}`}
+                        dir={isHebrew ? 'rtl' : 'ltr'}
                     >
                         {/* Header */}
                         <div className="p-4 bg-blue-600 text-white flex justify-between items-center">
                             <h3 className="font-bold text-lg flex items-center gap-2">
                                 <Accessibility className="w-5 h-5" />
-                                נגישות (Accessibility)
+                                {t.title}
                             </h3>
                             <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full">
                                 <X className="w-5 h-5" />
@@ -108,21 +133,23 @@ export default function AccessibilityWidget() {
                         </div>
 
                         {/* Controls */}
-                        <div className="p-4 space-y-4">
+                        <div className="p-4 space-y-3 sm:space-y-4 max-h-[60vh] overflow-y-auto">
                             {/* Font Size */}
                             <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800">
                                 <div className="flex justify-between text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                                    <span>Text Size - גודל טקסט</span>
+                                    <span>{t.textSize}</span>
                                     <span>{fontSize}%</span>
                                 </div>
-                                <div className="flex gap-2">
+                                <div className="flex gap-2" dir="ltr">
                                     <button
                                         onClick={() => setFontSize(f => Math.max(70, f - 10))}
                                         className="flex-1 bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 text-sm font-bold border border-zinc-200 dark:border-zinc-700"
+                                        aria-label="Decrease Font Size"
                                     >A-</button>
                                     <button
                                         onClick={() => setFontSize(f => Math.min(150, f + 10))}
                                         className="flex-1 bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-sm hover:bg-zinc-50 dark:hover:bg-zinc-700 text-lg font-bold border border-zinc-200 dark:border-zinc-700"
+                                        aria-label="Increase Font Size"
                                     >A+</button>
                                 </div>
                             </div>
@@ -135,12 +162,12 @@ export default function AccessibilityWidget() {
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <Eye className="w-5 h-5" />
+                                        <Eye className="w-5 h-5 flex-shrink-0" />
                                         <div className="text-start">
-                                            <span className="block text-sm font-bold">Contrast - ניגודיות</span>
+                                            <span className="block text-sm font-bold">{t.contrast}</span>
                                         </div>
                                     </div>
-                                    {contrast && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5" />}
+                                    {contrast && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5 flex-shrink-0" />}
                                 </button>
 
                                 <button
@@ -149,12 +176,12 @@ export default function AccessibilityWidget() {
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <MousePointer2 className="w-5 h-5" />
+                                        <MousePointer2 className="w-5 h-5 flex-shrink-0" />
                                         <div className="text-start">
-                                            <span className="block text-sm font-bold">Links - קישורים</span>
+                                            <span className="block text-sm font-bold">{t.links}</span>
                                         </div>
                                     </div>
-                                    {highlightLinks && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5" />}
+                                    {highlightLinks && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5 flex-shrink-0" />}
                                 </button>
 
                                 <button
@@ -163,12 +190,12 @@ export default function AccessibilityWidget() {
                                         }`}
                                 >
                                     <div className="flex items-center gap-3">
-                                        <Type className="w-5 h-5" />
+                                        <Type className="w-5 h-5 flex-shrink-0" />
                                         <div className="text-start">
-                                            <span className="block text-sm font-bold">Font - גופן קריא</span>
+                                            <span className="block text-sm font-bold">{t.font}</span>
                                         </div>
                                     </div>
-                                    {readableFont && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5" />}
+                                    {readableFont && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5 flex-shrink-0" />}
                                 </button>
                             </div>
 
@@ -177,7 +204,7 @@ export default function AccessibilityWidget() {
                                 className="w-full flex items-center justify-center gap-2 p-3 mt-4 text-zinc-500 hover:text-red-500 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-xl transition-colors text-sm font-medium border border-transparent hover:border-red-200"
                             >
                                 <RotateCcw className="w-4 h-4" />
-                                איפוס הגדרות (Reset)
+                                {t.reset}
                             </button>
                         </div>
                     </motion.div>
@@ -186,10 +213,10 @@ export default function AccessibilityWidget() {
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-14 h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl shadow-blue-600/30 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300 border-4 border-white dark:border-zinc-900"
-                aria-label="Accessibility Menu"
+                className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl shadow-blue-600/30 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300 border-4 border-white dark:border-zinc-900"
+                aria-label={t.title}
             >
-                <Accessibility className="w-7 h-7" />
+                <Accessibility className="w-6 h-6 sm:w-7 sm:h-7" />
             </button>
         </div>
     );

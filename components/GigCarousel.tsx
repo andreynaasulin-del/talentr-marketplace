@@ -133,7 +133,7 @@ export default function GigCarousel() {
     const row2Items = [...bottomRow, ...bottomRow, ...topRow, ...bottomRow]; // Mix
 
     return (
-        <section className="gig-carousel-section">
+        <section className="gig-carousel-section bg-zinc-50 dark:bg-zinc-950">
             {/* Header */}
             <div className="gig-header" dir={lang === 'he' ? 'rtl' : 'ltr'}>
                 <motion.div
@@ -142,8 +142,8 @@ export default function GigCarousel() {
                     viewport={{ once: true }}
                     transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
                 >
-                    <h2 className="gig-title">{t.title}</h2>
-                    <p className="gig-subtitle">{t.subtitle}</p>
+                    <h2 className="gig-title text-zinc-900 dark:text-white">{t.title}</h2>
+                    <p className="gig-subtitle text-zinc-600 dark:text-zinc-400">{t.subtitle}</p>
                 </motion.div>
             </div>
 
@@ -172,7 +172,6 @@ export default function GigCarousel() {
                 .gig-carousel-section {
                     position: relative;
                     padding: 48px 0 64px;
-                    background: var(--bg-primary);
                     width: 100%;
                     max-width: 100vw;
                     overflow: hidden !important;
@@ -192,11 +191,9 @@ export default function GigCarousel() {
                     line-height: 1.2;
                     margin-bottom: 8px;
                     font-size: 28px;
-                    color: var(--text-primary);
                 }
 
                 .gig-subtitle {
-                    color: var(--text-muted);
                     font-size: 16px;
                     max-width: 500px;
                     font-weight: 400;
@@ -213,7 +210,6 @@ export default function GigCarousel() {
                     max-width: 100vw;
                     overflow: hidden !important;
                     direction: ltr !important;
-                    mask-image: linear-gradient(to right, transparent, black 10%, black 90%, transparent);
                 }
 
                 .gig-row {
@@ -301,10 +297,10 @@ const GigCard = memo(function GigCard({
         <Link
             href={href}
             onClick={handleClick}
-            className="gig-card-wrapper group"
+            className="w-[240px] sm:w-[280px] flex-shrink-0 cursor-pointer group relative block no-underline"
             style={{ direction: isHebrew ? 'rtl' : 'ltr' }}
         >
-            <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md hover:shadow-xl hover:border-zinc-700 transition-all duration-300">
+            <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md hover:shadow-xl hover:border-zinc-700 transition-all duration-300 transform w-full">
                 {/* IMAGE */}
                 <div className="relative aspect-[4/3] w-full overflow-hidden bg-zinc-800">
                     <Image
@@ -319,9 +315,9 @@ const GigCard = memo(function GigCard({
                 </div>
 
                 {/* CONTENT */}
-                <div className="absolute bottom-0 left-0 right-0 p-5 text-center">
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-center w-full">
                     {/* Category Label */}
-                    <p className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-90">
+                    <p className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-90 truncate">
                         {gig.category_id}
                     </p>
 
@@ -331,18 +327,6 @@ const GigCard = memo(function GigCard({
                     </h3>
                 </div>
             </div>
-            <style jsx>{`
-                .gig-card-wrapper {
-                    width: 280px;
-                    flex-shrink: 0;
-                    cursor: pointer;
-                }
-                @media (max-width: 640px) {
-                    .gig-card-wrapper {
-                        width: 240px;
-                    }
-                }
-            `}</style>
         </Link>
     );
 });
