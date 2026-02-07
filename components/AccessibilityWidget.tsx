@@ -77,7 +77,7 @@ export default function AccessibilityWidget() {
     if (!mounted) return null;
 
     return (
-        <div className={`absolute top-24 z-40 font-sans ${isHebrew ? 'right-4' : 'left-4'}`}>
+        <div className="relative z-50 font-sans">
             <style jsx global>{`
                 .high-contrast-mode { filter: contrast(130%) grayscale(100%) !important; }
                 .highlight-links-mode a { text-decoration: underline !important; text-decoration-thickness: 2px !important; text-underline-offset: 4px !important; color: #2563eb !important; }
@@ -86,51 +86,55 @@ export default function AccessibilityWidget() {
 
             <AnimatePresence>
                 {isOpen && (
-                    <motion.div
-                        initial={{ opacity: 0, scale: 0.9, y: -20 }}
-                        animate={{ opacity: 1, scale: 1, y: 0 }}
-                        exit={{ opacity: 0, scale: 0.9, y: -20 }}
-                        className={`absolute top-16 w-[calc(100vw-32px)] sm:w-80 bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden ${isHebrew ? 'right-0' : 'left-0'}`}
-                        dir={isHebrew ? 'rtl' : 'ltr'}
-                    >
-                        <div className="p-4 bg-blue-600 text-white flex justify-between items-center">
-                            <h3 className="font-bold text-lg flex items-center gap-2">
-                                <Accessibility className="w-5 h-5" />
-                                {t.title}
-                            </h3>
-                            <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full"><X className="w-5 h-5" /></button>
-                        </div>
-                        <div className="p-4 space-y-3 sm:space-y-4 max-h-[60vh] overflow-y-auto">
-                            {/* Font Size */}
-                            <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800">
-                                <div className="flex justify-between text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
-                                    <span>{t.textSize}</span><span>{fontSize}%</span>
-                                </div>
-                                <div className="flex gap-2" dir="ltr">
-                                    <button onClick={() => setFontSize(f => Math.max(70, f - 10))} className="flex-1 bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-sm hover:bg-zinc-50 font-bold border border-zinc-200 dark:border-zinc-700">A-</button>
-                                    <button onClick={() => setFontSize(f => Math.min(150, f + 10))} className="flex-1 bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-sm hover:bg-zinc-50 font-bold border border-zinc-200 dark:border-zinc-700">A+</button>
-                                </div>
+                    <>
+                        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                        <motion.div
+                            initial={{ opacity: 0, scale: 0.9, y: -10 }}
+                            animate={{ opacity: 1, scale: 1, y: 0 }}
+                            exit={{ opacity: 0, scale: 0.9, y: -10 }}
+                            className={`absolute top-full mt-3 w-[300px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden z-50 ${isHebrew ? 'left-0' : 'right-0'}`}
+                            dir={isHebrew ? 'rtl' : 'ltr'}
+                        >
+                            <div className="p-4 bg-blue-600 text-white flex justify-between items-center">
+                                <h3 className="font-bold text-lg flex items-center gap-2">
+                                    <Accessibility className="w-5 h-5" />
+                                    {t.title}
+                                </h3>
+                                <button onClick={() => setIsOpen(false)} className="hover:bg-white/20 p-1 rounded-full"><X className="w-5 h-5" /></button>
                             </div>
-                            {/* Toggles */}
-                            <div className="grid grid-cols-1 gap-2">
-                                <ToggleButton active={contrast} onClick={() => setContrast(!contrast)} icon={Eye} label={t.contrast} />
-                                <ToggleButton active={highlightLinks} onClick={() => setHighlightLinks(!highlightLinks)} icon={MousePointer2} label={t.links} />
-                                <ToggleButton active={readableFont} onClick={() => setReadableFont(!readableFont)} icon={Type} label={t.font} />
+                            <div className="p-4 space-y-3 max-h-[60vh] overflow-y-auto">
+                                {/* Font Size */}
+                                <div className="bg-zinc-50 dark:bg-zinc-800/50 p-3 rounded-xl border border-zinc-100 dark:border-zinc-800">
+                                    <div className="flex justify-between text-sm font-medium text-zinc-700 dark:text-zinc-300 mb-2">
+                                        <span>{t.textSize}</span><span>{fontSize}%</span>
+                                    </div>
+                                    <div className="flex gap-2" dir="ltr">
+                                        <button onClick={() => setFontSize(f => Math.max(70, f - 10))} className="flex-1 bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-sm hover:bg-zinc-50 font-bold border border-zinc-200 dark:border-zinc-700">A-</button>
+                                        <button onClick={() => setFontSize(f => Math.min(150, f + 10))} className="flex-1 bg-white dark:bg-zinc-800 p-2 rounded-lg shadow-sm hover:bg-zinc-50 font-bold border border-zinc-200 dark:border-zinc-700">A+</button>
+                                    </div>
+                                </div>
+                                {/* Toggles */}
+                                <div className="grid grid-cols-1 gap-2">
+                                    <ToggleButton active={contrast} onClick={() => setContrast(!contrast)} icon={Eye} label={t.contrast} />
+                                    <ToggleButton active={highlightLinks} onClick={() => setHighlightLinks(!highlightLinks)} icon={MousePointer2} label={t.links} />
+                                    <ToggleButton active={readableFont} onClick={() => setReadableFont(!readableFont)} icon={Type} label={t.font} />
+                                </div>
+                                <button onClick={reset} className="w-full flex items-center justify-center gap-2 p-3 mt-4 text-zinc-500 hover:text-red-500 rounded-xl transition-colors text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20">
+                                    <RotateCcw className="w-4 h-4" /> {t.reset}
+                                </button>
                             </div>
-                            <button onClick={reset} className="w-full flex items-center justify-center gap-2 p-3 mt-4 text-zinc-500 hover:text-red-500 rounded-xl transition-colors text-sm font-medium hover:bg-red-50 dark:hover:bg-red-900/20">
-                                <RotateCcw className="w-4 h-4" /> {t.reset}
-                            </button>
-                        </div>
-                    </motion.div>
+                        </motion.div>
+                    </>
                 )}
             </AnimatePresence>
 
             <button
                 onClick={() => setIsOpen(!isOpen)}
-                className="w-12 h-12 sm:w-14 sm:h-14 bg-blue-600 hover:bg-blue-700 text-white rounded-full shadow-xl shadow-blue-600/30 flex items-center justify-center transition-transform hover:scale-110 active:scale-95 focus:outline-none focus:ring-4 focus:ring-blue-300 border-4 border-white dark:border-zinc-900"
+                className="w-10 h-10 flex items-center justify-center rounded-lg hover:bg-zinc-100 dark:hover:bg-white/10 text-zinc-600 dark:text-zinc-400 transition-colors"
                 aria-label={t.title}
+                title={t.title}
             >
-                <Accessibility className="w-6 h-6 sm:w-7 sm:h-7" />
+                <Accessibility className="w-5 h-5" />
             </button>
         </div>
     );

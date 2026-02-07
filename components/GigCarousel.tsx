@@ -17,6 +17,7 @@ interface Gig {
     price_amount?: number;
     currency?: string;
     pricing_type?: string;
+    has_landing?: boolean;
 }
 
 export default function GigCarousel() {
@@ -37,7 +38,8 @@ export default function GigCarousel() {
             category_id: 'DJ',
             category_slug: 'dj',
             photos: ['/categories/DJ.jpg'],
-            short_description: 'Set the perfect vibe for your event'
+            short_description: 'Set the perfect vibe for your event',
+            has_landing: true
         },
         {
             id: 'cat-magician',
@@ -45,7 +47,8 @@ export default function GigCarousel() {
             category_id: 'Magician',
             category_slug: 'magician',
             photos: ['/categories/Illusionist.jpg'],
-            short_description: 'Mind-blowing entertainment'
+            short_description: 'Mind-blowing entertainment',
+            has_landing: true
         },
         {
             id: 'cat-comedian',
@@ -53,7 +56,8 @@ export default function GigCarousel() {
             category_id: 'Comedian',
             category_slug: 'comedian',
             photos: ['/categories/stand-up-comedian.jpg'],
-            short_description: 'Laughter guaranteed'
+            short_description: 'Laughter guaranteed',
+            has_landing: true
         },
         {
             id: 'cat-singer',
@@ -61,7 +65,8 @@ export default function GigCarousel() {
             category_id: 'Singer',
             category_slug: 'singer',
             photos: ['/categories/live-musician.jpg'],
-            short_description: 'Soulful performances'
+            short_description: 'Soulful performances',
+            has_landing: true
         },
         {
             id: 'cat-bartender',
@@ -69,7 +74,8 @@ export default function GigCarousel() {
             category_id: 'Bartender',
             category_slug: 'bartender',
             photos: ['/categories/Bartender.jpg'],
-            short_description: 'Premium bar service'
+            short_description: 'Premium bar service',
+            has_landing: true
         },
         {
             id: 'cat-chef',
@@ -77,7 +83,8 @@ export default function GigCarousel() {
             category_id: 'Chef',
             category_slug: 'private-chef',
             photos: ['/categories/private-chef.jpg'],
-            short_description: 'Culinary excellence'
+            short_description: 'Culinary excellence',
+            has_landing: true
         },
         {
             id: 'cat-kids',
@@ -85,7 +92,8 @@ export default function GigCarousel() {
             category_id: 'Kids',
             category_slug: 'kids-animator',
             photos: ['/categories/rollerblade-coach.jpg'],
-            short_description: 'Fun for the little ones'
+            short_description: 'Fun for the little ones',
+            has_landing: false // Link to general registration
         }
     ];
 
@@ -120,38 +128,73 @@ export default function GigCarousel() {
         );
     }
 
+    // Split for two rows
+    const mid = Math.ceil(gigs.length / 2);
+    const topRow = gigs.slice(0, mid);
+    const bottomRow = gigs.slice(mid);
+
+    // Ensure we have enough items for scrolling loop (4 sets covers large screens)
+    const row1Items = [...topRow, ...topRow, ...topRow, ...topRow];
+    const row2Items = [...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow];
+
     return (
-        <section className="gig-carousel-section bg-zinc-50 dark:bg-black py-12">
+        <section className="gig-carousel-section bg-zinc-50 dark:bg-black overflow-hidden py-12">
             {/* Header */}
-            <div className="max-w-[1200px] mx-auto px-4 md:px-6 mb-8" dir={lang === 'he' ? 'rtl' : 'ltr'}>
-                <motion.div
-                    initial={{ opacity: 0, y: 30 }}
-                    whileInView={{ opacity: 1, y: 0 }}
-                    viewport={{ once: true }}
-                    transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
-                >
-                    <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">{t.title}</h2>
-                    <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">{t.subtitle}</p>
-                </motion.div>
+            <div className="gig-header mb-8" dir={lang === 'he' ? 'rtl' : 'ltr'}>
+                <div className="max-w-[1200px] mx-auto px-4 md:px-6">
+                    <motion.div
+                        initial={{ opacity: 0, y: 30 }}
+                        whileInView={{ opacity: 1, y: 0 }}
+                        viewport={{ once: true }}
+                        transition={{ duration: 1, ease: [0.16, 1, 0.3, 1] }}
+                    >
+                        <h2 className="text-3xl font-bold text-zinc-900 dark:text-white mb-2">{t.title}</h2>
+                        <p className="text-zinc-600 dark:text-zinc-400 max-w-lg">{t.subtitle}</p>
+                    </motion.div>
+                </div>
             </div>
 
-            {/* Horizontal Scroll List (No Duplicates) */}
-            <div className="w-full overflow-x-auto pb-8 hide-scrollbar" dir="ltr">
-                <div className="flex gap-4 px-4 md:px-8 w-max mx-auto md:mx-0">
-                    {gigs.map((gig, i) => (
-                        <GigCard key={gig.id} gig={gig} lang={lang} />
-                    ))}
+            {/* Carousel Rows */}
+            <div className="gig-rows flex flex-col gap-6" dir="ltr">
+                {/* ROW 1 */}
+                <div className="gig-row w-full overflow-hidden whitespace-nowrap">
+                    <div className="gig-track gig-track-left flex gap-4 w-max">
+                        {row1Items.map((gig, i) => (
+                            <GigCard key={`r1-${gig.id}-${i}`} gig={gig} lang={lang} />
+                        ))}
+                    </div>
+                </div>
+
+                {/* ROW 2 */}
+                <div className="gig-row w-full overflow-hidden whitespace-nowrap">
+                    <div className="gig-track gig-track-right flex gap-4 w-max">
+                        {row2Items.map((gig, i) => (
+                            <GigCard key={`r2-${gig.id}-${i}`} gig={gig} lang={lang} />
+                        ))}
+                    </div>
                 </div>
             </div>
 
             <style jsx global>{`
-                .hide-scrollbar::-webkit-scrollbar {
-                    display: none;
+                .gig-track-left {
+                    animation: scroll-left 60s linear infinite;
                 }
-                .hide-scrollbar {
-                    -ms-overflow-style: none;
-                    scrollbar-width: none;
+
+                .gig-track-right {
+                    animation: scroll-right 70s linear infinite;
                 }
+
+                @keyframes scroll-left {
+                    0% { transform: translateX(0); }
+                    100% { transform: translateX(-50%); } 
+                }
+
+                @keyframes scroll-right {
+                    0% { transform: translateX(-50%); } 
+                    100% { transform: translateX(0); }
+                }
+
+                /* Mobile Optimization - pause on hover maybe? or slower? */
             `}</style>
         </section>
     );
@@ -172,14 +215,19 @@ const GigCard = memo(function GigCard({
         : firstPhoto?.url || '/logo.jpg';
 
     const slug = gig.category_slug;
-    const href = `/book/${slug}?utm_source=homepage&utm_medium=card&utm_campaign=book_gig&utm_content=${slug}&ref=home_card`;
+
+    // Conditional Linking
+    const href = gig.has_landing
+        ? `/book/${slug}?utm_source=homepage&utm_medium=card&utm_campaign=book_gig&utm_content=${slug}&ref=home_card`
+        : `/join?utm_source=homepage&utm_medium=card&utm_campaign=book_general&utm_content=${slug}&ref=home_card_no_landing`;
 
     const handleClick = () => {
         trackEvent('select_gig_category', {
             gig_slug: slug,
             source: 'homepage_card',
-            card_position: 'scroll_list',
-            category_name: gig.title
+            card_position: 'carousel',
+            category_name: gig.title,
+            target_page: gig.has_landing ? 'booking_landing' : 'general_registration'
         });
     };
 
@@ -187,7 +235,7 @@ const GigCard = memo(function GigCard({
         <Link
             href={href}
             onClick={handleClick}
-            className="w-[260px] md:w-[280px] flex-shrink-0 cursor-pointer group relative block no-underline transition-transform hover:-translate-y-1"
+            className="w-[240px] sm:w-[280px] flex-shrink-0 cursor-pointer group relative block no-underline transition-transform hover:scale-95 duration-300"
             style={{ direction: isHebrew ? 'rtl' : 'ltr' }}
         >
             <div className="relative overflow-hidden rounded-2xl bg-zinc-900 border border-zinc-800 shadow-md hover:shadow-xl hover:border-zinc-700 transition-all duration-300 transform w-full">

@@ -10,6 +10,7 @@ import { usePathname, useRouter } from 'next/navigation';
 import { supabase } from '@/lib/supabase';
 import { User, AuthChangeEvent, Session } from '@supabase/supabase-js';
 import { createPortal } from 'react-dom';
+import AccessibilityWidget from '@/components/AccessibilityWidget';
 
 export default function Navbar() {
     const [showLangDropdown, setShowLangDropdown] = useState(false);
@@ -207,8 +208,9 @@ export default function Navbar() {
                         {/* Theme & Language Selector */}
                         <div className="mt-6 pt-6 border-t border-zinc-200 dark:border-zinc-800">
                             {/* Theme Toggle */}
-                            <p className="text-zinc-500 dark:text-zinc-400 text-center text-xs uppercase tracking-widest font-bold mb-4">Theme</p>
-                            <div className="flex justify-center gap-3 mb-6">
+                            <p className="text-zinc-500 dark:text-zinc-400 text-center text-xs uppercase tracking-widest font-bold mb-4">Settings</p>
+                            <div className="flex justify-center items-center gap-4 mb-6">
+                                <AccessibilityWidget />
                                 <button
                                     onClick={() => toggleTheme()}
                                     className="flex items-center gap-2 px-6 py-3 rounded-xl border border-blue-500 bg-blue-500/10 text-blue-600 dark:text-blue-400 font-semibold transition-colors hover:bg-blue-500/20"
@@ -278,6 +280,9 @@ export default function Navbar() {
 
                         {/* Right side (Desktop) */}
                         <div className="hidden md:flex items-center gap-3">
+                            {/* Accessibility */}
+                            <AccessibilityWidget />
+
                             {/* Theme Toggle */}
                             <button
                                 onClick={toggleTheme}
