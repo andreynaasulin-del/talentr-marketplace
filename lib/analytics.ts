@@ -13,8 +13,33 @@ declare global {
 
 export const GTM_ID = process.env.NEXT_PUBLIC_GTM_ID || 'GTM-XXXXXX';
 
+// Helper to set cookie
+const setCookie = (name: string, value: string, days: number) => {
+  let expires = "";
+  if (days) {
+    const date = new Date();
+    date.setTime(date.getTime() + (days * 24 * 60 * 60 * 1000));
+    expires = "; expires=" + date.toUTCString();
+  }
+  // SameSite=Lax for normal navigation, Secure if HTTPS
+  const secure = window.location.protocol === 'https:' ? '; Secure' : '';
+  document.cookie = name + "=" + (value || "") + expires + "; path=/" + secure + "; SameSite=Lax";
+};
+
+// Helper to get cookie
+const getCookie = (name: string) => {
+  const nameEQ = name + "=";
+  const ca = document.cookie.split(';');
+  for (let i = 0; i < ca.length; i++) {
+    let c = ca[i];
+    while (c.charAt(0) === ' ') c = c.substring(1, c.length);
+    if (c.indexOf(nameEQ) === 0) return c.substring(nameEQ.length, c.length);
+  }
+  return null;
+};
+
 // Helper to get UTM params from URL or persistent storage
-const getUtmParams = () => {
+export const getUtmParams = () => {
   if (typeof window === 'undefined') return {};
 
   const utms: Record<string, string | null> = {
@@ -23,41 +48,54 @@ const getUtmParams = () => {
     utm_campaign: null,
     utm_term: null,
     utm_content: null,
+    ref: null, // User requested 'ref'
   };
 
   // 1. Try to read from current URL
   const searchParams = new URLSearchParams(window.location.search);
   let foundInUrl = false;
+  const currentUtms: Record<string, string> = {};
 
   Object.keys(utms).forEach(key => {
     const val = searchParams.get(key);
     if (val) {
-      utms[key] = val;
+      currentUtms[key] = val;
       foundInUrl = true;
     }
   });
 
-  // 2. If found in URL, save to sessionStorage for session persistence
+  // 2. If found in URL, save to Cookie (30 days) and localStorage
   if (foundInUrl) {
     try {
-      sessionStorage.setItem('last_utms', JSON.stringify(utms));
+      const json = JSON.stringify(currentUtms);
+      // Save to LocalStorage
+      localStorage.setItem('traffic_source', json);
+      // Save to Cookie (30 days)
+      setCookie('traffic_source', encodeURIComponent(json), 30);
     } catch (e) {
-      // ignore
+      console.error('Failed to save UTMs', e);
     }
-    return utms;
+    return { ...utms, ...currentUtms };
   }
 
-  // 3. Fallback to storage
+  // 3. Fallback to storage (Cookie first, then LocalStorage)
   try {
-    const stored = sessionStorage.getItem('last_utms');
+    // Try Cookie
+    const cookieVal = getCookie('traffic_source');
+    if (cookieVal) {
+      return { ...utms, ...JSON.parse(decodeURIComponent(cookieVal)) };
+    }
+
+    // Try LocalStorage
+    const stored = localStorage.getItem('traffic_source');
     if (stored) {
-      return JSON.parse(stored);
+      return { ...utms, ...JSON.parse(stored) };
     }
   } catch (e) {
     // ignore
   }
 
-  return {};
+  return utms;
 };
 
 export const pageview = (url: string) => {

@@ -11,6 +11,8 @@ import CookieConsent from '@/components/CookieConsent';
 import GoogleTagManager from '@/components/analytics/GoogleTagManager';
 import MetaPixel from '@/components/analytics/MetaPixel';
 import { Suspense } from 'react';
+import AccessibilityWidget from '@/components/AccessibilityWidget';
+import TrafficTracker from '@/components/analytics/TrafficTracker';
 
 
 // Optimize font loading
@@ -122,6 +124,8 @@ export default function RootLayout({
                                 <CookieConsent />
                                 <GoogleTagManager />
                                 <MetaPixel />
+                                <TrafficTracker />
+                                <AccessibilityWidget />
                             </Suspense>
                         </FavoritesProvider>
                     </LanguageProvider>

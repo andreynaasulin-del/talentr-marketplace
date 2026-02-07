@@ -5,18 +5,18 @@ import { motion } from 'framer-motion';
 import Image from 'next/image';
 import Link from 'next/link';
 import { memo, useEffect, useState } from 'react';
+import { trackEvent } from '@/lib/analytics';
 
 interface Gig {
     id: string;
     title: string;
-    category_id: string;
+    category_id: string; // Display Name
+    category_slug: string; // URL Slug
     short_description?: string;
-    photos?: any[]; // string[] for Mocks, GigPhoto[] for Real DB
-    is_free?: boolean;
-    pricing_type?: string;
+    photos?: any[];
     price_amount?: number;
     currency?: string;
-    share_slug?: string;
+    pricing_type?: string;
 }
 
 export default function GigCarousel() {
@@ -26,106 +26,81 @@ export default function GigCarousel() {
     const [loading, setLoading] = useState(true);
 
     useEffect(() => {
-        const fetchGigs = async () => {
-            try {
-                const res = await fetch('/api/gigs?status=active');
-                if (res.ok) {
-                    const data = await res.json();
-                    if (data.gigs && data.gigs.length > 0) {
-                        setGigs(data.gigs);
-                    } else {
-                        setGigs(MOCK_GIGS);
-                    }
-                } else {
-                    setGigs(MOCK_GIGS);
-                }
-            } catch (err) {
-                console.error('Failed to fetch gigs:', err);
-                setGigs(MOCK_GIGS);
-            } finally {
-                setLoading(false);
-            }
-        };
-
-        fetchGigs();
+        // We use Mock Data for Categories as requested for the Homepage Navigation
+        // User requested specific categories: DJ, Magician, Comedian, Singer, Bartender...
+        setGigs(MOCK_CATEGORIES);
+        setLoading(false);
     }, []);
 
-    const MOCK_GIGS: Gig[] = [
+    const MOCK_CATEGORIES: Gig[] = [
         {
-            id: 'pkg-1',
-            title: 'Private Chef Experience',
-            category_id: 'Private Chef',
-            photos: ['/categories/private-chef.jpg'],
-            price_amount: 2500,
-            currency: 'ILS',
-            pricing_type: 'fixed',
-            short_description: 'Exclusive culinary journey in your home',
-            share_slug: 'demo-chef'
-        },
-        {
-            id: 'pkg-2',
-            title: 'Cocktail Bar & Mixology',
-            category_id: 'Bartender',
-            photos: ['/categories/Bartender.jpg'],
-            price_amount: 1200,
-            currency: 'ILS',
-            pricing_type: 'event',
-            short_description: 'Premium bar service for private events',
-            share_slug: 'demo-bar'
-        },
-        {
-            id: 'pkg-3',
-            title: 'Live Stand-up Comedy',
-            category_id: 'Stand-up',
-            photos: ['/categories/stand-up-comedian.jpg'],
-            price_amount: 3000,
-            currency: 'ILS',
-            pricing_type: 'show',
-            short_description: 'Hilarious performance for your guests',
-            share_slug: 'demo-comedy'
-        },
-        {
-            id: 'pkg-4',
-            title: 'Wedding DJ Set',
+            id: 'cat-dj',
+            title: 'Professional DJs',
             category_id: 'DJ',
+            category_slug: 'dj',
             photos: ['/categories/DJ.jpg'],
-            price_amount: 4500,
-            currency: 'ILS',
-            pricing_type: 'event',
-            short_description: 'Unforgettable party vibes',
-            share_slug: 'demo-dj'
+            short_description: 'Set the perfect vibe for your event'
         },
         {
-            id: 'pkg-5',
-            title: 'Live Jazz Band',
-            category_id: 'Band',
+            id: 'cat-magician',
+            title: 'Magicians & Illusionists',
+            category_id: 'Magician',
+            category_slug: 'magician',
+            photos: ['/categories/Illusionist.jpg'],
+            short_description: 'Mind-blowing entertainment'
+        },
+        {
+            id: 'cat-comedian',
+            title: 'Stand-up Comedians',
+            category_id: 'Comedian',
+            category_slug: 'comedian',
+            photos: ['/categories/stand-up-comedian.jpg'],
+            short_description: 'Laughter guaranteed'
+        },
+        {
+            id: 'cat-singer',
+            title: 'Live Singers',
+            category_id: 'Singer',
+            category_slug: 'singer',
             photos: ['/categories/live-musician.jpg'],
-            price_amount: 6000,
-            currency: 'ILS',
-            pricing_type: 'band',
-            short_description: 'Classy atmosphere for receptions',
-            share_slug: 'demo-jazz'
+            short_description: 'Soulful performances'
+        },
+        {
+            id: 'cat-bartender',
+            title: 'Cocktail Bartenders',
+            category_id: 'Bartender',
+            category_slug: 'bartender',
+            photos: ['/categories/Bartender.jpg'],
+            short_description: 'Premium bar service'
+        },
+        {
+            id: 'cat-chef',
+            title: 'Private Chefs',
+            category_id: 'Chef',
+            category_slug: 'private-chef',
+            photos: ['/categories/private-chef.jpg'],
+            short_description: 'Culinary excellence'
+        },
+        {
+            id: 'cat-kids',
+            title: 'Kids Animators',
+            category_id: 'Kids',
+            category_slug: 'kids-animator',
+            photos: ['/categories/rollerblade-coach.jpg'], // Placeholder
+            short_description: 'Fun for the little ones'
         }
     ];
 
     const content = {
         en: {
-            title: 'The Collection',
-            subtitle: 'Browse premium experiences from top vendors',
+            title: 'Browse Categories',
+            subtitle: 'Find the perfect professional for your event',
             viewAll: 'View All',
-            noGigs: 'No gigs yet',
-            noGigsDesc: 'Be the first to publish your service',
-            free: 'Free',
-            from: 'from'
         },
         he: {
-            title: 'האוסף',
-            subtitle: 'גלו חוויות פרימיום מהספקים הטובים ביותר',
+            title: 'קטגוריות מבוקשות', // Popular Categories
+            subtitle: 'מצאו את איש המקצוע המושלם לאירוע שלכם',
             viewAll: 'צפה בהכל',
-            noGigs: 'אין גיגים עדיין',
-            noGigsDesc: 'היו הראשונים לפרסם את השירות שלכם',
-            free: 'חינם',
-            from: 'החל מ'
         },
     };
 
@@ -148,23 +123,14 @@ export default function GigCarousel() {
         );
     }
 
-    // No gigs state
-    if (gigs.length === 0) {
-        return (
-            <section className="py-16 text-center">
-                <h2 className="text-xl font-bold text-zinc-900 dark:text-white mb-2">{t.noGigs}</h2>
-                <p className="text-zinc-500">{t.noGigsDesc}</p>
-            </section>
-        );
-    }
-
     // Split for two rows
     const mid = Math.ceil(gigs.length / 2);
     const topRow = gigs.slice(0, mid);
     const bottomRow = gigs.slice(mid);
 
-    // If not enough items for two rows, just duplicate topRow to bottom or similar logic
-    // But for marquee we need at least some items.
+    // Ensure we have enough items for scrolling loop by duplicating
+    const row1Items = [...topRow, ...topRow, ...topRow, ...bottomRow]; // Mix
+    const row2Items = [...bottomRow, ...bottomRow, ...topRow, ...bottomRow]; // Mix
 
     return (
         <section className="gig-carousel-section">
@@ -186,24 +152,18 @@ export default function GigCarousel() {
                 {/* ROW 1 */}
                 <div className="gig-row">
                     <div className="gig-track gig-track-left">
-                        {[...topRow, ...topRow, ...topRow, ...topRow].map((gig, i) => (
-                            <GigCard key={`r1-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
+                        {row1Items.map((gig, i) => (
+                            <GigCard key={`r1-${gig.id}-${i}`} gig={gig} lang={lang} />
                         ))}
                     </div>
                 </div>
 
-                {/* ROW 2 - Only if enough items, otherwise show topRow reversed or similar */}
-                {/* For visual density, let's just show bottomRow if exists, else topRow again but different speed */}
+                {/* ROW 2 */}
                 <div className="gig-row">
                     <div className="gig-track gig-track-right">
-                        {[...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow].length > 0 ?
-                            [...bottomRow, ...bottomRow, ...bottomRow, ...bottomRow].map((gig, i) => (
-                                <GigCard key={`r2-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
-                            )) :
-                            [...topRow, ...topRow, ...topRow, ...topRow].map((gig, i) => ( // Fallback to topRow if bottom empty
-                                <GigCard key={`r2-dup-${gig.id}-${i}`} gig={gig} lang={lang} t={t} />
-                            ))
-                        }
+                        {row2Items.map((gig, i) => (
+                            <GigCard key={`r2-${gig.id}-${i}`} gig={gig} lang={lang} />
+                        ))}
                     </div>
                 </div>
             </div>
@@ -307,15 +267,13 @@ export default function GigCarousel() {
     );
 }
 
-// Gig Card Component - Minimalist Dark Version (Strictly as requested)
+// Gig Card Component - Landing Page Navigation
 const GigCard = memo(function GigCard({
     gig,
     lang,
-    t
 }: {
     gig: Gig;
     lang: 'en' | 'he';
-    t: { free: string; from: string };
 }) {
     const isHebrew = lang === 'he';
 
@@ -323,13 +281,26 @@ const GigCard = memo(function GigCard({
     const firstPhoto = gig.photos?.[0];
     const photo = typeof firstPhoto === 'string'
         ? firstPhoto
-        : firstPhoto?.url || '/logo.jpg'; // Ultimate Fallback
+        : firstPhoto?.url || '/logo.jpg';
 
-    const link = gig.share_slug ? `/g/${gig.share_slug}` : `/gig/${gig.id}`;
+    // Build URL with UTMs as requested
+    const slug = gig.category_slug;
+    const href = `/book/${slug}?utm_source=homepage&utm_medium=card&utm_campaign=book_gig&utm_content=${slug}&ref=home_card`;
+
+    const handleClick = () => {
+        // Track the click event
+        trackEvent('select_gig_category', {
+            gig_slug: slug,
+            source: 'homepage_card',
+            card_position: 'carousel', // context
+            category_name: gig.title
+        });
+    };
 
     return (
         <Link
-            href={link}
+            href={href}
+            onClick={handleClick}
             className="gig-card-wrapper group"
             style={{ direction: isHebrew ? 'rtl' : 'ltr' }}
         >
@@ -343,17 +314,19 @@ const GigCard = memo(function GigCard({
                         className="object-cover transition-transform duration-700 group-hover:scale-110"
                         sizes="(max-width: 640px) 240px, 280px"
                     />
+                    {/* Overlay gradient */}
+                    <div className="absolute inset-0 bg-gradient-to-t from-black/80 via-black/20 to-transparent" />
                 </div>
 
-                {/* CONTENT - Minimal, No Prices, No Description */}
-                <div className="p-5 text-center">
-                    {/* Category */}
-                    <p className="text-blue-500 text-[11px] font-bold uppercase tracking-widest mb-2">
+                {/* CONTENT */}
+                <div className="absolute bottom-0 left-0 right-0 p-5 text-center">
+                    {/* Category Label */}
+                    <p className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-90">
                         {gig.category_id}
                     </p>
 
                     {/* Title */}
-                    <h3 className="text-white font-bold text-lg leading-snug line-clamp-2">
+                    <h3 className="text-white font-bold text-lg leading-snug line-clamp-2 drop-shadow-md">
                         {gig.title}
                     </h3>
                 </div>
@@ -362,6 +335,7 @@ const GigCard = memo(function GigCard({
                 .gig-card-wrapper {
                     width: 280px;
                     flex-shrink: 0;
+                    cursor: pointer;
                 }
                 @media (max-width: 640px) {
                     .gig-card-wrapper {
