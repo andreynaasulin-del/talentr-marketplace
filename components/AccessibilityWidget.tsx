@@ -87,12 +87,20 @@ export default function AccessibilityWidget() {
             <AnimatePresence>
                 {isOpen && (
                     <>
-                        <div className="fixed inset-0 z-40" onClick={() => setIsOpen(false)} />
+                        {/* Overlay: z-[100] to be above Navbar (z-50) and MobileMenu (z-[9999]?) wait, MobileMenu is z-[9999] */}
+                        {/* We need z-[10000] */}
+                        <div className="fixed inset-0 z-[10000] bg-black/20 backdrop-blur-sm sm:bg-transparent sm:backdrop-blur-none" onClick={() => setIsOpen(false)} />
+
                         <motion.div
                             initial={{ opacity: 0, scale: 0.9, y: -10 }}
                             animate={{ opacity: 1, scale: 1, y: 0 }}
                             exit={{ opacity: 0, scale: 0.9, y: -10 }}
-                            className={`absolute top-full mt-3 w-[300px] bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden z-50 ${isHebrew ? 'left-0' : 'right-0'}`}
+                            className={`
+                                fixed left-4 right-4 top-1/2 -translate-y-1/2 z-[10001]
+                                sm:absolute sm:top-full sm:mt-3 sm:translate-y-0 sm:w-[300px] sm:left-auto sm:right-auto
+                                bg-white dark:bg-zinc-900 rounded-2xl shadow-2xl border border-zinc-200 dark:border-zinc-800 overflow-hidden
+                                ${isHebrew ? 'sm:left-0' : 'sm:right-0'}
+                            `}
                             dir={isHebrew ? 'rtl' : 'ltr'}
                         >
                             <div className="p-4 bg-blue-600 text-white flex justify-between items-center">
@@ -151,15 +159,14 @@ function ToggleButton({ active, onClick, icon: Icon, label }: any) {
                 <Icon className="w-5 h-5 flex-shrink-0" />
                 <span className="text-sm font-bold">{label}</span>
             </div>
-            {active && <Check className="w-5 h-5 bg-white text-blue-600 rounded-full p-0.5 flex-shrink-0" />}
+            {/* Check Icon for Active State */}
+            {active && (
+                <div className="w-5 h-5 bg-white text-blue-600 rounded-full flex items-center justify-center shadow-sm">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className="w-3 h-3">
+                        <polyline points="20 6 9 17 4 12" />
+                    </svg>
+                </div>
+            )}
         </button>
-    );
-}
-
-function Check({ className }: { className?: string }) {
-    return (
-        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="3" strokeLinecap="round" strokeLinejoin="round" className={className}>
-            <polyline points="20 6 9 17 4 12" />
-        </svg>
     );
 }
