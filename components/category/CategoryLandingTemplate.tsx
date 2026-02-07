@@ -2,13 +2,13 @@
 
 import { useLanguage } from '@/context/LanguageContext';
 import { motion } from 'framer-motion';
-import { Check, ArrowRight, ChevronDown, ChevronUp } from 'lucide-react';
+import { Check, ArrowRight, ChevronDown, ChevronUp, MessageCircle } from 'lucide-react';
 import Link from 'next/link';
-import { useState, useEffect } from 'react';
+import { useState, useEffect, useRef } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import type { CategoryContent, PageType } from '@/lib/category-landing-data';
 import { HOW_IT_WORKS } from '@/lib/category-landing-data';
-import CategoryChat from './CategoryChat';
+import CategoryChat, { type CategoryChatRef } from './CategoryChat';
 import Navbar from '@/components/Navbar';
 import Footer from '@/components/Footer';
 
@@ -25,6 +25,9 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
   const content = category[pageType][lang];
   const howItWorks = HOW_IT_WORKS[pageType][lang];
 
+  // Chat ref for opening from book CTA
+  const chatRef = useRef<CategoryChatRef>(null);
+
   // FAQ accordion state
   const [openFaq, setOpenFaq] = useState<number | null>(null);
 
@@ -39,7 +42,7 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
 
   const ctaText = pageType === 'book'
     ? { en: 'Book now', he: 'הזמן עכשיו' }
-    : { en: 'Get Started', he: 'תקבל' };
+    : { en: 'Create your gig', he: 'צור את הגיג שלך' };
 
   const ctaLink = pageType === 'book' ? '/' : '/join';
 
@@ -96,8 +99,8 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
               {content.heroDescription}
             </p>
 
-            {/* CTA Button - Only for Become pages */}
-            {pageType === 'become' && (
+            {/* CTA Button */}
+            {pageType === 'become' ? (
               <div className="flex justify-center">
                 <Link
                   href={ctaLink}
@@ -108,6 +111,17 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
                   <ArrowRight className="w-5 h-5" />
                 </Link>
               </div>
+            ) : (
+              <button
+                onClick={() => {
+                  handleCtaClick();
+                  chatRef.current?.open();
+                }}
+                className="inline-flex items-center gap-2 px-8 sm:px-10 py-4 sm:py-5 bg-blue-600 hover:bg-blue-500 text-white text-base sm:text-lg font-bold rounded-xl sm:rounded-2xl shadow-xl shadow-blue-600/20 hover:shadow-blue-500/30 transition-all active:scale-95"
+              >
+                <MessageCircle className="w-5 h-5" />
+                {lang === 'he' ? 'הזמן עכשיו' : 'Book now'}
+              </button>
             )}
           </motion.div>
         </div>
@@ -286,6 +300,7 @@ export default function CategoryLandingTemplate({ category, pageType }: Category
 
       {/* ===== 6. CHATBOT CTA + FULLSCREEN CHAT ===== */}
       <CategoryChat
+        ref={chatRef}
         category={category.slug}
         pageType={pageType}
       />

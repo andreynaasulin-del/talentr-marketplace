@@ -3,7 +3,7 @@
 import { useLanguage } from '@/context/LanguageContext';
 import { motion, AnimatePresence } from 'framer-motion';
 import { MessageCircle, Sparkles, Send, Loader2, X } from 'lucide-react';
-import { useState, useEffect, useRef } from 'react';
+import { useState, useEffect, useRef, useImperativeHandle, forwardRef } from 'react';
 import { trackEvent } from '@/lib/analytics';
 import { getIntentBySlug, FALLBACK_INTENT, type ChatIntent } from '@/lib/chat-intents';
 import type { CategorySlug, PageType } from '@/lib/category-landing-data';
@@ -19,7 +19,11 @@ interface CategoryChatProps {
   pageType: PageType;
 }
 
-export default function CategoryChat({ category, pageType }: CategoryChatProps) {
+export interface CategoryChatRef {
+  open: () => void;
+}
+
+const CategoryChat = forwardRef<CategoryChatRef, CategoryChatProps>(function CategoryChat({ category, pageType }, ref) {
   const { language } = useLanguage();
   const lang = language as 'en' | 'he';
   const isRtl = lang === 'he';
@@ -51,6 +55,11 @@ export default function CategoryChat({ category, pageType }: CategoryChatProps) 
       }]);
     }
   }, [isChatOpen, lang, intent.firstMessage]);
+
+  // Expose open method to parent via ref
+  useImperativeHandle(ref, () => ({
+    open: () => handleOpen(),
+  }));
 
   const handleOpen = () => {
     setIsChatOpen(true);
@@ -309,7 +318,6 @@ export default function CategoryChat({ category, pageType }: CategoryChatProps) 
                   onKeyDown={handleKeyPress}
                   placeholder={placeholderText[lang]}
                   className="flex-1 px-4 py-3 bg-zinc-100 dark:bg-zinc-900 border border-zinc-200 dark:border-zinc-800 rounded-xl text-sm sm:text-base placeholder:text-zinc-400 dark:placeholder:text-zinc-600 focus:outline-none focus:border-blue-500 transition-all"
-                  autoFocus
                 />
                 <button
                   onClick={sendMessage}
@@ -329,4 +337,6 @@ export default function CategoryChat({ category, pageType }: CategoryChatProps) 
       </AnimatePresence>
     </>
   );
-}
+});
+
+export default CategoryChat;
