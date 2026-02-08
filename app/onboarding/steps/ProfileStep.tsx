@@ -29,8 +29,6 @@ interface ProfileStepProps {
 }
 
 export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVendor }: ProfileStepProps) {
-    console.log('[ProfileStep] Component rendered with props:', { gigId, inviteToken, hasPendingVendor: !!pendingVendor });
-
     const { language } = useLanguage();
     const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
     const [loading, setLoading] = useState(false);
