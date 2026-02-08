@@ -4,7 +4,7 @@ import { Suspense, useEffect, useState } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
-import { Loader2, Sparkles, Plus, LayoutDashboard } from 'lucide-react';
+import { Loader2, Sparkles, Plus, LayoutDashboard, AlertTriangle, Copy, Check } from 'lucide-react';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
 import { useLanguage } from '@/context/LanguageContext';
 import GigStep from './steps/GigStep';
@@ -20,18 +20,30 @@ function OnboardingContent() {
         en: {
             allSet: 'All Set!',
             profileActive: 'Your profile is active and your gig is under review.',
-            saveLink: 'IMPORTANT: SAVE THIS LINK',
-            saveLinkDesc: 'This is your personal dashboard link. Use it to edit your profile and manage gigs anytime. You do NOT need a password.',
+            saveLink: '⚠️ IMPORTANT: SAVE THIS LINK',
+            saveLinkDesc: 'This is your ONLY way to access your dashboard. Copy it NOW and save it somewhere safe (Notes, WhatsApp, Email).',
             goToDashboard: 'Go to My Dashboard',
             createAnother: 'Create Another Gig',
+            copyLink: 'Copy Link',
+            copied: 'Copied!',
+            warningTitle: 'Did you save your link?',
+            warningDesc: 'Without this link, you will NOT be able to access your profile. Make sure you copied it!',
+            yesISaved: 'Yes, I saved it',
+            goBackAndCopy: 'Go back and copy',
         },
         he: {
             allSet: 'הכל מוכן!',
             profileActive: 'הפרופיל שלך פעיל והגיג שלך בבדיקה.',
-            saveLink: 'חשוב: שמור את הקישור הזה',
-            saveLinkDesc: 'זהו קישור הדשבורד האישי שלך. השתמש בו כדי לערוך את הפרופיל שלך ולנהל גיגים בכל עת. לא צריך סיסמה.',
+            saveLink: '⚠️ חשוב: שמור את הקישור הזה',
+            saveLinkDesc: 'זו הדרך היחידה שלך לגשת לדשבורד. העתק אותו עכשיו ושמור במקום בטוח (הערות, וואטסאפ, אימייל).',
             goToDashboard: 'לדשבורד שלי',
             createAnother: 'צור גיג נוסף',
+            copyLink: 'העתק קישור',
+            copied: '!הועתק',
+            warningTitle: 'שמרת את הקישור?',
+            warningDesc: 'בלי הקישור הזה, לא תוכל לגשת לפרופיל שלך. ודא שהעתקת אותו!',
+            yesISaved: 'כן, שמרתי',
+            goBackAndCopy: 'חזרה להעתקה',
         },
     }[lang];
 
@@ -43,6 +55,8 @@ function OnboardingContent() {
     const [inviteToken, setInviteToken] = useState<string | null>(null);
     const [pendingVendor, setPendingVendor] = useState<any>(null);
     const [editLink, setEditLink] = useState<string | null>(null);
+    const [linkCopied, setLinkCopied] = useState(false);
+    const [showWarning, setShowWarning] = useState(false);
 
     useEffect(() => {
         checkUserAndState();
@@ -50,40 +64,29 @@ function OnboardingContent() {
 
     const checkUserAndState = async () => {
         try {
-            // 1. Check Auth
             if (!supabase) return;
             const { data: { user } } = await supabase.auth.getUser();
-            if (!user) {
-                // If not logged in, we might want to redirect or allow "Guest Draft" mode.
-                // For now, consistent with "Invite" flow, we assume they should be logged in.
-            }
             setUserId(user?.id);
 
-            // 2. Check URL for Gig ID (Resuming)
             const paramGigId = searchParams.get('gigId');
             if (paramGigId) {
                 setGigId(paramGigId);
-                // Verify status
                 const { data: gig } = await supabase.from('gigs').select('status').eq('id', paramGigId).single();
                 if (gig) {
                     if (gig.status === 'draft' || gig.status === 'draft_profile_missing') {
                         setStep(2);
                         trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId: paramGigId });
                     } else {
-                        // Already active?
                         setStep(3);
                     }
                 }
             } else {
-                // New Session
                 trackEvent(AnalyticsEvents.GIG_CREATE_START);
             }
 
-            // 3. Check for Invite Token
             const invite = searchParams.get('invite');
             if (invite) {
                 setInviteToken(invite);
-                // Fetch pending vendor
                 const res = await fetch(`/api/confirm/${invite}`);
                 if (res.ok) {
                     const data = await res.json();
@@ -100,7 +103,6 @@ function OnboardingContent() {
     const handleGigSuccess = (gig: any) => {
         setGigId(gig.id);
         setStep(2);
-        // Push to URL so refresh works
         router.push(`/onboarding?gigId=${gig.id}`);
         trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId: gig.id });
     };
@@ -109,6 +111,26 @@ function OnboardingContent() {
         setStep(3);
         if (link) setEditLink(link);
         trackEvent(AnalyticsEvents.INVITE_OPENED, { status: 'completed' });
+    };
+
+    const handleCopyLink = () => {
+        if (editLink) {
+            navigator.clipboard.writeText(editLink);
+            setLinkCopied(true);
+        }
+    };
+
+    const handleGoToDashboard = () => {
+        if (!linkCopied) {
+            setShowWarning(true);
+        } else {
+            window.open(editLink!, '_self');
+        }
+    };
+
+    const confirmGoToDashboard = () => {
+        setShowWarning(false);
+        window.open(editLink!, '_self');
     };
 
     if (loading) {
@@ -121,7 +143,7 @@ function OnboardingContent() {
 
     return (
         <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white flex flex-col relative">
-            {/* Language Switcher (Explicitly Added) */}
+            {/* Language Switcher */}
             <div className="absolute top-4 right-4 z-[100]">
                 <button
                     onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
@@ -132,7 +154,51 @@ function OnboardingContent() {
                 </button>
             </div>
 
-            {/* Header / Progress */}
+            {/* Warning Modal */}
+            <AnimatePresence>
+                {showWarning && (
+                    <motion.div
+                        initial={{ opacity: 0 }}
+                        animate={{ opacity: 1 }}
+                        exit={{ opacity: 0 }}
+                        className="fixed inset-0 z-[200] bg-black/70 backdrop-blur-sm flex items-center justify-center p-4"
+                        onClick={() => setShowWarning(false)}
+                    >
+                        <motion.div
+                            initial={{ scale: 0.9, opacity: 0 }}
+                            animate={{ scale: 1, opacity: 1 }}
+                            exit={{ scale: 0.9, opacity: 0 }}
+                            onClick={(e) => e.stopPropagation()}
+                            className="bg-white dark:bg-zinc-900 rounded-2xl p-6 max-w-md w-full shadow-2xl border border-zinc-200 dark:border-zinc-800"
+                            dir={lang === 'he' ? 'rtl' : 'ltr'}
+                        >
+                            <div className="flex items-center gap-3 mb-4">
+                                <div className="w-12 h-12 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                                    <AlertTriangle className="w-6 h-6 text-red-600" />
+                                </div>
+                                <h3 className="text-xl font-bold">{t.warningTitle}</h3>
+                            </div>
+                            <p className="text-zinc-600 dark:text-zinc-400 mb-6">{t.warningDesc}</p>
+                            <div className="flex flex-col gap-3">
+                                <button
+                                    onClick={confirmGoToDashboard}
+                                    className="w-full py-3 bg-blue-600 hover:bg-blue-500 text-white font-bold rounded-xl transition-all"
+                                >
+                                    {t.yesISaved}
+                                </button>
+                                <button
+                                    onClick={() => setShowWarning(false)}
+                                    className="w-full py-3 border border-zinc-300 dark:border-zinc-700 hover:bg-zinc-100 dark:hover:bg-zinc-800 font-bold rounded-xl transition-all"
+                                >
+                                    {t.goBackAndCopy}
+                                </button>
+                            </div>
+                        </motion.div>
+                    </motion.div>
+                )}
+            </AnimatePresence>
+
+            {/* Progress Bar */}
             <div className="w-full h-2 bg-zinc-100 dark:bg-zinc-900 sticky top-0 z-50">
                 <motion.div
                     className="h-full bg-blue-600"
@@ -177,37 +243,39 @@ function OnboardingContent() {
                             </div>
 
                             <h1 className="text-4xl font-black">{t.allSet}</h1>
-                            <p className="text-xl text-zinc-500">
-                                {t.profileActive}
-                            </p>
+                            <p className="text-xl text-zinc-500">{t.profileActive}</p>
 
                             {editLink && (
-                                <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-6 rounded-2xl text-start space-y-3">
-                                    <p className="font-bold text-yellow-800 dark:text-yellow-500 flex items-center gap-2">
-                                        <Sparkles className="w-5 h-5" />
+                                <div className="bg-red-50 dark:bg-red-900/20 border-2 border-red-300 dark:border-red-800 p-6 rounded-2xl text-start space-y-4">
+                                    <p className="font-bold text-red-700 dark:text-red-400 text-lg">
                                         {t.saveLink}
                                     </p>
-                                    <p className="text-sm text-yellow-700 dark:text-yellow-400">
+                                    <p className="text-sm text-red-600 dark:text-red-400">
                                         {t.saveLinkDesc}
                                     </p>
-                                    <div className="flex items-center gap-2 mt-2">
+                                    <div className="flex items-center gap-2 mt-2 bg-white dark:bg-black p-2 rounded-xl border border-red-200 dark:border-red-800">
                                         <input
                                             readOnly
                                             value={editLink}
-                                            className="flex-1 p-2 bg-white dark:bg-black border border-yellow-200 dark:border-yellow-800 rounded-lg text-sm font-mono text-zinc-600 dark:text-zinc-400 select-all"
+                                            className="flex-1 p-2 bg-transparent text-sm font-mono text-zinc-600 dark:text-zinc-400 select-all outline-none"
                                         />
                                         <button
-                                            onClick={() => {
-                                                navigator.clipboard.writeText(editLink);
-                                            }}
-                                            className="p-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg text-yellow-700 transition-colors"
+                                            onClick={handleCopyLink}
+                                            className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all ${linkCopied
+                                                    ? 'bg-green-500 text-white'
+                                                    : 'bg-red-500 hover:bg-red-600 text-white'
+                                                }`}
                                         >
-                                            Copy
+                                            {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
+                                            {linkCopied ? t.copied : t.copyLink}
                                         </button>
                                     </div>
                                     <button
-                                        onClick={() => window.open(editLink, '_self')}
-                                        className="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-xl mt-4 text-center block transition-all shadow-lg shadow-yellow-400/20"
+                                        onClick={handleGoToDashboard}
+                                        className={`w-full py-3 font-bold rounded-xl mt-4 text-center block transition-all shadow-lg ${linkCopied
+                                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'
+                                                : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 cursor-not-allowed'
+                                            }`}
                                     >
                                         {t.goToDashboard}
                                     </button>
@@ -242,7 +310,7 @@ function OnboardingContent() {
 
                 </AnimatePresence>
             </main>
-        </div >
+        </div>
     );
 }
 
