@@ -89,12 +89,13 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
             // INVITE FLOW (Guest/Anonymous)
             // ============================================
             if (inviteToken) {
-                // 1. Confirm Pending Vendor -> Create Real Vendor
+                // 1. Confirm Pending Vendor -> Create Real Vendor + Link Gig (atomic operation)
                 const confirmRes = await fetch(`/api/confirm/${inviteToken}`, {
                     method: 'POST',
                     headers: { 'Content-Type': 'application/json' },
                     body: JSON.stringify({
                         action: 'confirm',
+                        gigId, // Pass gigId for server-side linking
                         updates: {
                             name: data.full_name,
                             phone: data.phone,
@@ -106,27 +107,12 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
 
                 if (!confirmRes.ok) throw new Error('Failed to confirm profile');
                 const confirmData = await confirmRes.json();
-                const { editLink, vendorId, editToken: vendorEditToken } = confirmData;
+                const { editLink, gigLinked } = confirmData;
 
-                // 2. Link Gig to New Vendor
-                const gigRes = await fetch(`/api/gigs/${gigId}`, {
-                    method: 'PATCH',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'x-vendor-token': vendorEditToken // Use token directly from API response
-                    },
-                    body: JSON.stringify({
-                        vendor_id: vendorId,
-                        status: 'pending_review',
-                        moderation_status: 'pending',
-                        wizard_completed: true
-                    })
-                });
-
-                if (!gigRes.ok) {
-                    const gigError = await gigRes.json();
-                    console.error('Failed to link gig:', gigError);
-                    toast.error('Failed to link gig to your profile');
+                // Log if gig linking failed (but don't block user)
+                if (gigId && !gigLinked) {
+                    console.error('Gig was not linked to vendor');
+                    toast.error('Warning: Gig may not be linked to your profile');
                 }
 
                 onSuccess(editLink);

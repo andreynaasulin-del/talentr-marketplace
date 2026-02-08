@@ -76,6 +76,34 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
             const baseUrl = process.env.NEXT_PUBLIC_APP_URL || 'https://talentr.co.il';
             const editLink = `${baseUrl}/vendor/edit/${editToken}`;
 
+            // CRITICAL: Link gig to vendor on server side (atomic operation)
+            const { gigId } = body;
+            if (gigId && vendorId) {
+                const { createClient } = await import('@supabase/supabase-js');
+                const supabaseAdmin = createClient(
+                    process.env.NEXT_PUBLIC_SUPABASE_URL!,
+                    process.env.SUPABASE_SERVICE_ROLE_KEY!
+                );
+
+                const { error: gigError } = await supabaseAdmin
+                    .from('gigs')
+                    .update({
+                        vendor_id: vendorId,
+                        status: 'pending_review',
+                        moderation_status: 'pending',
+                        wizard_completed: true
+                    })
+                    .eq('id', gigId)
+                    .is('vendor_id', null); // Only update if orphan gig
+
+                if (gigError) {
+                    console.error('Failed to link gig to vendor:', gigError);
+                    // Don't fail the whole operation, but log it
+                } else {
+                    console.log(`Successfully linked gig ${gigId} to vendor ${vendorId}`);
+                }
+            }
+
             // Send magic link email to vendor
             if (updates?.email) {
                 try {
@@ -96,6 +124,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 vendorId,
                 editLink,
                 editToken, // Include token for PATCH authentication
+                gigLinked: !!gigId, // Indicate if gig was linked
                 message: 'Profile confirmed successfully!'
             });
         }
