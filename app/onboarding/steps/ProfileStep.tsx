@@ -139,58 +139,27 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
             const { data: { user } } = await supabase.auth.getUser();
             if (!user) throw new Error('No authenticated user found');
 
-            // 1. Upsert Vendor Profile
-            // Check if vendor exists
-            const { data: existingVendor } = await supabase
-                .from('vendors')
-                .select('id')
-                .eq('user_id', user.id)
-                .single();
-
-            let vendorId = existingVendor?.id;
-            let newVendorStatus = 'profile_filled_pending_review';
-
-            if (!vendorId) {
-                vendorId = crypto.randomUUID();
-                const { error: vendorError } = await supabase.from('vendors').insert({
-                    id: vendorId,
+            // Use server-side API to create/find vendor and link gig
+            const res = await fetch('/api/onboarding/complete', {
+                method: 'POST',
+                headers: { 'Content-Type': 'application/json' },
+                body: JSON.stringify({
                     user_id: user.id,
+                    gig_id: gigId,
                     full_name: data.full_name,
                     phone: data.phone,
                     bio: data.bio,
-                    email: user.email,
-                    status: newVendorStatus, // Correct status per requirements
-                    status_reason: 'Onboarding completed'
-                });
-                if (vendorError) throw vendorError;
-            } else {
-                // Update existing
-                const { error: updateError } = await supabase.from('vendors').update({
-                    full_name: data.full_name,
-                    phone: data.phone,
-                    bio: data.bio,
-                    status: newVendorStatus,
-                    status_reason: 'Profile updated during onboarding'
-                }).eq('id', vendorId);
-                if (updateError) throw updateError;
+                    email: user.email
+                })
+            });
+
+            if (!res.ok) {
+                const err = await res.json();
+                throw new Error(err.error || 'Failed to complete onboarding');
             }
 
-            // 2. Link Gig to Vendor (if not already) and Update Status
-            // The Gig was created with 'draft' status. Now we move it to 'pending_review' or 'active' depending on logic.
-            // User Req: "5.2 Statuses... pending_review (if moderation needed)"
-            const { error: gigError } = await supabase
-                .from('gigs')
-                .update({
-                    vendor_id: vendorId,
-                    status: 'pending_review', // Moving from draft to pending
-                    moderation_status: 'pending',
-                    wizard_completed: true
-                })
-                .eq('id', gigId);
-
-            if (gigError) throw gigError;
-
-            onSuccess();
+            const { editLink } = await res.json();
+            onSuccess(editLink);
 
         } catch (error: any) {
             toast.error(error.message);

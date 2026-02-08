@@ -125,6 +125,11 @@ export async function PATCH(request: NextRequest, { params }: RouteParams) {
         if (body.current_step !== undefined) updateData.current_step = body.current_step;
         if (body.wizard_completed !== undefined) updateData.wizard_completed = body.wizard_completed;
 
+        // Status & ownership (for onboarding flow linking)
+        if (body.status !== undefined) updateData.status = body.status;
+        if (body.moderation_status !== undefined) updateData.moderation_status = body.moderation_status;
+        if (body.vendor_id !== undefined && isClaimingOrphan) updateData.vendor_id = body.vendor_id;
+
         const { data: gig, error } = await supabase
             .from('gigs')
             .update(updateData)

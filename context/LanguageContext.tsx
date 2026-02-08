@@ -14,7 +14,25 @@ interface LanguageContextType {
 const LanguageContext = createContext<LanguageContextType | undefined>(undefined);
 
 export function LanguageProvider({ children }: { children: ReactNode }) {
-    const [language, setLanguage] = useState<Language>('he');
+    const [language, setLanguageState] = useState<Language>('he');
+
+    // Load saved language preference on mount
+    useEffect(() => {
+        if (typeof window !== 'undefined') {
+            const saved = localStorage.getItem('language') as Language | null;
+            if (saved && (saved === 'en' || saved === 'he')) {
+                setLanguageState(saved);
+            }
+        }
+    }, []);
+
+    // Persist language preference and update RTL
+    const setLanguage = (lang: Language) => {
+        setLanguageState(lang);
+        if (typeof window !== 'undefined') {
+            localStorage.setItem('language', lang);
+        }
+    };
 
     // RTL Support: Update HTML dir attribute when language changes
     useEffect(() => {
