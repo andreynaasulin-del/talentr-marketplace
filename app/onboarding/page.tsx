@@ -1,6 +1,6 @@
 'use client';
 
-import { Suspense, useEffect, useState } from 'react';
+import { Suspense, useEffect, useState, useRef } from 'react';
 import { useSearchParams, useRouter } from 'next/navigation';
 import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
@@ -100,19 +100,25 @@ function OnboardingContent() {
         }
     };
 
+    // Use ref to track gigId for reliable access in callbacks
+    const gigIdRef = useRef<string | null>(null);
+
     // Called when GigBuilder creates a draft (for tracking)
     const handleGigCreated = (newGigId: string) => {
         setGigId(newGigId);
+        gigIdRef.current = newGigId;
     };
 
     // Called when GigBuilder completes (publish/close)
     const handleGigBuilderClose = () => {
-        if (gigId) {
+        const id = gigIdRef.current || gigId;
+        if (id) {
             setStep(2);
-            router.push(`/onboarding?gigId=${gigId}`);
-            trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId });
+            router.push(`/onboarding?gigId=${id}`);
+            trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId: id });
         }
     };
+
 
     const handleProfileSuccess = (link?: string) => {
         setStep(3);
@@ -286,8 +292,8 @@ function OnboardingContent() {
                                         <button
                                             onClick={handleCopyLink}
                                             className={`flex items-center gap-2 px-4 py-2 rounded-lg font-bold transition-all ${linkCopied
-                                                    ? 'bg-green-500 text-white'
-                                                    : 'bg-red-500 hover:bg-red-600 text-white'
+                                                ? 'bg-green-500 text-white'
+                                                : 'bg-red-500 hover:bg-red-600 text-white'
                                                 }`}
                                         >
                                             {linkCopied ? <Check className="w-4 h-4" /> : <Copy className="w-4 h-4" />}
@@ -297,8 +303,8 @@ function OnboardingContent() {
                                     <button
                                         onClick={handleGoToDashboard}
                                         className={`w-full py-3 font-bold rounded-xl mt-4 text-center block transition-all shadow-lg ${linkCopied
-                                                ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'
-                                                : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 cursor-not-allowed'
+                                            ? 'bg-blue-600 hover:bg-blue-500 text-white shadow-blue-600/20'
+                                            : 'bg-zinc-300 dark:bg-zinc-700 text-zinc-500 dark:text-zinc-400 cursor-not-allowed'
                                             }`}
                                     >
                                         {t.goToDashboard}

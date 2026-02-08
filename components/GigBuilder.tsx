@@ -482,6 +482,18 @@ export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, 
     const handlePublish = async (asUnlisted = false) => {
         if (!gig.id) return;
 
+        // In onboarding mode, skip actual publish (no vendor yet) - just proceed to profile step
+        // The gig will be linked to vendor and published after ProfileStep completes
+        if (mode === 'onboarding') {
+            clearDraftStorage();
+            // Ensure parent has the gig ID before closing
+            if (onGigCreated && gig.id) {
+                onGigCreated(gig.id);
+            }
+            onClose();
+            return;
+        }
+
         setLoading(true);
         try {
             const endpoint = asUnlisted
@@ -498,12 +510,6 @@ export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, 
                 // Clear localStorage draft after successful publish
                 clearDraftStorage();
 
-                // In onboarding mode, just call onClose to proceed to profile step
-                if (mode === 'onboarding') {
-                    onClose();
-                    return;
-                }
-
                 if (asUnlisted && data.shareLink) {
                     setShareLink(data.shareLink);
                 } else {
@@ -518,6 +524,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, 
             setLoading(false);
         }
     };
+
 
 
     const copyLink = () => {
