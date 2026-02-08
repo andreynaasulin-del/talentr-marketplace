@@ -95,6 +95,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 success: true,
                 vendorId,
                 editLink,
+                editToken, // Include token for PATCH authentication
                 message: 'Profile confirmed successfully!'
             });
         }

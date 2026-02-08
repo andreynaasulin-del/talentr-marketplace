@@ -105,17 +105,15 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                 });
 
                 if (!confirmRes.ok) throw new Error('Failed to confirm profile');
-                const { editLink, vendorId } = await confirmRes.json();
-
-                // Extract token for authentication
-                const editToken = editLink.split('/').pop();
+                const confirmData = await confirmRes.json();
+                const { editLink, vendorId, editToken: vendorEditToken } = confirmData;
 
                 // 2. Link Gig to New Vendor
-                const gigRes = await fetch(`/api/gigs/${gigId}`, { // Ensure this route exists and handles PATCH/PUT
+                const gigRes = await fetch(`/api/gigs/${gigId}`, {
                     method: 'PATCH',
                     headers: {
                         'Content-Type': 'application/json',
-                        'x-vendor-token': editToken
+                        'x-vendor-token': vendorEditToken // Use token directly from API response
                     },
                     body: JSON.stringify({
                         vendor_id: vendorId,
@@ -125,12 +123,16 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                     })
                 });
 
-                // If gig update fails, we still succeeded in creating the vendor, so we proceed but log valid warning.
-                if (!gigRes.ok) console.error('Failed to link gig');
+                if (!gigRes.ok) {
+                    const gigError = await gigRes.json();
+                    console.error('Failed to link gig:', gigError);
+                    toast.error('Failed to link gig to your profile');
+                }
 
                 onSuccess(editLink);
                 return;
             }
+
 
             // ============================================
             // STANDARD FLOW (Authenticated)
