@@ -551,6 +551,14 @@ export async function deletePendingVendor(pendingId: string): Promise<{ error: s
 export async function deleteVendor(vendorId: string): Promise<{ error: string | null }> {
     try {
         const client = getAdminClient();
+
+        // 1. Unlink pending_vendors to avoid Foreign Key violation
+        await client
+            .from('pending_vendors')
+            .update({ converted_vendor_id: null })
+            .eq('converted_vendor_id', vendorId);
+
+        // 2. Delete the vendor
         const { error } = await client
             .from('vendors')
             .delete()

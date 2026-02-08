@@ -401,6 +401,14 @@ export default function Navbar() {
 
                         {/* Mobile Menu Toggle */}
                         <div className="md:hidden flex items-center gap-3">
+                            {/* Mobile Lang Switch */}
+                            <button
+                                onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
+                                className="text-2xl mr-1"
+                            >
+                                {language === 'en' ? '🇺🇸' : '🇮🇱'}
+                            </button>
+
                             {user && (
                                 <Link href="/dashboard" className="w-8 h-8 rounded-full bg-blue-600 flex items-center justify-center text-xs text-white font-bold">
                                     {user.email?.[0].toUpperCase() || 'U'}
