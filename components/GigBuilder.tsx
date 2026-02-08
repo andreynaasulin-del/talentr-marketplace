@@ -21,11 +21,14 @@ interface GigBuilderProps {
     vendorId?: string;
     ownerId?: string | null; // Made optional for Guest Vendors
     editToken?: string; // Vendor edit token for API authorization
+    inviteToken?: string; // For onboarding flow without vendor
     onClose: () => void;
+    onGigCreated?: (gigId: string) => void; // Callback when gig is created (for onboarding)
     existingGigId?: string;
+    mode?: 'full' | 'onboarding'; // 'onboarding' mode skips to next step after publish
 }
 
-export default function GigBuilder({ vendorId, ownerId, editToken, onClose, existingGigId }: GigBuilderProps) {
+export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, onClose, onGigCreated, existingGigId, mode = 'full' }: GigBuilderProps) {
     const router = useRouter();
     const { language } = useLanguage();
     const [currentStep, setCurrentStep] = useState(0);
@@ -380,6 +383,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                 body: JSON.stringify({
                     vendor_id: vendorId,
                     owner_user_id: ownerId,
+                    invite_token: inviteToken, // For onboarding flow
                     template_id: selectedTemplate?.id,
                     category_id: selectedTemplate?.category_id || gig.category_id || 'Other'
                 })
@@ -387,6 +391,10 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
             const data = await res.json();
             if (data.gig) {
                 setGig(prev => ({ ...prev, id: data.gig.id, share_slug: data.gig.share_slug }));
+                // Notify parent about gig creation (for onboarding)
+                if (onGigCreated) {
+                    onGigCreated(data.gig.id);
+                }
                 return data.gig.id;
             }
         } catch (error) {
@@ -394,6 +402,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
         }
         return null;
     };
+
 
     const saveStep = async () => {
         if (!gig.id) return;
@@ -489,6 +498,12 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                 // Clear localStorage draft after successful publish
                 clearDraftStorage();
 
+                // In onboarding mode, just call onClose to proceed to profile step
+                if (mode === 'onboarding') {
+                    onClose();
+                    return;
+                }
+
                 if (asUnlisted && data.shareLink) {
                     setShareLink(data.shareLink);
                 } else {
@@ -503,6 +518,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
             setLoading(false);
         }
     };
+
 
     const copyLink = () => {
         if (shareLink) {

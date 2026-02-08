@@ -7,7 +7,7 @@ import { supabase } from '@/lib/supabase';
 import { Loader2, Sparkles, Plus, LayoutDashboard, AlertTriangle, Copy, Check } from 'lucide-react';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
 import { useLanguage } from '@/context/LanguageContext';
-import GigStep from './steps/GigStep';
+import GigBuilder from '@/components/GigBuilder';
 import ProfileStep from './steps/ProfileStep';
 
 function OnboardingContent() {
@@ -100,11 +100,18 @@ function OnboardingContent() {
         }
     };
 
-    const handleGigSuccess = (gig: any) => {
-        setGigId(gig.id);
-        setStep(2);
-        router.push(`/onboarding?gigId=${gig.id}`);
-        trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId: gig.id });
+    // Called when GigBuilder creates a draft (for tracking)
+    const handleGigCreated = (newGigId: string) => {
+        setGigId(newGigId);
+    };
+
+    // Called when GigBuilder completes (publish/close)
+    const handleGigBuilderClose = () => {
+        if (gigId) {
+            setStep(2);
+            router.push(`/onboarding?gigId=${gigId}`);
+            trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId });
+        }
     };
 
     const handleProfileSuccess = (link?: string) => {
@@ -137,6 +144,32 @@ function OnboardingContent() {
         return (
             <div className="min-h-screen flex items-center justify-center bg-white dark:bg-black">
                 <Loader2 className="w-8 h-8 animate-spin text-blue-600" />
+            </div>
+        );
+    }
+
+    // Step 1: GigBuilder (Full wizard)
+    if (step === 1) {
+        return (
+            <div className="min-h-screen bg-white dark:bg-black relative">
+                {/* Language Switcher */}
+                <div className="absolute top-4 right-4 z-[100]">
+                    <button
+                        onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
+                        className="w-10 h-10 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-800 text-2xl hover:scale-110 transition-transform"
+                        title="Switch Language"
+                    >
+                        {language === 'en' ? '🇺🇸' : '🇮🇱'}
+                    </button>
+                </div>
+
+                <GigBuilder
+                    ownerId={userId}
+                    inviteToken={inviteToken || undefined}
+                    mode="onboarding"
+                    onGigCreated={handleGigCreated}
+                    onClose={handleGigBuilderClose}
+                />
             </div>
         );
     }
@@ -203,22 +236,13 @@ function OnboardingContent() {
                 <motion.div
                     className="h-full bg-blue-600"
                     initial={{ width: '0%' }}
-                    animate={{ width: step === 1 ? '33%' : step === 2 ? '66%' : '100%' }}
+                    animate={{ width: step === 2 ? '66%' : '100%' }}
                     transition={{ duration: 0.5 }}
                 />
             </div>
 
             <main className="flex-1 flex flex-col items-center justify-center p-4">
                 <AnimatePresence mode="wait">
-
-                    {step === 1 && (
-                        <GigStep
-                            key="step1"
-                            onSuccess={handleGigSuccess}
-                            userId={userId}
-                            inviteToken={inviteToken}
-                        />
-                    )}
 
                     {step === 2 && gigId && (
                         <ProfileStep
