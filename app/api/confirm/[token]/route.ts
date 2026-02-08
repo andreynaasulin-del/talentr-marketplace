@@ -103,8 +103,7 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                         .from('gigs')
                         .update({
                             vendor_id: vendorId,
-                            status: 'pending_review',
-                            moderation_status: 'pending',
+                            status: 'published', // 'pending_review' violates DB constraint - only 'draft' or 'published' allowed
                             wizard_completed: true
                         })
                         .eq('id', gigId)
