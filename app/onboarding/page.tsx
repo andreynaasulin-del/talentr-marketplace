@@ -114,7 +114,11 @@ function OnboardingContent() {
         const id = gigIdRef.current || gigId;
         if (id) {
             setStep(2);
-            router.push(`/onboarding?gigId=${id}`);
+            // Preserve invite token for ProfileStep to use
+            const params = new URLSearchParams();
+            params.set('gigId', id);
+            if (inviteToken) params.set('invite', inviteToken);
+            router.push(`/onboarding?${params.toString()}`);
             trackEvent(AnalyticsEvents.PROFILE_FILL_START, { gigId: id });
         }
     };
