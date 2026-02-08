@@ -160,6 +160,9 @@ function OnboardingContent() {
         );
     }
 
+    // DEBUG: Log current state
+    console.log('[OnboardingPage] Render state:', { step, gigId, inviteToken, gigIdRef: gigIdRef.current });
+
     // Step 1: GigBuilder (Full wizard)
     if (step === 1) {
         return (
