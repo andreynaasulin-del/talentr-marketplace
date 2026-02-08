@@ -190,6 +190,42 @@ export const translations: Translations = {
         en: 'Ashdod',
         he: 'אשדוד',
     },
+    'Petah Tikva': {
+        en: 'Petah Tikva',
+        he: 'פתח תקווה',
+    },
+    'Ramat Gan': {
+        en: 'Ramat Gan',
+        he: 'רמת גן',
+    },
+    'Beer Sheva': {
+        en: 'Beer Sheva',
+        he: 'באר שבע',
+    },
+    'Herzliya': {
+        en: 'Herzliya',
+        he: 'הרצליה',
+    },
+    'Holon': {
+        en: 'Holon',
+        he: 'חולון',
+    },
+    'Bat Yam': {
+        en: 'Bat Yam',
+        he: 'בת ים',
+    },
+    'Rehovot': {
+        en: 'Rehovot',
+        he: 'רחובות',
+    },
+    'Kfar Saba': {
+        en: 'Kfar Saba',
+        he: 'כפר סבא',
+    },
+    'Modiin': {
+        en: 'Modiin',
+        he: 'מודיעין',
+    },
 
     // ===== TAGS =====
     'Wedding': {

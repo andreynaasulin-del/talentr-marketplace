@@ -62,7 +62,8 @@ export async function POST(request: NextRequest) {
                 wizard_completed: false,
                 photos: body.photos || [],
                 price_amount: body.price_amount,
-                city: body.city
+                base_city: body.city || body.base_city || null,
+                location_mode: body.location_mode || 'city'
             })
             .select()
             .single();

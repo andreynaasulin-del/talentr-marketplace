@@ -10,6 +10,7 @@ import { toast } from 'sonner';
 import { AnalyticsEvents, trackEvent } from '@/lib/analytics';
 import { supabase } from '@/lib/supabase';
 import { useRouter } from 'next/navigation';
+import { useLanguage } from '@/context/LanguageContext';
 
 const profileSchema = z.object({
     full_name: z.string().min(2, 'Name is required'),
@@ -28,8 +29,43 @@ interface ProfileStepProps {
 }
 
 export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVendor }: ProfileStepProps) {
+    const { language } = useLanguage();
+    const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
     const [loading, setLoading] = useState(false);
     const router = useRouter();
+
+    const t = {
+        en: {
+            title: 'One Last Step',
+            subtitle: 'Tell us a bit about yourself to finish setup.',
+            nameLabel: 'Full Name / Display Name',
+            namePlaceholder: 'e.g. John Doe',
+            phoneLabel: 'Phone (WhatsApp)',
+            phonePlaceholder: '050-1234567',
+            bioLabel: 'Short Bio',
+            bioPlaceholder: 'I have been a photographer for 5 years...',
+            termsPrefix: 'I agree to the ',
+            termsLink: 'Terms of Service',
+            andText: ' and ',
+            privacyLink: 'Privacy Policy',
+            complete: 'Complete Setup',
+        },
+        he: {
+            title: 'שלב אחרון',
+            subtitle: 'ספר לנו קצת על עצמך כדי לסיים את ההגדרה.',
+            nameLabel: 'שם מלא / שם תצוגה',
+            namePlaceholder: 'למשל: ישראל ישראלי',
+            phoneLabel: 'טלפון (WhatsApp)',
+            phonePlaceholder: '050-1234567',
+            bioLabel: 'ביו קצר',
+            bioPlaceholder: 'אני צלם עם 5 שנות ניסיון...',
+            termsPrefix: 'אני מסכים ל',
+            termsLink: 'תנאי השימוש',
+            andText: ' ו',
+            privacyLink: 'מדיניות הפרטיות',
+            complete: 'סיום הגדרה',
+        },
+    }[lang];
 
     const {
         register,
@@ -169,13 +205,14 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
             initial={{ opacity: 0, x: 20 }}
             animate={{ opacity: 1, x: 0 }}
             className="max-w-md mx-auto space-y-8 p-6"
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
         >
             <div className="text-center space-y-2">
                 <h1 className="text-3xl font-black text-zinc-900 dark:text-white">
-                    One Last Step
+                    {t.title}
                 </h1>
                 <p className="text-zinc-500 dark:text-zinc-400">
-                    Tell us a bit about yourself to finish setup.
+                    {t.subtitle}
                 </p>
             </div>
 
@@ -184,11 +221,11 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                 {/* Name */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <User className="w-4 h-4" /> Full Name / Display Name
+                        <User className="w-4 h-4" /> {t.nameLabel}
                     </label>
                     <input
                         {...register('full_name')}
-                        placeholder="e.g. John Doe"
+                        placeholder={t.namePlaceholder}
                         className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all"
                     />
                     {errors.full_name && <p className="text-red-500 text-sm">{errors.full_name.message}</p>}
@@ -197,11 +234,11 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                 {/* Phone */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <Phone className="w-4 h-4" /> Phone (WhatsApp)
+                        <Phone className="w-4 h-4" /> {t.phoneLabel}
                     </label>
                     <input
                         {...register('phone')}
-                        placeholder="050-1234567"
+                        placeholder={t.phonePlaceholder}
                         className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all"
                     />
                     {errors.phone && <p className="text-red-500 text-sm">{errors.phone.message}</p>}
@@ -210,12 +247,12 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                 {/* Bio */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <FileText className="w-4 h-4" /> Short Bio
+                        <FileText className="w-4 h-4" /> {t.bioLabel}
                     </label>
                     <textarea
                         {...register('bio')}
                         rows={3}
-                        placeholder="I have been a photographer for 5 years..."
+                        placeholder={t.bioPlaceholder}
                         className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all resize-none"
                     />
                 </div>
@@ -228,7 +265,7 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                         className="mt-1 w-5 h-5 rounded border-zinc-300 text-blue-600 focus:ring-blue-500"
                     />
                     <div className="text-sm text-zinc-600 dark:text-zinc-400">
-                        I agree to the <a href="/terms" className="text-blue-500 hover:underline">Terms of Service</a> and <a href="/privacy" className="text-blue-500 hover:underline">Privacy Policy</a>.
+                        {t.termsPrefix}<a href="/terms" className="text-blue-500 hover:underline">{t.termsLink}</a>{t.andText}<a href="/privacy" className="text-blue-500 hover:underline">{t.privacyLink}</a>.
                         {errors.terms && <p className="text-red-500 text-xs mt-1 block">{errors.terms.message}</p>}
                     </div>
                 </div>
@@ -242,7 +279,7 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
                         <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
                         <>
-                            Complete Setup
+                            {t.complete}
                             <Check className="w-5 h-5" />
                         </>
                     )}

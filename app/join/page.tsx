@@ -68,6 +68,15 @@ export default function JoinPage() {
         { id: 'Rishon LeZion', label: { en: 'Rishon', he: 'ראשון לציון' } },
         { id: 'Netanya', label: { en: 'Netanya', he: 'נתניה' } },
         { id: 'Ashdod', label: { en: 'Ashdod', he: 'אשדוד' } },
+        { id: 'Petah Tikva', label: { en: 'Petah Tikva', he: 'פתח תקווה' } },
+        { id: 'Ramat Gan', label: { en: 'Ramat Gan', he: 'רמת גן' } },
+        { id: 'Beer Sheva', label: { en: 'Beer Sheva', he: 'באר שבע' } },
+        { id: 'Herzliya', label: { en: 'Herzliya', he: 'הרצליה' } },
+        { id: 'Holon', label: { en: 'Holon', he: 'חולון' } },
+        { id: 'Bat Yam', label: { en: 'Bat Yam', he: 'בת ים' } },
+        { id: 'Rehovot', label: { en: 'Rehovot', he: 'רחובות' } },
+        { id: 'Kfar Saba', label: { en: 'Kfar Saba', he: 'כפר סבא' } },
+        { id: 'Modiin', label: { en: 'Modiin', he: 'מודיעין' } },
     ];
 
     const content = {

@@ -222,7 +222,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
         price_amount: undefined,
         addons: [],
         location_mode: 'city',
-        base_city: 'Tel Aviv',
+        base_city: '',
         suitable_for_kids: true,
         age_limit: 'none',
         event_types: [],
@@ -533,11 +533,11 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                             <div className="w-12 h-12 rounded-xl bg-zinc-100 dark:bg-zinc-800 flex items-center justify-center text-2xl">
                                 ✏️
                             </div>
-                            <div className="text-left">
+                            <div className="text-start">
                                 <p className="font-bold text-zinc-900 dark:text-white">{t.fromScratch}</p>
                                 <p className="text-sm text-zinc-500">{t.fromScratchDesc}</p>
                             </div>
-                            {!selectedTemplate && <Check className="w-5 h-5 text-blue-500 ml-auto" />}
+                            {!selectedTemplate && <Check className="w-5 h-5 text-blue-500 ms-auto" />}
                         </button>
 
                         {/* Templates grid */}
@@ -553,7 +553,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                                             tags: template.suggested_tags || []
                                         }));
                                     }}
-                                    className={`p-4 rounded-2xl border-2 transition-all text-left ${selectedTemplate?.id === template.id
+                                    className={`p-4 rounded-2xl border-2 transition-all text-start ${selectedTemplate?.id === template.id
                                         ? 'border-blue-500 bg-blue-50 dark:bg-blue-900/20'
                                         : 'border-zinc-200 dark:border-zinc-700 hover:border-zinc-300'
                                         }`}
@@ -1020,7 +1020,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                                     >
                                         <span className="text-2xl">{mode.icon}</span>
                                         <span className="font-medium text-zinc-900 dark:text-white">{mode.label}</span>
-                                        {gig.location_mode === mode.id && <Check className="w-5 h-5 text-blue-500 ml-auto" />}
+                                        {gig.location_mode === mode.id && <Check className="w-5 h-5 text-blue-500 ms-auto" />}
                                     </button>
                                 ))}
                             </div>
@@ -1036,6 +1036,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                                     onChange={(e) => setGig(prev => ({ ...prev, base_city: e.target.value }))}
                                     className="w-full px-4 py-3 bg-zinc-50 dark:bg-zinc-800 border border-zinc-200 dark:border-zinc-700 rounded-xl text-zinc-900 dark:text-white theme-select"
                                 >
+                                    <option value="">{lang === 'he' ? 'בחר עיר' : 'Select city'}</option>
                                     {CITIES.map((city) => (
                                         <option key={city} value={city}>{city}</option>
                                     ))}
@@ -1220,11 +1221,11 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                                             }`}
                                     >
                                         <span className="text-2xl">{method.icon}</span>
-                                        <div className="text-left">
+                                        <div className="text-start">
                                             <p className="font-medium text-zinc-900 dark:text-white">{method.label}</p>
                                             <p className="text-sm text-zinc-500">{method.desc}</p>
                                         </div>
-                                        {gig.booking_method === method.id && <Check className="w-5 h-5 text-blue-500 ml-auto" />}
+                                        {gig.booking_method === method.id && <Check className="w-5 h-5 text-blue-500 ms-auto" />}
                                     </button>
                                 ))}
                             </div>
@@ -1360,7 +1361,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
     }
 
     return (
-        <div className="fixed inset-0 z-50 bg-white dark:bg-black overflow-y-auto">
+        <div className="fixed inset-0 z-50 bg-white dark:bg-black overflow-y-auto" dir={lang === 'he' ? 'rtl' : 'ltr'}>
             {/* Draft Recovery Modal */}
             {hasDraftRecovery && recoveredDraft && (
                 <div className="fixed inset-0 z-[60] bg-black/50 flex items-center justify-center p-4">
@@ -1462,7 +1463,7 @@ export default function GigBuilder({ vendorId, ownerId, editToken, onClose, exis
                         <button
                             onClick={handleNext}
                             disabled={saving || loading}
-                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2 transition-all ml-auto disabled:opacity-50"
+                            className="px-8 py-3 bg-blue-600 hover:bg-blue-700 text-white font-bold rounded-xl flex items-center gap-2 transition-all ms-auto disabled:opacity-50"
                         >
                             {loading ? <Loader2 className="w-5 h-5 animate-spin" /> : null}
                             {currentStep === GIG_WIZARD_STEPS.length - 1 ? t.publish : t.next}

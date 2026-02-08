@@ -43,15 +43,23 @@ export async function POST(request: NextRequest) {
         }
 
         // Step 1: Use AI to understand the search intent
-        const systemPrompt = `You are a search assistant for an event marketplace in Israel. 
+        const systemPrompt = `You are a search assistant for an event marketplace in Israel called Talentr.
 Analyze the user's request and extract:
-1. category: The type of service needed (Photographer, DJ, MC, Magician, Singer, Musician, Videographer, Kids Animator, Event Decor, Bartender)
-2. city: The desired city (Tel Aviv, Haifa, Jerusalem, Eilat, Rishon LeZion, or "any")
+1. category: The type of service needed. Must be one of: Photographer, Videographer, DJ, MC, Magician, Singer, Musician, Comedian, Dancer, Bartender, Bar Show, Event Decor, Kids Animator, Face Painter, Chef, Piercing/Tattoo, or null if unclear.
+   - "roller trainer", "rollerblade coach", "kids activities" → "Kids Animator"
+   - "stand-up", "comedy" → "Comedian"
+   - "cocktails", "bar service" → "Bartender"
+   - "flair bartending" → "Bar Show"
+   - "flowers", "decoration" → "Event Decor"
+   - "private chef", "catering", "cooking" → "Chef"
+   - "henna", "body art" → "Face Painter"
+2. city: The desired city (Tel Aviv, Haifa, Jerusalem, Eilat, Rishon LeZion, Netanya, Ashdod, Beer Sheva, Petah Tikva, Herzliya, Ramat Gan, or "any")
 3. maxPrice: Maximum budget in shekels (number or null)
-4. eventType: Type of event if mentioned (wedding, bar mitzvah, birthday, corporate, etc.)
+4. eventType: Type of event if mentioned (wedding, bar mitzvah, birthday, corporate, kids party, etc.)
+5. searchTerms: Array of keywords from the query for fuzzy text matching (e.g. ["roller", "trainer", "kids"])
 
 Respond ONLY with a JSON object, nothing else. Example:
-{"category": "Photographer", "city": "Tel Aviv", "maxPrice": 3000, "eventType": "wedding"}
+{"category": "Photographer", "city": "Tel Aviv", "maxPrice": 3000, "eventType": "wedding", "searchTerms": ["photographer", "wedding"]}
 
 If something is not mentioned, use null for that field.`;
 
@@ -75,6 +83,7 @@ If something is not mentioned, use null for that field.`;
         }
 
         // Step 2: Build Supabase query based on AI understanding
+        // Search vendors table
         let vendorQuery = supabase
             .from('vendors')
             .select('*')
@@ -96,7 +105,52 @@ If something is not mentioned, use null for that field.`;
         const { data: vendors, error } = await vendorQuery;
 
         if (error) {
-            return NextResponse.json({ error: 'Failed to fetch vendors' }, { status: 500 });
+            console.error('Vendor search error:', error);
+        }
+
+        // Also search gigs table for broader results
+        let gigQuery = supabase
+            .from('gigs')
+            .select('*, vendors!gigs_vendor_id_fkey(id, name, city, rating, image_url, phone)')
+            .eq('status', 'published')
+            .order('created_at', { ascending: false })
+            .limit(10);
+
+        if (searchParams.category) {
+            gigQuery = gigQuery.ilike('category_id', `%${searchParams.category}%`);
+        }
+
+        if (searchParams.city && searchParams.city !== 'any') {
+            gigQuery = gigQuery.ilike('base_city', `%${searchParams.city}%`);
+        }
+
+        if (searchParams.maxPrice) {
+            gigQuery = gigQuery.lte('price_amount', searchParams.maxPrice);
+        }
+
+        const { data: gigs } = await gigQuery;
+
+        // If no vendors found by category, try searching by name/description with search terms
+        let extraVendors: any[] = [];
+        if ((!vendors || vendors.length === 0) && searchParams.searchTerms?.length > 0) {
+            const searchText = searchParams.searchTerms.join(' ');
+            const { data: fuzzyResults } = await supabase
+                .from('vendors')
+                .select('*')
+                .or(`name.ilike.%${searchText}%,description.ilike.%${searchText}%,tags.cs.{${searchParams.searchTerms.join(',')}}`)
+                .order('rating', { ascending: false })
+                .limit(10);
+            extraVendors = fuzzyResults || [];
+        }
+
+        // Merge results (vendors from direct search + fuzzy search, deduplicated)
+        const allVendors = vendors || [];
+        const seenIds = new Set(allVendors.map((v: any) => v.id));
+        for (const v of extraVendors) {
+            if (!seenIds.has(v.id)) {
+                allVendors.push(v);
+                seenIds.add(v.id);
+            }
         }
 
         // Step 3: Generate AI recommendation summary
@@ -122,9 +176,10 @@ If something is not mentioned, use null for that field.`;
             success: true,
             query,
             searchParams,
-            vendors: vendors || [],
+            vendors: allVendors,
+            gigs: gigs || [],
             summary: summary.trim(),
-            count: vendors?.length || 0,
+            count: allVendors.length + (gigs?.length || 0),
         });
 
     } catch (error: any) {

@@ -9,6 +9,7 @@ import { Loader2, ArrowRight, DollarSign, MapPin, AlignLeft, Type, Camera, Uploa
 import { toast } from 'sonner';
 import { AnalyticsEvents, trackEvent } from '@/lib/analytics';
 import { GIG_CATEGORIES, CITIES } from '@/types/gig';
+import { useLanguage } from '@/context/LanguageContext';
 
 // Zod Schema
 const gigSchema = z.object({
@@ -31,8 +32,47 @@ interface GigStepProps {
 }
 
 export default function GigStep({ onSuccess, userId, initialData, inviteToken }: GigStepProps) {
+    const { language } = useLanguage();
+    const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
     const [loading, setLoading] = useState(false);
     const [uploading, setUploading] = useState(false);
+
+    const t = {
+        en: {
+            createGig: 'Create Your First Gig',
+            subtitle: 'Start earning by offering your services. Setup takes 2 minutes.',
+            gigTitle: 'Gig Title',
+            titlePlaceholder: 'e.g. Professional Wedding Photography',
+            category: 'Category',
+            selectCategory: 'Select Category',
+            city: 'City',
+            selectCity: 'Select City',
+            price: 'Starting Price (ILS)',
+            description: 'Description',
+            descPlaceholder: 'Describe what you offer in at least 50 characters...',
+            coverImage: 'Cover Image (Optional)',
+            changeImage: 'Change Image',
+            uploadImage: 'Upload Image',
+            continue: 'Continue',
+        },
+        he: {
+            createGig: 'צור את הגיג הראשון שלך',
+            subtitle: 'התחל להרוויח על ידי הצעת השירותים שלך. ההגדרה לוקחת 2 דקות.',
+            gigTitle: 'כותרת הגיג',
+            titlePlaceholder: 'למשל: צילום חתונות מקצועי',
+            category: 'קטגוריה',
+            selectCategory: 'בחר קטגוריה',
+            city: 'עיר',
+            selectCity: 'בחר עיר',
+            price: 'מחיר התחלתי (₪)',
+            description: 'תיאור',
+            descPlaceholder: 'תאר מה אתה מציע, לפחות 50 תווים...',
+            coverImage: 'תמונת כיסוי (אופציונלי)',
+            changeImage: 'שנה תמונה',
+            uploadImage: 'העלה תמונה',
+            continue: 'המשך',
+        },
+    }[lang];
 
     const {
         register,
@@ -45,7 +85,7 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
         defaultValues: {
             title: initialData?.title || '',
             category_id: initialData?.category_id || '',
-            city: initialData?.city || 'Tel Aviv',
+            city: initialData?.city || '',
             price_amount: initialData?.price_amount || 0,
             short_description: initialData?.short_description || '',
             media_url: initialData?.media_url || '',
@@ -122,13 +162,14 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
             className="max-w-2xl mx-auto space-y-8 p-6"
+            dir={lang === 'he' ? 'rtl' : 'ltr'}
         >
             <div className="text-center space-y-2">
                 <h1 className="text-3xl font-black text-zinc-900 dark:text-white">
-                    Create Your First Gig
+                    {t.createGig}
                 </h1>
                 <p className="text-zinc-500 dark:text-zinc-400">
-                    Start earning by offering your services. Setup takes 2 minutes.
+                    {t.subtitle}
                 </p>
             </div>
 
@@ -137,11 +178,11 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                 {/* Title */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <Type className="w-4 h-4" /> Gig Title
+                        <Type className="w-4 h-4" /> {t.gigTitle}
                     </label>
                     <input
                         {...register('title')}
-                        placeholder="e.g. Professional Wedding Photography"
+                        placeholder={t.titlePlaceholder}
                         className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all"
                     />
                     {errors.title && <p className="text-red-500 text-sm">{errors.title.message}</p>}
@@ -151,16 +192,16 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                 <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                            <Camera className="w-4 h-4" /> Category
+                            <Camera className="w-4 h-4" /> {t.category}
                         </label>
                         <select
                             {...register('category_id')}
                             className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all"
                         >
-                            <option value="">Select Category</option>
+                            <option value="">{t.selectCategory}</option>
                             {GIG_CATEGORIES.map((cat) => (
                                 <option key={cat.id} value={cat.id}>
-                                    {cat.icon} {cat.label.en}
+                                    {cat.icon} {(cat.label as any)[lang]}
                                 </option>
                             ))}
                         </select>
@@ -169,13 +210,13 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
 
                     <div className="space-y-2">
                         <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                            <MapPin className="w-4 h-4" /> City
+                            <MapPin className="w-4 h-4" /> {t.city}
                         </label>
                         <select
                             {...register('city')}
                             className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all"
                         >
-                            <option value="">Select City</option>
+                            <option value="">{t.selectCity}</option>
                             {CITIES.map((city) => (
                                 <option key={city} value={city}>{city}</option>
                             ))}
@@ -187,7 +228,7 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                 {/* Price */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <DollarSign className="w-4 h-4" /> Starting Price (ILS)
+                        <DollarSign className="w-4 h-4" /> {t.price}
                     </label>
                     <input
                         type="number"
@@ -200,12 +241,12 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                 {/* Description */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <AlignLeft className="w-4 h-4" /> Description
+                        <AlignLeft className="w-4 h-4" /> {t.description}
                     </label>
                     <textarea
                         {...register('short_description')}
                         rows={4}
-                        placeholder="Describe what you offer in at least 50 characters..."
+                        placeholder={t.descPlaceholder}
                         className="w-full p-4 rounded-xl bg-zinc-50 dark:bg-zinc-900 border-2 border-zinc-200 dark:border-zinc-800 focus:border-blue-500 outline-none transition-all resize-none"
                     />
                     {errors.short_description && <p className="text-red-500 text-sm">{errors.short_description.message}</p>}
@@ -214,7 +255,7 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                 {/* Media Upload (Optional) */}
                 <div className="space-y-2">
                     <label className="text-sm font-medium text-zinc-900 dark:text-zinc-200 flex items-center gap-2">
-                        <UploadCloud className="w-4 h-4" /> Covet Image (Optional)
+                        <UploadCloud className="w-4 h-4" /> {t.coverImage}
                     </label>
                     <div className="flex items-center gap-4">
                         {selectedMedia && (
@@ -223,7 +264,7 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                         <label className="cursor-pointer px-4 py-2 bg-zinc-100 dark:bg-zinc-800 rounded-lg hover:bg-zinc-200 dark:hover:bg-zinc-700 transition-colors flex items-center gap-2">
                             <input type="file" accept="image/*" onChange={handleFileUpload} className="hidden" />
                             {uploading ? <Loader2 className="w-4 h-4 animate-spin" /> : <UploadCloud className="w-4 h-4" />}
-                            {selectedMedia ? 'Change Image' : 'Upload Image'}
+                            {selectedMedia ? t.changeImage : t.uploadImage}
                         </label>
                     </div>
                 </div>
@@ -237,7 +278,7 @@ export default function GigStep({ onSuccess, userId, initialData, inviteToken }:
                         <Loader2 className="w-5 h-5 animate-spin" />
                     ) : (
                         <>
-                            Continue
+                            {t.continue}
                             <ArrowRight className="w-5 h-5" />
                         </>
                     )}

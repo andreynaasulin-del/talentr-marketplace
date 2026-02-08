@@ -247,5 +247,12 @@ export const CITIES = [
     'Ashdod',
     'Beer Sheva',
     'Herzliya',
-    'Ramat Gan'
+    'Ramat Gan',
+    'Petah Tikva',
+    'Bat Yam',
+    'Holon',
+    'Rehovot',
+    'Kfar Saba',
+    'Ra\'anana',
+    'Modiin',
 ];

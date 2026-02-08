@@ -6,12 +6,34 @@ import { motion, AnimatePresence } from 'framer-motion';
 import { supabase } from '@/lib/supabase';
 import { Loader2, Sparkles, Plus, LayoutDashboard } from 'lucide-react';
 import { trackEvent, AnalyticsEvents } from '@/lib/analytics';
+import { useLanguage } from '@/context/LanguageContext';
 import GigStep from './steps/GigStep';
 import ProfileStep from './steps/ProfileStep';
 
 function OnboardingContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
+    const { language } = useLanguage();
+    const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
+
+    const t = {
+        en: {
+            allSet: 'All Set!',
+            profileActive: 'Your profile is active and your gig is under review.',
+            saveLink: 'IMPORTANT: SAVE THIS LINK',
+            saveLinkDesc: 'This is your personal dashboard link. Use it to edit your profile and manage gigs anytime. You do NOT need a password.',
+            goToDashboard: 'Go to My Dashboard',
+            createAnother: 'Create Another Gig',
+        },
+        he: {
+            allSet: 'הכל מוכן!',
+            profileActive: 'הפרופיל שלך פעיל והגיג שלך בבדיקה.',
+            saveLink: 'חשוב: שמור את הקישור הזה',
+            saveLinkDesc: 'זהו קישור הדשבורד האישי שלך. השתמש בו כדי לערוך את הפרופיל שלך ולנהל גיגים בכל עת. לא צריך סיסמה.',
+            goToDashboard: 'לדשבורד שלי',
+            createAnother: 'צור גיג נוסף',
+        },
+    }[lang];
 
     // State
     const [step, setStep] = useState<1 | 2 | 3>(1);
@@ -144,24 +166,25 @@ function OnboardingContent() {
                             initial={{ opacity: 0, scale: 0.9 }}
                             animate={{ opacity: 1, scale: 1 }}
                             className="text-center space-y-6 max-w-lg mx-auto"
+                            dir={lang === 'he' ? 'rtl' : 'ltr'}
                         >
                             <div className="w-24 h-24 bg-green-100 dark:bg-green-900/30 rounded-full flex items-center justify-center mx-auto mb-6">
                                 <Sparkles className="w-12 h-12 text-green-600 dark:text-green-500" />
                             </div>
 
-                            <h1 className="text-4xl font-black">All Set!</h1>
+                            <h1 className="text-4xl font-black">{t.allSet}</h1>
                             <p className="text-xl text-zinc-500">
-                                Your profile is active and your gig is under review.
+                                {t.profileActive}
                             </p>
 
                             {editLink && (
-                                <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-6 rounded-2xl text-left space-y-3">
+                                <div className="bg-yellow-50 dark:bg-yellow-900/10 border border-yellow-200 dark:border-yellow-800 p-6 rounded-2xl text-start space-y-3">
                                     <p className="font-bold text-yellow-800 dark:text-yellow-500 flex items-center gap-2">
                                         <Sparkles className="w-5 h-5" />
-                                        IMPORTANT: SAVE THIS LINK
+                                        {t.saveLink}
                                     </p>
                                     <p className="text-sm text-yellow-700 dark:text-yellow-400">
-                                        This is your personal dashboard link. Use it to edit your profile and manage gigs anytime. You do NOT need a password.
+                                        {t.saveLinkDesc}
                                     </p>
                                     <div className="flex items-center gap-2 mt-2">
                                         <input
@@ -183,7 +206,7 @@ function OnboardingContent() {
                                         onClick={() => window.open(editLink, '_self')}
                                         className="w-full py-3 bg-yellow-400 hover:bg-yellow-500 text-black font-bold rounded-xl mt-4 text-center block transition-all shadow-lg shadow-yellow-400/20"
                                     >
-                                        Go to My Dashboard
+                                        {t.goToDashboard}
                                     </button>
                                 </div>
                             )}
@@ -199,7 +222,7 @@ function OnboardingContent() {
                                         className="p-4 rounded-xl border-2 border-zinc-200 dark:border-zinc-800 hover:border-blue-500 hover:bg-blue-50 dark:hover:bg-blue-900/20 transition-all flex flex-col items-center gap-2 font-bold"
                                     >
                                         <Plus className="w-6 h-6" />
-                                        Create Another Gig
+                                        {t.createAnother}
                                     </button>
 
                                     <button
@@ -207,7 +230,7 @@ function OnboardingContent() {
                                         className="p-4 rounded-xl bg-blue-600 hover:bg-blue-500 text-white transition-all flex flex-col items-center gap-2 font-bold shadow-lg shadow-blue-600/20"
                                     >
                                         <LayoutDashboard className="w-6 h-6" />
-                                        Go to Dashboard
+                                        {t.goToDashboard}
                                     </button>
                                 </div>
                             )}

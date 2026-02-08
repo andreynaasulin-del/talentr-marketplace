@@ -10,9 +10,12 @@ import { trackEvent } from '@/lib/analytics';
 interface Gig {
     id: string;
     title: string;
+    title_he?: string;
     category_id: string; // Display Name
+    category_id_he?: string;
     category_slug: string; // URL Slug
     short_description?: string;
+    short_description_he?: string;
     photos?: any[];
     price_amount?: number;
     currency?: string;
@@ -35,7 +38,9 @@ export default function GigCarousel() {
         {
             id: 'cat-dj',
             title: 'Professional DJs',
+            title_he: 'תקליטנים מקצועיים',
             category_id: 'DJ',
+            category_id_he: 'תקליטן',
             category_slug: 'dj',
             photos: ['/categories/DJ.jpg'],
             short_description: 'Set the perfect vibe for your event',
@@ -44,7 +49,9 @@ export default function GigCarousel() {
         {
             id: 'cat-magician',
             title: 'Magicians & Illusionists',
+            title_he: 'קוסמים ואשליינים',
             category_id: 'Magician',
+            category_id_he: 'קוסם',
             category_slug: 'magician',
             photos: ['/categories/Illusionist.jpg'],
             short_description: 'Mind-blowing entertainment',
@@ -53,7 +60,9 @@ export default function GigCarousel() {
         {
             id: 'cat-comedian',
             title: 'Stand-up Comedians',
+            title_he: 'סטנדאפיסטים',
             category_id: 'Comedian',
+            category_id_he: 'סטנדאפ',
             category_slug: 'comedian',
             photos: ['/categories/stand-up-comedian.jpg'],
             short_description: 'Laughter guaranteed',
@@ -62,7 +71,9 @@ export default function GigCarousel() {
         {
             id: 'cat-singer',
             title: 'Live Singers',
+            title_he: 'זמרים חיים',
             category_id: 'Singer',
+            category_id_he: 'זמר',
             category_slug: 'singer',
             photos: ['/categories/live-musician.jpg'],
             short_description: 'Soulful performances',
@@ -71,7 +82,9 @@ export default function GigCarousel() {
         {
             id: 'cat-bartender',
             title: 'Cocktail Bartenders',
+            title_he: 'ברמנים',
             category_id: 'Bartender',
+            category_id_he: 'ברמן',
             category_slug: 'bartender',
             photos: ['/categories/Bartender.jpg'],
             short_description: 'Premium bar service',
@@ -80,7 +93,9 @@ export default function GigCarousel() {
         {
             id: 'cat-chef',
             title: 'Private Chefs',
+            title_he: 'שפים פרטיים',
             category_id: 'Chef',
+            category_id_he: 'שף',
             category_slug: 'private-chef',
             photos: ['/categories/private-chef.jpg'],
             short_description: 'Culinary excellence',
@@ -89,11 +104,13 @@ export default function GigCarousel() {
         {
             id: 'cat-kids',
             title: 'Kids Animators',
+            title_he: 'מפעילים לילדים',
             category_id: 'Kids',
+            category_id_he: 'ילדים',
             category_slug: 'kids-animator',
             photos: ['/categories/rollerblade-coach.jpg'],
             short_description: 'Fun for the little ones',
-            has_landing: false // Link to general registration
+            has_landing: true
         }
     ];
 
@@ -215,6 +232,8 @@ const GigCard = memo(function GigCard({
         : firstPhoto?.url || '/logo.jpg';
 
     const slug = gig.category_slug;
+    const displayTitle = isHebrew && gig.title_he ? gig.title_he : gig.title;
+    const displayCategory = isHebrew && gig.category_id_he ? gig.category_id_he : gig.category_id;
 
     // Conditional Linking
     const href = gig.has_landing
@@ -254,10 +273,10 @@ const GigCard = memo(function GigCard({
                 {/* CONTENT */}
                 <div className="absolute bottom-0 left-0 right-0 p-5 text-center w-full">
                     <p className="text-blue-400 text-[10px] font-bold uppercase tracking-widest mb-1 opacity-90 truncate">
-                        {gig.category_id}
+                        {displayCategory}
                     </p>
                     <h3 className="text-white font-bold text-lg leading-snug line-clamp-2 drop-shadow-md">
-                        {gig.title}
+                        {displayTitle}
                     </h3>
                 </div>
             </div>
