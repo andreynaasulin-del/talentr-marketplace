@@ -13,7 +13,7 @@ import ProfileStep from './steps/ProfileStep';
 function OnboardingContent() {
     const searchParams = useSearchParams();
     const router = useRouter();
-    const { language } = useLanguage();
+    const { language, setLanguage } = useLanguage();
     const lang = (language === 'he' ? 'he' : 'en') as 'en' | 'he';
 
     const t = {
@@ -56,11 +56,6 @@ function OnboardingContent() {
             if (!user) {
                 // If not logged in, we might want to redirect or allow "Guest Draft" mode.
                 // For now, consistent with "Invite" flow, we assume they should be logged in.
-                // But to be safe, we'll allow seeing the form but enforce auth on submit?
-                // Let's redirect to signin if not found for strict security.
-                // router.push('/signin?next=/onboarding'); 
-                // User requested "Gig First". If I force login, it breaks the flow if they aren't logged in yet.
-                // BUT the requirements say "User comes by invite (Magic Link)". So they ARE logged in.
             }
             setUserId(user?.id);
 
@@ -93,8 +88,6 @@ function OnboardingContent() {
                 if (res.ok) {
                     const data = await res.json();
                     setPendingVendor(data.pending);
-                    // If we have an invite, we might want to skip the user check or treat them as "guest" until step 2
-                    // So we don't redirect away
                 }
             }
         } catch (e) {
@@ -127,7 +120,18 @@ function OnboardingContent() {
     }
 
     return (
-        <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white flex flex-col">
+        <div className="min-h-screen bg-white dark:bg-black text-zinc-900 dark:text-white flex flex-col relative">
+            {/* Language Switcher (Explicitly Added) */}
+            <div className="absolute top-4 right-4 z-[100]">
+                <button
+                    onClick={() => setLanguage(language === 'en' ? 'he' : 'en')}
+                    className="w-10 h-10 flex items-center justify-center bg-white dark:bg-zinc-900 rounded-full shadow-lg border border-zinc-200 dark:border-zinc-800 text-2xl hover:scale-110 transition-transform"
+                    title="Switch Language"
+                >
+                    {language === 'en' ? '🇺🇸' : '🇮🇱'}
+                </button>
+            </div>
+
             {/* Header / Progress */}
             <div className="w-full h-2 bg-zinc-100 dark:bg-zinc-900 sticky top-0 z-50">
                 <motion.div
@@ -195,7 +199,6 @@ function OnboardingContent() {
                                         <button
                                             onClick={() => {
                                                 navigator.clipboard.writeText(editLink);
-                                                // Could add toast here
                                             }}
                                             className="p-2 hover:bg-yellow-100 dark:hover:bg-yellow-900/30 rounded-lg text-yellow-700 transition-colors"
                                         >
