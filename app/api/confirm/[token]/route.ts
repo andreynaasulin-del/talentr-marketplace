@@ -78,6 +78,10 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
 
             // CRITICAL: Link gig to vendor on server side (atomic operation)
             const { gigId } = body;
+            let gigLinked = false;
+
+            console.log('[CONFIRM API] Received gigId:', gigId, 'vendorId:', vendorId);
+
             if (gigId && vendorId) {
                 const { createClient } = await import('@supabase/supabase-js');
                 const supabaseAdmin = createClient(
@@ -85,23 +89,46 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                     process.env.SUPABASE_SERVICE_ROLE_KEY!
                 );
 
-                const { error: gigError } = await supabaseAdmin
+                // First, check if gig exists and its current state
+                const { data: existingGig, error: fetchError } = await supabaseAdmin
                     .from('gigs')
-                    .update({
-                        vendor_id: vendorId,
-                        status: 'pending_review',
-                        moderation_status: 'pending',
-                        wizard_completed: true
-                    })
+                    .select('id, vendor_id, title')
                     .eq('id', gigId)
-                    .is('vendor_id', null); // Only update if orphan gig
+                    .single();
 
-                if (gigError) {
-                    console.error('Failed to link gig to vendor:', gigError);
-                    // Don't fail the whole operation, but log it
+                console.log('[CONFIRM API] Existing gig:', existingGig, 'fetchError:', fetchError);
+
+                if (existingGig && existingGig.vendor_id === null) {
+                    const { data: updatedGig, error: gigError } = await supabaseAdmin
+                        .from('gigs')
+                        .update({
+                            vendor_id: vendorId,
+                            status: 'pending_review',
+                            moderation_status: 'pending',
+                            wizard_completed: true
+                        })
+                        .eq('id', gigId)
+                        .is('vendor_id', null)
+                        .select()
+                        .single();
+
+                    if (gigError) {
+                        console.error('[CONFIRM API] Failed to link gig:', gigError);
+                    } else {
+                        console.log('[CONFIRM API] Successfully linked gig:', updatedGig);
+                        gigLinked = true;
+                    }
+                } else if (existingGig) {
+                    console.log('[CONFIRM API] Gig already has vendor_id:', existingGig.vendor_id);
+                    // If same vendor, consider it linked
+                    if (existingGig.vendor_id === vendorId) {
+                        gigLinked = true;
+                    }
                 } else {
-                    console.log(`Successfully linked gig ${gigId} to vendor ${vendorId}`);
+                    console.error('[CONFIRM API] Gig not found with id:', gigId);
                 }
+            } else {
+                console.log('[CONFIRM API] Missing gigId or vendorId - skipping gig linking');
             }
 
             // Send magic link email to vendor
@@ -123,8 +150,8 @@ export async function POST(request: NextRequest, { params }: RouteParams) {
                 success: true,
                 vendorId,
                 editLink,
-                editToken, // Include token for PATCH authentication
-                gigLinked: !!gigId, // Indicate if gig was linked
+                editToken,
+                gigLinked,
                 message: 'Profile confirmed successfully!'
             });
         }

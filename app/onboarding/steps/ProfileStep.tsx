@@ -89,6 +89,8 @@ export default function ProfileStep({ gigId, onSuccess, inviteToken, pendingVend
             // INVITE FLOW (Guest/Anonymous)
             // ============================================
             if (inviteToken) {
+                console.log('[ProfileStep] INVITE FLOW - gigId:', gigId, 'inviteToken:', inviteToken);
+
                 // 1. Confirm Pending Vendor -> Create Real Vendor + Link Gig (atomic operation)
                 const confirmRes = await fetch(`/api/confirm/${inviteToken}`, {
                     method: 'POST',

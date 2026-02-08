@@ -58,9 +58,11 @@ function OnboardingContent() {
     const [linkCopied, setLinkCopied] = useState(false);
     const [showWarning, setShowWarning] = useState(false);
 
+
     useEffect(() => {
         checkUserAndState();
-    }, []);
+        // eslint-disable-next-line react-hooks/exhaustive-deps
+    }, [searchParams]); // Re-run when searchParams change (after router.push)
 
     const checkUserAndState = async () => {
         try {
