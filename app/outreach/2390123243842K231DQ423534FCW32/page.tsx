@@ -1,9 +1,8 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { supabase } from '@/lib/supabase';
 
-interface PendingVendor {
+interface Vendor {
     id: string;
     phone: string;
     name: string | null;
@@ -20,7 +19,7 @@ AI שמחבר אמנים ללקוחות אוטומטית.
 הרשמה:`;
 
 export default function OutreachPage() {
-    const [vendors, setVendors] = useState<PendingVendor[]>([]);
+    const [vendors, setVendors] = useState<Vendor[]>([]);
     const [loading, setLoading] = useState(true);
     const [tab, setTab] = useState<'pending' | 'invited'>('pending');
 
@@ -29,16 +28,14 @@ export default function OutreachPage() {
     }, [tab]);
 
     const loadVendors = async () => {
-        if (!supabase) return;
         setLoading(true);
-
-        const { data } = await supabase
-            .from('pending_vendors')
-            .select('id, phone, name, category, status, confirmation_token')
-            .eq('status', tab)
-            .order('created_at', { ascending: false });
-
-        setVendors(data || []);
+        try {
+            const res = await fetch(`/api/outreach?status=${tab}`);
+            const data = await res.json();
+            setVendors(Array.isArray(data) ? data : []);
+        } catch (e) {
+            console.error(e);
+        }
         setLoading(false);
     };
 
@@ -47,23 +44,22 @@ export default function OutreachPage() {
         return clean.startsWith('0') ? '972' + clean.slice(1) : clean;
     };
 
-    const getWaLink = (v: PendingVendor) => {
+    const getWaLink = (v: Vendor) => {
         const phone = formatPhone(v.phone);
         const link = `https://talentr.co.il/onboarding?invite=${v.confirmation_token}`;
         return `https://wa.me/${phone}?text=${encodeURIComponent(MESSAGE + ' ' + link)}`;
     };
 
-    const handleClick = async (v: PendingVendor) => {
-        // Сразу удаляем из UI
+    const handleClick = async (v: Vendor) => {
+        // Удаляем из UI сразу
         setVendors(prev => prev.filter(x => x.id !== v.id));
 
         // Обновляем в БД
-        if (supabase) {
-            await supabase
-                .from('pending_vendors')
-                .update({ status: 'invited' })
-                .eq('id', v.id);
-        }
+        await fetch('/api/outreach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: v.id })
+        });
     };
 
     return (
