@@ -1,7 +1,7 @@
 'use client';
 
 import { useState, useEffect } from 'react';
-import { createClient } from '@/utils/supabase/client';
+import { supabase } from '@/lib/supabase';
 
 interface PendingVendor {
     id: string;
@@ -59,7 +59,7 @@ export default function OutreachPage() {
 
     const loadVendors = async () => {
         setLoading(true);
-        const supabase = createClient();
+        if (!supabase) return;
 
         let query = supabase
             .from('pending_vendors')
@@ -93,7 +93,7 @@ export default function OutreachPage() {
     };
 
     const markAsInvited = async (id: string) => {
-        const supabase = createClient();
+        if (!supabase) return;
         await supabase
             .from('pending_vendors')
             .update({ status: 'invited' })
