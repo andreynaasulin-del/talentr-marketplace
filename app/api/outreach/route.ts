@@ -24,13 +24,13 @@ export async function GET(request: NextRequest) {
     return NextResponse.json(data);
 }
 
-// POST - mark as invited
+// POST - update status
 export async function POST(request: NextRequest) {
-    const { id } = await request.json();
+    const { id, status } = await request.json();
 
     const { error } = await supabase
         .from('pending_vendors')
-        .update({ status: 'invited' })
+        .update({ status: status || 'invited' })
         .eq('id', id);
 
     if (error) {

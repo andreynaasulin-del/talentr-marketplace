@@ -11,17 +11,20 @@ interface Vendor {
     confirmation_token: string;
 }
 
-const MESSAGE = `שלום! 👋
+// Сообщение БЕЗ ссылки - первый контакт
+const FIRST_MESSAGE = `שלום! 👋
 ראיתי שאתה פעיל בתחום האירועים.
-Talentr - פלטפורמה חדשה לטאלנטים.
-AI שמחבר אמנים ללקוחות אוטומטית.
-בטא בחינם 🎁
-הרשמה:`;
+אנחנו משיקים פלטפורמה חדשה לטאלנטים - Talentr.
+AI שמחבר בין אמנים ללקוחות אוטומטית.
+בלי לחפש בקבוצות - המערכת שולחת לך הזמנות מוכנות.
+כרגע בבטא בחינם 🎁
+מעניין אותך לשמוע עוד?`;
 
 export default function OutreachPage() {
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [loading, setLoading] = useState(true);
-    const [tab, setTab] = useState<'pending' | 'invited'>('pending');
+    const [tab, setTab] = useState<'pending' | 'hold' | 'invited'>('pending');
+    const [copied, setCopied] = useState<string | null>(null);
 
     useEffect(() => {
         loadVendors();
@@ -44,29 +47,55 @@ export default function OutreachPage() {
         return clean.startsWith('0') ? '972' + clean.slice(1) : clean;
     };
 
-    const getWaLink = (v: Vendor) => {
+    // Первичное сообщение БЕЗ ссылки
+    const getFirstMessageLink = (v: Vendor) => {
         const phone = formatPhone(v.phone);
-        const link = `https://talentr.co.il/onboarding?invite=${v.confirmation_token}`;
-        return `https://wa.me/${phone}?text=${encodeURIComponent(MESSAGE + ' ' + link)}`;
+        return `https://wa.me/${phone}?text=${encodeURIComponent(FIRST_MESSAGE)}`;
     };
 
-    const handleClick = async (v: Vendor) => {
-        // Удаляем из UI сразу
-        setVendors(prev => prev.filter(x => x.id !== v.id));
+    // Полная ссылка для копирования
+    const getInviteLink = (v: Vendor) => {
+        return `https://talentr.co.il/onboarding?invite=${v.confirmation_token}`;
+    };
 
-        // Обновляем в БД
+    // Pending → Hold (после первого контакта)
+    const moveToHold = async (v: Vendor) => {
+        setVendors(prev => prev.filter(x => x.id !== v.id));
         await fetch('/api/outreach', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
-            body: JSON.stringify({ id: v.id })
+            body: JSON.stringify({ id: v.id, status: 'hold' })
         });
+    };
+
+    // Hold → Invited (после отправки ссылки)
+    const moveToInvited = async (v: Vendor) => {
+        setVendors(prev => prev.filter(x => x.id !== v.id));
+        await fetch('/api/outreach', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ id: v.id, status: 'invited' })
+        });
+    };
+
+    // Копировать ссылку
+    const copyLink = (v: Vendor) => {
+        navigator.clipboard.writeText(getInviteLink(v));
+        setCopied(v.id);
+        setTimeout(() => setCopied(null), 2000);
+    };
+
+    const tabColors = {
+        pending: '#f59e0b',
+        hold: '#3b82f6',
+        invited: '#22c55e'
     };
 
     return (
         <div style={{ background: '#111', minHeight: '100vh', color: 'white' }}>
             {/* Header */}
             <div style={{
-                background: '#25D366',
+                background: tabColors[tab],
                 padding: '16px',
                 position: 'sticky',
                 top: 0,
@@ -75,34 +104,38 @@ export default function OutreachPage() {
                 <h1 style={{ margin: 0, fontSize: 18, textAlign: 'center' }}>
                     📱 {vendors.length} vendors
                 </h1>
-                <div style={{ display: 'flex', gap: 8, marginTop: 12, justifyContent: 'center' }}>
-                    <button
-                        onClick={() => setTab('pending')}
-                        style={{
-                            padding: '8px 20px',
-                            borderRadius: 20,
-                            border: 'none',
-                            background: tab === 'pending' ? 'white' : 'rgba(255,255,255,0.3)',
-                            color: tab === 'pending' ? '#25D366' : 'white',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        ⏳ Pending
-                    </button>
-                    <button
-                        onClick={() => setTab('invited')}
-                        style={{
-                            padding: '8px 20px',
-                            borderRadius: 20,
-                            border: 'none',
-                            background: tab === 'invited' ? 'white' : 'rgba(255,255,255,0.3)',
-                            color: tab === 'invited' ? '#25D366' : 'white',
-                            fontWeight: 'bold'
-                        }}
-                    >
-                        ✅ Invited
-                    </button>
+                <div style={{ display: 'flex', gap: 6, marginTop: 12, justifyContent: 'center' }}>
+                    {(['pending', 'hold', 'invited'] as const).map(t => (
+                        <button
+                            key={t}
+                            onClick={() => setTab(t)}
+                            style={{
+                                padding: '8px 14px',
+                                borderRadius: 20,
+                                border: 'none',
+                                background: tab === t ? 'white' : 'rgba(255,255,255,0.3)',
+                                color: tab === t ? tabColors[t] : 'white',
+                                fontWeight: 'bold',
+                                fontSize: 13
+                            }}
+                        >
+                            {t === 'pending' ? '⏳ New' : t === 'hold' ? '💬 Hold' : '✅ Sent'}
+                        </button>
+                    ))}
                 </div>
+            </div>
+
+            {/* Instructions */}
+            <div style={{
+                padding: '10px 12px',
+                background: '#222',
+                fontSize: 12,
+                color: '#888',
+                textAlign: 'center'
+            }}>
+                {tab === 'pending' && '1️⃣ Нажми WhatsApp → отправь сообщение БЕЗ ссылки'}
+                {tab === 'hold' && '2️⃣ Если ответил "интересно" → Скопируй ссылку → Отправь вручную'}
+                {tab === 'invited' && '3️⃣ Те кому отправлена ссылка'}
             </div>
 
             {/* List */}
@@ -114,56 +147,108 @@ export default function OutreachPage() {
                 ) : (
                     vendors.map((v, i) => (
                         <div key={v.id} style={{
-                            background: '#222',
+                            background: '#1a1a1a',
                             borderRadius: 12,
                             padding: 14,
                             marginBottom: 10,
-                            display: 'flex',
-                            alignItems: 'center',
-                            gap: 12
+                            border: `1px solid ${tabColors[tab]}33`
                         }}>
-                            <div style={{
-                                background: '#25D366',
-                                color: 'white',
-                                width: 28,
-                                height: 28,
-                                borderRadius: '50%',
-                                display: 'flex',
-                                alignItems: 'center',
-                                justifyContent: 'center',
-                                fontSize: 12,
-                                fontWeight: 'bold',
-                                flexShrink: 0
-                            }}>
-                                {i + 1}
-                            </div>
-
-                            <div style={{ flex: 1, minWidth: 0 }}>
-                                <div style={{ fontWeight: 'bold', fontSize: 14 }}>
-                                    {v.name || 'Unknown'}
-                                </div>
-                                <div style={{ fontSize: 12, color: '#888' }}>
-                                    +{formatPhone(v.phone)}
-                                </div>
-                            </div>
-
-                            <a
-                                href={getWaLink(v)}
-                                target="_blank"
-                                onClick={() => handleClick(v)}
-                                style={{
-                                    background: '#25D366',
+                            <div style={{ display: 'flex', alignItems: 'center', gap: 12, marginBottom: 10 }}>
+                                <div style={{
+                                    background: tabColors[tab],
                                     color: 'white',
-                                    padding: '10px 16px',
-                                    borderRadius: 20,
-                                    textDecoration: 'none',
+                                    width: 28,
+                                    height: 28,
+                                    borderRadius: '50%',
+                                    display: 'flex',
+                                    alignItems: 'center',
+                                    justifyContent: 'center',
+                                    fontSize: 12,
                                     fontWeight: 'bold',
-                                    fontSize: 14,
                                     flexShrink: 0
-                                }}
-                            >
-                                📱 Send
-                            </a>
+                                }}>
+                                    {i + 1}
+                                </div>
+
+                                <div style={{ flex: 1 }}>
+                                    <div style={{ fontWeight: 'bold', fontSize: 14 }}>
+                                        {v.name || 'Unknown'}
+                                    </div>
+                                    <div style={{ fontSize: 12, color: '#666' }}>
+                                        +{formatPhone(v.phone)} • {v.category || ''}
+                                    </div>
+                                </div>
+                            </div>
+
+                            {/* Actions based on tab */}
+                            <div style={{ display: 'flex', gap: 8 }}>
+                                {tab === 'pending' && (
+                                    <a
+                                        href={getFirstMessageLink(v)}
+                                        target="_blank"
+                                        onClick={() => moveToHold(v)}
+                                        style={{
+                                            flex: 1,
+                                            background: '#25D366',
+                                            color: 'white',
+                                            padding: '12px',
+                                            borderRadius: 10,
+                                            textDecoration: 'none',
+                                            fontWeight: 'bold',
+                                            textAlign: 'center'
+                                        }}
+                                    >
+                                        📱 WhatsApp
+                                    </a>
+                                )}
+
+                                {tab === 'hold' && (
+                                    <>
+                                        <button
+                                            onClick={() => copyLink(v)}
+                                            style={{
+                                                flex: 1,
+                                                background: copied === v.id ? '#22c55e' : '#3b82f6',
+                                                color: 'white',
+                                                padding: '12px',
+                                                borderRadius: 10,
+                                                border: 'none',
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            {copied === v.id ? '✅ Copied!' : '📋 Copy Link'}
+                                        </button>
+                                        <button
+                                            onClick={() => moveToInvited(v)}
+                                            style={{
+                                                background: '#22c55e',
+                                                color: 'white',
+                                                padding: '12px 16px',
+                                                borderRadius: 10,
+                                                border: 'none',
+                                                fontWeight: 'bold',
+                                                cursor: 'pointer'
+                                            }}
+                                        >
+                                            ✅ Sent
+                                        </button>
+                                    </>
+                                )}
+
+                                {tab === 'invited' && (
+                                    <div style={{
+                                        flex: 1,
+                                        padding: '12px',
+                                        background: '#1f2937',
+                                        borderRadius: 10,
+                                        textAlign: 'center',
+                                        color: '#666'
+                                    }}>
+                                        Link sent ✓
+                                    </div>
+                                )}
+                            </div>
                         </div>
                     ))
                 )}
