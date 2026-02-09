@@ -359,6 +359,7 @@ interface PendingVendor {
     status: string;
     instagram_followers?: number;
     confirmation_token: string;
+    converted_vendor_id?: string;
 }
 
 interface Vendor {
@@ -1448,6 +1449,19 @@ Talentr Team`;
                                                                         </button>
                                                                     </div>
                                                                 </div>
+                                                            )}
+
+                                                            {/* View Profile button for confirmed vendors */}
+                                                            {pending.status === 'confirmed' && pending.converted_vendor_id && (
+                                                                <a
+                                                                    href={`/vendor/${pending.converted_vendor_id}`}
+                                                                    target="_blank"
+                                                                    rel="noopener noreferrer"
+                                                                    className="flex items-center gap-2 px-4 py-2.5 md:px-3 md:py-2 bg-green-600 text-white text-sm font-bold rounded-xl hover:bg-green-700 active:scale-95 transition-all"
+                                                                >
+                                                                    <ExternalLink className="w-4 h-4" />
+                                                                    {lang === 'he' ? 'צפה בפרופיל' : 'View Profile'}
+                                                                </a>
                                                             )}
                                                         </div>
                                                     </div>
