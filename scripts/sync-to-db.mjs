@@ -30,6 +30,23 @@ async function syncToDatabase() {
         }
     }
 
+    // Читаем результаты ночного скрапинга
+    const nightResultsPath = path.join(DATA_DIR, 'night_scrape_results.json');
+    if (fs.existsSync(nightResultsPath)) {
+        try {
+            const data = JSON.parse(fs.readFileSync(nightResultsPath, 'utf-8'));
+            allContacts = allContacts.concat(data.map(v => ({
+                phone: v.phone,
+                text: v.text || '',
+                source: v.source || '',
+                name: v.name || 'Talent',
+                category: v.category,
+            })));
+        } catch (e) {
+            console.log(`⚠️ Ошибка чтения night_scrape_results.json: ${e.message}`);
+        }
+    }
+
     // Также читаем vendors JSON если есть
     const vendorFiles = fs.readdirSync(DATA_DIR).filter(f => f.startsWith('vendors_') && f.endsWith('.json'));
     for (const file of vendorFiles) {

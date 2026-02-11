@@ -25,10 +25,11 @@ interface GigBuilderProps {
     onClose: () => void;
     onGigCreated?: (gigId: string) => void; // Callback when gig is created (for onboarding)
     existingGigId?: string;
+    initialCategory?: string;
     mode?: 'full' | 'onboarding'; // 'onboarding' mode skips to next step after publish
 }
 
-export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, onClose, onGigCreated, existingGigId, mode = 'full' }: GigBuilderProps) {
+export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, onClose, onGigCreated, existingGigId, initialCategory, mode = 'full' }: GigBuilderProps) {
     const router = useRouter();
     const { language } = useLanguage();
     const [currentStep, setCurrentStep] = useState(0);
@@ -234,6 +235,21 @@ export default function GigBuilder({ vendorId, ownerId, editToken, inviteToken, 
         lead_time_hours: 24,
         status: 'draft'
     });
+
+    // Pre-fill category from props if provided and missing
+    useEffect(() => {
+        if (initialCategory && !gig.category_id) {
+            // Find category id by checking GIG_CATEGORIES labels or matching direct ID
+            const found = GIG_CATEGORIES.find(c =>
+                c.id.toLowerCase() === initialCategory.toLowerCase() ||
+                (c.label as any).en.toLowerCase() === initialCategory.toLowerCase()
+            );
+            if (found) {
+                setGig(prev => ({ ...prev, category_id: found.id }));
+            }
+        }
+    }, [initialCategory]);
+
 
     const step = GIG_WIZARD_STEPS[currentStep] as GigWizardStep;
     const stepConfig = GIG_STEP_CONFIG[step];

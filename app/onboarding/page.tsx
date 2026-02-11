@@ -178,6 +178,7 @@ function OnboardingContent() {
                 <GigBuilder
                     ownerId={userId}
                     inviteToken={inviteToken || undefined}
+                    initialCategory={pendingVendor?.category}
                     mode="onboarding"
                     onGigCreated={handleGigCreated}
                     onClose={handleGigBuilderClose}
