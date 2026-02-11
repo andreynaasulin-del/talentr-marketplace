@@ -44,12 +44,16 @@ export default function OutreachPage() {
     const [copied, setCopied] = useState<string | null>(null);
     const [expandedVendor, setExpandedVendor] = useState<string | null>(null);
 
+    // CRITICAL FIX: Local hidden list for instant UI feedback
+    const [hiddenIds, setHiddenIds] = useState<Set<string>>(new Set());
+
     // Filters & Sort
     const [sortBy, setSortBy] = useState<'score' | 'date' | 'tier'>('score');
     const [filterCategory, setFilterCategory] = useState<string>('All');
 
     useEffect(() => {
         loadVendors();
+        setHiddenIds(new Set()); // Reset hidden IDs when tab changes
     }, [tab]);
 
     const loadVendors = async () => {
@@ -90,12 +94,15 @@ export default function OutreachPage() {
     }, [vendors]);
 
     const processedVendors = useMemo(() => {
-        let result = [...vendors];
+        // 1. Filter out locally hidden (instant removal)
+        let result = vendors.filter(v => !hiddenIds.has(v.id));
 
+        // 2. Filter Category
         if (filterCategory !== 'All') {
             result = result.filter(v => normalizeCategory(v.category) === filterCategory);
         }
 
+        // 3. Sort
         result.sort((a, b) => {
             if (sortBy === 'score') {
                 return (b.source_data?.talentr_score || 0) - (a.source_data?.talentr_score || 0);
@@ -110,7 +117,7 @@ export default function OutreachPage() {
         });
 
         return result;
-    }, [vendors, filterCategory, sortBy]);
+    }, [vendors, filterCategory, sortBy, hiddenIds]);
 
     const formatPhone = (phone: string) => {
         const clean = phone.replace(/\D/g, '');
@@ -127,7 +134,10 @@ export default function OutreachPage() {
     };
 
     const updateStatus = async (v: Vendor, status: string) => {
-        setVendors(prev => prev.filter(x => x.id !== v.id));
+        // First hide locally immediately
+        setHiddenIds(prev => new Set(prev).add(v.id));
+
+        // Then update backend
         await fetch('/api/outreach', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -388,9 +398,13 @@ export default function OutreachPage() {
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
-                                                // 1. Open WhatsApp
+                                                // 1. Hide FIRST
+                                                setHiddenIds(prev => new Set(prev).add(v.id));
+
+                                                // 2. Open WhatsApp
                                                 window.open(getFirstMessageLink(v), '_blank');
-                                                // 2. Remove from list immediately
+
+                                                // 3. Sync to DB
                                                 updateStatus(v, 'hold');
                                             }}
                                             style={{ ...actionButtonStyle('#10b981'), height: 40, width: '100%' }}
