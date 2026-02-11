@@ -385,18 +385,19 @@ export default function OutreachPage() {
                                     display: 'flex', gap: 10
                                 }}>
                                     {tab === 'pending' && (
-                                        <a
-                                            href={getFirstMessageLink(v)}
-                                            target="_blank"
+                                        <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
+                                                // 1. Open WhatsApp
+                                                window.open(getFirstMessageLink(v), '_blank');
+                                                // 2. Remove from list immediately
                                                 updateStatus(v, 'hold');
                                             }}
-                                            style={{ ...actionButtonStyle('#10b981'), height: 40 }}
+                                            style={{ ...actionButtonStyle('#10b981'), height: 40, width: '100%' }}
                                         >
                                             <MessageCircle size={18} fill="white" strokeWidth={0} />
                                             <span style={{ fontWeight: 600 }}>WhatsApp</span>
-                                        </a>
+                                        </button>
                                     )}
 
                                     {tab === 'hold' && (
