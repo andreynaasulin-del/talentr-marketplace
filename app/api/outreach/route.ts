@@ -13,7 +13,7 @@ export async function GET(request: NextRequest) {
 
     const { data, error } = await supabase
         .from('pending_vendors')
-        .select('id, phone, name, category, status, confirmation_token')
+        .select('id, phone, name, category, status, confirmation_token, source_data')
         .eq('status', status)
         .order('created_at', { ascending: false });
 
