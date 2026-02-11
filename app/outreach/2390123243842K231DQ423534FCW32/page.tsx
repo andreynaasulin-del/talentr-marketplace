@@ -2,9 +2,9 @@
 
 import { useState, useEffect, useMemo } from 'react';
 import {
-    Search, Filter, ChevronDown, ChevronUp, Star,
-    MessageCircle, Copy, CheckCircle, ExternalLink,
-    MoreHorizontal, DollarSign, Zap, Briefcase
+    Filter, ChevronDown, Star,
+    MessageCircle, Copy, CheckCircle,
+    DollarSign, Zap, Briefcase
 } from 'lucide-react';
 
 interface Vendor {
@@ -64,20 +64,38 @@ export default function OutreachPage() {
         setLoading(false);
     };
 
+    // --- CATEGORY NORMALIZATION ---
+    const normalizeCategory = (raw: string | null) => {
+        if (!raw) return 'Other';
+        const lower = raw.toLowerCase().trim();
+
+        if (lower.includes('dj') || lower.includes('music') || lower.includes('singer') || lower.includes('band')) return 'Music & DJ';
+        if (lower.includes('photo') || lower.includes('video') || lower.includes('camera')) return 'Photo & Video';
+        if (lower.includes('makeup') || lower.includes('hair') || lower.includes('beauty')) return 'Beauty';
+        if (lower.includes('event') || lower.includes('plan') || lower.includes('produc') || lower.includes('אירועים')) return 'Event Planner';
+        if (lower.includes('decor') || lower.includes('balloon') || lower.includes('flower')) return 'Decor';
+        if (lower.includes('cook') || lower.includes('chef') || lower.includes('food') || lower.includes('bar')) return 'Food & Bar';
+        if (lower.includes('rabbi') || lower.includes('mohel')) return 'Rabbi';
+        if (lower.includes('magician') || lower.includes('mentalist')) return 'Magician';
+
+        return raw.charAt(0).toUpperCase() + raw.slice(1);
+    };
+
     const categories = useMemo(() => {
-        const cats = new Set(vendors.map(v => v.category).filter(Boolean));
-        return ['All', ...Array.from(cats)];
+        const cats = new Set<string>();
+        vendors.forEach(v => {
+            cats.add(normalizeCategory(v.category));
+        });
+        return ['All', ...Array.from(cats).sort()];
     }, [vendors]);
 
     const processedVendors = useMemo(() => {
         let result = [...vendors];
 
-        // Filter
         if (filterCategory !== 'All') {
-            result = result.filter(v => v.category === filterCategory);
+            result = result.filter(v => normalizeCategory(v.category) === filterCategory);
         }
 
-        // Sort
         result.sort((a, b) => {
             if (sortBy === 'score') {
                 return (b.source_data?.talentr_score || 0) - (a.source_data?.talentr_score || 0);
@@ -88,8 +106,6 @@ export default function OutreachPage() {
                 const tB = tiers[b.source_data?.ai_analysis?.price_tier || 'Low'] || 0;
                 return tB - tA;
             }
-            // Date (ID fallback essentially as newer IDs are larger/uuids not sequentially sortable usually but created_at sorting is better done on backend or if we had the field)
-            // Assuming default backend sort is date, so we reverse for newest if needed, or just keep as is.
             return 0;
         });
 
@@ -111,7 +127,7 @@ export default function OutreachPage() {
     };
 
     const updateStatus = async (v: Vendor, status: string) => {
-        setVendors(prev => prev.filter(x => x.id !== v.id)); // Optimistic UI
+        setVendors(prev => prev.filter(x => x.id !== v.id));
         await fetch('/api/outreach', {
             method: 'POST',
             headers: { 'Content-Type': 'application/json' },
@@ -126,12 +142,11 @@ export default function OutreachPage() {
     };
 
     const tabColors = {
-        pending: '#f59e0b', // Amber/Orange
-        hold: '#3b82f6', // Blue
-        invited: '#10b981' // Emerald
+        pending: '#f59e0b',
+        hold: '#3b82f6',
+        invited: '#10b981'
     };
 
-    // Helper for Tier Badge
     const TierBadge = ({ tier }: { tier?: string }) => {
         if (!tier) return null;
         let color = '#9ca3af';
@@ -151,13 +166,12 @@ export default function OutreachPage() {
         );
     };
 
-    // Helper for Score Badge
     const ScoreBadge = ({ score }: { score?: number }) => {
         if (!score) return null;
         let color = '#fbbf24';
         if (score < 5) color = '#ef4444';
         if (score >= 7.5) color = '#10b981';
-        if (score >= 9) color = '#8b5cf6'; // Pro level usually
+        if (score >= 9) color = '#8b5cf6';
 
         return (
             <div style={{ display: 'flex', alignItems: 'center', gap: 4 }}>
@@ -174,25 +188,27 @@ export default function OutreachPage() {
     };
 
     return (
-        <div style={{ background: '#0a0a0a', minHeight: '100vh', color: '#e5e5e5', fontFamily: 'sans-serif' }}>
+        <div style={{ background: '#0a0a0a', minHeight: '100vh', color: '#e5e5e5', fontFamily: 'Inter, sans-serif' }}>
 
-            {/* --- HEADER & TABS --- */}
+            {/* --- HEADER --- */}
             <div style={{
-                background: 'rgba(10,10,10,0.8)', backdropFilter: 'blur(10px)',
+                background: 'rgba(10,10,10,0.85)', backdropFilter: 'blur(12px)',
                 position: 'sticky', top: 0, zIndex: 50, borderBottom: '1px solid #222'
             }}>
                 <div style={{ padding: '16px 20px' }}>
-                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 }}>
-                        <h1 style={{ margin: 0, fontSize: 18, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 8 }}>
-                            <Zap size={18} color="#f59e0b" fill="#f59e0b" />
-                            Talentr Outreach
+                    <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 16 }}>
+                        <h1 style={{ margin: 0, fontSize: 20, fontWeight: 700, display: 'flex', alignItems: 'center', gap: 10, letterSpacing: '-0.5px' }}>
+                            <div style={{ background: 'linear-gradient(135deg, #f59e0b, #ef4444)', padding: 6, borderRadius: 8 }}>
+                                <Zap size={18} color="white" fill="white" />
+                            </div>
+                            Talentr <span style={{ opacity: 0.5, fontWeight: 400 }}>Outreach</span>
                         </h1>
-                        <div style={{ fontSize: 12, color: '#666', fontWeight: 600 }}>
+                        <div style={{ fontSize: 13, color: '#888', fontWeight: 500, background: '#1a1a1a', padding: '4px 10px', borderRadius: 20 }}>
                             {processedVendors.length} found
                         </div>
                     </div>
 
-                    <div style={{ display: 'flex', gap: 4, background: '#1a1a1a', padding: 4, borderRadius: 12, width: 'fit-content' }}>
+                    <div style={{ display: 'flex', gap: 4, background: '#161616', padding: 4, borderRadius: 10, width: 'fit-content', border: '1px solid #222' }}>
                         {(['pending', 'hold', 'invited'] as const).map(t => (
                             <button
                                 key={t}
@@ -202,57 +218,72 @@ export default function OutreachPage() {
                                     background: tab === t ? tabColors[t] : 'transparent',
                                     color: tab === t ? 'white' : '#666',
                                     fontWeight: 600, fontSize: 13, cursor: 'pointer',
-                                    transition: 'all 0.2s'
+                                    transition: 'all 0.2s',
+                                    boxShadow: tab === t ? '0 2px 10px rgba(0,0,0,0.2)' : 'none'
                                 }}
                             >
-                                {t.charAt(0).toUpperCase() + t.slice(1)}
+                                {t === 'pending' ? 'New' : t.charAt(0).toUpperCase() + t.slice(1)}
                             </button>
                         ))}
                     </div>
                 </div>
 
-                {/* --- FILTERS BAR --- */}
+                {/* --- FILTERS --- */}
                 <div style={{
-                    padding: '0 20px 12px', display: 'flex', gap: 10, overflowX: 'auto',
-                    scrollbarWidth: 'none'
+                    padding: '0 20px 16px', display: 'flex', gap: 10, overflowX: 'auto',
+                    scrollbarWidth: 'none', alignItems: 'center'
                 }}>
-                    <select
-                        value={filterCategory}
-                        onChange={(e) => setFilterCategory(e.target.value)}
-                        style={{
-                            background: '#222', color: 'white', border: '1px solid #333',
-                            padding: '6px 12px', borderRadius: 8, fontSize: 12, cursor: 'pointer'
-                        }}
-                    >
-                        {categories.map(c => <option key={c} value={c}>{c}</option>)}
-                    </select>
+                    <div style={{ position: 'relative' }}>
+                        <Filter size={14} style={{ position: 'absolute', left: 10, top: 11, color: '#666', pointerEvents: 'none' }} />
+                        <select
+                            value={filterCategory}
+                            onChange={(e) => setFilterCategory(e.target.value)}
+                            style={{
+                                appearance: 'none',
+                                background: '#1a1a1a', color: 'white', border: '1px solid #333',
+                                padding: '8px 32px 8px 32px', borderRadius: 10, fontSize: 13, cursor: 'pointer',
+                                fontWeight: 500, minWidth: 120
+                            }}
+                        >
+                            {categories.map(c => <option key={c} value={c}>{c}</option>)}
+                        </select>
+                        <ChevronDown size={14} style={{ position: 'absolute', right: 10, top: 11, color: '#666', pointerEvents: 'none' }} />
+                    </div>
 
-                    <select
-                        value={sortBy}
-                        onChange={(e) => setSortBy(e.target.value as any)}
-                        style={{
-                            background: '#222', color: 'white', border: '1px solid #333',
-                            padding: '6px 12px', borderRadius: 8, fontSize: 12, cursor: 'pointer'
-                        }}
-                    >
-                        <option value="score">⭐ Sort: Highest Score</option>
-                        <option value="tier">💰 Sort: Highest Price</option>
-                        <option value="date">📅 Sort: Newest</option>
-                    </select>
+                    <div style={{ position: 'relative' }}>
+                        <select
+                            value={sortBy}
+                            onChange={(e) => setSortBy(e.target.value as any)}
+                            style={{
+                                appearance: 'none',
+                                background: '#1a1a1a', color: 'white', border: '1px solid #333',
+                                padding: '8px 32px 8px 12px', borderRadius: 10, fontSize: 13, cursor: 'pointer',
+                                fontWeight: 500
+                            }}
+                        >
+                            <option value="score">⭐ Highest Score</option>
+                            <option value="tier">💰 Highest Price</option>
+                            <option value="date">📅 Newest</option>
+                        </select>
+                        <ChevronDown size={14} style={{ position: 'absolute', right: 10, top: 11, color: '#666', pointerEvents: 'none' }} />
+                    </div>
                 </div>
             </div>
 
-            {/* --- CONTENT --- */}
-            <div style={{ padding: 12, maxWidth: 600, margin: '0 auto' }}>
+            {/* --- LIST --- */}
+            <div style={{ padding: '16px 12px', maxWidth: 640, margin: '0 auto' }}>
                 {loading ? (
-                    <div style={{ textAlign: 'center', padding: 40, color: '#666' }}>
-                        <div className="loader"></div>
-                        Running AI analysis...
+                    <div style={{ textAlign: 'center', padding: 60, color: '#666' }}>
+                        <div className="loader" style={{ margin: '0 auto 20px' }}></div>
+                        <p>Scanning intelligence...</p>
                     </div>
                 ) : processedVendors.length === 0 ? (
-                    <div style={{ textAlign: 'center', color: '#444', marginTop: 60 }}>
-                        <Briefcase size={40} style={{ marginBottom: 10, opacity: 0.2 }} />
-                        <p>No vendors found here.</p>
+                    <div style={{ textAlign: 'center', color: '#444', marginTop: 80, display: 'flex', flexDirection: 'column', alignItems: 'center' }}>
+                        <div style={{ background: '#1a1a1a', padding: 20, borderRadius: '50%', marginBottom: 16 }}>
+                            <Briefcase size={32} />
+                        </div>
+                        <p style={{ margin: 0, fontWeight: 500 }}>No vendors match constraints.</p>
+                        <p style={{ fontSize: 13, color: '#666', marginTop: 8 }}>Try changing filters.</p>
                     </div>
                 ) : (
                     processedVendors.map((v, i) => {
@@ -260,44 +291,56 @@ export default function OutreachPage() {
                         const score = v.source_data?.talentr_score;
                         const isExpanded = expandedVendor === v.id;
                         const isElite = (score || 0) >= 8.5;
+                        const cleanCategory = normalizeCategory(v.category);
+                        const isNameGeneric = !v.name || v.name.includes('Talent') || v.name.includes('מומחה');
 
                         return (
                             <div key={v.id} style={{
                                 background: '#161616',
                                 borderRadius: 16,
                                 marginBottom: 12,
-                                border: isElite ? '1px solid rgba(16, 185, 129, 0.3)' : '1px solid #222',
+                                border: isElite ? '1px solid rgba(16, 185, 129, 0.4)' : '1px solid #222',
                                 overflow: 'hidden',
-                                boxShadow: isElite ? '0 4px 20px rgba(16, 185, 129, 0.1)' : 'none',
-                                position: 'relative'
+                                boxShadow: isElite ? '0 4px 24px rgba(16, 185, 129, 0.08)' : 'none',
+                                position: 'relative',
+                                transition: 'transform 0.2s',
                             }}>
-                                {/* Top Row */}
                                 <div
                                     onClick={() => setExpandedVendor(isExpanded ? null : v.id)}
                                     style={{ padding: 16, cursor: 'pointer', display: 'flex', alignItems: 'center', gap: 14 }}
                                 >
-                                    {/* Avatar Initials */}
                                     <div style={{
-                                        width: 42, height: 42, borderRadius: 12,
-                                        background: `linear-gradient(135deg, #333, #222)`,
+                                        width: 44, height: 44, borderRadius: 14,
+                                        background: isElite
+                                            ? `linear-gradient(135deg, #059669, #047857)`
+                                            : `linear-gradient(135deg, #262626, #171717)`,
                                         display: 'flex', alignItems: 'center', justifyContent: 'center',
-                                        fontSize: 16, fontWeight: 'bold', color: '#888',
-                                        border: '1px solid #333'
+                                        fontSize: 18, fontWeight: 'bold', color: isElite ? 'white' : '#666',
+                                        border: isElite ? 'none' : '1px solid #333',
+                                        flexShrink: 0
                                     }}>
                                         {v.name ? v.name.slice(0, 1).toUpperCase() : '?'}
                                     </div>
 
-                                    {/* Info */}
-                                    <div style={{ flex: 1 }}>
-                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'flex-start' }}>
-                                            <div style={{ fontWeight: 600, fontSize: 15, color: 'white' }}>
+                                    <div style={{ flex: 1, minWidth: 0 }}>
+                                        <div style={{ display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: 4 }}>
+                                            <div style={{
+                                                fontWeight: 600, fontSize: 15, color: isNameGeneric ? '#888' : 'white',
+                                                whiteSpace: 'nowrap', overflow: 'hidden', textOverflow: 'ellipsis', maxWidth: '80%',
+                                                fontStyle: isNameGeneric ? 'italic' : 'normal'
+                                            }}>
                                                 {v.name || 'Unknown Talent'}
                                             </div>
                                             <ScoreBadge score={score} />
                                         </div>
 
-                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8, marginTop: 4 }}>
-                                            <span style={{ fontSize: 12, color: '#888' }}>{v.category || 'Event Pro'}</span>
+                                        <div style={{ display: 'flex', alignItems: 'center', gap: 8 }}>
+                                            <span style={{
+                                                fontSize: 12, color: '#aaa',
+                                                background: '#222', padding: '2px 8px', borderRadius: 6
+                                            }}>
+                                                {cleanCategory}
+                                            </span>
                                             <TierBadge tier={ai?.price_tier} />
                                         </div>
                                     </div>
@@ -309,33 +352,37 @@ export default function OutreachPage() {
                                     />
                                 </div>
 
-                                {/* Expanded Details */}
                                 {isExpanded && (
                                     <div style={{
                                         padding: '0 16px 16px',
                                         borderTop: '1px solid #222',
-                                        background: '#131313'
+                                        background: '#131313',
+                                        animation: 'fadeIn 0.2s ease-in-out'
                                     }}>
                                         {ai && (
-                                            <div style={{ display: 'grid', gridTemplateColumns: '1fr 1fr', gap: 8, marginTop: 12 }}>
-                                                <div style={metricStyle}>🎨 Creativity: <span style={{ color: 'white' }}>{ai.creativity_score}</span></div>
-                                                <div style={metricStyle}>👔 Professionalism: <span style={{ color: 'white' }}>{ai.professionalism_score}</span></div>
-                                                <div style={metricStyle}>⚡ Activity: <span style={{ color: 'white' }}>{ai.activity_level}</span></div>
-                                                <div style={metricStyle}>🤖 Confidence: <span style={{ color: 'white' }}>{ai.confidence}%</span></div>
+                                            <div style={{ display: 'grid', gridTemplateColumns: 'repeat(2, 1fr)', gap: 8, marginTop: 12 }}>
+                                                <div style={metricStyle}>🎨 Creative <span style={{ color: 'white' }}>{ai.creativity_score}</span></div>
+                                                <div style={metricStyle}>👔 Professional <span style={{ color: 'white' }}>{ai.professionalism_score}</span></div>
+                                                <div style={metricStyle}>⚡ Active <span style={{ color: 'white' }}>{ai.activity_level}</span></div>
+                                                <div style={metricStyle}>🤖 Confidence <span style={{ color: 'white' }}>{ai.confidence}%</span></div>
                                             </div>
                                         )}
                                         {ai?.summary && (
-                                            <div style={{ marginTop: 12, fontSize: 12, color: '#888', fontStyle: 'italic', lineHeight: '1.4' }}>
+                                            <div style={{ marginTop: 12, padding: 10, background: '#1a1a1a', borderRadius: 8, fontSize: 12, color: '#999', fontStyle: 'italic', lineHeight: '1.5' }}>
                                                 "{ai.summary}"
                                             </div>
                                         )}
+
+                                        <div style={{ marginTop: 12, fontSize: 11, color: '#444', display: 'flex', gap: 10 }}>
+                                            <span>ID: {v.id.slice(0, 8)}</span>
+                                            <span>Added: {new Date().toLocaleDateString()}</span>
+                                        </div>
                                     </div>
                                 )}
 
-                                {/* Card Actions Footer */}
                                 <div style={{
                                     padding: 12, background: '#111', borderTop: '1px solid #222',
-                                    display: 'flex', gap: 8
+                                    display: 'flex', gap: 10
                                 }}>
                                     {tab === 'pending' && (
                                         <a
@@ -345,9 +392,10 @@ export default function OutreachPage() {
                                                 e.stopPropagation();
                                                 updateStatus(v, 'hold');
                                             }}
-                                            style={actionButtonStyle('#10b981')}
+                                            style={{ ...actionButtonStyle('#10b981'), height: 40 }}
                                         >
-                                            <MessageCircle size={16} /> WhatsApp
+                                            <MessageCircle size={18} fill="white" strokeWidth={0} />
+                                            <span style={{ fontWeight: 600 }}>WhatsApp</span>
                                         </a>
                                     )}
 
@@ -355,14 +403,14 @@ export default function OutreachPage() {
                                         <>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); copyLink(v); }}
-                                                style={{ ...actionButtonStyle(copied === v.id ? '#10b981' : '#3b82f6'), flex: 1 }}
+                                                style={{ ...actionButtonStyle(copied === v.id ? '#10b981' : '#222'), flex: 1, border: '1px solid #333' }}
                                             >
                                                 {copied === v.id ? <CheckCircle size={16} /> : <Copy size={16} />}
-                                                {copied === v.id ? 'Copied' : 'Copy Invite'}
+                                                {copied === v.id ? 'Copied' : 'Link'}
                                             </button>
                                             <button
                                                 onClick={(e) => { e.stopPropagation(); updateStatus(v, 'invited'); }}
-                                                style={{ ...actionButtonStyle('#222', true), width: 'auto' }}
+                                                style={{ ...actionButtonStyle('#2563eb'), flex: 2 }}
                                             >
                                                 Mark Sent
                                             </button>
@@ -370,8 +418,8 @@ export default function OutreachPage() {
                                     )}
 
                                     {tab === 'invited' && (
-                                        <div style={{ width: '100%', textAlign: 'center', fontSize: 12, color: '#444', padding: 8 }}>
-                                            Invitation Sent on {new Date().toLocaleDateString()}
+                                        <div style={{ width: '100%', textAlign: 'center', fontSize: 12, color: '#444', padding: 8, display: 'flex', alignItems: 'center', justifyContent: 'center', gap: 6 }}>
+                                            <CheckCircle size={14} color="#10b981" /> Invite sent
                                         </div>
                                     )}
                                 </div>
@@ -380,21 +428,6 @@ export default function OutreachPage() {
                     })
                 )}
             </div>
-
-            {/* FAB for refresh maybe? */}
-            <button
-                onClick={loadVendors}
-                style={{
-                    position: 'fixed', bottom: 20, right: 20,
-                    width: 48, height: 48, borderRadius: 24,
-                    background: 'white', color: 'black',
-                    border: 'none', boxShadow: '0 4px 20px rgba(0,0,0,0.5)',
-                    display: 'flex', alignItems: 'center', justifyContent: 'center',
-                    cursor: 'pointer', zIndex: 100
-                }}
-            >
-                <MoreHorizontal size={24} />
-            </button>
         </div>
     );
 }
@@ -409,7 +442,7 @@ const actionButtonStyle = (bg: string, outline = false) => ({
     background: outline ? 'transparent' : bg,
     border: outline ? `1px solid #333` : 'none',
     color: outline ? '#888' : 'white',
-    padding: '10px',
+    padding: '0 16px',
     borderRadius: 10,
     fontSize: 13,
     fontWeight: 600,
@@ -418,5 +451,6 @@ const actionButtonStyle = (bg: string, outline = false) => ({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    textDecoration: 'none'
+    textDecoration: 'none',
+    transition: 'all 0.2s'
 });
