@@ -40,7 +40,7 @@ AI שמחבר בין אמנים ללקוחות אוטומטית.
 export default function OutreachPage() {
     const [vendors, setVendors] = useState<Vendor[]>([]);
     const [loading, setLoading] = useState(true);
-    const [tab, setTab] = useState<'pending' | 'hold' | 'invited'>('pending');
+    const [tab, setTab] = useState<'pending' | 'hold' | 'invited' | 'confirmed'>('pending');
     const [copied, setCopied] = useState<string | null>(null);
     const [expandedVendor, setExpandedVendor] = useState<string | null>(null);
 
@@ -154,7 +154,8 @@ export default function OutreachPage() {
     const tabColors = {
         pending: '#f59e0b',
         hold: '#3b82f6',
-        invited: '#10b981'
+        invited: '#10b981',
+        confirmed: '#ec4899'
     };
 
     const TierBadge = ({ tier }: { tier?: string }) => {
@@ -219,7 +220,7 @@ export default function OutreachPage() {
                     </div>
 
                     <div style={{ display: 'flex', gap: 4, background: '#161616', padding: 4, borderRadius: 10, width: 'fit-content', border: '1px solid #222' }}>
-                        {(['pending', 'hold', 'invited'] as const).map(t => (
+                        {(['pending', 'confirmed', 'hold', 'invited'] as const).map(t => (
                             <button
                                 key={t}
                                 onClick={() => setTab(t)}
@@ -394,7 +395,7 @@ export default function OutreachPage() {
                                     padding: 12, background: '#111', borderTop: '1px solid #222',
                                     display: 'flex', gap: 10
                                 }}>
-                                    {tab === 'pending' && (
+                                    {(tab === 'pending' || tab === 'confirmed') && (
                                         <button
                                             onClick={(e) => {
                                                 e.stopPropagation();
@@ -407,10 +408,10 @@ export default function OutreachPage() {
                                                 // 3. Sync to DB
                                                 updateStatus(v, 'hold');
                                             }}
-                                            style={{ ...actionButtonStyle('#10b981'), height: 40, width: '100%' }}
+                                            style={{ ...actionButtonStyle(tab === 'confirmed' ? '#ec4899' : '#10b981'), height: 40, width: '100%' }}
                                         >
                                             <MessageCircle size={18} fill="white" strokeWidth={0} />
-                                            <span style={{ fontWeight: 600 }}>WhatsApp</span>
+                                            <span style={{ fontWeight: 600 }}>WhatsApp {tab === 'confirmed' ? '(Start Chat)' : ''}</span>
                                         </button>
                                     )}
 
